@@ -437,6 +437,9 @@ function showMedicationForm() {
     document.getElementById('medEndMonth').value = '';
     document.getElementById('medEndDay').value = '';
     document.getElementById('medEndTime').value = '';
+    // Reset hours interval
+    document.getElementById('hoursIntervalGroup').style.display = 'none';
+    document.getElementById('medHoursInterval').value = '';
     // Update form title
     document.querySelector('#medicationForm h3').textContent = 'Add Medication / Agregar Medicamento';
 }
@@ -451,6 +454,12 @@ async function editMedication(id) {
         document.getElementById('medName').value = med.name;
         document.getElementById('medDosage').value = med.dosage;
         document.getElementById('medFrequency').value = med.frequency;
+        
+        // Handle hours interval
+        if (med.hours_interval) {
+            document.getElementById('medHoursInterval').value = med.hours_interval;
+        }
+        handleFrequencyChange(); // Update form visibility
         
         const times = JSON.parse(med.time_slots);
         document.getElementById('medTimes').value = times.join(', ');
@@ -490,8 +499,16 @@ async function saveMedication(event) {
     const name = document.getElementById('medName').value;
     const dosage = document.getElementById('medDosage').value;
     const frequency = document.getElementById('medFrequency').value;
+    const hoursInterval = frequency === 'Every X hours' ? parseInt(document.getElementById('medHoursInterval').value) : null;
+    
+    if (frequency === 'Every X hours' && (!hoursInterval || hoursInterval < 1)) {
+        showMessage('Please enter valid hours between doses / Por favor ingrese horas válidas entre dosis', 'error');
+        return;
+    }
+    
     const timesStr = document.getElementById('medTimes').value;
-    const time_slots = timesStr.split(',').map(t => t.trim());
+    // For X hours mode, time_slots can be empty or contain initial time
+    const time_slots = timesStr ? timesStr.split(',').map(t => t.trim()).filter(t => t) : [];
     const start_date = getDateTimeFromDropdowns('medStartYear', 'medStartMonth', 'medStartDay', 'medStartTime') || null;
     const end_date = getDateTimeFromDropdowns('medEndYear', 'medEndMonth', 'medEndDay', 'medEndTime') || null;
     
@@ -499,7 +516,8 @@ async function saveMedication(event) {
         name,
         dosage,
         frequency,
-        time_slots,
+        time_slots: time_slots.length > 0 ? time_slots : ['00:00'], // Default if empty
+        hours_interval: hoursInterval,
         start_date,
         end_date
     };
@@ -563,21 +581,78 @@ async function loadMedications() {
             const card = document.createElement('div');
             card.className = 'item-card';
             
-            let timesHTML = times.map(time => {
-                const logForTime = logs.find(log => log.scheduled_time === time && log.status === 'taken');
-                const status = logForTime ? 'taken' : 'pending';
+            // Handle "Every X hours" frequency
+            let timesHTML = '';
+            let nextDoseInfo = '';
+            
+            if (med.frequency === 'Every X hours' && med.hours_interval) {
+                // Find the last taken dose
+                const takenLogs = logs.filter(log => log.status === 'taken').sort((a, b) => 
+                    new Date(b.taken_at || b.scheduled_time) - new Date(a.taken_at || a.scheduled_time)
+                );
                 
-                return `
-                    <div style="display: inline-block; margin-right: 1rem; margin-bottom: 0.5rem;">
-                        <span>${time}</span>
-                        <button class="btn btn-sm ${status === 'taken' ? 'btn-secondary' : 'btn-success'}" 
-                                onclick="logMedication(${med.id}, '${time}')"
-                                ${status === 'taken' ? 'disabled' : ''}>
-                            ${status === 'taken' ? '✓ Taken / Tomado' : 'Mark Taken / Marcar Tomado'}
-                        </button>
-                    </div>
+                if (takenLogs.length > 0) {
+                    const lastDoseTime = new Date(takenLogs[0].taken_at || takenLogs[0].scheduled_time);
+                    const nextDoseTime = new Date(lastDoseTime.getTime() + (med.hours_interval * 60 * 60 * 1000));
+                    const now = new Date();
+                    
+                    if (nextDoseTime > now) {
+                        const hoursUntil = Math.floor((nextDoseTime - now) / (1000 * 60 * 60));
+                        const minutesUntil = Math.floor(((nextDoseTime - now) % (1000 * 60 * 60)) / (1000 * 60));
+                        const nextDoseStr = nextDoseTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                        
+                        nextDoseInfo = `
+                            <div style="margin-top: 0.5rem; padding: 0.75rem; background: var(--light-blue); border-radius: 0.5rem;">
+                                <strong>Next Dose / Próxima Dosis:</strong> ${nextDoseStr}<br>
+                                <small>In ${hoursUntil}h ${minutesUntil}m / En ${hoursUntil}h ${minutesUntil}m</small>
+                            </div>
+                        `;
+                    } else {
+                        nextDoseInfo = `
+                            <div style="margin-top: 0.5rem; padding: 0.75rem; background: var(--warning-yellow); border-radius: 0.5rem;">
+                                <strong>Due Now / Vencido Ahora</strong>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // No doses given yet, show initial time if available
+                    const initialTime = times[0] && times[0] !== '00:00' ? times[0] : 'Now / Ahora';
+                    nextDoseInfo = `
+                        <div style="margin-top: 0.5rem; padding: 0.75rem; background: var(--light-blue); border-radius: 0.5rem;">
+                            <strong>Initial Dose / Dosis Inicial:</strong> ${initialTime}<br>
+                            <small>Every ${med.hours_interval} hours / Cada ${med.hours_interval} horas</small>
+                        </div>
+                    `;
+                }
+                
+                // Button to mark dose as taken
+                timesHTML = `
+                    <button class="btn btn-success btn-sm" onclick="logMedicationNow(${med.id})">
+                        Mark Dose Taken / Marcar Dosis Tomada
+                    </button>
                 `;
-            }).join('');
+            } else {
+                // Regular scheduled times
+                timesHTML = times.map(time => {
+                    const logForTime = logs.find(log => log.scheduled_time === time && log.status === 'taken');
+                    const status = logForTime ? 'taken' : 'pending';
+                    
+                    return `
+                        <div style="display: inline-block; margin-right: 1rem; margin-bottom: 0.5rem;">
+                            <span>${time}</span>
+                            <button class="btn btn-sm ${status === 'taken' ? 'btn-secondary' : 'btn-success'}" 
+                                    onclick="logMedication(${med.id}, '${time}')"
+                                    ${status === 'taken' ? 'disabled' : ''}>
+                                ${status === 'taken' ? '✓ Taken / Tomado' : 'Mark Taken / Marcar Tomado'}
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            const frequencyDisplay = med.frequency === 'Every X hours' && med.hours_interval 
+                ? `Every ${med.hours_interval} hours / Cada ${med.hours_interval} horas`
+                : med.frequency;
             
             card.innerHTML = `
                 <div class="item-header">
@@ -585,7 +660,7 @@ async function loadMedications() {
                         <div class="item-title">${med.name}</div>
                         <div class="item-details">
                             <p><strong>Dosage / Dosis:</strong> ${med.dosage}</p>
-                            <p><strong>Frequency / Frecuencia:</strong> ${med.frequency}</p>
+                            <p><strong>Frequency / Frecuencia:</strong> ${frequencyDisplay}</p>
                         </div>
                     </div>
                     <div class="item-actions">
@@ -594,8 +669,9 @@ async function loadMedications() {
                     </div>
                 </div>
                 <div style="margin-top: 1rem;">
-                    <strong>Scheduled Times / Horarios:</strong><br>
+                    ${med.frequency !== 'Every X hours' ? '<strong>Scheduled Times / Horarios:</strong><br>' : ''}
                     ${timesHTML}
+                    ${nextDoseInfo}
                 </div>
             `;
             
@@ -613,6 +689,30 @@ async function logMedication(medId, scheduledTime) {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify({ scheduled_time: scheduledTime, status: 'taken' })
+        });
+        
+        if (response.ok) {
+            showMessage('Medication marked as taken! / ¡Medicamento marcado como tomado!', 'success');
+            loadMedications();
+            loadDashboard();
+        } else {
+            showMessage('Error logging medication / Error al registrar medicamento', 'error');
+        }
+    } catch (error) {
+        console.error('Error logging medication:', error);
+        showMessage('Error logging medication / Error al registrar medicamento', 'error');
+    }
+}
+
+async function logMedicationNow(medId) {
+    try {
+        const now = new Date();
+        const timeStr = now.toTimeString().slice(0, 5); // HH:MM format
+        
+        const response = await fetch(`${API_URL}/medications/${medId}/log`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ scheduled_time: timeStr, status: 'taken' })
         });
         
         if (response.ok) {

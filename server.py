@@ -72,6 +72,7 @@ def init_db():
             dosage TEXT NOT NULL,
             frequency TEXT NOT NULL,
             time_slots TEXT NOT NULL,
+            hours_interval INTEGER,
             start_date DATETIME,
             end_date DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -79,6 +80,13 @@ def init_db():
             FOREIGN KEY (resident_id) REFERENCES residents (id)
         )
     ''')
+    
+    # Add hours_interval column if it doesn't exist (for existing databases)
+    try:
+        cursor.execute('ALTER TABLE medications ADD COLUMN hours_interval INTEGER')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     
     # Medication logs
     cursor.execute('''
@@ -462,14 +470,15 @@ def medications():
     elif request.method == 'POST':
         data = request.json
         cursor.execute('''
-            INSERT INTO medications (resident_id, name, dosage, frequency, time_slots, start_date, end_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO medications (resident_id, name, dosage, frequency, time_slots, hours_interval, start_date, end_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data.get('resident_id'),
             data['name'],
             data['dosage'],
             data['frequency'],
             json.dumps(data['time_slots']),
+            data.get('hours_interval'),
             data.get('start_date'),
             data.get('end_date')
         ))
@@ -488,13 +497,14 @@ def medication_detail(id):
         data = request.json
         cursor.execute('''
             UPDATE medications 
-            SET name = ?, dosage = ?, frequency = ?, time_slots = ?, start_date = ?, end_date = ?
+            SET name = ?, dosage = ?, frequency = ?, time_slots = ?, hours_interval = ?, start_date = ?, end_date = ?
             WHERE id = ?
         ''', (
             data['name'],
             data['dosage'],
             data['frequency'],
             json.dumps(data['time_slots']),
+            data.get('hours_interval'),
             data.get('start_date'),
             data.get('end_date'),
             id

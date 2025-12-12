@@ -241,20 +241,26 @@
                         </div>
                         <div class="form-group">
                             <label for="medFrequency">Frequency / Frecuencia *</label>
-                            <select id="medFrequency" required>
+                            <select id="medFrequency" required onchange="handleFrequencyChange()">
                                 <option value="Once daily">Once daily / Una vez al día</option>
                                 <option value="Twice daily">Twice daily / Dos veces al día</option>
                                 <option value="Three times daily">Three times daily / Tres veces al día</option>
                                 <option value="Every 4 hours">Every 4 hours / Cada 4 horas</option>
                                 <option value="Every 6 hours">Every 6 hours / Cada 6 horas</option>
                                 <option value="Every 8 hours">Every 8 hours / Cada 8 horas</option>
+                                <option value="Every X hours">Every X hours / Cada X horas</option>
                                 <option value="As needed">As needed / Según sea necesario</option>
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" id="hoursIntervalGroup" style="display: none;">
+                            <label for="medHoursInterval">Hours Between Doses / Horas Entre Dosis *</label>
+                            <input type="number" id="medHoursInterval" min="1" max="24" placeholder="e.g., 3, 4, 6, 8">
+                            <small>Enter number of hours between doses / Ingrese número de horas entre dosis</small>
+                        </div>
+                        <div class="form-group" id="medTimesGroup">
                             <label for="medTimes">Time(s) / Hora(s) *</label>
-                            <input type="text" id="medTimes" placeholder="e.g., 08:00, 20:00" required>
-                            <small>Enter times separated by commas / Ingrese horas separadas por comas</small>
+                            <input type="text" id="medTimes" placeholder="e.g., 08:00, 20:00">
+                            <small>Enter initial time or leave blank for X hours mode / Ingrese hora inicial o deje en blanco para modo X horas</small>
                         </div>
                         <div class="form-group">
                             <label>Start Date / Fecha de Inicio</label>
