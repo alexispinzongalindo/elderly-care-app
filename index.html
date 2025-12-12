@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c5aa0">
+    <title>Elder Care Management - Puerto Rico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display: block;">
+        <div class="form-card login-card">
+            <h2 class="login-title">🏥 Elder Care Management</h2>
+            <h3 class="login-subtitle">Iniciar Sesión / Login</h3>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginUsername">Usuario / Username *</label>
+                    <input type="text" id="loginUsername" required autocomplete="username" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña / Password *</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Enter password">
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Iniciar Sesión / Login</button>
+                </div>
+            </form>
+            <p class="login-hint">Default: admin / admin123</p>
+        </div>
+    </div>
+
+    <!-- Resident Selector -->
+    <div id="residentSelector" class="modal" style="display: none;">
+        <div class="form-card">
+            <h2>Select Resident / Seleccionar Residente</h2>
+            <div class="form-group">
+                <label for="residentSelect">Choose Resident *</label>
+                <select id="residentSelect" class="form-control" required>
+                    <option value="">-- Select a resident --</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="selectResident()">Continue / Continuar</button>
+                <button class="btn btn-secondary" onclick="showAddResidentForm()">+ Add New Resident / Agregar Residente</button>
+            </div>
+            
+            <!-- Add Resident Form -->
+            <div id="addResidentForm" class="form-card" style="display: none; margin-top: 2rem; background: var(--light-gray);">
+                <h3>Add New Resident / Agregar Nuevo Residente</h3>
+                <form id="newResidentForm" onsubmit="saveNewResident(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newFirstName">First Name / Nombre *</label>
+                            <input type="text" id="newFirstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newLastName">Last Name / Apellido *</label>
+                            <input type="text" id="newLastName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of Birth / Fecha de Nacimiento</label>
+                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="newBirthYear" class="form-control">
+                                        <option value="">Year / Año</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="newBirthMonth" class="form-control">
+                                        <option value="">Month / Mes</option>
+                                        <option value="01">January / Enero</option>
+                                        <option value="02">February / Febrero</option>
+                                        <option value="03">March / Marzo</option>
+                                        <option value="04">April / Abril</option>
+                                        <option value="05">May / Mayo</option>
+                                        <option value="06">June / Junio</option>
+                                        <option value="07">July / Julio</option>
+                                        <option value="08">August / Agosto</option>
+                                        <option value="09">September / Septiembre</option>
+                                        <option value="10">October / Octubre</option>
+                                        <option value="11">November / Noviembre</option>
+                                        <option value="12">December / Diciembre</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="newBirthDay" class="form-control">
+                                        <option value="">Day / Día</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newGender">Gender / Género</label>
+                            <select id="newGender">
+                                <option value="">-- Select --</option>
+                                <option value="Male">Male / Masculino</option>
+                                <option value="Female">Female / Femenino</option>
+                                <option value="Other">Other / Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newRoomNumber">Room Number / Número de Habitación</label>
+                            <input type="text" id="newRoomNumber">
+                        </div>
+                        <div class="form-group">
+                            <label for="newBedNumber">Bed Number / Número de Cama</label>
+                            <input type="text" id="newBedNumber">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newEmergencyContact">Emergency Contact Name / Nombre del Contacto de Emergencia</label>
+                        <input type="text" id="newEmergencyContact">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newEmergencyPhone">Emergency Contact Phone / Teléfono</label>
+                            <input type="tel" id="newEmergencyPhone">
+                        </div>
+                        <div class="form-group">
+                            <label for="newEmergencyRelation">Relation / Relación</label>
+                            <input type="text" id="newEmergencyRelation" placeholder="e.g., Son, Daughter / Hijo, Hija">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newMedicalConditions">Medical Conditions / Condiciones Médicas</label>
+                        <textarea id="newMedicalConditions" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="newAllergies">Allergies / Alergias</label>
+                        <textarea id="newAllergies" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="newDietaryRestrictions">Dietary Restrictions / Restricciones Dietéticas</label>
+                        <textarea id="newDietaryRestrictions" rows="2"></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-success">Save Resident / Guardar Residente</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddResidentForm()">Cancel / Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App (hidden until login and resident selected) -->
+    <div id="mainApp" style="display: none;">
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="nav-title">
+                    <img src="attached_assets/generated_images/medical_cross_heart_logo.png" alt="Logo" class="nav-logo">
+                    Elder Care Tracker
+                </h1>
+                <div id="currentResidentInfo" class="resident-badge" style="display: none;">
+                    <strong id="currentResidentName">No resident selected</strong>
+                </div>
+                <div id="liveClock" class="live-clock"></div>
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span id="userName"></span>
+                    <button class="btn btn-sm btn-secondary" onclick="handleLogout()">Logout</button>
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#" class="nav-link active" data-page="dashboard">Dashboard</a></li>
+                    <li><a href="#" class="nav-link" data-page="residents">Residents</a></li>
+                    <li><a href="#" class="nav-link" data-page="medications">Medications</a></li>
+                    <li><a href="#" class="nav-link" data-page="appointments">Appointments</a></li>
+                    <li><a href="#" class="nav-link" data-page="vitalsigns">Vital Signs</a></li>
+                    <li><a href="#" class="nav-link" data-page="calendar">Calendar / Calendario</a></li>
+                    <li><a href="#" class="nav-link" data-page="billing">Billing / Facturación</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="container">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <h2>Today's Overview / Resumen del Día</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Medications / Medicamentos</h3>
+                        <p class="stat-number" id="medsTakenStat">0/0</p>
+                        <p class="stat-label">Taken Today / Tomados Hoy</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Appointments / Citas</h3>
+                        <p class="stat-number" id="apptsToday">0</p>
+                        <p class="stat-label">Scheduled Today / Programadas Hoy</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Residents / Residentes</h3>
+                        <p class="stat-number" id="totalResidents">0</p>
+                        <p class="stat-label">Active / Activos</p>
+                    </div>
+                    <div class="stat-card" id="billingCard" style="display: none;">
+                        <h3>Account Balance / Saldo de Cuenta</h3>
+                        <p class="stat-number" id="accountBalance">$0.00</p>
+                        <p class="stat-label" id="balanceLabel">Balance / Saldo</p>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <h3>Quick Actions / Acciones Rápidas</h3>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="showPage('medications')">Add Medication / Agregar Medicamento</button>
+                        <button class="btn btn-primary" onclick="showPage('appointments')">Add Appointment / Agregar Cita</button>
+                        <button class="btn btn-primary" onclick="showPage('vitalsigns')">Record Vital Signs / Registrar Signos Vitales</button>
+                        <button class="btn btn-primary" onclick="showPage('billing')">Billing / Facturación</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Residents Page -->
+            <div id="residents" class="page">
+                <h2>Residents Management / Gestión de Residentes</h2>
+                <button class="btn btn-primary" onclick="showAddResidentForm()">+ Add New Resident / Agregar Nuevo Residente</button>
+                <div id="residentsList" class="item-list"></div>
+            </div>
+
+            <!-- Medications Page -->
+            <div id="medications" class="page">
+                <h2>Medication Management / Gestión de Medicamentos</h2>
+                <button class="btn btn-primary" onclick="showMedicationForm()">+ Add New Medication / Agregar Medicamento</button>
+                
+                <div id="medicationForm" class="form-card" style="display: none;">
+                    <h3>Add Medication / Agregar Medicamento</h3>
+                    <form id="medForm" onsubmit="saveMedication(event)">
+                        <div class="form-group">
+                            <label for="medName">Medication Name / Nombre del Medicamento *</label>
+                            <input type="text" id="medName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="medDosage">Dosage / Dosis *</label>
+                            <input type="text" id="medDosage" placeholder="e.g., 10mg" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="medFrequency">Frequency / Frecuencia *</label>
+                            <select id="medFrequency" required>
+                                <option value="Once daily">Once daily / Una vez al día</option>
+                                <option value="Twice daily">Twice daily / Dos veces al día</option>
+                                <option value="Three times daily">Three times daily / Tres veces al día</option>
+                                <option value="Every 4 hours">Every 4 hours / Cada 4 horas</option>
+                                <option value="Every 6 hours">Every 6 hours / Cada 6 horas</option>
+                                <option value="Every 8 hours">Every 8 hours / Cada 8 horas</option>
+                                <option value="As needed">As needed / Según sea necesario</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="medTimes">Time(s) / Hora(s) *</label>
+                            <input type="text" id="medTimes" placeholder="e.g., 08:00, 20:00" required>
+                            <small>Enter times separated by commas / Ingrese horas separadas por comas</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Start Date / Fecha de Inicio</label>
+                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medStartYear" class="form-control">
+                                        <option value="">Year / Año</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medStartMonth" class="form-control">
+                                        <option value="">Month / Mes</option>
+                                        <option value="01">Jan / Ene</option>
+                                        <option value="02">Feb</option>
+                                        <option value="03">Mar</option>
+                                        <option value="04">Apr / Abr</option>
+                                        <option value="05">May / May</option>
+                                        <option value="06">Jun</option>
+                                        <option value="07">Jul</option>
+                                        <option value="08">Aug / Ago</option>
+                                        <option value="09">Sep</option>
+                                        <option value="10">Oct</option>
+                                        <option value="11">Nov</option>
+                                        <option value="12">Dec / Dic</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medStartDay" class="form-control">
+                                        <option value="">Day / Día</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <input type="time" id="medStartTime" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>End Date / Fecha de Fin</label>
+                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medEndYear" class="form-control">
+                                        <option value="">Year / Año</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medEndMonth" class="form-control">
+                                        <option value="">Month / Mes</option>
+                                        <option value="01">Jan / Ene</option>
+                                        <option value="02">Feb</option>
+                                        <option value="03">Mar</option>
+                                        <option value="04">Apr / Abr</option>
+                                        <option value="05">May / May</option>
+                                        <option value="06">Jun</option>
+                                        <option value="07">Jul</option>
+                                        <option value="08">Aug / Ago</option>
+                                        <option value="09">Sep</option>
+                                        <option value="10">Oct</option>
+                                        <option value="11">Nov</option>
+                                        <option value="12">Dec / Dic</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medEndDay" class="form-control">
+                                        <option value="">Day / Día</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <input type="time" id="medEndTime" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success">Save / Guardar</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideMedicationForm()">Cancel / Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="medicationList" class="item-list"></div>
+            </div>
+
+            <!-- Appointments Page -->
+            <div id="appointments" class="page">
+                <h2>Appointment Tracking / Seguimiento de Citas</h2>
+                <button class="btn btn-primary" onclick="showAppointmentForm()">+ Add New Appointment / Agregar Nueva Cita</button>
+                
+                <div id="appointmentForm" class="form-card" style="display: none;">
+                    <h3>Add Appointment / Agregar Cita</h3>
+                    <form id="apptForm" onsubmit="saveAppointment(event)">
+                        <div class="form-group">
+                            <label>Date / Fecha *</label>
+                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="apptYear" class="form-control" required>
+                                        <option value="">Year / Año *</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="apptMonth" class="form-control" required>
+                                        <option value="">Month / Mes *</option>
+                                        <option value="01">January / Enero</option>
+                                        <option value="02">February / Febrero</option>
+                                        <option value="03">March / Marzo</option>
+                                        <option value="04">April / Abril</option>
+                                        <option value="05">May / Mayo</option>
+                                        <option value="06">June / Junio</option>
+                                        <option value="07">July / Julio</option>
+                                        <option value="08">August / Agosto</option>
+                                        <option value="09">September / Septiembre</option>
+                                        <option value="10">October / Octubre</option>
+                                        <option value="11">November / Noviembre</option>
+                                        <option value="12">December / Diciembre</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="apptDay" class="form-control" required>
+                                        <option value="">Day / Día *</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="apptTime">Time / Hora *</label>
+                            <input type="time" id="apptTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apptDoctor">Doctor/Provider / Doctor/Proveedor *</label>
+                            <input type="text" id="apptDoctor" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apptFacility">Facility / Instalación</label>
+                            <input type="text" id="apptFacility">
+                        </div>
+                        <div class="form-group">
+                            <label for="apptPurpose">Purpose / Propósito</label>
+                            <input type="text" id="apptPurpose">
+                        </div>
+                        <div class="form-group">
+                            <label for="apptNotes">Notes / Notas</label>
+                            <textarea id="apptNotes" rows="3"></textarea>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success">Save / Guardar</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideAppointmentForm()">Cancel / Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="appointmentList" class="item-list"></div>
+            </div>
+
+            <!-- Vital Signs Page -->
+            <div id="vitalsigns" class="page">
+                <h2>Vital Signs Tracker / Registro de Signos Vitales</h2>
+                
+                <div class="form-card">
+                    <h3>Record Vital Signs / Registrar Signos Vitales</h3>
+                    <form id="vitalSignsForm" onsubmit="saveVitalSign(event)">
+                        <div class="form-group">
+                            <label>Date & Time / Fecha y Hora *</label>
+                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="vsYear" class="form-control" required>
+                                        <option value="">Year / Año *</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="vsMonth" class="form-control" required>
+                                        <option value="">Month / Mes *</option>
+                                        <option value="01">Jan / Ene</option>
+                                        <option value="02">Feb</option>
+                                        <option value="03">Mar</option>
+                                        <option value="04">Apr / Abr</option>
+                                        <option value="05">May / May</option>
+                                        <option value="06">Jun</option>
+                                        <option value="07">Jul</option>
+                                        <option value="08">Aug / Ago</option>
+                                        <option value="09">Sep</option>
+                                        <option value="10">Oct</option>
+                                        <option value="11">Nov</option>
+                                        <option value="12">Dec / Dic</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="vsDay" class="form-control" required>
+                                        <option value="">Day / Día *</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <input type="time" id="vsTime" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4>🩸 Blood Pressure / Presión Arterial</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="vsSystolic">Systolic (mmHg)</label>
+                                    <input type="number" id="vsSystolic" min="0" max="300" placeholder="120">
+                                </div>
+                                <div class="form-group">
+                                    <label for="vsDiastolic">Diastolic (mmHg)</label>
+                                    <input type="number" id="vsDiastolic" min="0" max="200" placeholder="80">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4>🩹 Blood Glucose / Glucosa en Sangre</h4>
+                            <div class="form-group">
+                                <label for="vsGlucose">Glucose Level (mg/dL)</label>
+                                <input type="number" id="vsGlucose" min="0" max="600" step="0.1" placeholder="100">
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4>🌡️ Temperature / Temperatura</h4>
+                            <div class="form-group">
+                                <label for="vsTemperature">Temperature (°F)</label>
+                                <input type="number" id="vsTemperature" min="90" max="110" step="0.1" placeholder="98.6">
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4>❤️ Heart Rate / Frecuencia Cardíaca</h4>
+                            <div class="form-group">
+                                <label for="vsHeartRate">Heart Rate (bpm)</label>
+                                <input type="number" id="vsHeartRate" min="30" max="200" placeholder="72">
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4>⚖️ Weight / Peso</h4>
+                            <div class="form-group">
+                                <label for="vsWeight">Weight (lbs)</label>
+                                <input type="number" id="vsWeight" min="0" max="1000" step="0.1" placeholder="150">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="vsNotes">Notes / Notas</label>
+                            <textarea id="vsNotes" rows="2" placeholder="Any observations..."></textarea>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success">💾 Save Vital Signs / Guardar Signos Vitales</button>
+                            <button type="button" class="btn btn-secondary" onclick="clearVitalSignsForm()">Clear / Limpiar</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h3>Vital Signs History / Historial de Signos Vitales</h3>
+                    <div id="vitalSignsList" class="item-list"></div>
+                </div>
+            </div>
+
+            <!-- Calendar Page -->
+            <div id="calendar" class="page">
+                <h2>Activity Calendar / Calendario de Actividades</h2>
+                
+                <div class="form-card">
+                    <div class="calendar-controls" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                        <div class="form-group" style="margin: 0; flex: 1; min-width: 120px;">
+                            <label for="calendarYear" style="font-size: 0.9rem; margin-bottom: 0.25rem;">Year / Año</label>
+                            <select id="calendarYear" class="form-control" style="padding: 0.5rem;">
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin: 0; flex: 1; min-width: 150px;">
+                            <label for="calendarMonth" style="font-size: 0.9rem; margin-bottom: 0.25rem;">Month / Mes</label>
+                            <select id="calendarMonth" class="form-control" style="padding: 0.5rem;">
+                                <option value="0">January / Enero</option>
+                                <option value="1">February / Febrero</option>
+                                <option value="2">March / Marzo</option>
+                                <option value="3">April / Abril</option>
+                                <option value="4">May / Mayo</option>
+                                <option value="5">June / Junio</option>
+                                <option value="6">July / Julio</option>
+                                <option value="7">August / Agosto</option>
+                                <option value="8">September / Septiembre</option>
+                                <option value="9">October / Octubre</option>
+                                <option value="10">November / Noviembre</option>
+                                <option value="11">December / Diciembre</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                            <button class="btn btn-secondary" onclick="changeCalendarMonth(-1)">← Previous / Anterior</button>
+                            <button class="btn btn-secondary" onclick="changeCalendarMonth(1)">Next / Siguiente →</button>
+                            <button class="btn btn-primary" onclick="goToToday()">Today / Hoy</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="calendarSearch" style="font-size: 0.9rem; margin-bottom: 0.25rem;">Search Activities / Buscar Actividades</label>
+                        <input type="text" id="calendarSearch" class="form-control" placeholder="Search by name, doctor, medication... / Buscar por nombre, doctor, medicamento..." style="padding: 0.5rem;">
+                    </div>
+                </div>
+                
+                <div id="calendarDisplay" class="calendar-container"></div>
+            </div>
+
+            <!-- Billing Page -->
+            <div id="billing" class="page">
+                <h2>Billing & Payments / Facturación y Pagos</h2>
+                
+                <!-- Account Balance Summary -->
+                <div id="accountBalanceCard" class="form-card" style="display: none;">
+                    <h3>Account Balance / Saldo de Cuenta</h3>
+                    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 1rem;">
+                        <div class="stat-card">
+                            <h4>Total Billed / Total Facturado</h4>
+                            <p class="stat-number" id="totalBilled">$0.00</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Total Paid / Total Pagado</h4>
+                            <p class="stat-number" style="color: var(--success-green);" id="totalPaid">$0.00</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Balance / Saldo</h4>
+                            <p class="stat-number" id="currentBalance">$0.00</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Pending / Pendiente</h4>
+                            <p class="stat-number" style="color: var(--warning-color);" id="pendingAmount">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Bill Form -->
+                <div class="form-card">
+                    <h3>Create Bill / Crear Factura</h3>
+                    <button class="btn btn-primary" onclick="showBillForm()">+ Add New Bill / Agregar Nueva Factura</button>
+                    
+                    <div id="billForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
+                        <form id="newBillForm" onsubmit="saveBill(event)">
+                            <div class="form-group">
+                                <label>Billing Date / Fecha de Factura *</label>
+                                <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billYear" class="form-control" required>
+                                            <option value="">Year / Año *</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billMonth" class="form-control" required>
+                                            <option value="">Month / Mes *</option>
+                                            <option value="01">January / Enero</option>
+                                            <option value="02">February / Febrero</option>
+                                            <option value="03">March / Marzo</option>
+                                            <option value="04">April / Abril</option>
+                                            <option value="05">May / Mayo</option>
+                                            <option value="06">June / Junio</option>
+                                            <option value="07">July / Julio</option>
+                                            <option value="08">August / Agosto</option>
+                                            <option value="09">September / Septiembre</option>
+                                            <option value="10">October / Octubre</option>
+                                            <option value="11">November / Noviembre</option>
+                                            <option value="12">December / Diciembre</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billDay" class="form-control" required>
+                                            <option value="">Day / Día *</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Due Date / Fecha de Vencimiento *</label>
+                                <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billDueYear" class="form-control" required>
+                                            <option value="">Year / Año *</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billDueMonth" class="form-control" required>
+                                            <option value="">Month / Mes *</option>
+                                            <option value="01">January / Enero</option>
+                                            <option value="02">February / Febrero</option>
+                                            <option value="03">March / Marzo</option>
+                                            <option value="04">April / Abril</option>
+                                            <option value="05">May / Mayo</option>
+                                            <option value="06">June / Junio</option>
+                                            <option value="07">July / Julio</option>
+                                            <option value="08">August / Agosto</option>
+                                            <option value="09">September / Septiembre</option>
+                                            <option value="10">October / Octubre</option>
+                                            <option value="11">November / Noviembre</option>
+                                            <option value="12">December / Diciembre</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billDueDay" class="form-control" required>
+                                            <option value="">Day / Día *</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="billAmount">Amount / Monto ($) *</label>
+                                    <input type="number" id="billAmount" step="0.01" min="0" required placeholder="0.00">
+                                </div>
+                                <div class="form-group">
+                                    <label for="billCategory">Category / Categoría</label>
+                                    <select id="billCategory">
+                                        <option value="Monthly Fee">Monthly Fee / Cuota Mensual</option>
+                                        <option value="Medical Services">Medical Services / Servicios Médicos</option>
+                                        <option value="Medications">Medications / Medicamentos</option>
+                                        <option value="Special Care">Special Care / Cuidado Especial</option>
+                                        <option value="Other">Other / Otro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="billDescription">Description / Descripción</label>
+                                <input type="text" id="billDescription" placeholder="e.g., Monthly care fee for December">
+                            </div>
+                            <div class="form-group">
+                                <label for="billNotes">Notes / Notas</label>
+                                <textarea id="billNotes" rows="2"></textarea>
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-success">Save Bill / Guardar Factura</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideBillForm()">Cancel / Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Record Payment Form -->
+                <div class="form-card">
+                    <h3>Record Payment / Registrar Pago</h3>
+                    <button class="btn btn-primary" onclick="showPaymentForm()">+ Record Payment / Registrar Pago</button>
+                    
+                    <div id="paymentForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
+                        <form id="newPaymentForm" onsubmit="savePayment(event)">
+                            <div class="form-group">
+                                <label>Payment Date / Fecha de Pago *</label>
+                                <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="paymentYear" class="form-control" required>
+                                            <option value="">Year / Año *</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="paymentMonth" class="form-control" required>
+                                            <option value="">Month / Mes *</option>
+                                            <option value="01">January / Enero</option>
+                                            <option value="02">February / Febrero</option>
+                                            <option value="03">March / Marzo</option>
+                                            <option value="04">April / Abril</option>
+                                            <option value="05">May / Mayo</option>
+                                            <option value="06">June / Junio</option>
+                                            <option value="07">July / Julio</option>
+                                            <option value="08">August / Agosto</option>
+                                            <option value="09">September / Septiembre</option>
+                                            <option value="10">October / Octubre</option>
+                                            <option value="11">November / Noviembre</option>
+                                            <option value="12">December / Diciembre</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="paymentDay" class="form-control" required>
+                                            <option value="">Day / Día *</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                <div class="form-group">
+                                    <label for="paymentAmount">Amount / Monto ($) *</label>
+                                    <input type="number" id="paymentAmount" step="0.01" min="0" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="paymentMethod">Payment Method / Método de Pago</label>
+                                    <select id="paymentMethod">
+                                        <option value="Cash">Cash / Efectivo</option>
+                                        <option value="Check">Check / Cheque</option>
+                                        <option value="Credit Card">Credit Card / Tarjeta de Crédito</option>
+                                        <option value="Debit Card">Debit Card / Tarjeta de Débito</option>
+                                        <option value="Bank Transfer">Bank Transfer / Transferencia Bancaria</option>
+                                        <option value="Other">Other / Otro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="paymentReference">Reference Number / Número de Referencia</label>
+                                    <input type="text" id="paymentReference" placeholder="Check #, Transaction ID, etc.">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="paymentBillId">Apply to Bill / Aplicar a Factura (Optional)</label>
+                                <select id="paymentBillId">
+                                    <option value="">-- Select bill -- / Seleccionar factura</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="paymentNotes">Notes / Notas</label>
+                                <textarea id="paymentNotes" rows="2"></textarea>
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-success">Record Payment / Registrar Pago</button>
+                                <button type="button" class="btn btn-secondary" onclick="hidePaymentForm()">Cancel / Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Bills List -->
+                <div style="margin-top: 2rem;">
+                    <h3>Bills / Facturas</h3>
+                    <div id="billsList" class="item-list"></div>
+                </div>
+
+                <!-- Payments List -->
+                <div style="margin-top: 2rem;">
+                    <h3>Payment History / Historial de Pagos</h3>
+                    <div id="paymentsList" class="item-list"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="messageBox" class="message-box"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
