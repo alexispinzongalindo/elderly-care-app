@@ -72,6 +72,7 @@ def init_db():
             dosage TEXT NOT NULL,
             frequency TEXT NOT NULL,
             time_slots TEXT NOT NULL,
+            hours_interval INTEGER,
             start_date DATETIME,
             end_date DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -79,6 +80,12 @@ def init_db():
             FOREIGN KEY (resident_id) REFERENCES residents (id)
         )
     ''')
+    
+    # Add hours_interval column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE medications ADD COLUMN hours_interval INTEGER')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     
     # Medication logs
     cursor.execute('''
@@ -175,6 +182,73 @@ def init_db():
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             expires_at DATETIME NOT NULL,
             FOREIGN KEY (staff_id) REFERENCES staff (id)
+        )
+    ''')
+    
+    # Incident Reports table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS incident_reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resident_id INTEGER NOT NULL,
+            incident_date DATETIME NOT NULL,
+            incident_type TEXT NOT NULL,
+            location TEXT,
+            description TEXT NOT NULL,
+            severity TEXT DEFAULT 'minor',
+            witnesses TEXT,
+            actions_taken TEXT,
+            family_notified BOOLEAN DEFAULT 0,
+            family_notification_date DATETIME,
+            follow_up_required BOOLEAN DEFAULT 0,
+            follow_up_notes TEXT,
+            photos TEXT,
+            staff_id INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (resident_id) REFERENCES residents (id),
+            FOREIGN KEY (staff_id) REFERENCES staff (id)
+        )
+    ''')
+    
+    # Daily Care Notes table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS daily_care_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resident_id INTEGER NOT NULL,
+            note_date DATE NOT NULL,
+            shift TEXT,
+            meal_breakfast TEXT,
+            meal_lunch TEXT,
+            meal_dinner TEXT,
+            meal_snacks TEXT,
+            bathing TEXT,
+            hygiene TEXT,
+            sleep_hours REAL,
+            sleep_quality TEXT,
+            mood TEXT,
+            behavior_notes TEXT,
+            activities TEXT,
+            general_notes TEXT,
+            staff_id INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (resident_id) REFERENCES residents (id),
+            FOREIGN KEY (staff_id) REFERENCES staff (id)
+        )
+    ''')
+    
+    # Notifications table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resident_id INTEGER,
+            notification_type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            message TEXT NOT NULL,
+            priority TEXT DEFAULT 'normal',
+            read BOOLEAN DEFAULT 0,
+            action_url TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            expires_at DATETIME,
+            FOREIGN KEY (resident_id) REFERENCES residents (id)
         )
     ''')
     
@@ -334,35 +408,60 @@ def residents():
         return jsonify(residents_list)
     
     elif request.method == 'POST':
-        data = request.json
-        cursor.execute('''
-            INSERT INTO residents (
-                first_name, last_name, date_of_birth, room_number, bed_number,
-                gender, emergency_contact_name, emergency_contact_phone,
-                emergency_contact_relation, insurance_provider, insurance_number,
-                medical_conditions, allergies, dietary_restrictions, notes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            data.get('first_name'),
-            data.get('last_name'),
-            data.get('date_of_birth'),
-            data.get('room_number'),
-            data.get('bed_number'),
-            data.get('gender'),
-            data.get('emergency_contact_name'),
-            data.get('emergency_contact_phone'),
-            data.get('emergency_contact_relation'),
-            data.get('insurance_provider'),
-            data.get('insurance_number'),
-            data.get('medical_conditions'),
-            data.get('allergies'),
-            data.get('dietary_restrictions'),
-            data.get('notes')
-        ))
-        conn.commit()
-        resident_id = cursor.lastrowid
-        conn.close()
-        return jsonify({'id': resident_id, 'message': 'Resident added successfully'}), 201
+        try:
+            data = request.json
+            if not data:
+                conn.close()
+                return jsonify({'error': 'No data provided'}), 400
+            
+            # Validate required fields
+            if not data.get('first_name') or not data.get('first_name').strip():
+                conn.close()
+                return jsonify({'error': 'First name is required / El nombre es requerido'}), 400
+            
+            if not data.get('last_name') or not data.get('last_name').strip():
+                conn.close()
+                return jsonify({'error': 'Last name is required / El apellido es requerido'}), 400
+            
+            cursor.execute('''
+                INSERT INTO residents (
+                    first_name, last_name, date_of_birth, room_number, bed_number,
+                    gender, emergency_contact_name, emergency_contact_phone,
+                    emergency_contact_relation, insurance_provider, insurance_number,
+                    medical_conditions, allergies, dietary_restrictions, notes, photo_path
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                data.get('first_name'),
+                data.get('last_name'),
+                data.get('date_of_birth'),
+                data.get('room_number'),
+                data.get('bed_number'),
+                data.get('gender'),
+                data.get('emergency_contact_name'),
+                data.get('emergency_contact_phone'),
+                data.get('emergency_contact_relation'),
+                data.get('insurance_provider'),
+                data.get('insurance_number'),
+                data.get('medical_conditions'),
+                data.get('allergies'),
+                data.get('dietary_restrictions'),
+                data.get('notes'),
+                data.get('photo_path')
+            ))
+            conn.commit()
+            resident_id = cursor.lastrowid
+            conn.close()
+            return jsonify({'id': resident_id, 'message': 'Resident added successfully'}), 201
+        except sqlite3.Error as e:
+            conn.rollback()
+            conn.close()
+            print(f"Database error adding resident: {e}")
+            return jsonify({'error': f'Database error: {str(e)}'}), 500
+        except Exception as e:
+            conn.rollback()
+            conn.close()
+            print(f"Error adding resident: {e}")
+            return jsonify({'error': f'Error adding resident: {str(e)}'}), 500
 
 @app.route('/api/residents/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @require_auth
@@ -387,7 +486,7 @@ def resident_detail(id):
                 bed_number = ?, gender = ?, emergency_contact_name = ?,
                 emergency_contact_phone = ?, emergency_contact_relation = ?,
                 insurance_provider = ?, insurance_number = ?, medical_conditions = ?,
-                allergies = ?, dietary_restrictions = ?, notes = ?,
+                allergies = ?, dietary_restrictions = ?, notes = ?, photo_path = ?,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         ''', (
@@ -406,6 +505,7 @@ def resident_detail(id):
             data.get('allergies'),
             data.get('dietary_restrictions'),
             data.get('notes'),
+            data.get('photo_path'),
             id
         ))
         conn.commit()
@@ -462,14 +562,15 @@ def medications():
     elif request.method == 'POST':
         data = request.json
         cursor.execute('''
-            INSERT INTO medications (resident_id, name, dosage, frequency, time_slots, start_date, end_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO medications (resident_id, name, dosage, frequency, time_slots, hours_interval, start_date, end_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data.get('resident_id'),
             data['name'],
             data['dosage'],
             data['frequency'],
             json.dumps(data['time_slots']),
+            data.get('hours_interval'),
             data.get('start_date'),
             data.get('end_date')
         ))
@@ -478,23 +579,32 @@ def medications():
         conn.close()
         return jsonify({'id': med_id, 'message': 'Medication added successfully'}), 201
 
-@app.route('/api/medications/<int:id>', methods=['PUT', 'DELETE'])
+@app.route('/api/medications/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @require_auth
 def medication_detail(id):
     conn = get_db()
     cursor = conn.cursor()
     
-    if request.method == 'PUT':
+    if request.method == 'GET':
+        cursor.execute('SELECT * FROM medications WHERE id = ? AND active = 1', (id,))
+        med = cursor.fetchone()
+        conn.close()
+        if not med:
+            return jsonify({'error': 'Medication not found'}), 404
+        return jsonify(dict(med))
+    
+    elif request.method == 'PUT':
         data = request.json
         cursor.execute('''
             UPDATE medications 
-            SET name = ?, dosage = ?, frequency = ?, time_slots = ?, start_date = ?, end_date = ?
+            SET name = ?, dosage = ?, frequency = ?, time_slots = ?, hours_interval = ?, start_date = ?, end_date = ?
             WHERE id = ?
         ''', (
             data['name'],
             data['dosage'],
             data['frequency'],
             json.dumps(data['time_slots']),
+            data.get('hours_interval'),
             data.get('start_date'),
             data.get('end_date'),
             id
@@ -580,13 +690,21 @@ def appointments():
         conn.close()
         return jsonify({'id': appt_id, 'message': 'Appointment added successfully'}), 201
 
-@app.route('/api/appointments/<int:id>', methods=['PUT', 'DELETE'])
+@app.route('/api/appointments/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @require_auth
 def appointment_detail(id):
     conn = get_db()
     cursor = conn.cursor()
     
-    if request.method == 'PUT':
+    if request.method == 'GET':
+        cursor.execute('SELECT * FROM appointments WHERE id = ?', (id,))
+        appt = cursor.fetchone()
+        conn.close()
+        if not appt:
+            return jsonify({'error': 'Appointment not found'}), 404
+        return jsonify(dict(appt))
+    
+    elif request.method == 'PUT':
         data = request.json
         cursor.execute('''
             UPDATE appointments 
@@ -657,13 +775,21 @@ def vital_signs():
         conn.close()
         return jsonify({'id': sign_id, 'message': 'Vital signs recorded successfully'}), 201
 
-@app.route('/api/vital-signs/<int:sign_id>', methods=['PUT', 'DELETE'])
+@app.route('/api/vital-signs/<int:sign_id>', methods=['GET', 'PUT', 'DELETE'])
 @require_auth
 def vital_sign_detail(sign_id):
     conn = get_db()
     cursor = conn.cursor()
     
-    if request.method == 'PUT':
+    if request.method == 'GET':
+        cursor.execute('SELECT * FROM vital_signs WHERE id = ?', (sign_id,))
+        sign = cursor.fetchone()
+        conn.close()
+        if not sign:
+            return jsonify({'error': 'Vital sign not found'}), 404
+        return jsonify(dict(sign))
+    
+    elif request.method == 'PUT':
         data = request.json
         cursor.execute('''
             UPDATE vital_signs 
@@ -1089,6 +1215,421 @@ def staff():
         conn.close()
         return jsonify({'id': staff_id, 'message': 'Staff member added successfully'}), 201
 
+@app.route('/api/staff/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@require_role('admin')
+def staff_detail(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        cursor.execute('SELECT id, username, full_name, role, email, phone, active, created_at FROM staff WHERE id = ?', (id,))
+        staff = cursor.fetchone()
+        conn.close()
+        if not staff:
+            return jsonify({'error': 'Staff member not found'}), 404
+        return jsonify(dict(staff))
+    
+    elif request.method == 'PUT':
+        data = request.json
+        # If password is provided, hash it; otherwise keep existing password
+        if data.get('password'):
+            password_hash = hash_password(data.get('password'))
+            cursor.execute('''
+                UPDATE staff 
+                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, active = ?
+                WHERE id = ?
+            ''', (
+                data.get('username'),
+                data.get('full_name'),
+                data.get('role', 'caregiver'),
+                data.get('email'),
+                data.get('phone'),
+                data.get('active', True),
+                id
+            ))
+            # Update password separately if provided
+            cursor.execute('UPDATE staff SET password_hash = ? WHERE id = ?', (password_hash, id))
+        else:
+            cursor.execute('''
+                UPDATE staff 
+                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, active = ?
+                WHERE id = ?
+            ''', (
+                data.get('username'),
+                data.get('full_name'),
+                data.get('role', 'caregiver'),
+                data.get('email'),
+                data.get('phone'),
+                data.get('active', True),
+                id
+            ))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Staff member updated successfully'})
+    
+    elif request.method == 'DELETE':
+        # Soft delete - set active to 0
+        cursor.execute('UPDATE staff SET active = 0 WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Staff member deactivated successfully'})
+
+# Incident Reports
+@app.route('/api/incidents', methods=['GET', 'POST'])
+@require_auth
+def incidents():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        resident_id = request.args.get('resident_id')
+        if resident_id:
+            cursor.execute('''
+                SELECT ir.*, r.first_name || ' ' || r.last_name as resident_name,
+                       s.full_name as staff_name
+                FROM incident_reports ir
+                JOIN residents r ON ir.resident_id = r.id
+                JOIN staff s ON ir.staff_id = s.id
+                WHERE ir.resident_id = ?
+                ORDER BY ir.incident_date DESC
+            ''', (resident_id,))
+        else:
+            cursor.execute('''
+                SELECT ir.*, r.first_name || ' ' || r.last_name as resident_name,
+                       s.full_name as staff_name
+                FROM incident_reports ir
+                JOIN residents r ON ir.resident_id = r.id
+                JOIN staff s ON ir.staff_id = s.id
+                ORDER BY ir.incident_date DESC
+            ''')
+        incidents = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(incidents)
+    
+    elif request.method == 'POST':
+        data = request.json
+        
+        # Validate required fields
+        if not data.get('resident_id'):
+            conn.close()
+            return jsonify({'error': 'Resident ID is required / Se requiere ID de residente'}), 400
+        if not data.get('incident_date'):
+            conn.close()
+            return jsonify({'error': 'Incident date is required / Se requiere fecha del incidente'}), 400
+        if not data.get('incident_type'):
+            conn.close()
+            return jsonify({'error': 'Incident type is required / Se requiere tipo de incidente'}), 400
+        if not data.get('description'):
+            conn.close()
+            return jsonify({'error': 'Description is required / Se requiere descripción'}), 400
+        
+        try:
+            cursor.execute('''
+                INSERT INTO incident_reports (
+                    resident_id, incident_date, incident_type, location, description,
+                    severity, witnesses, actions_taken, family_notified,
+                    family_notification_date, follow_up_required, follow_up_notes,
+                    photos, staff_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                int(data.get('resident_id')),
+                data.get('incident_date'),
+                data.get('incident_type'),
+                data.get('location') or '',
+                data.get('description'),
+                data.get('severity', 'minor'),
+                data.get('witnesses') or '',
+                data.get('actions_taken') or '',
+                1 if data.get('family_notified') else 0,
+                data.get('family_notification_date') or None,
+                1 if data.get('follow_up_required') else 0,
+                data.get('follow_up_notes') or '',
+                data.get('photos') or '',
+                request.current_staff['id']
+            ))
+            conn.commit()
+            incident_id = cursor.lastrowid
+            
+            # Create notification for incident
+            try:
+                cursor.execute('''
+                    INSERT INTO notifications (resident_id, notification_type, title, message, priority)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (
+                    int(data.get('resident_id')),
+                    'incident',
+                    f'New Incident Report - {data.get("incident_type", "Incident")}',
+                    f'Incident reported: {data.get("description", "")[:100]}',
+                    'high' if data.get('severity') in ['major', 'critical'] else 'normal'
+                ))
+                conn.commit()
+            except Exception as notif_error:
+                print(f'Warning: Could not create notification: {notif_error}')
+            
+            conn.close()
+            return jsonify({'id': incident_id, 'message': 'Incident report created successfully'}), 201
+        except sqlite3.IntegrityError as e:
+            conn.close()
+            return jsonify({'error': f'Database error: {str(e)}'}), 400
+        except Exception as e:
+            conn.close()
+            return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+@app.route('/api/incidents/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@require_auth
+def incident_detail(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        cursor.execute('''
+            SELECT ir.*, r.first_name || ' ' || r.last_name as resident_name,
+                   s.full_name as staff_name
+            FROM incident_reports ir
+            JOIN residents r ON ir.resident_id = r.id
+            JOIN staff s ON ir.staff_id = s.id
+            WHERE ir.id = ?
+        ''', (id,))
+        incident = cursor.fetchone()
+        conn.close()
+        if not incident:
+            return jsonify({'error': 'Incident report not found'}), 404
+        return jsonify(dict(incident))
+    
+    elif request.method == 'PUT':
+        data = request.json
+        cursor.execute('''
+            UPDATE incident_reports 
+            SET incident_date = ?, incident_type = ?, location = ?, description = ?,
+                severity = ?, witnesses = ?, actions_taken = ?, family_notified = ?,
+                family_notification_date = ?, follow_up_required = ?, follow_up_notes = ?,
+                photos = ?
+            WHERE id = ?
+        ''', (
+            data.get('incident_date'),
+            data.get('incident_type'),
+            data.get('location'),
+            data.get('description'),
+            data.get('severity'),
+            data.get('witnesses'),
+            data.get('actions_taken'),
+            data.get('family_notified'),
+            data.get('family_notification_date'),
+            data.get('follow_up_required'),
+            data.get('follow_up_notes'),
+            data.get('photos'),
+            id
+        ))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Incident report updated successfully'})
+    
+    elif request.method == 'DELETE':
+        cursor.execute('DELETE FROM incident_reports WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Incident report deleted successfully'})
+
+# Daily Care Notes
+@app.route('/api/care-notes', methods=['GET', 'POST'])
+@require_auth
+def care_notes():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        resident_id = request.args.get('resident_id')
+        note_date = request.args.get('date')
+        
+        query = '''
+            SELECT cn.*, r.first_name || ' ' || r.last_name as resident_name,
+                   s.full_name as staff_name
+            FROM daily_care_notes cn
+            JOIN residents r ON cn.resident_id = r.id
+            JOIN staff s ON cn.staff_id = s.id
+            WHERE 1=1
+        '''
+        params = []
+        
+        if resident_id:
+            query += ' AND cn.resident_id = ?'
+            params.append(resident_id)
+        
+        if note_date:
+            query += ' AND cn.note_date = ?'
+            params.append(note_date)
+        
+        query += ' ORDER BY cn.note_date DESC, cn.created_at DESC'
+        
+        cursor.execute(query, params)
+        notes = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(notes)
+    
+    elif request.method == 'POST':
+        data = request.json
+        cursor.execute('''
+            INSERT INTO daily_care_notes (
+                resident_id, note_date, shift, meal_breakfast, meal_lunch,
+                meal_dinner, meal_snacks, bathing, hygiene, sleep_hours,
+                sleep_quality, mood, behavior_notes, activities, general_notes, staff_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data.get('resident_id'),
+            data.get('note_date'),
+            data.get('shift'),
+            data.get('meal_breakfast'),
+            data.get('meal_lunch'),
+            data.get('meal_dinner'),
+            data.get('meal_snacks'),
+            data.get('bathing'),
+            data.get('hygiene'),
+            data.get('sleep_hours'),
+            data.get('sleep_quality'),
+            data.get('mood'),
+            data.get('behavior_notes'),
+            data.get('activities'),
+            data.get('general_notes'),
+            request.current_staff['id']
+        ))
+        conn.commit()
+        note_id = cursor.lastrowid
+        conn.close()
+        return jsonify({'id': note_id, 'message': 'Care note created successfully'}), 201
+
+@app.route('/api/care-notes/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@require_auth
+def care_note_detail(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        cursor.execute('''
+            SELECT cn.*, r.first_name || ' ' || r.last_name as resident_name,
+                   s.full_name as staff_name
+            FROM daily_care_notes cn
+            JOIN residents r ON cn.resident_id = r.id
+            JOIN staff s ON cn.staff_id = s.id
+            WHERE cn.id = ?
+        ''', (id,))
+        note = cursor.fetchone()
+        conn.close()
+        if not note:
+            return jsonify({'error': 'Care note not found'}), 404
+        return jsonify(dict(note))
+    
+    elif request.method == 'PUT':
+        data = request.json
+        cursor.execute('''
+            UPDATE daily_care_notes 
+            SET note_date = ?, shift = ?, meal_breakfast = ?, meal_lunch = ?,
+                meal_dinner = ?, meal_snacks = ?, bathing = ?, hygiene = ?,
+                sleep_hours = ?, sleep_quality = ?, mood = ?, behavior_notes = ?,
+                activities = ?, general_notes = ?
+            WHERE id = ?
+        ''', (
+            data.get('note_date'),
+            data.get('shift'),
+            data.get('meal_breakfast'),
+            data.get('meal_lunch'),
+            data.get('meal_dinner'),
+            data.get('meal_snacks'),
+            data.get('bathing'),
+            data.get('hygiene'),
+            data.get('sleep_hours'),
+            data.get('sleep_quality'),
+            data.get('mood'),
+            data.get('behavior_notes'),
+            data.get('activities'),
+            data.get('general_notes'),
+            id
+        ))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Care note updated successfully'})
+    
+    elif request.method == 'DELETE':
+        cursor.execute('DELETE FROM daily_care_notes WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Care note deleted successfully'})
+
+# Notifications
+@app.route('/api/notifications', methods=['GET', 'POST'])
+@require_auth
+def notifications():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        resident_id = request.args.get('resident_id')
+        unread_only = request.args.get('unread_only', 'false') == 'true'
+        
+        query = 'SELECT * FROM notifications WHERE 1=1'
+        params = []
+        
+        if resident_id:
+            query += ' AND (resident_id = ? OR resident_id IS NULL)'
+            params.append(resident_id)
+        
+        if unread_only:
+            query += ' AND read = 0'
+        
+        query += ' AND (expires_at IS NULL OR expires_at > datetime("now"))'
+        query += ' ORDER BY created_at DESC LIMIT 50'
+        
+        cursor.execute(query, params)
+        notifications_list = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(notifications_list)
+    
+    elif request.method == 'POST':
+        data = request.json
+        cursor.execute('''
+            INSERT INTO notifications (
+                resident_id, notification_type, title, message, priority,
+                action_url, expires_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data.get('resident_id'),
+            data.get('notification_type', 'general'),
+            data.get('title'),
+            data.get('message'),
+            data.get('priority', 'normal'),
+            data.get('action_url'),
+            data.get('expires_at')
+        ))
+        conn.commit()
+        notification_id = cursor.lastrowid
+        conn.close()
+        return jsonify({'id': notification_id, 'message': 'Notification created successfully'}), 201
+
+@app.route('/api/notifications/<int:id>/read', methods=['PUT'])
+@require_auth
+def mark_notification_read(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE notifications SET read = 1 WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Notification marked as read'})
+
+@app.route('/api/notifications/read-all', methods=['PUT'])
+@require_auth
+def mark_all_notifications_read():
+    conn = get_db()
+    cursor = conn.cursor()
+    resident_id = request.json.get('resident_id') if request.json else None
+    
+    if resident_id:
+        cursor.execute('UPDATE notifications SET read = 1 WHERE resident_id = ?', (resident_id,))
+    else:
+        cursor.execute('UPDATE notifications SET read = 1 WHERE read = 0')
+    
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'All notifications marked as read'})
+
 # Static file serving
 @app.route('/')
 def index():
@@ -1096,7 +1637,13 @@ def index():
 
 @app.route('/<path:path>')
 def static_files(path):
-    return send_from_directory('.', path)
+    response = send_from_directory('.', path)
+    # Add aggressive cache control for JS and CSS files to prevent caching
+    if path.endswith('.js') or path.endswith('.css') or path.endswith('.html'):
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
 
 if __name__ == '__main__':
     init_db()

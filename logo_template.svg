@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Blue circle background matching your theme -->
+  <circle cx="256" cy="256" r="240" fill="#4a90e2"/>
+  
+  <!-- White medical cross (thick, bold for visibility) -->
+  <!-- Vertical bar -->
+  <rect x="216" y="120" width="80" height="272" rx="12" fill="white"/>
+  <!-- Horizontal bar -->
+  <rect x="120" y="216" width="272" height="80" rx="12" fill="white"/>
+  
+  <!-- Optional: Small heart accent at bottom (represents care) -->
+  <path d="M256 420 C256 420, 230 395, 230 370 C230 355, 243 355, 256 370 C269 355, 282 355, 282 370 C282 395, 256 420, 256 420 Z" fill="white" opacity="0.9"/>
+</svg>
+
+
+
+

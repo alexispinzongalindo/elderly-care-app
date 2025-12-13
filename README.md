@@ -111,12 +111,38 @@ The application uses SQLite with the following main tables:
 - Role-based access control (admin, caregiver)
 - All API endpoints require authentication
 
-## Deployment
+## 🚀 Deployment (No Server Management!)
 
-For production deployment:
+**Want to deploy your app to the cloud? No more dealing with servers or IPs!**
+
+### Quick Deploy (5 minutes):
+See **[QUICK_DEPLOY.md](QUICK_DEPLOY.md)** for the fastest way to get your app online.
+
+### Full Deployment Guide:
+See **[DEPLOY_TO_CLOUD.md](DEPLOY_TO_CLOUD.md)** for detailed instructions with multiple platform options.
+
+### Recommended Platforms:
+- **Render.com** - FREE tier, easiest setup (recommended)
+- **Railway.app** - $5/month, modern platform
+- **PythonAnywhere** - FREE tier, Python-focused
+
+### What You Get:
+- ✅ Access from anywhere (no local network needed)
+- ✅ Your own domain (e.g., `yourapp.com`)
+- ✅ Automatic HTTPS/SSL
+- ✅ Auto-deploy from GitHub
+- ✅ No server management
+
+**Cost**: FREE to start, $5-7/month for unlimited usage
+
+---
+
+### Local Development Deployment:
+
+For local development only:
 
 1. Change the default admin password
-2. Use a production WSGI server (e.g., Gunicorn)
+2. Use a production WSGI server (e.g., Gunicorn) for production
 3. Set up HTTPS/SSL
 4. Configure proper database backups
 5. Set environment variables for sensitive data

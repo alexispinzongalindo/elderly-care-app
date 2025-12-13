@@ -4,35 +4,51 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
+venv/
+ENV/
+.venv
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
-elder_care.db
 
-# Environment
-.env
-.venv
-env/
-venv/
-ENV/
+# Logs
+*.log
+server.log
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
+# Environment variables
+.env
+.env.local
 
 # Temporary files
 *.tmp
 *.temp
 
+# Archives
+*.zip
+*.tar.gz
 
+# Node (if you add any)
+node_modules/
+package-lock.json
+
+# Keep elder_care.db structure but ignore data
+# (Database will be created on first run in production)
