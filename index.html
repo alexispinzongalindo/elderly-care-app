@@ -1141,9 +1141,9 @@
             </div>
 
             <!-- Incident Reports Page -->
-            <div id="incidents" class="page">
-                <h2 style="display: block !important; visibility: visible !important; opacity: 1 !important; color: var(--text-color) !important; margin-bottom: 1.5rem !important;">Incident Reports / Reportes de Incidentes</h2>
-                <button class="btn btn-primary" onclick="showIncidentForm()" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1.5rem !important; cursor: pointer !important;">+ Report Incident / Reportar Incidente</button>
+            <div id="incidents" class="page" style="display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important;">
+                <h2 style="display: block !important; visibility: visible !important; opacity: 1 !important; color: var(--text-color) !important; margin-bottom: 1.5rem !important; font-size: 1.8rem !important; font-weight: bold !important;">Incident Reports / Reportes de Incidentes</h2>
+                <button class="btn btn-primary" onclick="showIncidentForm()" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1.5rem !important; cursor: pointer !important; padding: 0.75rem 1.5rem !important; font-size: 1rem !important;">+ Report Incident / Reportar Incidente</button>
                 
                 <!-- Incident Form -->
                 <div id="incidentForm" class="form-card" style="display: none; margin-top: 2rem;">
@@ -1268,7 +1268,7 @@
                     </form>
                 </div>
                 
-                <div id="incidentsList" class="item-list" style="margin-top: 2rem; display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important;"></div>
+                <div id="incidentsList" class="item-list" style="margin-top: 2rem !important; display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important; background: var(--white) !important; border-radius: 8px !important;"></div>
             </div>
 
             <!-- Daily Care Notes Page -->

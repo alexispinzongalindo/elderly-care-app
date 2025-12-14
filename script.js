@@ -1271,6 +1271,9 @@ function showPage(pageName) {
             loadStaff();
         }
         else if (pageName === 'incidents') {
+            console.log('🚨🚨🚨 SHOWING INCIDENTS PAGE 🚨🚨🚨');
+            console.log('🚨 Running from: ' + window.location.hostname);
+            
             // CRITICAL: Aggressively hide billing page and ALL its content
             const billingPage = document.getElementById('billing');
             if (billingPage) {
@@ -1288,40 +1291,106 @@ function showPage(pageName) {
                     child.style.setProperty('visibility', 'hidden', 'important');
                 });
                 console.log('✅ Billing page forcefully hidden');
+            } else {
+                console.log('⚠️ Billing page element not found (this is OK if it doesn\'t exist)');
             }
+            
             // Also hide all billing-related containers anywhere in the DOM
             const billingContainers = document.querySelectorAll('#billingList, #paymentsList, #accountBalanceCard, [id^="billing"], [id^="payment"]');
             billingContainers.forEach(container => {
                 container.style.setProperty('display', 'none', 'important');
                 container.style.setProperty('visibility', 'hidden', 'important');
             });
+            console.log('✅ Hidden', billingContainers.length, 'billing containers');
             
-            // CRITICAL: Explicitly show incidents page content
+            // CRITICAL: Explicitly show incidents page content IMMEDIATELY
             const incidentsPage = document.getElementById('incidents');
-            if (incidentsPage) {
-                const incidentsH2 = incidentsPage.querySelector('h2');
-                const incidentsButton = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
-                const incidentsList = document.getElementById('incidentsList');
-                
-                if (incidentsH2) {
-                    incidentsH2.style.setProperty('display', 'block', 'important');
-                    incidentsH2.style.setProperty('visibility', 'visible', 'important');
-                    incidentsH2.style.setProperty('opacity', '1', 'important');
-                    console.log('✅ Incidents H2 shown');
-                }
-                if (incidentsButton) {
-                    incidentsButton.style.setProperty('display', 'inline-block', 'important');
-                    incidentsButton.style.setProperty('visibility', 'visible', 'important');
-                    incidentsButton.style.setProperty('opacity', '1', 'important');
-                    console.log('✅ Incidents button shown');
-                }
-                if (incidentsList) {
-                    incidentsList.style.setProperty('display', 'block', 'important');
-                    incidentsList.style.setProperty('visibility', 'visible', 'important');
-                    incidentsList.style.setProperty('opacity', '1', 'important');
-                    console.log('✅ Incidents list shown');
-                }
+            if (!incidentsPage) {
+                console.error('❌❌❌ INCIDENTS PAGE ELEMENT NOT FOUND IN DOM! ❌❌❌');
+                alert('ERROR: Incidents page element not found! Check console.');
+                return;
             }
+            
+            console.log('✅ Incidents page element found');
+            console.log('✅ Incidents page ID:', incidentsPage.id);
+            console.log('✅ Incidents page classes:', incidentsPage.className);
+            console.log('✅ Incidents page children count:', incidentsPage.children.length);
+            
+            // Force incidents page to be visible
+            incidentsPage.classList.add('active');
+            incidentsPage.style.setProperty('display', 'block', 'important');
+            incidentsPage.style.setProperty('visibility', 'visible', 'important');
+            incidentsPage.style.setProperty('opacity', '1', 'important');
+            incidentsPage.style.setProperty('position', 'relative', 'important');
+            incidentsPage.style.setProperty('z-index', '10', 'important');
+            incidentsPage.style.setProperty('min-height', '400px', 'important');
+            incidentsPage.style.setProperty('width', '100%', 'important');
+            incidentsPage.style.setProperty('background', 'var(--light-gray)', 'important');
+            console.log('✅ Incidents page forced visible');
+            
+            // Show ALL direct children of incidents page
+            Array.from(incidentsPage.children).forEach((child, index) => {
+                console.log(`✅ Child ${index}:`, child.tagName, child.id || child.className);
+                // Don't hide the form if it's supposed to be hidden
+                if (child.id === 'incidentForm' && child.style.display === 'none') {
+                    console.log('⚠️ Skipping incidentForm (should be hidden)');
+                    return;
+                }
+                child.style.setProperty('display', child.tagName === 'BUTTON' ? 'inline-block' : 'block', 'important');
+                child.style.setProperty('visibility', 'visible', 'important');
+                child.style.setProperty('opacity', '1', 'important');
+            });
+            
+            const incidentsH2 = incidentsPage.querySelector('h2');
+            const incidentsButton = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
+            const incidentsList = document.getElementById('incidentsList');
+            
+            if (incidentsH2) {
+                incidentsH2.style.setProperty('display', 'block', 'important');
+                incidentsH2.style.setProperty('visibility', 'visible', 'important');
+                incidentsH2.style.setProperty('opacity', '1', 'important');
+                incidentsH2.style.setProperty('color', 'var(--text-color)', 'important');
+                incidentsH2.style.setProperty('margin-bottom', '1.5rem', 'important');
+                console.log('✅ Incidents H2 shown:', incidentsH2.textContent);
+            } else {
+                console.error('❌ Incidents H2 NOT FOUND!');
+            }
+            
+            if (incidentsButton) {
+                incidentsButton.style.setProperty('display', 'inline-block', 'important');
+                incidentsButton.style.setProperty('visibility', 'visible', 'important');
+                incidentsButton.style.setProperty('opacity', '1', 'important');
+                incidentsButton.style.setProperty('margin-bottom', '1.5rem', 'important');
+                incidentsButton.style.setProperty('cursor', 'pointer', 'important');
+                console.log('✅ Incidents button shown:', incidentsButton.textContent);
+            } else {
+                console.error('❌ Incidents button NOT FOUND!');
+            }
+            
+            if (incidentsList) {
+                incidentsList.style.setProperty('display', 'block', 'important');
+                incidentsList.style.setProperty('visibility', 'visible', 'important');
+                incidentsList.style.setProperty('opacity', '1', 'important');
+                incidentsList.style.setProperty('min-height', '200px', 'important');
+                incidentsList.style.setProperty('width', '100%', 'important');
+                console.log('✅ Incidents list container shown');
+            } else {
+                console.error('❌ Incidents list container NOT FOUND!');
+            }
+            
+            // Verify visibility with computed styles
+            setTimeout(() => {
+                const computedDisplay = window.getComputedStyle(incidentsPage).display;
+                const computedVisibility = window.getComputedStyle(incidentsPage).visibility;
+                const computedOpacity = window.getComputedStyle(incidentsPage).opacity;
+                console.log('🔍 Computed styles for incidents page:');
+                console.log('  - display:', computedDisplay);
+                console.log('  - visibility:', computedVisibility);
+                console.log('  - opacity:', computedOpacity);
+                if (computedDisplay === 'none' || computedVisibility === 'hidden' || computedOpacity === '0') {
+                    console.error('❌❌❌ PAGE IS STILL HIDDEN DESPITE ALL EFFORTS! ❌❌❌');
+                }
+            }, 100);
             
             console.log('🔄 Loading incidents page data...');
             loadIncidents();
