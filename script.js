@@ -2514,8 +2514,15 @@ async function loadIncidents() {
         // CRITICAL: Force show ALL direct children immediately
         const directChildren = Array.from(incidentsPage.children);
         console.log('🔍 Found', directChildren.length, 'direct children of incidents page');
+        console.log('🔍 Children list:', directChildren.map(c => `${c.tagName}#${c.id || ''}.${c.className || ''}`).join(', '));
+        
         directChildren.forEach((child, index) => {
             console.log(`  Child ${index}:`, child.tagName, child.id || child.className);
+            const beforeDisplay = window.getComputedStyle(child).display;
+            const beforeVisibility = window.getComputedStyle(child).visibility;
+            const beforeOpacity = window.getComputedStyle(child).opacity;
+            console.log(`    Before: display=${beforeDisplay}, visibility=${beforeVisibility}, opacity=${beforeOpacity}`);
+            
             // Skip the form if it's supposed to be hidden
             if (child.id === 'incidentForm' && child.style.display === 'none') {
                 console.log(`  ⏭️ Skipping ${child.id} (form should be hidden)`);
@@ -2527,7 +2534,21 @@ async function loadIncidents() {
             child.style.setProperty('opacity', '1', 'important');
             child.style.setProperty('position', 'relative', 'important');
             child.style.setProperty('z-index', '1', 'important');
+            
+            const afterDisplay = window.getComputedStyle(child).display;
+            const afterVisibility = window.getComputedStyle(child).visibility;
+            const afterOpacity = window.getComputedStyle(child).opacity;
+            console.log(`    After: display=${afterDisplay}, visibility=${afterVisibility}, opacity=${afterOpacity}`);
             console.log(`  ✅ Forced child ${index} to be visible`);
+            
+            // Also check if child has any hidden children
+            const hiddenChildren = Array.from(child.querySelectorAll('*')).filter(c => {
+                const style = window.getComputedStyle(c);
+                return style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0';
+            });
+            if (hiddenChildren.length > 0) {
+                console.log(`  ⚠️ Child ${index} has ${hiddenChildren.length} hidden descendants`);
+            }
         });
         
         console.log('🔄 Loading incidents...');
@@ -2579,23 +2600,31 @@ async function loadIncidents() {
         }
         
         // FORCE the button to be visible with !important
-        const reportButton = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
+        const reportButton = incidentsPage.querySelector('#incidentsButton') || incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
         if (reportButton) {
-            reportButton.style.setProperty('display', 'inline-block', 'important');
-            reportButton.style.setProperty('visibility', 'visible', 'important');
-            reportButton.style.setProperty('opacity', '1', 'important');
-            reportButton.style.setProperty('margin-bottom', '1.5rem', 'important');
-            reportButton.style.setProperty('cursor', 'pointer', 'important');
-            reportButton.style.setProperty('position', 'relative', 'important');
-            reportButton.style.setProperty('z-index', '1', 'important');
+            reportButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1.5rem !important; padding: 0.75rem 1.5rem !important; font-size: 1rem !important; cursor: pointer !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important; background: var(--primary-color) !important; color: white !important; border: none !important;';
             console.log('✅ Report Incident button forced to be visible');
             console.log('✅ Button text:', reportButton.textContent);
             console.log('✅ Button display:', window.getComputedStyle(reportButton).display);
             console.log('✅ Button visibility:', window.getComputedStyle(reportButton).visibility);
             console.log('✅ Button opacity:', window.getComputedStyle(reportButton).opacity);
+            console.log('✅ Button offsetHeight:', reportButton.offsetHeight);
+            console.log('✅ Button offsetWidth:', reportButton.offsetWidth);
         } else {
             console.error('❌ Report Incident button not found!');
             console.error('Available buttons:', incidentsPage.querySelectorAll('button'));
+        }
+        
+        // Check for test element
+        const testElement = incidentsPage.querySelector('div[style*="TEST"]');
+        if (testElement) {
+            console.log('🔴 TEST ELEMENT FOUND!');
+            console.log('✅ Test element display:', window.getComputedStyle(testElement).display);
+            console.log('✅ Test element visibility:', window.getComputedStyle(testElement).visibility);
+            console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
+            console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
+        } else {
+            console.error('❌ TEST ELEMENT NOT FOUND!');
         }
         
         // CRITICAL: Also check and fix the main.container parent
