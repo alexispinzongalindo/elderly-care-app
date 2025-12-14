@@ -5108,10 +5108,43 @@ async function loadPayments() {
         const url = currentResidentId 
             ? `${API_URL}/payments?resident_id=${currentResidentId}`
             : `${API_URL}/payments`;
-        const response = await fetch(url);
+        const response = await fetch(url, { headers: getAuthHeaders() });
+        
+        if (response.status === 401) {
+            showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
+            handleLogout();
+            return;
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error loading payments:', response.status, errorData);
+            const listContainer = document.getElementById('paymentsList');
+            if (listContainer) {
+                listContainer.innerHTML = '<div class="empty-state">Error loading payments / Error al cargar pagos</div>';
+            }
+            showMessage('Error loading payments / Error al cargar pagos', 'error');
+            return;
+        }
+        
         const payments = await response.json();
         
+        // Validate payments is an array
+        if (!Array.isArray(payments)) {
+            console.error('Error: payments is not an array:', payments);
+            const listContainer = document.getElementById('paymentsList');
+            if (listContainer) {
+                listContainer.innerHTML = '<div class="empty-state">Error loading payments / Error al cargar pagos</div>';
+            }
+            showMessage('Error loading payments / Error al cargar pagos', 'error');
+            return;
+        }
+        
         const listContainer = document.getElementById('paymentsList');
+        if (!listContainer) {
+            console.error('paymentsList container not found');
+            return;
+        }
         listContainer.innerHTML = '';
         
         if (payments.length === 0) {
