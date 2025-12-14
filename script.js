@@ -2569,9 +2569,15 @@ async function loadIncidents() {
             header.style.setProperty('opacity', '1', 'important');
             header.style.setProperty('color', 'var(--text-color)', 'important');
             header.style.setProperty('margin-bottom', '1.5rem', 'important');
+            header.style.setProperty('font-size', '1.8rem', 'important');
+            header.style.setProperty('font-weight', 'bold', 'important');
+            header.style.setProperty('position', 'relative', 'important');
+            header.style.setProperty('z-index', '1', 'important');
             console.log('✅ Header forced to be visible');
             console.log('✅ Header text:', header.textContent);
             console.log('✅ Header display:', window.getComputedStyle(header).display);
+            console.log('✅ Header visibility:', window.getComputedStyle(header).visibility);
+            console.log('✅ Header opacity:', window.getComputedStyle(header).opacity);
         } else {
             console.error('❌ Header not found!');
         }
@@ -2584,12 +2590,32 @@ async function loadIncidents() {
             reportButton.style.setProperty('opacity', '1', 'important');
             reportButton.style.setProperty('margin-bottom', '1.5rem', 'important');
             reportButton.style.setProperty('cursor', 'pointer', 'important');
+            reportButton.style.setProperty('position', 'relative', 'important');
+            reportButton.style.setProperty('z-index', '1', 'important');
             console.log('✅ Report Incident button forced to be visible');
             console.log('✅ Button text:', reportButton.textContent);
             console.log('✅ Button display:', window.getComputedStyle(reportButton).display);
+            console.log('✅ Button visibility:', window.getComputedStyle(reportButton).visibility);
+            console.log('✅ Button opacity:', window.getComputedStyle(reportButton).opacity);
         } else {
             console.error('❌ Report Incident button not found!');
             console.error('Available buttons:', incidentsPage.querySelectorAll('button'));
+        }
+        
+        // CRITICAL: Also check and fix the main.container parent
+        const mainContainer = incidentsPage.closest('main.container');
+        if (mainContainer) {
+            console.log('🔍 Found main.container parent');
+            const mainDisplay = window.getComputedStyle(mainContainer).display;
+            const mainVisibility = window.getComputedStyle(mainContainer).visibility;
+            const mainOpacity = window.getComputedStyle(mainContainer).opacity;
+            console.log(`  Main container: display=${mainDisplay}, visibility=${mainVisibility}, opacity=${mainOpacity}`);
+            if (mainDisplay === 'none' || mainVisibility === 'hidden' || mainOpacity === '0') {
+                console.log('⚠️ Fixing main.container visibility');
+                mainContainer.style.setProperty('display', 'block', 'important');
+                mainContainer.style.setProperty('visibility', 'visible', 'important');
+                mainContainer.style.setProperty('opacity', '1', 'important');
+            }
         }
         
         // Show loading state
