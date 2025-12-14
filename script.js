@@ -1368,6 +1368,18 @@ function showPage(pageName) {
                 // DON'T hide children with !important - just hide the container
                 // This allows billing to be restored when shown again
                 console.log('✅ Billing page forcefully hidden');
+                
+                // CRITICAL: If incidents is inside billing, move it out!
+                if (incidentsPageElement.parentElement && incidentsPageElement.parentElement.id === 'billing') {
+                    console.log('⚠️⚠️⚠️ CRITICAL: Incidents page is INSIDE billing page! Moving it out...');
+                    const mainContainer = billingPage.parentElement; // Should be main.container
+                    if (mainContainer) {
+                        // Move incidents page to be a sibling of billing, not a child
+                        mainContainer.insertBefore(incidentsPageElement, billingPage.nextSibling);
+                        console.log('✅ Incidents page moved out of billing page');
+                        console.log('✅ New parent:', incidentsPageElement.parentElement?.tagName, incidentsPageElement.parentElement?.id);
+                    }
+                }
             } else {
                 console.log('⚠️ Billing page element not found (this is OK if it doesn\'t exist)');
             }
@@ -1389,6 +1401,7 @@ function showPage(pageName) {
             console.log('✅ Incidents page innerHTML length:', incidentsPage.innerHTML.length);
             
             // CRITICAL: Ensure ALL parents are visible, starting from incidentsPage up to mainApp
+            // BUT: Skip the billing page if incidents is inside it (we'll move incidents out first)
             let currentElement = incidentsPage;
             let level = 0;
             while (currentElement && level < 10) {
@@ -1398,6 +1411,16 @@ function showPage(pageName) {
                 const opacity = computedStyle.opacity;
                 
                 console.log(`🔍 Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}): display=${display}, visibility=${visibility}, opacity=${opacity}`);
+                
+                // CRITICAL: If this is the billing page, DON'T make it visible - incidents should not be inside it!
+                if (currentElement.id === 'billing') {
+                    console.log(`⚠️⚠️⚠️ SKIPPING billing page - incidents should NOT be inside billing!`);
+                    console.log(`⚠️ This means incidents page is incorrectly nested. It should be a sibling, not a child.`);
+                    // Don't fix billing - instead, we should have moved incidents out already
+                    currentElement = currentElement.parentElement;
+                    level++;
+                    continue;
+                }
                 
                 // Fix any parent with display:none (except intentionally hidden elements)
                 if (display === 'none' && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm') {
