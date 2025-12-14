@@ -2674,6 +2674,17 @@ async function loadIncidents() {
                     console.log(`⚠️ Fixing Parent ${level} (${parent.tagName}) - visibility/opacity issue`);
                     parent.style.setProperty('visibility', 'visible', 'important');
                     parent.style.setProperty('opacity', '1', 'important');
+                    parent.style.setProperty('display', 'block', 'important');
+                }
+                
+                // CRITICAL: If this is the mainApp container, ALWAYS make it visible
+                if (parent.id === 'mainApp') {
+                    console.log(`🔧 CRITICAL: Found mainApp container - forcing visibility`);
+                    parent.style.setProperty('display', 'block', 'important');
+                    parent.style.setProperty('visibility', 'visible', 'important');
+                    parent.style.setProperty('opacity', '1', 'important');
+                    parent.style.setProperty('position', 'relative', 'important');
+                    parent.style.setProperty('z-index', '1', 'important');
                 }
                 
                 parent = parent.parentElement;
