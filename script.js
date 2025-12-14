@@ -1,6 +1,7 @@
 // FORCE IMMEDIATE CONSOLE LOG - IF YOU SEE THIS, SCRIPT IS LOADING
-console.log('%c🚀🚀🚀 SCRIPT.JS LOADED - Version 6.1 - Enhanced resident save debugging! 🚀🚀🚀', 'background: #00ff00; color: #000; font-size: 20px; font-weight: bold; padding: 10px;');
+console.log('%c🚀🚀🚀 SCRIPT.JS LOADED - Version 7.0 - Network Request Logging Enabled! 🚀🚀🚀', 'background: #00ff00; color: #000; font-size: 20px; font-weight: bold; padding: 10px;');
 console.log('Timestamp:', new Date().toISOString());
+console.log('%c📡 TIP: Open Network tab (not Console) to see HTTP requests!', 'background: #2196F3; color: #fff; font-size: 14px; padding: 5px;');
 
 const API_URL = '/api';
 
