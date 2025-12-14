@@ -1187,8 +1187,9 @@ function initNavigation() {
     }
 }
 
-function showPage(pageName) {
-    console.log('📄📄📄 showPage() CALLED with:', pageName);
+// Make showPage globally accessible
+window.showPage = function(pageName) {
+    console.log('%c📄📄📄 showPage() CALLED with: ' + pageName + ' 📄📄📄', 'background: #FF6B6B; color: white; font-size: 18px; font-weight: bold; padding: 10px;');
     console.log('📄 Current URL:', window.location.href);
     console.log('📄 Timestamp:', new Date().toISOString());
     
@@ -1199,6 +1200,10 @@ function showPage(pageName) {
     
     const pages = document.querySelectorAll('.page');
     console.log('📄 Found', pages.length, 'pages in DOM');
+    
+    if (pageName === 'incidents') {
+        console.log('%c🚨🚨🚨 SHOWING INCIDENTS PAGE 🚨🚨🚨', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
+    }
     
     // CRITICAL: Hide ALL pages first with inline styles to override any forced visibility
     pages.forEach(page => {

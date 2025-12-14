@@ -286,7 +286,8 @@ body {
 }
 
 /* CRITICAL: Force incidents page to show when active */
-#incidents.page.active {
+#incidents.page.active,
+#incidents.active {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -295,6 +296,14 @@ body {
     min-height: 400px !important;
     width: 100% !important;
     background: var(--light-gray) !important;
+}
+
+/* TEMPORARY DEBUG: Show incidents page if it has active class OR if incidents nav is active */
+.nav-link[data-page="incidents"].active ~ * #incidents,
+body:has(.nav-link[data-page="incidents"].active) #incidents {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #incidents.page.active h2 {

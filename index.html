@@ -244,7 +244,7 @@
                     <li><a href="#" class="nav-link" data-page="vitalsigns">Vital Signs</a></li>
                     <li><a href="#" class="nav-link" data-page="calendar">Calendar / Calendario</a></li>
                     <li><a href="#" class="nav-link" data-page="billing">Billing / Facturación</a></li>
-                    <li><a href="#" class="nav-link" data-page="incidents">Incidents / Incidentes</a></li>
+                    <li><a href="#" class="nav-link" data-page="incidents" onclick="event.preventDefault(); console.log('🔴 INCIDENTS LINK CLICKED'); if(typeof showPage === 'function') { showPage('incidents'); } else { console.error('❌ showPage not defined!'); alert('Error: showPage function not found. Check console.'); } return false;">Incidents / Incidentes</a></li>
                     <li><a href="#" class="nav-link" data-page="carenotes">Care Notes / Notas de Cuidado</a></li>
                     <li><a href="#" class="nav-link" data-page="notifications">Notifications / Notificaciones</a></li>
                     <li><a href="#" class="nav-link" data-page="reports">Reports / Reportes</a></li>
@@ -1142,8 +1142,8 @@
 
             <!-- Incident Reports Page -->
             <div id="incidents" class="page">
-                <h2>Incident Reports / Reportes de Incidentes</h2>
-                <button class="btn btn-primary" onclick="showIncidentForm()">+ Report Incident / Reportar Incidente</button>
+                <h2 style="color: var(--text-color); margin-bottom: 1.5rem; font-size: 1.8rem; font-weight: bold;">Incident Reports / Reportes de Incidentes</h2>
+                <button class="btn btn-primary" onclick="showIncidentForm()" style="margin-bottom: 1.5rem; padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer;">+ Report Incident / Reportar Incidente</button>
                 
                 <!-- Incident Form -->
                 <div id="incidentForm" class="form-card" style="display: none; margin-top: 2rem;">
@@ -1499,27 +1499,44 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        // Immediate console log to verify script is loading
-        console.log('📄 index.html loaded');
-        console.log('🌐 Current URL:', window.location.href);
-        console.log('📍 Hostname:', window.location.hostname);
-        
-        // Check if script.js loads
-        window.addEventListener('error', function(e) {
-            console.error('❌❌❌ SCRIPT LOAD ERROR:', e.filename, e.message, e.lineno);
-        }, true);
-        
-        // Verify script loaded after a delay
-        setTimeout(function() {
-            if (typeof showPage === 'undefined') {
-                console.error('❌❌❌ script.js DID NOT LOAD - showPage function not found!');
-                alert('ERROR: script.js failed to load! Check Network tab.');
-            } else {
-                console.log('✅ script.js loaded - showPage function exists');
-            }
-        }, 2000);
+        // CRITICAL: These logs MUST appear - if they don't, JavaScript is disabled or blocked
+        try {
+            console.log('%c🔴🔴🔴 HTML SCRIPT BLOCK EXECUTING 🔴🔴🔴', 'background: red; color: white; font-size: 24px; font-weight: bold; padding: 20px;');
+            console.log('📄 index.html script block loaded at:', new Date().toISOString());
+            console.log('🌐 Current URL:', window.location.href);
+            console.log('📍 Hostname:', window.location.hostname);
+            console.log('🔍 User Agent:', navigator.userAgent);
+            console.log('✅ Console is working!');
+            
+            // Check if script.js loads
+            window.addEventListener('error', function(e) {
+                console.error('%c❌❌❌ SCRIPT LOAD ERROR ❌❌❌', 'background: red; color: white; font-size: 16px; padding: 10px;');
+                console.error('File:', e.filename);
+                console.error('Message:', e.message);
+                console.error('Line:', e.lineno);
+                console.error('Column:', e.colno);
+                console.error('Error object:', e.error);
+            }, true);
+            
+            // Verify script loaded after a delay
+            setTimeout(function() {
+                console.log('⏰ 2 second check - verifying script.js loaded...');
+                if (typeof showPage === 'undefined') {
+                    console.error('%c❌❌❌ script.js DID NOT LOAD ❌❌❌', 'background: red; color: white; font-size: 20px; padding: 15px;');
+                    console.error('showPage function is undefined!');
+                    console.error('Check Network tab for script.js request');
+                    alert('ERROR: script.js failed to load!\n\nCheck:\n1. Network tab for script.js\n2. Console for errors\n3. Server logs');
+                } else {
+                    console.log('%c✅✅✅ script.js LOADED SUCCESSFULLY ✅✅✅', 'background: green; color: white; font-size: 16px; padding: 10px;');
+                    console.log('showPage function exists:', typeof showPage);
+                }
+            }, 2000);
+        } catch(e) {
+            console.error('FATAL ERROR in HTML script block:', e);
+            alert('FATAL: JavaScript error in HTML: ' + e.message);
+        }
     </script>
-    <script src="script.js?v=1765623000" onerror="console.error('❌❌❌ FAILED TO LOAD script.js!'); alert('ERROR: Cannot load script.js!');"></script>
+    <script src="script.js?v=1765624000" onerror="console.error('%c❌❌❌ FAILED TO LOAD script.js! ❌❌❌', 'background: red; color: white; font-size: 20px; padding: 15px;'); alert('ERROR: Cannot load script.js!\n\nStatus: ' + (this.status || 'unknown') + '\n\nCheck Network tab.');"></script>
     <script>
         // Force show incidents page content immediately if page is active
         document.addEventListener('DOMContentLoaded', function() {
