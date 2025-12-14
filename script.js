@@ -2910,7 +2910,8 @@ async function loadIncidents() {
             return;
         }
         
-        container.innerHTML = incidents.map(incident => {
+        // Render incidents
+        const incidentsHTML = incidents.map(incident => {
             const date = new Date(incident.incident_date);
             const severityColors = {
                 'minor': 'badge-success',
@@ -2926,7 +2927,7 @@ async function loadIncidents() {
             };
             
             return `
-                <div class="item-card">
+                <div class="item-card" style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important; border-radius: 8px !important;">
                     <div class="item-header">
                         <h3>${incident.incident_type || 'Incident'} - ${incident.resident_name || 'N/A'}</h3>
                         <span class="badge ${severityColors[incident.severity] || 'badge-warning'}">${severityLabels[incident.severity] || incident.severity}</span>
@@ -2948,6 +2949,28 @@ async function loadIncidents() {
                 </div>
             `;
         }).join('');
+        
+        container.innerHTML = incidentsHTML;
+        console.log('✅ Rendered', incidents.length, 'incidents into container');
+        console.log('✅ Container innerHTML length after render:', container.innerHTML.length);
+        console.log('✅ Container has children:', container.children.length);
+        
+        // CRITICAL: Force container visible AFTER rendering
+        container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; min-height: 200px !important; width: 100% !important; margin-top: 2rem !important; padding: 1rem !important; background: var(--white) !important; border-radius: 8px !important;';
+        
+        // Force all incident cards visible
+        const incidentCards = container.querySelectorAll('.item-card');
+        console.log('✅ Found', incidentCards.length, 'incident cards');
+        incidentCards.forEach((card, idx) => {
+            card.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important; border-radius: 8px !important; position: relative !important; z-index: 1 !important; width: 100% !important;';
+            console.log(`✅ Forced card ${idx} visible - offsetHeight: ${card.offsetHeight}, offsetWidth: ${card.offsetWidth}`);
+        });
+        
+        console.log('✅ Container final display:', window.getComputedStyle(container).display);
+        console.log('✅ Container final visibility:', window.getComputedStyle(container).visibility);
+        console.log('✅ Container final opacity:', window.getComputedStyle(container).opacity);
+        console.log('✅ Container final offsetHeight:', container.offsetHeight);
+        console.log('✅ Container final offsetWidth:', container.offsetWidth);
     } catch (error) {
         console.error('❌ Error loading incidents:', error);
         const container = document.getElementById('incidentsList');
