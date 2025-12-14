@@ -4682,17 +4682,39 @@ async function loadAccountBalance() {
     }
     
     try {
-        const response = await fetch(`${API_URL}/billing/balance/${currentResidentId}`);
+        const response = await fetch(`${API_URL}/billing/balance/${currentResidentId}`, { headers: getAuthHeaders() });
+        
+        if (response.status === 401) {
+            showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
+            handleLogout();
+            return;
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error loading account balance:', response.status, errorData);
+            document.getElementById('accountBalanceCard').style.display = 'none';
+            return;
+        }
+        
         const balance = await response.json();
         
+        // Validate balance object
+        if (!balance || typeof balance !== 'object' || balance.error) {
+            console.error('Invalid balance data:', balance);
+            document.getElementById('accountBalanceCard').style.display = 'none';
+            return;
+        }
+        
         document.getElementById('accountBalanceCard').style.display = 'block';
-        document.getElementById('totalBilled').textContent = `$${balance.total_billed.toFixed(2)}`;
-        document.getElementById('totalPaid').textContent = `$${balance.total_paid.toFixed(2)}`;
-        document.getElementById('currentBalance').textContent = `$${balance.balance.toFixed(2)}`;
-        document.getElementById('currentBalance').style.color = balance.balance >= 0 ? 'var(--success-green)' : 'var(--error-red)';
-        document.getElementById('pendingAmount').textContent = `$${balance.pending_amount.toFixed(2)}`;
+        document.getElementById('totalBilled').textContent = `$${(balance.total_billed || 0).toFixed(2)}`;
+        document.getElementById('totalPaid').textContent = `$${(balance.total_paid || 0).toFixed(2)}`;
+        document.getElementById('currentBalance').textContent = `$${(balance.balance || 0).toFixed(2)}`;
+        document.getElementById('currentBalance').style.color = (balance.balance || 0) >= 0 ? 'var(--success-green)' : 'var(--error-red)';
+        document.getElementById('pendingAmount').textContent = `$${(balance.pending_amount || 0).toFixed(2)}`;
     } catch (error) {
         console.error('Error loading account balance:', error);
+        document.getElementById('accountBalanceCard').style.display = 'none';
     }
 }
 
