@@ -1388,7 +1388,52 @@ function showPage(pageName) {
             console.log('✅ Incidents page parent display:', window.getComputedStyle(incidentsPage.parentElement).display);
             console.log('✅ Incidents page innerHTML length:', incidentsPage.innerHTML.length);
             
-            // CRITICAL: Ensure main.container is visible
+            // CRITICAL: Ensure ALL parents are visible, starting from incidentsPage up to mainApp
+            let currentElement = incidentsPage;
+            let level = 0;
+            while (currentElement && level < 10) {
+                const computedStyle = window.getComputedStyle(currentElement);
+                const display = computedStyle.display;
+                const visibility = computedStyle.visibility;
+                const opacity = computedStyle.opacity;
+                
+                console.log(`🔍 Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}): display=${display}, visibility=${visibility}, opacity=${opacity}`);
+                
+                // Fix any parent with display:none (except intentionally hidden elements)
+                if (display === 'none' && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm') {
+                    console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - setting display to block with !important`);
+                    currentElement.style.setProperty('display', 'block', 'important');
+                    currentElement.style.setProperty('visibility', 'visible', 'important');
+                    currentElement.style.setProperty('opacity', '1', 'important');
+                    currentElement.style.setProperty('position', 'relative', 'important');
+                    currentElement.style.setProperty('z-index', '1', 'important');
+                    console.log(`✅ Fixed Parent ${level} - new display:`, window.getComputedStyle(currentElement).display);
+                }
+                
+                // Also fix if visibility is hidden or opacity is 0
+                if ((visibility === 'hidden' || opacity === '0') && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm') {
+                    console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - visibility/opacity issue`);
+                    currentElement.style.setProperty('visibility', 'visible', 'important');
+                    currentElement.style.setProperty('opacity', '1', 'important');
+                    currentElement.style.setProperty('display', 'block', 'important');
+                }
+                
+                // Stop at mainApp
+                if (currentElement.id === 'mainApp') {
+                    console.log(`🔧 CRITICAL: Found mainApp container - forcing visibility`);
+                    currentElement.style.setProperty('display', 'block', 'important');
+                    currentElement.style.setProperty('visibility', 'visible', 'important');
+                    currentElement.style.setProperty('opacity', '1', 'important');
+                    currentElement.style.setProperty('position', 'relative', 'important');
+                    currentElement.style.setProperty('z-index', '1', 'important');
+                    break;
+                }
+                
+                currentElement = currentElement.parentElement;
+                level++;
+            }
+            
+            // Also ensure main.container is visible
             const mainContainer = incidentsPage.closest('main.container');
             if (mainContainer) {
                 mainContainer.style.setProperty('display', 'block', 'important');
