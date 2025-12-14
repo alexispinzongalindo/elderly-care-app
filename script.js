@@ -2519,6 +2519,18 @@ async function loadIncidents() {
             return;
         }
         
+        // Force container to be visible with !important
+        container.style.setProperty('display', 'block', 'important');
+        container.style.setProperty('visibility', 'visible', 'important');
+        container.style.setProperty('opacity', '1', 'important');
+        container.style.setProperty('position', 'relative', 'important');
+        container.style.setProperty('z-index', '999', 'important');
+        container.style.setProperty('min-height', '200px', 'important');
+        container.style.setProperty('width', '100%', 'important');
+        container.style.setProperty('margin-top', '2rem', 'important');
+        console.log('✅ Container forced visible with !important');
+        console.log('✅ Container computed display:', window.getComputedStyle(container).display);
+        
         // Force container to be visible
         container.style.setProperty('display', 'block', 'important');
         container.style.setProperty('visibility', 'visible', 'important');
@@ -2648,10 +2660,20 @@ async function loadIncidents() {
                 
                 // Fix any parent with display:none (except if it's intentionally hidden)
                 if (display === 'none' && parent.id !== 'loginModal' && parent.id !== 'residentSelector') {
-                    console.log(`⚠️ Fixing Parent ${level} (${parent.tagName}) - setting display to block`);
-                    parent.style.display = 'block';
-                    parent.style.visibility = 'visible';
-                    parent.style.opacity = '1';
+                    console.log(`⚠️ Fixing Parent ${level} (${parent.tagName}) - setting display to block with !important`);
+                    parent.style.setProperty('display', 'block', 'important');
+                    parent.style.setProperty('visibility', 'visible', 'important');
+                    parent.style.setProperty('opacity', '1', 'important');
+                    parent.style.setProperty('position', 'relative', 'important');
+                    parent.style.setProperty('z-index', '1', 'important');
+                    console.log(`✅ Fixed Parent ${level} - new display:`, window.getComputedStyle(parent).display);
+                }
+                
+                // Also fix if visibility is hidden or opacity is 0
+                if ((visibility === 'hidden' || opacity === '0') && parent.id !== 'loginModal' && parent.id !== 'residentSelector' && parent.id !== 'incidentForm') {
+                    console.log(`⚠️ Fixing Parent ${level} (${parent.tagName}) - visibility/opacity issue`);
+                    parent.style.setProperty('visibility', 'visible', 'important');
+                    parent.style.setProperty('opacity', '1', 'important');
                 }
                 
                 parent = parent.parentElement;
