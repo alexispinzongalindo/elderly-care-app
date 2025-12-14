@@ -45,13 +45,32 @@ window.fetch = function(url, options = {}) {
             options.headers['Pragma'] = 'no-cache';
         }
         
-        // Log all API requests
-        console.log(`🌐 [${timestamp}] ${method} ${url}`, {
+        // Log all API requests - MAKE IT IMPOSSIBLE TO MISS
+        console.log(
+            `%c🌐🌐🌐 NETWORK REQUEST 🌐🌐🌐\n` +
+            `%c${method} ${url}\n` +
+            `%cTime: ${timestamp}\n` +
+            `%cCache: ${options.cache || 'default'}`,
+            'background: #2196F3; color: white; font-size: 16px; font-weight: bold; padding: 10px;',
+            'background: #4CAF50; color: white; font-size: 14px; padding: 5px;',
+            'color: #666; font-size: 12px;',
+            'color: #666; font-size: 12px;'
+        );
+        console.log('Full request details:', {
             url: url,
             method: method,
             headers: options.headers,
             body: options.body,
             cache: options.cache
+        });
+        
+        // Also log to window for debugging
+        if (!window.networkRequests) window.networkRequests = [];
+        window.networkRequests.push({
+            timestamp: timestamp,
+            method: method,
+            url: url,
+            status: 'pending'
         });
     }
     
