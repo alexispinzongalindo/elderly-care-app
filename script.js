@@ -2413,12 +2413,24 @@ function hideIncidentForm() {
 
 async function loadIncidents() {
     try {
-        // CRITICAL: Only load if incidents page is actually active
+        console.log('🔄 loadIncidents() called');
         const incidentsPage = document.getElementById('incidents');
-        if (!incidentsPage || !incidentsPage.classList.contains('active')) {
-            console.log('⏭️ Skipping loadIncidents - incidents page is not active');
+        if (!incidentsPage) {
+            console.error('❌ Incidents page element not found!');
+            showMessage('Error: Incidents page not found / Error: Página de incidentes no encontrada', 'error');
             return;
         }
+        
+        // ALWAYS ensure the page is visible and active - don't check, just force it
+        incidentsPage.classList.add('active');
+        incidentsPage.style.setProperty('display', 'block', 'important');
+        incidentsPage.style.setProperty('visibility', 'visible', 'important');
+        incidentsPage.style.setProperty('opacity', '1', 'important');
+        incidentsPage.style.setProperty('position', 'relative', 'important');
+        incidentsPage.style.setProperty('z-index', '1', 'important');
+        console.log('✅ Incidents page forced to be visible');
+        console.log('✅ Page display:', window.getComputedStyle(incidentsPage).display);
+        console.log('✅ Page has active class:', incidentsPage.classList.contains('active'));
         
         console.log('🔄 Loading incidents...');
         const container = document.getElementById('incidentsList');
@@ -2428,36 +2440,43 @@ async function loadIncidents() {
             return;
         }
         
-        // Ensure the page is visible (incidentsPage already declared above)
-        if (incidentsPage) {
-            incidentsPage.classList.add('active');
-            incidentsPage.style.display = 'block';
-            incidentsPage.style.visibility = 'visible';
-            incidentsPage.style.opacity = '1';
-            console.log('✅ Incidents page is active');
-            console.log('✅ Page display:', window.getComputedStyle(incidentsPage).display);
-        } else {
-            console.error('❌ Incidents page element not found!');
-        }
+        // Force container to be visible
+        container.style.setProperty('display', 'block', 'important');
+        container.style.setProperty('visibility', 'visible', 'important');
+        container.style.setProperty('opacity', '1', 'important');
+        container.style.setProperty('min-height', '200px', 'important');
+        container.style.setProperty('width', '100%', 'important');
+        console.log('✅ Container forced to be visible');
         
-        // Ensure the header is visible
-        const header = incidentsPage?.querySelector('h2');
+        // FORCE the header to be visible with !important
+        const header = incidentsPage.querySelector('h2');
         if (header) {
-            header.style.display = 'block';
-            header.style.visibility = 'visible';
-            console.log('✅ Header is visible');
+            header.style.setProperty('display', 'block', 'important');
+            header.style.setProperty('visibility', 'visible', 'important');
+            header.style.setProperty('opacity', '1', 'important');
+            header.style.setProperty('color', 'var(--text-color)', 'important');
+            header.style.setProperty('margin-bottom', '1.5rem', 'important');
+            console.log('✅ Header forced to be visible');
+            console.log('✅ Header text:', header.textContent);
+            console.log('✅ Header display:', window.getComputedStyle(header).display);
+        } else {
+            console.error('❌ Header not found!');
         }
         
-        // Ensure the button is visible
-        const reportButton = incidentsPage?.querySelector('button[onclick="showIncidentForm()"]');
+        // FORCE the button to be visible with !important
+        const reportButton = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
         if (reportButton) {
-            reportButton.style.display = 'inline-block';
-            reportButton.style.visibility = 'visible';
-            reportButton.style.opacity = '1';
-            console.log('✅ Report Incident button is visible');
+            reportButton.style.setProperty('display', 'inline-block', 'important');
+            reportButton.style.setProperty('visibility', 'visible', 'important');
+            reportButton.style.setProperty('opacity', '1', 'important');
+            reportButton.style.setProperty('margin-bottom', '1.5rem', 'important');
+            reportButton.style.setProperty('cursor', 'pointer', 'important');
+            console.log('✅ Report Incident button forced to be visible');
+            console.log('✅ Button text:', reportButton.textContent);
             console.log('✅ Button display:', window.getComputedStyle(reportButton).display);
         } else {
             console.error('❌ Report Incident button not found!');
+            console.error('Available buttons:', incidentsPage.querySelectorAll('button'));
         }
         
         // Show loading state
