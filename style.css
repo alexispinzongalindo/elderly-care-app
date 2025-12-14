@@ -125,6 +125,27 @@ body {
     flex-shrink: 0;
 }
 
+.language-selector {
+    padding: 0.5rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: 4px;
+    background: var(--white);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    min-width: 140px;
+}
+
+.language-selector:hover {
+    border-color: var(--primary-color);
+}
+
+.language-selector:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
 .nav-title {
     font-size: 1.4rem;
     color: var(--primary-color);
