@@ -2718,28 +2718,23 @@ async function loadIncidents() {
         console.log('✅ Container offsetHeight:', container.offsetHeight);
         console.log('✅ Container offsetWidth:', container.offsetWidth);
         
-        // FORCE the header to be visible with !important
-        const header = incidentsPage.querySelector('h2');
+        // FORCE the header to be visible with cssText
+        const header = incidentsPage.querySelector('h2') || incidentsPage.querySelector('#incidentsH2');
         if (header) {
-            header.style.setProperty('display', 'block', 'important');
-            header.style.setProperty('visibility', 'visible', 'important');
-            header.style.setProperty('opacity', '1', 'important');
-            header.style.setProperty('color', 'var(--text-color)', 'important');
-            header.style.setProperty('margin-bottom', '1.5rem', 'important');
-            header.style.setProperty('font-size', '1.8rem', 'important');
-            header.style.setProperty('font-weight', 'bold', 'important');
-            header.style.setProperty('position', 'relative', 'important');
-            header.style.setProperty('z-index', '1', 'important');
+            header.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; color: var(--text-color) !important; margin-bottom: 1.5rem !important; font-size: 1.8rem !important; font-weight: bold !important; position: relative !important; z-index: 1 !important; width: 100% !important; height: auto !important;';
             console.log('✅ Header forced to be visible');
             console.log('✅ Header text:', header.textContent);
             console.log('✅ Header display:', window.getComputedStyle(header).display);
             console.log('✅ Header visibility:', window.getComputedStyle(header).visibility);
             console.log('✅ Header opacity:', window.getComputedStyle(header).opacity);
+            console.log('✅ Header offsetHeight:', header.offsetHeight);
+            console.log('✅ Header offsetWidth:', header.offsetWidth);
         } else {
             console.error('❌ Header not found!');
+            console.error('Available h2 elements:', incidentsPage.querySelectorAll('h2'));
         }
         
-        // FORCE the button to be visible with !important
+        // FORCE the button to be visible with cssText
         const reportButton = incidentsPage.querySelector('#incidentsButton') || incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
         if (reportButton) {
             reportButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1.5rem !important; padding: 0.75rem 1.5rem !important; font-size: 1rem !important; cursor: pointer !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important; background: var(--primary-color) !important; color: white !important; border: none !important;';
@@ -2750,9 +2745,26 @@ async function loadIncidents() {
             console.log('✅ Button opacity:', window.getComputedStyle(reportButton).opacity);
             console.log('✅ Button offsetHeight:', reportButton.offsetHeight);
             console.log('✅ Button offsetWidth:', reportButton.offsetWidth);
+            if (reportButton.offsetHeight === 0 || reportButton.offsetWidth === 0) {
+                console.error('❌❌❌ BUTTON HAS ZERO DIMENSIONS! ❌❌❌');
+            }
         } else {
             console.error('❌ Report Incident button not found!');
             console.error('Available buttons:', incidentsPage.querySelectorAll('button'));
+        }
+        
+        // CRITICAL: Force test element visible if it exists
+        const testElement = incidentsPage.querySelector('div[style*="TEST"]');
+        if (testElement) {
+            testElement.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; background: red !important; color: white !important; padding: 1rem !important; margin: 1rem 0 !important; font-size: 1.2rem !important; font-weight: bold !important; position: relative !important; z-index: 9999 !important; width: 100% !important; height: auto !important;';
+            console.log('🔴 TEST ELEMENT FORCED VISIBLE!');
+            console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
+            console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
+            if (testElement.offsetHeight === 0 || testElement.offsetWidth === 0) {
+                console.error('❌❌❌ TEST ELEMENT HAS ZERO DIMENSIONS! ❌❌❌');
+            }
+        } else {
+            console.error('❌ TEST ELEMENT NOT FOUND IN DOM!');
         }
         
         // Check for test element (already checked above at line 2596, removing duplicate)
