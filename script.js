@@ -206,26 +206,43 @@ async function handleLogin(event) {
     console.log('🔐 Attempting login for username:', username);
     
     try {
+        console.log('🔐 Sending login request...');
         const response = await fetch('/api/auth/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ username, password }),
+            cache: 'no-store'
         });
         
-        console.log('Login response status:', response.status);
+        console.log('📡 Login response status:', response.status, response.statusText);
+        console.log('📡 Login response headers:', [...response.headers.entries()]);
+        
+        // Get response text first to see what we're dealing with
+        const responseText = await response.text();
+        console.log('📡 Login response text:', responseText);
         
         // Try to parse response
         let data;
         try {
-            data = await response.json();
+            data = JSON.parse(responseText);
+            console.log('✅ Parsed login response:', data);
         } catch (parseError) {
-            const text = await response.text();
-            console.error('Failed to parse login response:', text);
+            console.error('❌ Failed to parse login response as JSON:', parseError);
+            console.error('Response text was:', responseText);
             showMessage('Server error. Please try again / Error del servidor. Por favor intente de nuevo', 'error');
             return;
         }
         
         if (response.ok) {
+            if (!data.token || !data.staff) {
+                console.error('❌ Login response missing token or staff data:', data);
+                showMessage('Invalid server response / Respuesta del servidor inválida', 'error');
+                return;
+            }
+            
             console.log('✅ Login successful!', data);
             authToken = data.token;
             currentStaff = data.staff;
@@ -253,7 +270,7 @@ async function handleLogin(event) {
             showMessage('Login successful! / ¡Inicio de sesión exitoso!', 'success');
         } else {
             // Login failed - show error message
-            const errorMsg = data.error || 'Login failed / Error de inicio de sesión';
+            const errorMsg = data.error || data.message || 'Login failed / Error de inicio de sesión';
             console.error('❌ Login failed:', response.status, errorMsg);
             showMessage(errorMsg, 'error');
             

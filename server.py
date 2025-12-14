@@ -264,9 +264,10 @@ def init_db():
     if cursor.fetchone()['count'] == 0:
         default_password = hashlib.sha256('admin123'.encode()).hexdigest()
         cursor.execute('''
-            INSERT INTO staff (username, password_hash, full_name, role, email)
-            VALUES (?, ?, ?, ?, ?)
-        ''', ('admin', default_password, 'Administrator', 'admin', 'admin@eldercare.pr'))
+            INSERT INTO staff (username, password_hash, full_name, role, email, active)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', ('admin', default_password, 'Administrator', 'admin', 'admin@eldercare.pr', 1))
+        print('✅ Default admin user created: username=admin, password=admin123')
     
     conn.commit()
     conn.close()
@@ -333,45 +334,64 @@ def require_role(*allowed_roles):
 # Authentication endpoints
 @app.route('/api/auth/login', methods=['POST'])
 def login():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
-    
-    if not username or not password:
-        return jsonify({'error': 'Username and password required'}), 400
-    
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT * FROM staff WHERE username = ? AND active = 1', (username,))
-    staff = cursor.fetchone()
-    
-    if not staff or not verify_password(password, staff['password_hash']):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data received / No se recibieron datos'}), 400
+        
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        
+        if not username or not password:
+            return jsonify({'error': 'Username and password required / Se requiere usuario y contraseña'}), 400
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Check if user exists
+        cursor.execute('SELECT * FROM staff WHERE username = ? AND active = 1', (username,))
+        staff = cursor.fetchone()
+        
+        if not staff:
+            conn.close()
+            print(f'Login failed: User not found or inactive - {username}')
+            return jsonify({'error': 'Invalid credentials / Credenciales inválidas'}), 401
+        
+        # Verify password
+        password_hash = staff['password_hash']
+        if not verify_password(password, password_hash):
+            conn.close()
+            print(f'Login failed: Invalid password for user - {username}')
+            return jsonify({'error': 'Invalid credentials / Credenciales inválidas'}), 401
+        
+        # Create session
+        session_token = generate_session_token()
+        expires_at = datetime.now() + timedelta(days=1)
+        
+        cursor.execute('''
+            INSERT INTO sessions (staff_id, session_token, expires_at)
+            VALUES (?, ?, ?)
+        ''', (staff['id'], session_token, expires_at))
+        
+        conn.commit()
         conn.close()
-        return jsonify({'error': 'Invalid credentials'}), 401
-    
-    # Create session
-    session_token = generate_session_token()
-    expires_at = datetime.now() + timedelta(days=1)
-    
-    cursor.execute('''
-        INSERT INTO sessions (staff_id, session_token, expires_at)
-        VALUES (?, ?, ?)
-    ''', (staff['id'], session_token, expires_at))
-    
-    conn.commit()
-    conn.close()
-    
-    return jsonify({
-        'token': session_token,
-        'staff': {
-            'id': staff['id'],
-            'username': staff['username'],
-            'full_name': staff['full_name'],
-            'role': staff['role'],
-            'email': staff['email']
-        }
-    })
+        
+        print(f'Login successful for user: {username}')
+        return jsonify({
+            'token': session_token,
+            'staff': {
+                'id': staff['id'],
+                'username': staff['username'],
+                'full_name': staff['full_name'],
+                'role': staff['role'],
+                'email': staff['email']
+            }
+        })
+    except Exception as e:
+        print(f'Login error: {str(e)}')
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Server error: {str(e)} / Error del servidor'}), 500
 
 @app.route('/api/auth/logout', methods=['POST'])
 @require_auth
