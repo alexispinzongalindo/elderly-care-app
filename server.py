@@ -420,13 +420,18 @@ def logout():
 @app.route('/api/auth/me', methods=['GET'])
 @require_auth
 def get_current_user():
+    # Get preferred_language, handling both dict and Row object access
+    preferred_lang = 'en'
+    if 'preferred_language' in request.current_staff.keys():
+        preferred_lang = request.current_staff['preferred_language'] or 'en'
+    
     return jsonify({
         'id': request.current_staff['id'],
         'username': request.current_staff['username'],
         'full_name': request.current_staff['full_name'],
         'role': request.current_staff['role'],
         'email': request.current_staff['email'],
-        'preferred_language': request.current_staff.get('preferred_language', 'en') or 'en'
+        'preferred_language': preferred_lang
     })
 
 @app.route('/api/staff/language', methods=['PUT'])
