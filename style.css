@@ -1847,9 +1847,23 @@ body.dark-mode .notification-time {
 #incidents button[onclick="showIncidentForm()"] {
     display: inline-block !important;
     margin-bottom: 1.5rem;
+    cursor: pointer;
 }
 
 #incidentsList {
     display: block !important;
     min-height: 200px;
+}
+
+/* Ensure incident form is visible when shown */
+#incidentForm {
+    display: none; /* Default hidden */
+}
+
+#incidentForm[style*="display: block"],
+#incidentForm.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-top: 2rem;
 }

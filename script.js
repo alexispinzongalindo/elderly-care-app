@@ -1211,6 +1211,22 @@ function showPage(pageName) {
         else if (pageName === 'incidents') {
             console.log('🔄 Calling loadIncidents()...');
             loadIncidents();
+            
+            // Ensure button has event listener (backup in case onclick doesn't work)
+            const reportButton = document.querySelector('#incidents button[onclick="showIncidentForm()"]');
+            if (reportButton) {
+                // Remove any existing listeners to avoid duplicates
+                const newButton = reportButton.cloneNode(true);
+                reportButton.parentNode.replaceChild(newButton, reportButton);
+                // Add click listener
+                newButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🔘 Report Incident button clicked (via event listener)');
+                    showIncidentForm();
+                });
+                console.log('✅ Report Incident button event listener attached');
+            }
         }
         else if (pageName === 'carenotes') {
             loadCareNotes();
@@ -2079,54 +2095,105 @@ let editingIncidentId = null;
 let incidentPhotos = []; // Store base64 encoded photos
 
 async function showIncidentForm() {
-    editingIncidentId = null;
-    incidentPhotos = [];
-    document.getElementById('incidentForm').style.display = 'block';
-    document.getElementById('incidentFormTitle').textContent = 'Report Incident / Reportar Incidente';
-    document.getElementById('newIncidentForm').reset();
-    
-    // Clear photo preview
-    const photoPreview = document.getElementById('incidentPhotoPreview');
-    if (photoPreview) photoPreview.innerHTML = '';
-    
-    // Set default date to now
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    document.getElementById('incidentDate').value = now.toISOString().slice(0, 16);
-    document.getElementById('familyNotificationDateGroup').style.display = 'none';
-    document.getElementById('followUpNotesGroup').style.display = 'none';
-    
-    // Load staff dropdown
-    await loadStaffForIncident();
-    
-    // Load residents dropdown
-    await loadResidentsForIncident();
-    
-    // Setup checkbox handlers
-    const familyNotified = document.getElementById('incidentFamilyNotified');
-    const followUp = document.getElementById('incidentFollowUp');
-    if (familyNotified) {
-        familyNotified.onchange = function() {
-            document.getElementById('familyNotificationDateGroup').style.display = this.checked ? 'block' : 'none';
-        };
+    console.log('🔄 showIncidentForm() called');
+    try {
+        editingIncidentId = null;
+        incidentPhotos = [];
+        
+        // Show the form IMMEDIATELY - don't wait for anything
+        const formElement = document.getElementById('incidentForm');
+        if (!formElement) {
+            console.error('❌ incidentForm element not found!');
+            showMessage('Error: Incident form not found. Please refresh the page. / Error: Formulario de incidente no encontrado. Por favor actualice la página.', 'error');
+            return;
+        }
+        
+        console.log('✅ Incident form element found, showing it...');
+        formElement.style.display = 'block';
+        formElement.style.visibility = 'visible';
+        formElement.style.opacity = '1';
+        
+        // Reset form
+        const formTitle = document.getElementById('incidentFormTitle');
+        if (formTitle) formTitle.textContent = 'Report Incident / Reportar Incidente';
+        
+        const newForm = document.getElementById('newIncidentForm');
+        if (newForm) newForm.reset();
+        
+        // Clear photo preview
+        const photoPreview = document.getElementById('incidentPhotoPreview');
+        if (photoPreview) photoPreview.innerHTML = '';
+        
+        // Set default date to now
+        const dateInput = document.getElementById('incidentDate');
+        if (dateInput) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            dateInput.value = now.toISOString().slice(0, 16);
+        }
+        
+        const familyNotificationDateGroup = document.getElementById('familyNotificationDateGroup');
+        if (familyNotificationDateGroup) familyNotificationDateGroup.style.display = 'none';
+        
+        const followUpNotesGroup = document.getElementById('followUpNotesGroup');
+        if (followUpNotesGroup) followUpNotesGroup.style.display = 'none';
+        
+        // Setup checkbox handlers
+        const familyNotified = document.getElementById('incidentFamilyNotified');
+        const followUp = document.getElementById('incidentFollowUp');
+        if (familyNotified) {
+            familyNotified.onchange = function() {
+                const group = document.getElementById('familyNotificationDateGroup');
+                if (group) group.style.display = this.checked ? 'block' : 'none';
+            };
+        }
+        if (followUp) {
+            followUp.onchange = function() {
+                const group = document.getElementById('followUpNotesGroup');
+                if (group) group.style.display = this.checked ? 'block' : 'none';
+            };
+        }
+        
+        // Load dropdowns (but don't block form display if they fail)
+        try {
+            await loadStaffForIncident();
+        } catch (error) {
+            console.error('Error loading staff:', error);
+            showMessage('Warning: Could not load staff list. / Advertencia: No se pudo cargar la lista de personal.', 'warning');
+        }
+        
+        try {
+            await loadResidentsForIncident();
+        } catch (error) {
+            console.error('Error loading residents:', error);
+            showMessage('Warning: Could not load residents list. / Advertencia: No se pudo cargar la lista de residentes.', 'warning');
+        }
+        
+        // Scroll to form
+        formElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        console.log('✅ Incident form is now visible');
+    } catch (error) {
+        console.error('❌ Error in showIncidentForm:', error);
+        showMessage('Error showing incident form. Please try again. / Error al mostrar el formulario de incidente. Por favor intente nuevamente.', 'error');
     }
-    if (followUp) {
-        followUp.onchange = function() {
-            document.getElementById('followUpNotesGroup').style.display = this.checked ? 'block' : 'none';
-        };
-    }
-    
-    document.getElementById('incidentForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 async function loadStaffForIncident() {
     try {
+        console.log('🔄 Loading staff for incident form...');
         const response = await fetch('/api/staff', { headers: getAuthHeaders() });
-        if (!response.ok) return;
+        if (!response.ok) {
+            console.error('❌ Failed to load staff:', response.status);
+            return;
+        }
         
         const staffList = await response.json();
+        console.log('✅ Loaded staff:', staffList.length);
         const select = document.getElementById('incidentStaffId');
-        if (!select) return;
+        if (!select) {
+            console.error('❌ incidentStaffId select not found');
+            return;
+        }
         
         select.innerHTML = '<option value="">-- Select Staff / Seleccionar Personal --</option>';
         
@@ -2142,19 +2209,29 @@ async function loadStaffForIncident() {
             }
             select.appendChild(option);
         });
+        console.log('✅ Staff dropdown populated');
     } catch (error) {
-        console.error('Error loading staff for incident:', error);
+        console.error('❌ Error loading staff for incident:', error);
+        throw error; // Re-throw so caller knows it failed
     }
 }
 
 async function loadResidentsForIncident() {
     try {
+        console.log('🔄 Loading residents for incident form...');
         const response = await fetch('/api/residents?active_only=true', { headers: getAuthHeaders() });
-        if (!response.ok) return;
+        if (!response.ok) {
+            console.error('❌ Failed to load residents:', response.status);
+            return;
+        }
         
         const residents = await response.json();
+        console.log('✅ Loaded residents:', residents.length);
         const select = document.getElementById('incidentResidents');
-        if (!select) return;
+        if (!select) {
+            console.error('❌ incidentResidents select not found');
+            return;
+        }
         
         select.innerHTML = '<option value="">-- Select Residents / Seleccionar Residentes --</option>';
         
@@ -2168,8 +2245,10 @@ async function loadResidentsForIncident() {
             }
             select.appendChild(option);
         });
+        console.log('✅ Residents dropdown populated');
     } catch (error) {
-        console.error('Error loading residents for incident:', error);
+        console.error('❌ Error loading residents for incident:', error);
+        throw error; // Re-throw so caller knows it failed
     }
 }
 
