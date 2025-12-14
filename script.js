@@ -1284,6 +1284,18 @@ function showPage(pageName) {
             console.log('%c🚨🚨🚨 SHOWING INCIDENTS PAGE 🚨🚨🚨', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
             console.log('🚨 Running from: ' + window.location.hostname);
             
+            // CRITICAL: Get incidents page element FIRST
+            const incidentsPageElement = document.getElementById('incidents');
+            if (!incidentsPageElement) {
+                console.error('%c❌❌❌ INCIDENTS PAGE ELEMENT NOT FOUND IN DOM! ❌❌❌', 'background: red; color: white; font-size: 20px; padding: 15px;');
+                alert('ERROR: Incidents page element (#incidents) not found in DOM!');
+                return;
+            }
+            console.log('✅ Incidents page element found in DOM');
+            console.log('✅ Element ID:', incidentsPageElement.id);
+            console.log('✅ Element classes:', incidentsPageElement.className);
+            console.log('✅ Element parent:', incidentsPageElement.parentElement?.tagName, incidentsPageElement.parentElement?.id);
+            
             // CRITICAL: Aggressively hide billing page and ALL its content
             const billingPage = document.getElementById('billing');
             if (billingPage) {
