@@ -384,6 +384,11 @@ def login():
         conn.close()
         
         print(f'Login successful for user: {username}')
+        # Get preferred_language, handling both dict and Row object access
+        preferred_lang = 'en'
+        if 'preferred_language' in staff.keys():
+            preferred_lang = staff['preferred_language'] or 'en'
+        
         return jsonify({
             'token': session_token,
             'staff': {
@@ -392,7 +397,7 @@ def login():
                 'full_name': staff['full_name'],
                 'role': staff['role'],
                 'email': staff['email'],
-                'preferred_language': staff.get('preferred_language', 'en') or 'en'
+                'preferred_language': preferred_lang
             }
         })
     except Exception as e:
