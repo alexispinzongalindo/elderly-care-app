@@ -1900,3 +1900,41 @@ body.dark-mode .notification-time {
     opacity: 1 !important;
     margin-top: 2rem;
 }
+
+/* CRITICAL: Force hide billing page when incidents is active */
+#incidents.page.active ~ #billing,
+#incidents.active ~ #billing {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    z-index: -1 !important;
+}
+
+/* CRITICAL: Force hide incidents page when billing is active */
+#billing.page.active ~ #incidents,
+#billing.active ~ #incidents {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    z-index: -1 !important;
+}
+
+/* Additional safety: Hide billing if incidents is active */
+body:has(#incidents.page.active) #billing:not(.active),
+body:has(#incidents.active) #billing:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Additional safety: Hide incidents if billing is active */
+body:has(#billing.page.active) #incidents:not(.active),
+body:has(#billing.active) #incidents:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
