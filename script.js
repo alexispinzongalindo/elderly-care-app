@@ -1193,26 +1193,33 @@ function showPage(pageName) {
     
     // CRITICAL: Hide ALL pages first with inline styles to override any forced visibility
     pages.forEach(page => {
-        page.classList.remove('active');
-        page.style.display = 'none';
-        page.style.visibility = 'hidden';
-        page.style.opacity = '0';
-        // Also hide all child containers that might have forced visibility
-        const containers = page.querySelectorAll('[id$="List"], [class*="container"], [class*="form-card"]');
-        containers.forEach(container => {
-            if (pageName !== page.id) {
-                container.style.display = 'none';
-            }
-        });
+        if (page.id !== pageName) {
+            page.classList.remove('active');
+            // Use !important via setProperty to override any CSS
+            page.style.setProperty('display', 'none', 'important');
+            page.style.setProperty('visibility', 'hidden', 'important');
+            page.style.setProperty('opacity', '0', 'important');
+            // Also hide all child containers that might have forced visibility
+            const containers = page.querySelectorAll('[id$="List"], [class*="container"], [class*="form-card"], h2, h3');
+            containers.forEach(container => {
+                container.style.setProperty('display', 'none', 'important');
+            });
+        }
     });
     
     const targetPage = document.getElementById(pageName);
     if (targetPage) {
         targetPage.classList.add('active');
-        // Only show the target page
-        targetPage.style.display = 'block';
-        targetPage.style.visibility = 'visible';
-        targetPage.style.opacity = '1';
+        // Only show the target page with !important
+        targetPage.style.setProperty('display', 'block', 'important');
+        targetPage.style.setProperty('visibility', 'visible', 'important');
+        targetPage.style.setProperty('opacity', '1', 'important');
+        targetPage.style.setProperty('position', 'relative', 'important');
+        // Show all child elements
+        const targetContainers = targetPage.querySelectorAll('[id$="List"], [class*="container"], [class*="form-card"], h2, h3');
+        targetContainers.forEach(container => {
+            container.style.removeProperty('display');
+        });
         console.log('✅ Page activated:', pageName);
         
         // Update nav links
@@ -1257,6 +1264,22 @@ function showPage(pageName) {
             loadStaff();
         }
         else if (pageName === 'incidents') {
+            // CRITICAL: Hide billing page and its containers when showing incidents
+            const billingPage = document.getElementById('billing');
+            if (billingPage) {
+                billingPage.style.display = 'none';
+                billingPage.style.visibility = 'hidden';
+                billingPage.style.opacity = '0';
+                billingPage.classList.remove('active');
+            }
+            // Also hide all billing-related containers
+            const billingContainers = document.querySelectorAll('#billingList, #paymentsList, #accountBalanceCard, [id^="billing"], [id^="payment"]');
+            billingContainers.forEach(container => {
+                if (container.closest('#billing')) {
+                    container.style.display = 'none';
+                    container.style.visibility = 'hidden';
+                }
+            });
             console.log('🔄 Loading incidents page data...');
             loadIncidents();
         }
