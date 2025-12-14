@@ -2575,13 +2575,36 @@ async function loadIncidents() {
         
         // ALWAYS ensure the page is visible and active - don't check, just force it
         incidentsPage.classList.add('active');
-        incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important;';
+        incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important; overflow: visible !important;';
         console.log('✅ Incidents page forced to be visible');
         console.log('✅ Page display:', window.getComputedStyle(incidentsPage).display);
         console.log('✅ Page visibility:', window.getComputedStyle(incidentsPage).visibility);
         console.log('✅ Page opacity:', window.getComputedStyle(incidentsPage).opacity);
+        console.log('✅ Page offsetHeight:', incidentsPage.offsetHeight);
+        console.log('✅ Page offsetWidth:', incidentsPage.offsetWidth);
+        console.log('✅ Page scrollHeight:', incidentsPage.scrollHeight);
+        console.log('✅ Page scrollWidth:', incidentsPage.scrollWidth);
         console.log('✅ Page has active class:', incidentsPage.classList.contains('active'));
-        console.log('✅ Page computed height:', window.getComputedStyle(incidentsPage).height);
+        console.log('✅ Page innerHTML length:', incidentsPage.innerHTML.length);
+        console.log('✅ Page children count:', incidentsPage.children.length);
+        
+        // CRITICAL: Check if test element exists and is visible
+        const testElement = incidentsPage.querySelector('div[style*="TEST"]');
+        if (testElement) {
+            console.log('🔴 TEST ELEMENT EXISTS IN DOM!');
+            console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
+            console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
+            console.log('✅ Test element computed display:', window.getComputedStyle(testElement).display);
+            console.log('✅ Test element computed visibility:', window.getComputedStyle(testElement).visibility);
+            console.log('✅ Test element computed opacity:', window.getComputedStyle(testElement).opacity);
+            console.log('✅ Test element computed height:', window.getComputedStyle(testElement).height);
+            console.log('✅ Test element computed width:', window.getComputedStyle(testElement).width);
+            console.log('✅ Test element parent:', testElement.parentElement?.id);
+            console.log('✅ Test element parent display:', window.getComputedStyle(testElement.parentElement).display);
+        } else {
+            console.error('❌ TEST ELEMENT NOT FOUND IN DOM!');
+            console.error('Available children:', Array.from(incidentsPage.children).map(c => `${c.tagName}#${c.id || ''}.${c.className || ''}`));
+        }
         console.log('✅ Page computed width:', window.getComputedStyle(incidentsPage).width);
         
         // CRITICAL: Force show ALL direct children immediately
