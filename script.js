@@ -2715,17 +2715,8 @@ async function loadIncidents() {
             console.error('Available buttons:', incidentsPage.querySelectorAll('button'));
         }
         
-        // Check for test element
-        const testElement = incidentsPage.querySelector('div[style*="TEST"]');
-        if (testElement) {
-            console.log('🔴 TEST ELEMENT FOUND!');
-            console.log('✅ Test element display:', window.getComputedStyle(testElement).display);
-            console.log('✅ Test element visibility:', window.getComputedStyle(testElement).visibility);
-            console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
-            console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
-        } else {
-            console.error('❌ TEST ELEMENT NOT FOUND!');
-        }
+        // Check for test element (already checked above at line 2596, removing duplicate)
+        // const testElement already declared above - removed duplicate declaration
         
         // CRITICAL: Also check and fix the main.container parent
         const mainContainer = incidentsPage.closest('main.container');
