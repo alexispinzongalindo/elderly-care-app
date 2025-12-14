@@ -1180,6 +1180,13 @@ function showPage(pageName) {
         page.style.display = 'none';
         page.style.visibility = 'hidden';
         page.style.opacity = '0';
+        // Also hide all child containers that might have forced visibility
+        const containers = page.querySelectorAll('[id$="List"], [class*="container"], [class*="form-card"]');
+        containers.forEach(container => {
+            if (pageName !== page.id) {
+                container.style.display = 'none';
+            }
+        });
     });
     
     const targetPage = document.getElementById(pageName);
@@ -1212,6 +1219,19 @@ function showPage(pageName) {
             loadCalendar();
         }
         else if (pageName === 'billing') {
+            // CRITICAL: Hide incidents page and its containers when showing billing
+            const incidentsPage = document.getElementById('incidents');
+            if (incidentsPage) {
+                incidentsPage.style.display = 'none';
+                incidentsPage.style.visibility = 'hidden';
+                incidentsPage.style.opacity = '0';
+                incidentsPage.classList.remove('active');
+            }
+            const incidentsList = document.getElementById('incidentsList');
+            if (incidentsList) {
+                incidentsList.style.display = 'none';
+                incidentsList.style.visibility = 'hidden';
+            }
             loadBilling();
             loadPayments();
             loadAccountBalance();
@@ -2310,6 +2330,13 @@ function hideIncidentForm() {
 
 async function loadIncidents() {
     try {
+        // CRITICAL: Only load if incidents page is actually active
+        const incidentsPage = document.getElementById('incidents');
+        if (!incidentsPage || !incidentsPage.classList.contains('active')) {
+            console.log('⏭️ Skipping loadIncidents - incidents page is not active');
+            return;
+        }
+        
         console.log('🔄 Loading incidents...');
         const container = document.getElementById('incidentsList');
         if (!container) {
