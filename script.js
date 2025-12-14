@@ -4649,7 +4649,7 @@ async function loadBilling() {
     }
 }
 
-function updatePaymentBillDropdown(bills) {
+async function updatePaymentBillDropdown(bills) {
     const select = document.getElementById('paymentBillId');
     if (!select) {
         console.error('paymentBillId select not found');
