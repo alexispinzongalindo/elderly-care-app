@@ -1384,6 +1384,25 @@ function showPage(pageName) {
             console.log('✅ Incidents page ID:', incidentsPage.id);
             console.log('✅ Incidents page classes:', incidentsPage.className);
             console.log('✅ Incidents page children count:', incidentsPage.children.length);
+            console.log('✅ Incidents page parent:', incidentsPage.parentElement?.tagName, incidentsPage.parentElement?.id);
+            console.log('✅ Incidents page parent display:', window.getComputedStyle(incidentsPage.parentElement).display);
+            console.log('✅ Incidents page innerHTML length:', incidentsPage.innerHTML.length);
+            
+            // CRITICAL: Ensure main.container is visible
+            const mainContainer = incidentsPage.closest('main.container');
+            if (mainContainer) {
+                mainContainer.style.setProperty('display', 'block', 'important');
+                mainContainer.style.setProperty('visibility', 'visible', 'important');
+                mainContainer.style.setProperty('opacity', '1', 'important');
+                console.log('✅ main.container forced visible');
+            }
+            
+            // CRITICAL: Check if test element exists in HTML
+            if (incidentsPage.innerHTML.includes('TEST')) {
+                console.log('✅ TEST element found in innerHTML');
+            } else {
+                console.error('❌ TEST element NOT found in innerHTML!');
+            }
             
             // Force incidents page to be visible using cssText for maximum control
             incidentsPage.classList.add('active');
