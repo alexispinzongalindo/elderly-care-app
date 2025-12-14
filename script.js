@@ -1282,16 +1282,33 @@ function showPage(pageName) {
                 billingPage.style.setProperty('z-index', '1', 'important');
                 billingPage.style.removeProperty('left'); // Remove left: -9999px if it was set
                 
-                // Restore all billing children visibility
-                const billingChildren = billingPage.querySelectorAll('*');
-                billingChildren.forEach(child => {
+                // Force show all direct children of billing page
+                Array.from(billingPage.children).forEach((child, index) => {
                     // Only restore if it's not a form that should be hidden
-                    if (child.id !== 'billForm' && child.id !== 'paymentForm' && 
-                        !child.classList.contains('form-card') || child.style.display !== 'none') {
-                        child.style.removeProperty('display');
-                        child.style.removeProperty('visibility');
+                    if (child.id === 'billForm' || child.id === 'paymentForm') {
+                        // Keep forms hidden if they should be hidden
+                        if (child.style.display === 'none') {
+                            return;
+                        }
                     }
+                    // Force show everything else
+                    child.style.setProperty('display', 'block', 'important');
+                    child.style.setProperty('visibility', 'visible', 'important');
+                    child.style.setProperty('opacity', '1', 'important');
                 });
+                
+                // Also force show key billing containers
+                const billingList = document.getElementById('billsList');
+                const paymentsList = document.getElementById('paymentsList');
+                if (billingList) {
+                    billingList.style.setProperty('display', 'block', 'important');
+                    billingList.style.setProperty('visibility', 'visible', 'important');
+                }
+                if (paymentsList) {
+                    paymentsList.style.setProperty('display', 'block', 'important');
+                    paymentsList.style.setProperty('visibility', 'visible', 'important');
+                }
+                
                 console.log('✅ Billing page restored and shown');
             }
             
