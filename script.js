@@ -1288,6 +1288,7 @@ function showPage(pageName) {
                 billingPage.style.setProperty('position', 'relative', 'important');
                 billingPage.style.setProperty('z-index', '1', 'important');
                 billingPage.style.removeProperty('left'); // Remove left: -9999px if it was set
+                billingPage.style.removeProperty('right'); // Remove any right positioning
                 
                 // Force show all direct children of billing page
                 Array.from(billingPage.children).forEach((child, index) => {
