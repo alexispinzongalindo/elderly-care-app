@@ -32,10 +32,17 @@ def init_db():
             role TEXT NOT NULL DEFAULT 'caregiver',
             email TEXT,
             phone TEXT,
+            preferred_language TEXT DEFAULT 'en',
             active BOOLEAN DEFAULT 1,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    
+    # Add preferred_language column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE staff ADD COLUMN preferred_language TEXT DEFAULT "en"')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     
     # Residents table
     cursor.execute('''
@@ -384,7 +391,8 @@ def login():
                 'username': staff['username'],
                 'full_name': staff['full_name'],
                 'role': staff['role'],
-                'email': staff['email']
+                'email': staff['email'],
+                'preferred_language': staff.get('preferred_language', 'en') or 'en'
             }
         })
     except Exception as e:
@@ -412,8 +420,32 @@ def get_current_user():
         'username': request.current_staff['username'],
         'full_name': request.current_staff['full_name'],
         'role': request.current_staff['role'],
-        'email': request.current_staff['email']
+        'email': request.current_staff['email'],
+        'preferred_language': request.current_staff.get('preferred_language', 'en') or 'en'
     })
+
+@app.route('/api/staff/language', methods=['PUT'])
+@require_auth
+def update_staff_language():
+    try:
+        data = request.json
+        language = data.get('language', 'en')
+        
+        if language not in ['en', 'es']:
+            return jsonify({'error': 'Invalid language. Must be "en" or "es"'}), 400
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('UPDATE staff SET preferred_language = ? WHERE id = ?', (language, request.current_staff['id']))
+        conn.commit()
+        conn.close()
+        
+        # Update current staff object
+        request.current_staff['preferred_language'] = language
+        
+        return jsonify({'message': 'Language preference updated', 'language': language})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Residents endpoints
 @app.route('/api/residents', methods=['GET', 'POST'])

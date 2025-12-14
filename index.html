@@ -200,7 +200,7 @@
                     <!-- Center: Search and Resident Info -->
                     <div class="nav-center">
                         <div id="searchContainer" class="search-container" style="display: none;">
-                            <input type="text" id="globalSearch" class="search-input" placeholder="🔍 Search / Buscar..." autocomplete="off">
+                            <input type="text" id="globalSearch" class="search-input" data-translate-placeholder="common.search" placeholder="🔍 Search" autocomplete="off">
                             <button class="btn-icon-small" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">✕</button>
                         </div>
                         <div id="currentResidentInfo" class="resident-badge" style="display: none;">
@@ -208,48 +208,52 @@
                         </div>
                     </div>
                     
-                    <!-- Right: Clock, Notifications, User Info -->
+                    <!-- Right: Language Selector, Clock, Notifications, User Info -->
                     <div class="nav-right">
+                        <select id="languageSelector" class="language-selector" onchange="setLanguage(this.value)" style="padding: 0.5rem; border: 1px solid var(--medium-gray); border-radius: 4px; background: var(--white); cursor: pointer; font-size: 0.9rem;">
+                            <option value="en">🇺🇸 English</option>
+                            <option value="es">🇪🇸 Español</option>
+                        </select>
                         <div id="liveClock" class="live-clock"></div>
                         <div id="notificationsContainer" class="notifications-container" style="display: none;">
-                            <button class="btn-icon notifications-bell" onclick="toggleNotifications()" id="notificationsBell" title="Notifications / Notificaciones">
+                            <button class="btn-icon notifications-bell" onclick="toggleNotifications()" id="notificationsBell" data-translate-title="nav.notifications">
                                 🔔
                                 <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
                             </button>
                             <div id="notificationsDropdown" class="notifications-dropdown" style="display: none;">
                                 <div class="notifications-header">
-                                    <h4>Notifications / Notificaciones</h4>
-                                    <button class="btn btn-sm btn-secondary" onclick="markAllNotificationsRead()">Mark All Read / Marcar Todas</button>
+                                    <h4 data-translate="nav.notifications">Notifications</h4>
+                                    <button class="btn btn-sm btn-secondary" onclick="markAllNotificationsRead()" data-translate="common.markAllRead">Mark All Read</button>
                                 </div>
                                 <div id="notificationsList" class="notifications-list"></div>
                                 <div class="notifications-footer">
-                                    <a href="#" onclick="showPage('notifications'); return false;">View All / Ver Todas</a>
+                                    <a href="#" onclick="showPage('notifications'); return false;" data-translate="common.viewAll">View All</a>
                                 </div>
                             </div>
                         </div>
                         <div id="userInfo" class="user-info" style="display: none;">
                             <span id="userName"></span>
                             <span class="user-role" id="userRole" style="display: none;"></span>
-                            <button class="btn btn-sm btn-secondary" onclick="handleLogout()" title="Logout / Cerrar Sesión">Logout</button>
+                            <button class="btn btn-sm btn-secondary" onclick="handleLogout()" data-translate="nav.logout" data-translate-title="nav.logout">Logout</button>
                         </div>
                         <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
                     </div>
                 </div>
                 <!-- Navigation Menu -->
                 <ul class="nav-menu" id="navMenu">
-                    <li><a href="#" class="nav-link active" data-page="dashboard">Dashboard</a></li>
-                    <li><a href="#" class="nav-link" data-page="residents">Residents</a></li>
-                    <li><a href="#" class="nav-link" data-page="medications">Medications</a></li>
-                    <li><a href="#" class="nav-link" data-page="appointments">Appointments</a></li>
-                    <li><a href="#" class="nav-link" data-page="vitalsigns">Vital Signs</a></li>
-                    <li><a href="#" class="nav-link" data-page="calendar">Calendar / Calendario</a></li>
-                    <li><a href="#" class="nav-link" data-page="billing">Billing / Facturación</a></li>
-                    <li><a href="#" class="nav-link" data-page="incidents" onclick="event.preventDefault(); console.log('🔴 INCIDENTS LINK CLICKED'); if(typeof showPage === 'function') { showPage('incidents'); } else { console.error('❌ showPage not defined!'); alert('Error: showPage function not found. Check console.'); } return false;">Incidents / Incidentes</a></li>
-                    <li><a href="#" class="nav-link" data-page="carenotes">Care Notes / Notas de Cuidado</a></li>
-                    <li><a href="#" class="nav-link" data-page="notifications">Notifications / Notificaciones</a></li>
-                    <li><a href="#" class="nav-link" data-page="reports">Reports / Reportes</a></li>
-                    <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;">Staff / Personal</a></li>
-                    <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;" style="color: var(--danger-color);">Logout / Cerrar Sesión</a></li>
+                    <li><a href="#" class="nav-link active" data-page="dashboard" data-translate="nav.dashboard">Dashboard</a></li>
+                    <li><a href="#" class="nav-link" data-page="residents" data-translate="nav.residents">Residents</a></li>
+                    <li><a href="#" class="nav-link" data-page="medications" data-translate="nav.medications">Medications</a></li>
+                    <li><a href="#" class="nav-link" data-page="appointments" data-translate="nav.appointments">Appointments</a></li>
+                    <li><a href="#" class="nav-link" data-page="vitalsigns" data-translate="nav.vitalSigns">Vital Signs</a></li>
+                    <li><a href="#" class="nav-link" data-page="calendar" data-translate="nav.calendar">Calendar</a></li>
+                    <li><a href="#" class="nav-link" data-page="billing" data-translate="nav.billing">Billing</a></li>
+                    <li><a href="#" class="nav-link" data-page="incidents" data-translate="nav.incidents" onclick="event.preventDefault(); console.log('🔴 INCIDENTS LINK CLICKED'); if(typeof showPage === 'function') { showPage('incidents'); } else { console.error('❌ showPage not defined!'); alert('Error: showPage function not found. Check console.'); } return false;">Incidents</a></li>
+                    <li><a href="#" class="nav-link" data-page="carenotes" data-translate="nav.careNotes">Care Notes</a></li>
+                    <li><a href="#" class="nav-link" data-page="notifications" data-translate="nav.notifications">Notifications</a></li>
+                    <li><a href="#" class="nav-link" data-page="reports" data-translate="nav.reports">Reports</a></li>
+                    <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;" data-translate="nav.staff">Staff</a></li>
+                    <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;" style="color: var(--danger-color);" data-translate="nav.logout">Logout</a></li>
                 </ul>
             </div>
         </nav>
@@ -257,7 +261,7 @@
         <main class="container">
             <!-- Dashboard Page -->
             <div id="dashboard" class="page active">
-                <h2>Dashboard / Panel de Control</h2>
+                <h2 data-translate="dashboard.title">Dashboard</h2>
                 <p id="dashboardDate" style="color: var(--dark-gray); margin-bottom: 2rem;"></p>
                 
                 <!-- Stats Grid with Cards Side by Side -->
@@ -265,9 +269,9 @@
                     <div class="stat-card stat-card-medications">
                         <div class="stat-icon">💊</div>
                         <div class="stat-content">
-                            <h3>Medications / Medicamentos</h3>
+                            <h3 data-translate="dashboard.medications">Medications</h3>
                             <p class="stat-number" id="medsTakenStat">0/0</p>
-                            <p class="stat-label">Taken Today / Tomados Hoy</p>
+                            <p class="stat-label" data-translate="dashboard.medicationsTaken">Taken Today</p>
                             <div class="stat-progress" id="medsProgress" style="display: none;">
                                 <div class="stat-progress-bar" id="medsProgressBar"></div>
                             </div>
@@ -276,33 +280,33 @@
                     <div class="stat-card stat-card-appointments">
                         <div class="stat-icon">📅</div>
                         <div class="stat-content">
-                            <h3>Appointments / Citas</h3>
+                            <h3 data-translate="dashboard.appointments">Appointments</h3>
                             <p class="stat-number" id="apptsToday">0</p>
-                            <p class="stat-label">Scheduled Today / Programadas Hoy</p>
+                            <p class="stat-label" data-translate="dashboard.appointmentsScheduled">Scheduled Today</p>
                         </div>
                     </div>
                     <div class="stat-card stat-card-residents">
                         <div class="stat-icon">👥</div>
                         <div class="stat-content">
-                            <h3>Residents / Residentes</h3>
+                            <h3 data-translate="dashboard.residents">Residents</h3>
                             <p class="stat-number" id="totalResidents">0</p>
-                            <p class="stat-label">Active / Activos</p>
+                            <p class="stat-label" data-translate="dashboard.residentsActive">Active</p>
                         </div>
                     </div>
                     <div class="stat-card stat-card-vitals" id="vitalsCard" style="display: none;">
                         <div class="stat-icon">❤️</div>
                         <div class="stat-content">
-                            <h3>Vital Signs / Signos Vitales</h3>
+                            <h3 data-translate="dashboard.vitalSigns">Vital Signs</h3>
                             <p class="stat-number" id="vitalsToday">0</p>
-                            <p class="stat-label">Recorded Today / Registrados Hoy</p>
+                            <p class="stat-label" data-translate="dashboard.vitalSignsRecorded">Recorded Today</p>
                         </div>
                     </div>
                     <div class="stat-card stat-card-billing" id="billingCard" style="display: none;">
                         <div class="stat-icon">💰</div>
                         <div class="stat-content">
-                            <h3>Account Balance / Saldo</h3>
+                            <h3 data-translate="dashboard.accountBalance">Account Balance</h3>
                             <p class="stat-number" id="accountBalance">$0.00</p>
-                            <p class="stat-label" id="balanceLabel">Balance / Saldo</p>
+                            <p class="stat-label" id="balanceLabel" data-translate="dashboard.balance">Balance</p>
                         </div>
                     </div>
                 </div>

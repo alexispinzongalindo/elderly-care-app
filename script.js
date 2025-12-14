@@ -17,6 +17,162 @@ let editingVitalSignId = null;
 let editingBillId = null;
 let editingPaymentId = null;
 
+// Language system
+let currentLanguage = 'en'; // Default to English
+let currentUser = null;
+
+// Translation dictionary
+const translations = {
+    en: {
+        // Navigation
+        'nav.dashboard': 'Dashboard',
+        'nav.residents': 'Residents',
+        'nav.medications': 'Medications',
+        'nav.appointments': 'Appointments',
+        'nav.vitalSigns': 'Vital Signs',
+        'nav.calendar': 'Calendar',
+        'nav.billing': 'Billing',
+        'nav.incidents': 'Incidents',
+        'nav.careNotes': 'Care Notes',
+        'nav.notifications': 'Notifications',
+        'nav.reports': 'Reports',
+        'nav.staff': 'Staff',
+        'nav.logout': 'Logout',
+        
+        // Dashboard
+        'dashboard.title': 'Dashboard',
+        'dashboard.medications': 'Medications',
+        'dashboard.medicationsTaken': 'Taken Today',
+        'dashboard.appointments': 'Appointments',
+        'dashboard.appointmentsScheduled': 'Scheduled Today',
+        'dashboard.residents': 'Residents',
+        'dashboard.residentsActive': 'Active',
+        'dashboard.vitalSigns': 'Vital Signs',
+        'dashboard.vitalSignsRecorded': 'Recorded Today',
+        'dashboard.accountBalance': 'Account Balance',
+        'dashboard.balance': 'Balance',
+        'dashboard.overdue': 'Overdue',
+        
+        // Common
+        'common.search': 'Search',
+        'common.logout': 'Logout',
+        'common.save': 'Save',
+        'common.cancel': 'Cancel',
+        'common.edit': 'Edit',
+        'common.delete': 'Delete',
+        'common.add': 'Add',
+        'common.close': 'Close',
+        'common.loading': 'Loading...',
+        'common.error': 'Error',
+        'common.success': 'Success',
+        'common.markAllRead': 'Mark All Read',
+        'common.viewAll': 'View All',
+    },
+    es: {
+        // Navigation
+        'nav.dashboard': 'Panel de Control',
+        'nav.residents': 'Residentes',
+        'nav.medications': 'Medicamentos',
+        'nav.appointments': 'Citas',
+        'nav.vitalSigns': 'Signos Vitales',
+        'nav.calendar': 'Calendario',
+        'nav.billing': 'Facturación',
+        'nav.incidents': 'Incidentes',
+        'nav.careNotes': 'Notas de Cuidado',
+        'nav.notifications': 'Notificaciones',
+        'nav.reports': 'Reportes',
+        'nav.staff': 'Personal',
+        'nav.logout': 'Cerrar Sesión',
+        
+        // Dashboard
+        'dashboard.title': 'Panel de Control',
+        'dashboard.medications': 'Medicamentos',
+        'dashboard.medicationsTaken': 'Tomados Hoy',
+        'dashboard.appointments': 'Citas',
+        'dashboard.appointmentsScheduled': 'Programadas Hoy',
+        'dashboard.residents': 'Residentes',
+        'dashboard.residentsActive': 'Activos',
+        'dashboard.vitalSigns': 'Signos Vitales',
+        'dashboard.vitalSignsRecorded': 'Registrados Hoy',
+        'dashboard.accountBalance': 'Saldo de Cuenta',
+        'dashboard.balance': 'Saldo',
+        'dashboard.overdue': 'Vencido',
+        
+        // Common
+        'common.search': 'Buscar',
+        'common.logout': 'Cerrar Sesión',
+        'common.save': 'Guardar',
+        'common.cancel': 'Cancelar',
+        'common.edit': 'Editar',
+        'common.delete': 'Eliminar',
+        'common.add': 'Agregar',
+        'common.close': 'Cerrar',
+        'common.loading': 'Cargando...',
+        'common.error': 'Error',
+        'common.success': 'Éxito',
+        'common.markAllRead': 'Marcar Todas',
+        'common.viewAll': 'Ver Todas',
+    }
+};
+
+// Translation function
+function t(key) {
+    return translations[currentLanguage][key] || key;
+}
+
+// Set language and update UI
+function setLanguage(lang) {
+    if (lang !== 'en' && lang !== 'es') {
+        console.error('Invalid language:', lang);
+        return;
+    }
+    
+    currentLanguage = lang;
+    document.documentElement.lang = lang;
+    
+    // Save to localStorage
+    localStorage.setItem('preferredLanguage', lang);
+    
+    // Update language selector
+    const langSelector = document.getElementById('languageSelector');
+    if (langSelector) {
+        langSelector.value = lang;
+    }
+    
+    // Update all translatable elements
+    updateTranslations();
+    
+    // Save to server if user is logged in
+    if (currentUser && authToken) {
+        fetch('/api/staff/language', {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ language: lang })
+        }).catch(err => console.error('Error updating language preference:', err));
+    }
+}
+
+// Update all translatable text on the page
+function updateTranslations() {
+    // Update navigation
+    document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        el.textContent = t(key);
+    });
+    
+    // Update placeholders
+    document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-translate-placeholder');
+        el.placeholder = t(key);
+    });
+    
+    // Update titles
+    document.querySelectorAll('[data-translate-title]').forEach(el => {
+        const key = el.getAttribute('data-translate-title');
+        el.title = t(key);
+    });
+}
+
 // Set auth token for all API calls
 function getAuthHeaders() {
     const headers = { 'Content-Type': 'application/json' };
@@ -246,8 +402,13 @@ async function handleLogin(event) {
             console.log('✅ Login successful!', data);
             authToken = data.token;
             currentStaff = data.staff;
+            currentUser = data.staff; // Set for language system
             localStorage.setItem('authToken', authToken);
             localStorage.setItem('currentStaff', JSON.stringify(currentStaff));
+            
+            // Load user's preferred language
+            const userLanguage = currentStaff.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
+            setLanguage(userLanguage);
             
             document.getElementById('userName').textContent = currentStaff.full_name;
             const userRoleEl = document.getElementById('userRole');
