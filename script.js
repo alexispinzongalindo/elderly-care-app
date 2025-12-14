@@ -252,11 +252,17 @@ async function handleLogin(event) {
             showResidentSelector();
             showMessage('Login successful! / ¡Inicio de sesión exitoso!', 'success');
         } else {
-            showMessage(data.error || 'Login failed / Error de inicio de sesión', 'error');
+            // Login failed - show error message
+            const errorMsg = data.error || 'Login failed / Error de inicio de sesión';
+            console.error('❌ Login failed:', response.status, errorMsg);
+            showMessage(errorMsg, 'error');
+            
+            // Clear password field on error
+            document.getElementById('loginPassword').value = '';
         }
     } catch (error) {
-        console.error('Login error:', error);
-        showMessage('Error connecting to server / Error al conectar con el servidor', 'error');
+        console.error('❌ Login error:', error);
+        showMessage(`Error connecting to server: ${error.message} / Error al conectar con el servidor: ${error.message}`, 'error');
     }
 }
 
