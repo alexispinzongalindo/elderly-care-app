@@ -257,37 +257,119 @@
         <main class="container">
             <!-- Dashboard Page -->
             <div id="dashboard" class="page active">
-                <h2>Today's Overview / Resumen del Día</h2>
+                <div class="dashboard-header">
+                    <h2>Dashboard / Panel de Control</h2>
+                    <p class="dashboard-subtitle" id="dashboardDate"></p>
+                </div>
+                
+                <!-- Stats Grid with Icons -->
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Medications / Medicamentos</h3>
-                        <p class="stat-number" id="medsTakenStat">0/0</p>
-                        <p class="stat-label">Taken Today / Tomados Hoy</p>
+                    <div class="stat-card stat-card-medications">
+                        <div class="stat-icon">💊</div>
+                        <div class="stat-content">
+                            <h3>Medications / Medicamentos</h3>
+                            <p class="stat-number" id="medsTakenStat">0/0</p>
+                            <p class="stat-label">Taken Today / Tomados Hoy</p>
+                            <div class="stat-progress" id="medsProgress" style="display: none;">
+                                <div class="stat-progress-bar" id="medsProgressBar"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Appointments / Citas</h3>
-                        <p class="stat-number" id="apptsToday">0</p>
-                        <p class="stat-label">Scheduled Today / Programadas Hoy</p>
+                    <div class="stat-card stat-card-appointments">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-content">
+                            <h3>Appointments / Citas</h3>
+                            <p class="stat-number" id="apptsToday">0</p>
+                            <p class="stat-label">Scheduled Today / Programadas Hoy</p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Residents / Residentes</h3>
-                        <p class="stat-number" id="totalResidents">0</p>
-                        <p class="stat-label">Active / Activos</p>
+                    <div class="stat-card stat-card-residents">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <h3>Residents / Residentes</h3>
+                            <p class="stat-number" id="totalResidents">0</p>
+                            <p class="stat-label">Active / Activos</p>
+                        </div>
                     </div>
-                    <div class="stat-card" id="billingCard" style="display: none;">
-                        <h3>Account Balance / Saldo de Cuenta</h3>
-                        <p class="stat-number" id="accountBalance">$0.00</p>
-                        <p class="stat-label" id="balanceLabel">Balance / Saldo</p>
+                    <div class="stat-card stat-card-vitals" id="vitalsCard" style="display: none;">
+                        <div class="stat-icon">❤️</div>
+                        <div class="stat-content">
+                            <h3>Vital Signs / Signos Vitales</h3>
+                            <p class="stat-number" id="vitalsToday">0</p>
+                            <p class="stat-label">Recorded Today / Registrados Hoy</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-card-billing" id="billingCard" style="display: none;">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <h3>Account Balance / Saldo</h3>
+                            <p class="stat-number" id="accountBalance">$0.00</p>
+                            <p class="stat-label" id="balanceLabel">Balance / Saldo</p>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="quick-actions">
-                    <h3>Quick Actions / Acciones Rápidas</h3>
-                    <div class="button-group">
-                        <button class="btn btn-primary" onclick="showPage('medications')">Add Medication / Agregar Medicamento</button>
-                        <button class="btn btn-primary" onclick="showPage('appointments')">Add Appointment / Agregar Cita</button>
-                        <button class="btn btn-primary" onclick="showPage('vitalsigns')">Record Vital Signs / Registrar Signos Vitales</button>
-                        <button class="btn btn-primary" onclick="showPage('billing')">Billing / Facturación</button>
+                <!-- Dashboard Content Grid -->
+                <div class="dashboard-grid">
+                    <!-- Left Column -->
+                    <div class="dashboard-column">
+                        <!-- Quick Actions -->
+                        <div class="dashboard-widget">
+                            <h3>🚀 Quick Actions / Acciones Rápidas</h3>
+                            <div class="quick-actions-grid">
+                                <button class="quick-action-btn" onclick="showPage('residents')">
+                                    <span class="quick-action-icon">➕</span>
+                                    <span>Add Resident / Agregar Residente</span>
+                                </button>
+                                <button class="quick-action-btn" onclick="showPage('medications')">
+                                    <span class="quick-action-icon">💊</span>
+                                    <span>Add Medication / Agregar Medicamento</span>
+                                </button>
+                                <button class="quick-action-btn" onclick="showPage('appointments')">
+                                    <span class="quick-action-icon">📅</span>
+                                    <span>Add Appointment / Agregar Cita</span>
+                                </button>
+                                <button class="quick-action-btn" onclick="showPage('vitalsigns')">
+                                    <span class="quick-action-icon">❤️</span>
+                                    <span>Record Vitals / Registrar Signos</span>
+                                </button>
+                                <button class="quick-action-btn" onclick="showPage('incidents')">
+                                    <span class="quick-action-icon">⚠️</span>
+                                    <span>Report Incident / Reportar Incidente</span>
+                                </button>
+                                <button class="quick-action-btn" onclick="showPage('carenotes')">
+                                    <span class="quick-action-icon">📝</span>
+                                    <span>Add Care Note / Agregar Nota</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Upcoming Appointments -->
+                        <div class="dashboard-widget" id="upcomingAppointmentsWidget">
+                            <h3>📅 Upcoming Appointments / Próximas Citas</h3>
+                            <div id="upcomingAppointmentsList" class="upcoming-list">
+                                <p class="empty-state">No upcoming appointments / No hay citas próximas</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="dashboard-column">
+                        <!-- Medication Reminders -->
+                        <div class="dashboard-widget" id="medicationRemindersWidget">
+                            <h3>⏰ Medication Reminders / Recordatorios de Medicamentos</h3>
+                            <div id="medicationRemindersList" class="reminders-list">
+                                <p class="empty-state">No medications scheduled / No hay medicamentos programados</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Activity -->
+                        <div class="dashboard-widget" id="recentActivityWidget">
+                            <h3>📋 Recent Activity / Actividad Reciente</h3>
+                            <div id="recentActivityList" class="activity-list">
+                                <p class="empty-state">No recent activity / No hay actividad reciente</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1374,6 +1456,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="script.js?v=1765601000"></script>
+    <script src="script.js?v=1765602000"></script>
 </body>
 </html>

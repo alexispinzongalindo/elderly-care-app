@@ -1207,6 +1207,14 @@ function showMessage(message, type = 'success') {
 // Dashboard
 async function loadDashboard() {
     try {
+        // Set dashboard date
+        const dateEl = document.getElementById('dashboardDate');
+        if (dateEl) {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateEl.textContent = today.toLocaleDateString('en-US', options) + ' / ' + today.toLocaleDateString('es-PR', options);
+        }
+        
         const url = currentResidentId 
             ? `${API_URL}/dashboard?resident_id=${currentResidentId}`
             : `${API_URL}/dashboard`;
@@ -1229,6 +1237,17 @@ async function loadDashboard() {
         const medsStatEl = document.getElementById('medsTakenStat');
         if (medsStatEl) {
             medsStatEl.textContent = `${medsTaken}/${totalMeds}`;
+            
+            // Show progress bar if there are medications
+            const progressEl = document.getElementById('medsProgress');
+            const progressBarEl = document.getElementById('medsProgressBar');
+            if (totalMeds > 0 && progressEl && progressBarEl) {
+                const percentage = (medsTaken / totalMeds) * 100;
+                progressBarEl.style.width = `${percentage}%`;
+                progressEl.style.display = 'block';
+            } else if (progressEl) {
+                progressEl.style.display = 'none';
+            }
         }
         
         const apptsEl = document.getElementById('apptsToday');
@@ -1255,7 +1274,7 @@ async function loadDashboard() {
             const billingCard = document.getElementById('billingCard');
             if (billingCard) {
                 const balance = data.billing_summary.balance ?? 0;
-                billingCard.style.display = 'block';
+                billingCard.style.display = 'flex';
                 const balanceEl = document.getElementById('accountBalance');
                 if (balanceEl) {
                     balanceEl.textContent = `$${balance.toFixed(2)}`;
@@ -1272,6 +1291,12 @@ async function loadDashboard() {
                 billingCard.style.display = 'none';
             }
         }
+        
+        // Load widgets
+        await loadUpcomingAppointments();
+        await loadMedicationReminders();
+        await loadRecentActivity();
+        
     } catch (error) {
         console.error('Error loading dashboard:', error);
         // Set default values on error
@@ -1282,6 +1307,195 @@ async function loadDashboard() {
         const residentsEl = document.getElementById('totalResidents');
         if (residentsEl) residentsEl.textContent = '0';
     }
+}
+
+async function loadUpcomingAppointments() {
+    try {
+        const url = currentResidentId 
+            ? `${API_URL}/appointments?resident_id=${currentResidentId}`
+            : `${API_URL}/appointments`;
+        const response = await fetch(url, { headers: getAuthHeaders() });
+        
+        if (!response.ok) return;
+        
+        const appointments = await response.json();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Filter upcoming appointments (today and future)
+        const upcoming = appointments
+            .filter(apt => {
+                const aptDate = new Date(apt.date);
+                aptDate.setHours(0, 0, 0, 0);
+                return aptDate >= today && !apt.completed;
+            })
+            .sort((a, b) => {
+                const dateA = new Date(a.date + ' ' + a.time);
+                const dateB = new Date(b.date + ' ' + b.time);
+                return dateA - dateB;
+            })
+            .slice(0, 5); // Show only next 5
+        
+        const listEl = document.getElementById('upcomingAppointmentsList');
+        if (!listEl) return;
+        
+        if (upcoming.length === 0) {
+            listEl.innerHTML = '<p class="empty-state">No upcoming appointments / No hay citas próximas</p>';
+            return;
+        }
+        
+        listEl.innerHTML = upcoming.map(apt => {
+            const aptDate = new Date(apt.date);
+            const isToday = aptDate.toDateString() === today.toDateString();
+            return `
+                <div class="upcoming-item">
+                    <div class="upcoming-item-icon">📅</div>
+                    <div class="upcoming-item-content">
+                        <div class="upcoming-item-title">${apt.doctor_name || 'Appointment'}</div>
+                        <div class="upcoming-item-time">
+                            ${isToday ? 'Today / Hoy' : aptDate.toLocaleDateString()} at ${apt.time}
+                            ${apt.facility ? ' - ' + apt.facility : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading upcoming appointments:', error);
+    }
+}
+
+async function loadMedicationReminders() {
+    try {
+        const url = currentResidentId 
+            ? `${API_URL}/medications?resident_id=${currentResidentId}`
+            : `${API_URL}/medications`;
+        const response = await fetch(url, { headers: getAuthHeaders() });
+        
+        if (!response.ok) return;
+        
+        const medications = await response.json();
+        const activeMeds = medications.filter(m => m.active);
+        
+        const listEl = document.getElementById('medicationRemindersList');
+        if (!listEl) return;
+        
+        if (activeMeds.length === 0) {
+            listEl.innerHTML = '<p class="empty-state">No medications scheduled / No hay medicamentos programados</p>';
+            return;
+        }
+        
+        // Show next 5 medications
+        const nextMeds = activeMeds.slice(0, 5);
+        
+        listEl.innerHTML = nextMeds.map(med => {
+            const times = JSON.parse(med.time_slots || '[]');
+            const nextTime = times.length > 0 ? times[0] : 'N/A';
+            return `
+                <div class="reminder-item">
+                    <div class="reminder-item-icon">💊</div>
+                    <div class="reminder-item-content">
+                        <div class="reminder-item-title">${med.name}</div>
+                        <div class="reminder-item-time">${med.dosage || ''} - Next: ${nextTime}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading medication reminders:', error);
+    }
+}
+
+async function loadRecentActivity() {
+    try {
+        // Load recent items from various sources
+        const activities = [];
+        
+        // Get recent vital signs
+        try {
+            const vsUrl = currentResidentId 
+                ? `${API_URL}/vital-signs?resident_id=${currentResidentId}`
+                : `${API_URL}/vital-signs`;
+            const vsResponse = await fetch(vsUrl, { headers: getAuthHeaders() });
+            if (vsResponse.ok) {
+                const vitalSigns = await vsResponse.json();
+                vitalSigns.slice(0, 3).forEach(vs => {
+                    activities.push({
+                        type: 'vital',
+                        icon: '❤️',
+                        title: 'Vital Signs Recorded / Signos Vitales Registrados',
+                        time: new Date(vs.recorded_at),
+                        id: vs.id
+                    });
+                });
+            }
+        } catch (err) {
+            console.error('Error loading vital signs for activity:', err);
+        }
+        
+        // Get recent care notes
+        try {
+            const notesUrl = currentResidentId 
+                ? `${API_URL}/care-notes?resident_id=${currentResidentId}`
+                : `${API_URL}/care-notes`;
+            const notesResponse = await fetch(notesUrl, { headers: getAuthHeaders() });
+            if (notesResponse.ok) {
+                const notes = await notesResponse.json();
+                notes.slice(0, 2).forEach(note => {
+                    activities.push({
+                        type: 'note',
+                        icon: '📝',
+                        title: 'Care Note Added / Nota de Cuidado Agregada',
+                        time: new Date(note.created_at),
+                        id: note.id
+                    });
+                });
+            }
+        } catch (err) {
+            console.error('Error loading care notes for activity:', err);
+        }
+        
+        // Sort by time (most recent first) and take top 5
+        activities.sort((a, b) => b.time - a.time);
+        const recent = activities.slice(0, 5);
+        
+        const listEl = document.getElementById('recentActivityList');
+        if (!listEl) return;
+        
+        if (recent.length === 0) {
+            listEl.innerHTML = '<p class="empty-state">No recent activity / No hay actividad reciente</p>';
+            return;
+        }
+        
+        listEl.innerHTML = recent.map(activity => {
+            const timeAgo = getTimeAgo(activity.time);
+            return `
+                <div class="activity-item">
+                    <div class="activity-item-icon">${activity.icon}</div>
+                    <div class="activity-item-content">
+                        <div class="activity-item-title">${activity.title}</div>
+                        <div class="activity-item-time">${timeAgo}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading recent activity:', error);
+    }
+}
+
+function getTimeAgo(date) {
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    
+    if (minutes < 1) return 'Just now / Ahora mismo';
+    if (minutes < 60) return `${minutes}m ago / hace ${minutes}m`;
+    if (hours < 24) return `${hours}h ago / hace ${hours}h`;
+    if (days < 7) return `${days}d ago / hace ${days}d`;
+    return date.toLocaleDateString();
 }
 
 // Residents Management

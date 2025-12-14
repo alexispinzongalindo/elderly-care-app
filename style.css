@@ -247,31 +247,234 @@ h2 {
 
 .stat-card {
     background: var(--white);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    text-align: center;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.stat-card-medications {
+    border-left-color: #4CAF50;
+}
+
+.stat-card-appointments {
+    border-left-color: #2196F3;
+}
+
+.stat-card-residents {
+    border-left-color: #9C27B0;
+}
+
+.stat-card-vitals {
+    border-left-color: #F44336;
+}
+
+.stat-card-billing {
+    border-left-color: #FF9800;
+}
+
+.stat-icon {
+    font-size: 3rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.stat-content {
+    flex: 1;
 }
 
 .stat-card h3 {
     color: var(--dark-gray);
-    font-size: 1rem;
-    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
 }
 
 .stat-number {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: bold;
     color: var(--primary-color);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
 }
 
 .stat-label {
     color: var(--dark-gray);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    margin: 0;
 }
 
-/* Quick Actions */
+.stat-progress {
+    margin-top: 0.75rem;
+    height: 4px;
+    background: var(--light-gray);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.stat-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    transition: width 0.3s;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.dashboard-subtitle {
+    color: var(--dark-gray);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.dashboard-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.dashboard-widget {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.dashboard-widget h3 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Quick Actions Grid */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    background: var(--light-gray);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.quick-action-btn:hover {
+    background: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.quick-action-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.quick-action-btn span:last-child {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Upcoming List */
+.upcoming-list,
+.reminders-list,
+.activity-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.upcoming-item,
+.reminder-item,
+.activity-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--light-gray);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: background 0.2s;
+}
+
+.upcoming-item:hover,
+.reminder-item:hover,
+.activity-item:hover {
+    background: var(--light-gray);
+}
+
+.upcoming-item:last-child,
+.reminder-item:last-child,
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.upcoming-item-icon,
+.reminder-item-icon,
+.activity-item-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.upcoming-item-content,
+.reminder-item-content,
+.activity-item-content {
+    flex: 1;
+}
+
+.upcoming-item-title,
+.reminder-item-title,
+.activity-item-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-color);
+}
+
+.upcoming-item-time,
+.reminder-item-time,
+.activity-item-time {
+    font-size: 0.85rem;
+    color: var(--dark-gray);
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--dark-gray);
+    padding: 2rem;
+    font-style: italic;
+}
+
+/* Quick Actions (Legacy) */
 .quick-actions {
     background: var(--white);
     padding: 2rem;
@@ -716,6 +919,14 @@ h2 {
     .stats-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
     }
     
     .button-group {
