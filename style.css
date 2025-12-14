@@ -287,7 +287,8 @@ body {
 
 /* CRITICAL: Force incidents page to show when active */
 #incidents.page.active,
-#incidents.active {
+#incidents.active,
+#incidents {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -296,6 +297,25 @@ body {
     min-height: 400px !important;
     width: 100% !important;
     background: var(--light-gray) !important;
+    padding: 2rem !important;
+}
+
+/* CRITICAL: Force ALL children of incidents page to be visible */
+#incidents.page.active > *,
+#incidents.active > *,
+#incidents > * {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* But keep the form hidden if it should be hidden */
+#incidents.page.active > #incidentForm[style*="display: none"],
+#incidents.active > #incidentForm[style*="display: none"],
+#incidents > #incidentForm[style*="display: none"] {
+    display: none !important;
 }
 
 /* TEMPORARY DEBUG: Show incidents page if it has active class OR if incidents nav is active */
@@ -306,7 +326,9 @@ body:has(.nav-link[data-page="incidents"].active) #incidents {
     opacity: 1 !important;
 }
 
-#incidents.page.active h2 {
+#incidents.page.active h2,
+#incidents.active h2,
+#incidents h2 {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -314,9 +336,16 @@ body:has(.nav-link[data-page="incidents"].active) #incidents {
     margin-bottom: 1.5rem !important;
     font-size: 1.8rem !important;
     font-weight: bold !important;
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    height: auto !important;
 }
 
-#incidents.page.active button.btn-primary {
+#incidents.page.active button.btn-primary,
+#incidents.active button.btn-primary,
+#incidents button.btn-primary,
+#incidents button[onclick="showIncidentForm()"] {
     display: inline-block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -324,14 +353,26 @@ body:has(.nav-link[data-page="incidents"].active) #incidents {
     cursor: pointer !important;
     padding: 0.75rem 1.5rem !important;
     font-size: 1rem !important;
+    position: relative !important;
+    z-index: 1 !important;
+    width: auto !important;
+    height: auto !important;
 }
 
-#incidents.page.active #incidentsList {
+#incidents.page.active #incidentsList,
+#incidents.active #incidentsList,
+#incidents #incidentsList {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
     min-height: 200px !important;
     width: 100% !important;
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: 2rem !important;
+    padding: 1rem !important;
+    background: var(--white) !important;
+    border-radius: 8px !important;
 }
 
 h2 {
