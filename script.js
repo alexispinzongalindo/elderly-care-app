@@ -2244,6 +2244,20 @@ async function loadIncidents() {
             return;
         }
         
+        // Ensure the page is visible
+        const incidentsPage = document.getElementById('incidents');
+        if (incidentsPage) {
+            incidentsPage.classList.add('active');
+            console.log('✅ Incidents page is active');
+        }
+        
+        // Ensure the button is visible
+        const reportButton = incidentsPage?.querySelector('button[onclick="showIncidentForm()"]');
+        if (reportButton) {
+            reportButton.style.display = 'inline-block';
+            console.log('✅ Report Incident button is visible');
+        }
+        
         // Show loading state
         container.innerHTML = '<div class="empty-state">Loading incidents... / Cargando incidentes...</div>';
         
@@ -2271,7 +2285,8 @@ async function loadIncidents() {
         console.log('✅ Loaded incidents:', incidents.length);
         
         if (incidents.length === 0) {
-            container.innerHTML = '<div class="empty-state">No incident reports found. / No se encontraron reportes de incidentes.</div>';
+            container.innerHTML = '<div class="empty-state" style="padding: 3rem; font-size: 1.1rem; color: var(--text-color);"><p style="margin-bottom: 1rem;">📋 No incident reports found. / No se encontraron reportes de incidentes.</p><p style="font-size: 0.9rem; color: var(--medium-gray);">Click the "+ Report Incident" button above to create your first incident report. / Haga clic en el botón "+ Reportar Incidente" arriba para crear su primer reporte de incidente.</p></div>';
+            console.log('✅ Empty state message displayed');
             return;
         }
         

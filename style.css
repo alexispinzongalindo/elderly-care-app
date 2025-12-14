@@ -1832,3 +1832,24 @@ body.dark-mode .notification-time {
         right: -50px;
     }
 }
+
+/* Ensure incidents page content is always visible */
+#incidents.page.active {
+    display: block !important;
+    min-height: 400px;
+}
+
+#incidents h2 {
+    display: block !important;
+    margin-bottom: 1.5rem;
+}
+
+#incidents button[onclick="showIncidentForm()"] {
+    display: inline-block !important;
+    margin-bottom: 1.5rem;
+}
+
+#incidentsList {
+    display: block !important;
+    min-height: 200px;
+}
