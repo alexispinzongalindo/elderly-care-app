@@ -2502,18 +2502,14 @@ async function loadIncidents() {
         
         // ALWAYS ensure the page is visible and active - don't check, just force it
         incidentsPage.classList.add('active');
-        incidentsPage.style.setProperty('display', 'block', 'important');
-        incidentsPage.style.setProperty('visibility', 'visible', 'important');
-        incidentsPage.style.setProperty('opacity', '1', 'important');
-        incidentsPage.style.setProperty('position', 'relative', 'important');
-        incidentsPage.style.setProperty('z-index', '10', 'important');
-        incidentsPage.style.setProperty('min-height', '400px', 'important');
-        incidentsPage.style.setProperty('width', '100%', 'important');
-        incidentsPage.style.setProperty('padding', '2rem', 'important');
-        incidentsPage.style.setProperty('background', 'var(--light-gray)', 'important');
+        incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important;';
         console.log('✅ Incidents page forced to be visible');
         console.log('✅ Page display:', window.getComputedStyle(incidentsPage).display);
+        console.log('✅ Page visibility:', window.getComputedStyle(incidentsPage).visibility);
+        console.log('✅ Page opacity:', window.getComputedStyle(incidentsPage).opacity);
         console.log('✅ Page has active class:', incidentsPage.classList.contains('active'));
+        console.log('✅ Page computed height:', window.getComputedStyle(incidentsPage).height);
+        console.log('✅ Page computed width:', window.getComputedStyle(incidentsPage).width);
         
         // CRITICAL: Force show ALL direct children immediately
         const directChildren = Array.from(incidentsPage.children);
