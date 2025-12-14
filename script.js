@@ -332,6 +332,9 @@ const translations = {
         'medication.endDate': 'Fecha de Fin',
         'medication.instructions': 'Instrucciones',
         'medication.save': 'Guardar Medicamento',
+        'medication.times': 'Hora(s)',
+        'medication.timesHint': 'Ingrese horas separadas por comas',
+        'medication.hoursBetween': 'Horas Entre Dosis',
         
         // Appointments
         'appointment.add': 'Agregar Cita',

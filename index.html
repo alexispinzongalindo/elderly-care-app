@@ -448,7 +448,7 @@
                     <form id="newStaffForm" onsubmit="saveStaff(event)">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="staffFullName">Full Name / Nombre Completo *</label>
+                                <label data-translate="staff.fullName">Full Name *</label>
                                 <input type="text" id="staffFullName" required>
                             </div>
                             <div class="form-group">
@@ -458,17 +458,17 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="staffEmail">Email / Correo Electrónico</label>
+                                <label data-translate="staff.email">Email</label>
                                 <input type="email" id="staffEmail">
                             </div>
                             <div class="form-group">
-                                <label for="staffPhone">Phone / Teléfono</label>
+                                <label data-translate="staff.phone">Phone</label>
                                 <input type="tel" id="staffPhone">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="staffRole">Role / Rol *</label>
+                                <label data-translate="staff.role">Role *</label>
                                 <select id="staffRole" required>
                                     <option value="caregiver">Caregiver / Cuidador</option>
                                     <option value="nurse">Nurse / Enfermero(a)</option>
@@ -489,7 +489,7 @@
                             </label>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-success">Save Staff / Guardar Personal</button>
+                            <button type="submit" class="btn btn-success" data-translate="staff.save">Save Staff</button>
                             <button type="button" class="btn btn-secondary" onclick="hideAddStaffForm()">Cancel / Cancelar</button>
                         </div>
                     </form>
@@ -507,15 +507,15 @@
                     <h3 data-translate="medication.add">Add Medication</h3>
                     <form id="medForm" onsubmit="saveMedication(event)">
                         <div class="form-group">
-                            <label for="medName">Medication Name / Nombre del Medicamento *</label>
+                            <label for="medName" data-translate="medication.name">Medication Name *</label>
                             <input type="text" id="medName" required>
                         </div>
                         <div class="form-group">
-                            <label for="medDosage">Dosage / Dosis *</label>
+                            <label for="medDosage" data-translate="medication.dosage">Dosage *</label>
                             <input type="text" id="medDosage" placeholder="e.g., 10mg" required>
                         </div>
                         <div class="form-group">
-                            <label for="medFrequency">Frequency / Frecuencia *</label>
+                            <label for="medFrequency" data-translate="medication.frequency">Frequency *</label>
                             <select id="medFrequency" required onchange="handleFrequencyChange()">
                                 <option value="Once daily">Once daily / Una vez al día</option>
                                 <option value="Twice daily">Twice daily / Dos veces al día</option>
@@ -528,7 +528,7 @@
                             </select>
                         </div>
                         <div id="hoursIntervalGroup" class="form-group" style="display: none;">
-                            <label>Hours Between Doses / Horas Entre Dosis</label>
+                            <label data-translate="medication.hoursBetween">Hours Between Doses</label>
                             <div class="hours-selector-compact">
                                 <input type="number" id="hoursIntervalInput" min="1" max="24" value="8" class="hours-number-input" onchange="selectHourFromInput()">
                                 <div class="hours-quick-select">
@@ -543,12 +543,12 @@
                             </div>
                         </div>
                         <div class="form-group" id="medTimesGroup">
-                            <label for="medTimes">Time(s) / Hora(s) *</label>
+                            <label for="medTimes" data-translate="medication.times">Time(s) *</label>
                             <input type="text" id="medTimes" placeholder="e.g., 08:00, 20:00" required>
-                            <small>Enter times separated by commas / Ingrese horas separadas por comas</small>
+                            <small data-translate="medication.timesHint">Enter times separated by commas</small>
                         </div>
                         <div class="form-group">
-                            <label>Start Date / Fecha de Inicio</label>
+                            <label data-translate="medication.startDate">Start Date</label>
                             <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                                 <div class="form-group" style="margin: 0;">
                                     <select id="medStartYear" class="form-control">
@@ -583,7 +583,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>End Date / Fecha de Fin</label>
+                            <label data-translate="medication.endDate">End Date</label>
                             <div class="form-group" style="margin-bottom: 0.75rem;">
                                 <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
                                     <input type="checkbox" id="medNoEndDate" onchange="handleNoEndDateChange()">
@@ -642,7 +642,7 @@
                     <h3 data-translate="appointment.add">Add Appointment</h3>
                     <form id="apptForm" onsubmit="saveAppointment(event)">
                         <div class="form-group">
-                            <label>Date / Fecha *</label>
+                            <label data-translate="appointment.date">Date *</label>
                             <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                 <div class="form-group" style="margin: 0;">
                                     <select id="apptYear" class="form-control" required>
@@ -674,7 +674,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="apptTime">Time / Hora *</label>
+                            <label data-translate="appointment.time">Time *</label>
                             <input type="time" id="apptTime" required>
                         </div>
                         <div class="form-group">
@@ -690,7 +690,7 @@
                             <input type="text" id="apptPurpose">
                         </div>
                         <div class="form-group">
-                            <label for="apptNotes">Notes / Notas</label>
+                            <label data-translate="appointment.notes">Notes</label>
                             <textarea id="apptNotes" rows="3"></textarea>
                         </div>
                         <div class="button-group">
@@ -793,7 +793,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="vsNotes">Notes / Notas</label>
+                            <label data-translate="appointment.notes">Notes</label>
                             <textarea id="vsNotes" rows="2" placeholder="Any observations..."></textarea>
                         </div>
                         
@@ -890,7 +890,7 @@
                         <h3 id="billFormTitle">Add New Bill / Agregar Nueva Factura</h3>
                         <form id="newBillForm" onsubmit="saveBill(event)">
                             <div class="form-group">
-                                <label>Billing Date / Fecha de Factura *</label>
+                                <label data-translate="billing.date">Billing Date *</label>
                                 <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                     <div class="form-group" style="margin: 0;">
                                         <select id="billYear" class="form-control" required>
@@ -959,7 +959,7 @@
                                     <input type="number" id="billAmount" step="0.01" min="0" required placeholder="0.00">
                                 </div>
                                 <div class="form-group">
-                                    <label for="billCategory">Category / Categoría</label>
+                                    <label data-translate="carenote.category">Category</label>
                                     <select id="billCategory">
                                         <option value="Monthly Fee">Monthly Fee / Cuota Mensual</option>
                                         <option value="Medical Services">Medical Services / Servicios Médicos</option>
@@ -970,15 +970,15 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="billDescription">Description / Descripción</label>
+                                <label data-translate="billing.description">Description</label>
                                 <input type="text" id="billDescription" placeholder="e.g., Monthly care fee for December">
                             </div>
                             <div class="form-group">
-                                <label for="billNotes">Notes / Notas</label>
+                                <label data-translate="appointment.notes">Notes</label>
                                 <textarea id="billNotes" rows="2"></textarea>
                             </div>
                             <div class="button-group">
-                                <button type="submit" class="btn btn-success">Save Bill / Guardar Factura</button>
+                                <button type="submit" class="btn btn-success" data-translate="billing.save">Save Bill</button>
                                 <button type="button" class="btn btn-secondary" onclick="hideBillForm()">Cancel / Cancelar</button>
                             </div>
                         </form>
@@ -1055,7 +1055,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="paymentNotes">Notes / Notas</label>
+                                <label data-translate="appointment.notes">Notes</label>
                                 <textarea id="paymentNotes" rows="2"></textarea>
                             </div>
                             <div class="button-group">
@@ -1147,7 +1147,7 @@
                         <!-- Location -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentLocation">Location / Ubicación</label>
+                                <label data-translate="appointment.location">Location</label>
                                 <input type="text" id="incidentLocation" placeholder="e.g., Room 101, Dining Hall">
                             </div>
                         </div>
@@ -1225,7 +1225,7 @@
                     <form id="newCareNoteForm" onsubmit="saveCareNote(event)">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="careNoteDate">Date / Fecha *</label>
+                                <label data-translate="appointment.date">Date *</label>
                                 <input type="date" id="careNoteDate" required>
                             </div>
                             <div class="form-group">
