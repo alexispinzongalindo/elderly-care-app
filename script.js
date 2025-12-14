@@ -1195,15 +1195,11 @@ function showPage(pageName) {
     pages.forEach(page => {
         if (page.id !== pageName) {
             page.classList.remove('active');
-            // Use !important via setProperty to override any CSS
+            // Use !important via setProperty to override any CSS - only hide the page container itself
+            // Don't hide children here as it can interfere with the target page's children
             page.style.setProperty('display', 'none', 'important');
             page.style.setProperty('visibility', 'hidden', 'important');
             page.style.setProperty('opacity', '0', 'important');
-            // Also hide all child containers that might have forced visibility
-            const containers = page.querySelectorAll('[id$="List"], [class*="container"], [class*="form-card"], h2, h3');
-            containers.forEach(container => {
-                container.style.setProperty('display', 'none', 'important');
-            });
         }
     });
     
