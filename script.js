@@ -4569,10 +4569,35 @@ async function loadBilling() {
         const url = currentResidentId 
             ? `${API_URL}/billing?resident_id=${currentResidentId}`
             : `${API_URL}/billing`;
-        const response = await fetch(url);
+        const response = await fetch(url, { headers: getAuthHeaders() });
+        
+        if (!response.ok) {
+            console.error('Error loading billing:', response.status, response.statusText);
+            const listContainer = document.getElementById('billsList');
+            if (listContainer) {
+                listContainer.innerHTML = '<div class="empty-state">Error loading bills / Error al cargar facturas</div>';
+            }
+            return;
+        }
+        
         const bills = await response.json();
         
+        // CRITICAL: Check if bills is an array
+        if (!Array.isArray(bills)) {
+            console.error('Error: bills is not an array:', bills);
+            const listContainer = document.getElementById('billsList');
+            if (listContainer) {
+                listContainer.innerHTML = '<div class="empty-state">Error: Invalid data format / Error: Formato de datos inválido</div>';
+            }
+            return;
+        }
+        
         const listContainer = document.getElementById('billsList');
+        if (!listContainer) {
+            console.error('billsList container not found');
+            return;
+        }
+        
         listContainer.innerHTML = '';
         
         if (bills.length === 0) {
