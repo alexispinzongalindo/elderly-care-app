@@ -4626,7 +4626,35 @@ async function loadBilling() {
 
 function updatePaymentBillDropdown(bills) {
     const select = document.getElementById('paymentBillId');
+    if (!select) {
+        console.error('paymentBillId select not found');
+        return;
+    }
     select.innerHTML = '<option value="">-- Select bill -- / Seleccionar factura</option>';
+    
+    // Load bills if not already loaded
+    if (typeof bills === 'undefined' || !Array.isArray(bills)) {
+        try {
+            const url = currentResidentId 
+                ? `${API_URL}/billing?resident_id=${currentResidentId}`
+                : `${API_URL}/billing`;
+            const response = await fetch(url, { headers: getAuthHeaders() });
+            if (response.ok) {
+                bills = await response.json();
+                if (!Array.isArray(bills)) {
+                    console.error('bills is not an array:', bills);
+                    return;
+                }
+            } else {
+                console.error('Error loading bills for payment form:', response.status);
+                return;
+            }
+        } catch (error) {
+            console.error('Error loading bills:', error);
+            return;
+        }
+    }
+    
     bills.forEach(bill => {
         const option = document.createElement('option');
         option.value = bill.id;
