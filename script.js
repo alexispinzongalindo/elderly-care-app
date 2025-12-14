@@ -2506,10 +2506,33 @@ async function loadIncidents() {
         incidentsPage.style.setProperty('visibility', 'visible', 'important');
         incidentsPage.style.setProperty('opacity', '1', 'important');
         incidentsPage.style.setProperty('position', 'relative', 'important');
-        incidentsPage.style.setProperty('z-index', '1', 'important');
+        incidentsPage.style.setProperty('z-index', '10', 'important');
+        incidentsPage.style.setProperty('min-height', '400px', 'important');
+        incidentsPage.style.setProperty('width', '100%', 'important');
+        incidentsPage.style.setProperty('padding', '2rem', 'important');
+        incidentsPage.style.setProperty('background', 'var(--light-gray)', 'important');
         console.log('✅ Incidents page forced to be visible');
         console.log('✅ Page display:', window.getComputedStyle(incidentsPage).display);
         console.log('✅ Page has active class:', incidentsPage.classList.contains('active'));
+        
+        // CRITICAL: Force show ALL direct children immediately
+        const directChildren = Array.from(incidentsPage.children);
+        console.log('🔍 Found', directChildren.length, 'direct children of incidents page');
+        directChildren.forEach((child, index) => {
+            console.log(`  Child ${index}:`, child.tagName, child.id || child.className);
+            // Skip the form if it's supposed to be hidden
+            if (child.id === 'incidentForm' && child.style.display === 'none') {
+                console.log(`  ⏭️ Skipping ${child.id} (form should be hidden)`);
+                return;
+            }
+            // Force show everything else
+            child.style.setProperty('display', child.tagName === 'BUTTON' ? 'inline-block' : 'block', 'important');
+            child.style.setProperty('visibility', 'visible', 'important');
+            child.style.setProperty('opacity', '1', 'important');
+            child.style.setProperty('position', 'relative', 'important');
+            child.style.setProperty('z-index', '1', 'important');
+            console.log(`  ✅ Forced child ${index} to be visible`);
+        });
         
         console.log('🔄 Loading incidents...');
         const container = document.getElementById('incidentsList');
@@ -2528,16 +2551,15 @@ async function loadIncidents() {
         container.style.setProperty('min-height', '200px', 'important');
         container.style.setProperty('width', '100%', 'important');
         container.style.setProperty('margin-top', '2rem', 'important');
+        container.style.setProperty('padding', '1rem', 'important');
+        container.style.setProperty('background', 'var(--white)', 'important');
+        container.style.setProperty('border-radius', '8px', 'important');
         console.log('✅ Container forced visible with !important');
         console.log('✅ Container computed display:', window.getComputedStyle(container).display);
-        
-        // Force container to be visible
-        container.style.setProperty('display', 'block', 'important');
-        container.style.setProperty('visibility', 'visible', 'important');
-        container.style.setProperty('opacity', '1', 'important');
-        container.style.setProperty('min-height', '200px', 'important');
-        container.style.setProperty('width', '100%', 'important');
-        console.log('✅ Container forced to be visible');
+        console.log('✅ Container computed visibility:', window.getComputedStyle(container).visibility);
+        console.log('✅ Container computed opacity:', window.getComputedStyle(container).opacity);
+        console.log('✅ Container computed height:', window.getComputedStyle(container).height);
+        console.log('✅ Container computed width:', window.getComputedStyle(container).width);
         
         // FORCE the header to be visible with !important
         const header = incidentsPage.querySelector('h2');
