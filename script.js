@@ -1119,10 +1119,13 @@ function hideKeyboardShortcuts() {
 
 function updateClock() {
     const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
+    let hours = now.getHours();
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-    const timeString = `${hours}:${minutes}:${seconds}`;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const timeString = `${hours}:${minutes}:${seconds} ${ampm}`;
     const clockEl = document.getElementById('liveClock');
     if (clockEl) clockEl.textContent = timeString;
 }

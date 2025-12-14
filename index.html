@@ -184,25 +184,33 @@
         <nav class="navbar">
             <div class="nav-container">
                 <div class="nav-top">
-                    <!-- Left: Logo and Title -->
+                    <!-- Left: Logo, Title, and Quick Actions -->
                     <div class="nav-left">
                         <h1 class="nav-title">
                             <img src="attached_assets/generated_images/medical_cross_heart_logo.png" alt="Logo" class="nav-logo">
-                            Elder Care Tracker
+                            <span class="nav-title-text">Elder Care Tracker</span>
                         </h1>
+                        <div class="quick-actions-nav" style="display: none;">
+                            <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeToggle" title="Dark Mode / Modo Oscuro">🌙</button>
+                            <button class="btn-icon" onclick="printCurrentPage()" title="Print / Imprimir">🖨️</button>
+                            <button class="btn-icon" onclick="showKeyboardShortcuts()" title="Keyboard Shortcuts / Atajos de Teclado">⌨️</button>
+                        </div>
                     </div>
                     
-                    <!-- Center: Resident Info and Clock -->
+                    <!-- Center: Search and Resident Info -->
                     <div class="nav-center">
+                        <div id="searchContainer" class="search-container" style="display: none;">
+                            <input type="text" id="globalSearch" class="search-input" placeholder="🔍 Search / Buscar..." autocomplete="off">
+                            <button class="btn-icon-small" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">✕</button>
+                        </div>
                         <div id="currentResidentInfo" class="resident-badge" style="display: none;">
                             <strong id="currentResidentName">No resident selected</strong>
                         </div>
-                        <div id="liveClock" class="live-clock"></div>
                     </div>
                     
-                    <!-- Right: Notifications, User Info, and Logout -->
+                    <!-- Right: Clock, Notifications, User Info -->
                     <div class="nav-right">
-                        <!-- Notifications Bell -->
+                        <div id="liveClock" class="live-clock"></div>
                         <div id="notificationsContainer" class="notifications-container" style="display: none;">
                             <button class="btn-icon notifications-bell" onclick="toggleNotifications()" id="notificationsBell" title="Notifications / Notificaciones">
                                 🔔
@@ -223,17 +231,6 @@
                             <span id="userName"></span>
                             <span class="user-role" id="userRole" style="display: none;"></span>
                             <button class="btn btn-sm btn-secondary" onclick="handleLogout()" title="Logout / Cerrar Sesión">Logout</button>
-                        </div>
-                        <!-- Search Bar -->
-                        <div id="searchContainer" class="search-container" style="display: none;">
-                            <input type="text" id="globalSearch" class="search-input" placeholder="🔍 Search / Buscar..." autocomplete="off">
-                            <button class="btn btn-sm btn-secondary" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">✕</button>
-                        </div>
-                        <!-- Quick Actions -->
-                        <div class="quick-actions-nav" style="display: none;">
-                            <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeToggle" title="Dark Mode / Modo Oscuro">🌙</button>
-                            <button class="btn-icon" onclick="printCurrentPage()" title="Print / Imprimir">🖨️</button>
-                            <button class="btn-icon" onclick="showKeyboardShortcuts()" title="Keyboard Shortcuts / Atajos de Teclado">⌨️</button>
                         </div>
                         <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
                     </div>
@@ -1459,6 +1456,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="script.js?v=1765603000"></script>
+    <script src="script.js?v=1765604000"></script>
 </body>
 </html>
