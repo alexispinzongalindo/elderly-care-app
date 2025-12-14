@@ -1148,12 +1148,35 @@
                 <!-- Incident Form -->
                 <div id="incidentForm" class="form-card" style="display: none; margin-top: 2rem;">
                     <h3 id="incidentFormTitle">Report Incident / Reportar Incidente</h3>
-                    <form id="newIncidentForm" onsubmit="saveIncident(event)">
+                    <form id="newIncidentForm" onsubmit="saveIncident(event)" enctype="multipart/form-data">
+                        <!-- Timestamp Section -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentDate">Incident Date & Time / Fecha y Hora *</label>
+                                <label for="incidentDate">Incident Date & Time / Fecha y Hora del Incidente *</label>
                                 <input type="datetime-local" id="incidentDate" required>
+                                <small class="form-hint">Timestamp when the incident occurred / Marca de tiempo cuando ocurrió el incidente</small>
                             </div>
+                        </div>
+                        
+                        <!-- Staff and Residents Section -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="incidentStaffId">Reporting Staff / Personal que Reporta *</label>
+                                <select id="incidentStaffId" required>
+                                    <option value="">-- Select Staff / Seleccionar Personal --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="incidentResidents">Residents Involved / Residentes Involucrados *</label>
+                                <select id="incidentResidents" multiple required style="min-height: 120px;">
+                                    <option value="">-- Select Residents / Seleccionar Residentes --</option>
+                                </select>
+                                <small class="form-hint">Hold Ctrl/Cmd to select multiple / Mantenga Ctrl/Cmd para seleccionar múltiples</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Incident Type and Severity -->
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="incidentType">Incident Type / Tipo de Incidente *</label>
                                 <select id="incidentType" required>
@@ -1167,12 +1190,6 @@
                                     <option value="Other">Other / Otro</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="incidentLocation">Location / Ubicación</label>
-                                <input type="text" id="incidentLocation" placeholder="e.g., Room 101, Dining Hall">
-                            </div>
                             <div class="form-group">
                                 <label for="incidentSeverity">Severity / Gravedad *</label>
                                 <select id="incidentSeverity" required>
@@ -1183,9 +1200,34 @@
                                 </select>
                             </div>
                         </div>
+                        
+                        <!-- Location -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="incidentLocation">Location / Ubicación</label>
+                                <input type="text" id="incidentLocation" placeholder="e.g., Room 101, Dining Hall">
+                            </div>
+                        </div>
+                        
+                        <!-- Description Section -->
                         <div class="form-group">
-                            <label for="incidentDescription">Description / Descripción *</label>
-                            <textarea id="incidentDescription" rows="4" required placeholder="Describe what happened..."></textarea>
+                            <label for="incidentDescription">Description / Descripción del Incidente *</label>
+                            <textarea id="incidentDescription" rows="6" required placeholder="Provide a detailed description of what happened, who was involved, and any immediate observations... / Proporcione una descripción detallada de lo que sucedió, quién estuvo involucrado y cualquier observación inmediata..."></textarea>
+                        </div>
+                        
+                        <!-- Photo Upload Section -->
+                        <div class="form-group">
+                            <label>Incident Photos / Fotos del Incidente</label>
+                            <div class="photo-upload-area" id="incidentPhotoArea">
+                                <input type="file" id="incidentPhotos" multiple accept="image/*" capture="environment" style="display: none;" onchange="handleIncidentPhotos(event)">
+                                <div class="photo-upload-placeholder" onclick="document.getElementById('incidentPhotos').click()">
+                                    <div class="photo-upload-icon">📷</div>
+                                    <p><strong>Tap to Upload Photos / Toca para Subir Fotos</strong></p>
+                                    <p>Camera will open automatically / La cámara se abrirá automáticamente</p>
+                                    <p class="photo-upload-hint">You can select multiple photos / Puedes seleccionar múltiples fotos</p>
+                                </div>
+                                <div id="incidentPhotoPreview" class="photo-preview-grid"></div>
+                            </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">

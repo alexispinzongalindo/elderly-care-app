@@ -202,12 +202,19 @@ def init_db():
             follow_up_required BOOLEAN DEFAULT 0,
             follow_up_notes TEXT,
             photos TEXT,
+            residents_involved TEXT,
             staff_id INTEGER NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (resident_id) REFERENCES residents (id),
             FOREIGN KEY (staff_id) REFERENCES staff (id)
         )
     ''')
+    
+    # Add residents_involved column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE incident_reports ADD COLUMN residents_involved TEXT')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     
     # Daily Care Notes table
     cursor.execute('''
@@ -1324,13 +1331,16 @@ def incidents():
             return jsonify({'error': 'Description is required / Se requiere descripción'}), 400
         
         try:
+            # Use provided staff_id or fallback to current staff
+            staff_id = data.get('staff_id') or request.current_staff['id']
+            
             cursor.execute('''
                 INSERT INTO incident_reports (
                     resident_id, incident_date, incident_type, location, description,
                     severity, witnesses, actions_taken, family_notified,
                     family_notification_date, follow_up_required, follow_up_notes,
-                    photos, staff_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    photos, residents_involved, staff_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 int(data.get('resident_id')),
                 data.get('incident_date'),
@@ -1345,7 +1355,8 @@ def incidents():
                 1 if data.get('follow_up_required') else 0,
                 data.get('follow_up_notes') or '',
                 data.get('photos') or '',
-                request.current_staff['id']
+                data.get('residents_involved') or '',
+                int(staff_id)
             ))
             conn.commit()
             incident_id = cursor.lastrowid
@@ -1398,14 +1409,9 @@ def incident_detail(id):
     
     elif request.method == 'PUT':
         data = request.json
-        cursor.execute('''
-            UPDATE incident_reports 
-            SET incident_date = ?, incident_type = ?, location = ?, description = ?,
-                severity = ?, witnesses = ?, actions_taken = ?, family_notified = ?,
-                family_notification_date = ?, follow_up_required = ?, follow_up_notes = ?,
-                photos = ?
-            WHERE id = ?
-        ''', (
+        # Use provided staff_id or keep existing
+        staff_id = data.get('staff_id')
+        update_fields = [
             data.get('incident_date'),
             data.get('incident_type'),
             data.get('location'),
@@ -1418,8 +1424,27 @@ def incident_detail(id):
             data.get('follow_up_required'),
             data.get('follow_up_notes'),
             data.get('photos'),
-            id
-        ))
+            data.get('residents_involved') or ''
+        ]
+        
+        if staff_id:
+            cursor.execute('''
+                UPDATE incident_reports 
+                SET incident_date = ?, incident_type = ?, location = ?, description = ?,
+                    severity = ?, witnesses = ?, actions_taken = ?, family_notified = ?,
+                    family_notification_date = ?, follow_up_required = ?, follow_up_notes = ?,
+                    photos = ?, residents_involved = ?, staff_id = ?
+                WHERE id = ?
+            ''', (*update_fields, int(staff_id), id))
+        else:
+            cursor.execute('''
+                UPDATE incident_reports 
+                SET incident_date = ?, incident_type = ?, location = ?, description = ?,
+                    severity = ?, witnesses = ?, actions_taken = ?, family_notified = ?,
+                    family_notification_date = ?, follow_up_required = ?, follow_up_notes = ?,
+                    photos = ?, residents_involved = ?
+                WHERE id = ?
+            ''', (*update_fields, id))
         conn.commit()
         conn.close()
         return jsonify({'message': 'Incident report updated successfully'})

@@ -2047,18 +2047,31 @@ async function deleteStaff(id) {
 
 // Incident Reports Management
 let editingIncidentId = null;
+let incidentPhotos = []; // Store base64 encoded photos
 
-function showIncidentForm() {
+async function showIncidentForm() {
     editingIncidentId = null;
+    incidentPhotos = [];
     document.getElementById('incidentForm').style.display = 'block';
     document.getElementById('incidentFormTitle').textContent = 'Report Incident / Reportar Incidente';
     document.getElementById('newIncidentForm').reset();
+    
+    // Clear photo preview
+    const photoPreview = document.getElementById('incidentPhotoPreview');
+    if (photoPreview) photoPreview.innerHTML = '';
+    
     // Set default date to now
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     document.getElementById('incidentDate').value = now.toISOString().slice(0, 16);
     document.getElementById('familyNotificationDateGroup').style.display = 'none';
     document.getElementById('followUpNotesGroup').style.display = 'none';
+    
+    // Load staff dropdown
+    await loadStaffForIncident();
+    
+    // Load residents dropdown
+    await loadResidentsForIncident();
     
     // Setup checkbox handlers
     const familyNotified = document.getElementById('incidentFamilyNotified');
@@ -2075,6 +2088,114 @@ function showIncidentForm() {
     }
     
     document.getElementById('incidentForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function loadStaffForIncident() {
+    try {
+        const response = await fetch('/api/staff', { headers: getAuthHeaders() });
+        if (!response.ok) return;
+        
+        const staffList = await response.json();
+        const select = document.getElementById('incidentStaffId');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">-- Select Staff / Seleccionar Personal --</option>';
+        
+        // Set current user as default
+        const currentStaff = JSON.parse(localStorage.getItem('currentStaff') || '{}');
+        
+        staffList.forEach(staff => {
+            const option = document.createElement('option');
+            option.value = staff.id;
+            option.textContent = `${staff.full_name} (${staff.role})`;
+            if (staff.id === currentStaff.id) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading staff for incident:', error);
+    }
+}
+
+async function loadResidentsForIncident() {
+    try {
+        const response = await fetch('/api/residents?active_only=true', { headers: getAuthHeaders() });
+        if (!response.ok) return;
+        
+        const residents = await response.json();
+        const select = document.getElementById('incidentResidents');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">-- Select Residents / Seleccionar Residentes --</option>';
+        
+        residents.forEach(resident => {
+            const option = document.createElement('option');
+            option.value = resident.id;
+            option.textContent = `${resident.first_name} ${resident.last_name}${resident.room_number ? ' - Room ' + resident.room_number : ''}`;
+            // Pre-select current resident if available
+            if (currentResidentId && resident.id == currentResidentId) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading residents for incident:', error);
+    }
+}
+
+function handleIncidentPhotos(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    incidentPhotos = [];
+    const preview = document.getElementById('incidentPhotoPreview');
+    if (!preview) return;
+    
+    preview.innerHTML = '';
+    
+    Array.from(files).forEach((file, index) => {
+        if (!file.type.startsWith('image/')) {
+            showMessage('Please select only image files / Por favor seleccione solo archivos de imagen', 'error');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            incidentPhotos.push(e.target.result); // Store as base64
+            
+            // Create preview
+            const photoDiv = document.createElement('div');
+            photoDiv.className = 'photo-preview-item';
+            photoDiv.innerHTML = `
+                <img src="${e.target.result}" alt="Incident photo ${index + 1}">
+                <button type="button" class="photo-remove-btn" onclick="removeIncidentPhoto(${index})" title="Remove / Eliminar">×</button>
+            `;
+            preview.appendChild(photoDiv);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function removeIncidentPhoto(index) {
+    incidentPhotos.splice(index, 1);
+    // Rebuild preview
+    const preview = document.getElementById('incidentPhotoPreview');
+    if (!preview) return;
+    
+    preview.innerHTML = '';
+    incidentPhotos.forEach((photo, idx) => {
+        const photoDiv = document.createElement('div');
+        photoDiv.className = 'photo-preview-item';
+        photoDiv.innerHTML = `
+            <img src="${photo}" alt="Incident photo ${idx + 1}">
+            <button type="button" class="photo-remove-btn" onclick="removeIncidentPhoto(${idx})" title="Remove / Eliminar">×</button>
+        `;
+        preview.appendChild(photoDiv);
+    });
+    
+    // Reset file input
+    document.getElementById('incidentPhotos').value = '';
 }
 
 function hideIncidentForm() {
@@ -2164,6 +2285,10 @@ async function editIncident(id) {
         
         const incident = await response.json();
         
+        // Load dropdowns first
+        await loadStaffForIncident();
+        await loadResidentsForIncident();
+        
         // Format datetime for input
         const incidentDate = new Date(incident.incident_date);
         incidentDate.setMinutes(incidentDate.getMinutes() - incidentDate.getTimezoneOffset());
@@ -2178,6 +2303,58 @@ async function editIncident(id) {
         document.getElementById('incidentFamilyNotified').checked = incident.family_notified === 1;
         document.getElementById('incidentFollowUp').checked = incident.follow_up_required === 1;
         document.getElementById('followUpNotes').value = incident.follow_up_notes || '';
+        
+        // Set staff
+        if (incident.staff_id) {
+            document.getElementById('incidentStaffId').value = incident.staff_id;
+        }
+        
+        // Set residents (handle multiple)
+        const residentsSelect = document.getElementById('incidentResidents');
+        if (residentsSelect) {
+            // Clear selections
+            Array.from(residentsSelect.options).forEach(opt => opt.selected = false);
+            
+            // Try to parse residents_involved, fallback to single resident_id
+            let residentsToSelect = [incident.resident_id];
+            if (incident.residents_involved) {
+                try {
+                    residentsToSelect = JSON.parse(incident.residents_involved);
+                } catch (e) {
+                    console.error('Error parsing residents_involved:', e);
+                }
+            }
+            
+            residentsToSelect.forEach(resId => {
+                const option = residentsSelect.querySelector(`option[value="${resId}"]`);
+                if (option) option.selected = true;
+            });
+        }
+        
+        // Load photos
+        incidentPhotos = [];
+        const photoPreview = document.getElementById('incidentPhotoPreview');
+        if (photoPreview) photoPreview.innerHTML = '';
+        
+        if (incident.photos) {
+            try {
+                const photos = JSON.parse(incident.photos);
+                if (Array.isArray(photos) && photos.length > 0) {
+                    incidentPhotos = photos;
+                    photos.forEach((photo, idx) => {
+                        const photoDiv = document.createElement('div');
+                        photoDiv.className = 'photo-preview-item';
+                        photoDiv.innerHTML = `
+                            <img src="${photo}" alt="Incident photo ${idx + 1}">
+                            <button type="button" class="photo-remove-btn" onclick="removeIncidentPhoto(${idx})" title="Remove / Eliminar">×</button>
+                        `;
+                        photoPreview.appendChild(photoDiv);
+                    });
+                }
+            } catch (e) {
+                console.error('Error parsing photos:', e);
+            }
+        }
         
         if (incident.family_notification_date) {
             const notifDate = new Date(incident.family_notification_date);
@@ -2206,19 +2383,26 @@ async function saveIncident(event) {
     const incidentType = document.getElementById('incidentType').value;
     const description = document.getElementById('incidentDescription').value;
     const severity = document.getElementById('incidentSeverity').value;
+    const staffId = document.getElementById('incidentStaffId').value;
+    const residentsSelect = document.getElementById('incidentResidents');
+    const selectedResidents = Array.from(residentsSelect.selectedOptions).map(opt => opt.value).filter(v => v);
     
-    if (!incidentDate || !incidentType || !description || !severity) {
+    if (!incidentDate || !incidentType || !description || !severity || !staffId) {
         showMessage('Please fill in all required fields / Por favor complete todos los campos requeridos', 'error');
         return;
     }
     
-    if (!currentResidentId) {
-        showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
+    if (selectedResidents.length === 0) {
+        showMessage('Please select at least one resident / Por favor seleccione al menos un residente', 'error');
         return;
     }
     
+    // For now, save with first resident (we'll need to update backend to support multiple residents)
+    const primaryResidentId = parseInt(selectedResidents[0]);
+    
     const incidentData = {
-        resident_id: parseInt(currentResidentId),
+        resident_id: primaryResidentId,
+        staff_id: parseInt(staffId),
         incident_date: incidentDate,
         incident_type: incidentType,
         location: document.getElementById('incidentLocation').value || '',
@@ -2228,7 +2412,9 @@ async function saveIncident(event) {
         actions_taken: document.getElementById('incidentActions').value || '',
         family_notified: document.getElementById('incidentFamilyNotified').checked || false,
         follow_up_required: document.getElementById('incidentFollowUp').checked || false,
-        follow_up_notes: document.getElementById('followUpNotes').value || ''
+        follow_up_notes: document.getElementById('followUpNotes').value || '',
+        photos: JSON.stringify(incidentPhotos), // Store photos as JSON array of base64
+        residents_involved: JSON.stringify(selectedResidents) // Store all involved residents
     };
     
     if (incidentData.family_notified) {
