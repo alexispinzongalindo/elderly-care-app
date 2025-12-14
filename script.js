@@ -1383,6 +1383,8 @@ function showPage(pageName) {
             incidentsPage.style.setProperty('min-height', '400px', 'important');
             incidentsPage.style.setProperty('width', '100%', 'important');
             incidentsPage.style.setProperty('background', 'var(--light-gray)', 'important');
+            incidentsPage.style.removeProperty('left'); // Remove left: -9999px if it was set
+            incidentsPage.style.removeProperty('right'); // Remove any right positioning
             console.log('✅ Incidents page forced visible');
             
             // Show ALL direct children of incidents page
