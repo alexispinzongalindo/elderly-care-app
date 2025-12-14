@@ -4738,7 +4738,21 @@ function showBillForm() {
 
 async function editBill(id) {
     try {
-        const response = await fetch(`${API_URL}/billing/${id}`);
+        const response = await fetch(`${API_URL}/billing/${id}`, { headers: getAuthHeaders() });
+        
+        if (response.status === 401) {
+            showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
+            handleLogout();
+            return;
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error loading bill:', response.status, errorData);
+            showMessage('Error loading bill / Error al cargar factura', 'error');
+            return;
+        }
+        
         const bill = await response.json();
         
         editingBillId = id;
