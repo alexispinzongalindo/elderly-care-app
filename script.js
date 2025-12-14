@@ -785,6 +785,19 @@ async function saveNewResident(event) {
 }
 
 function initApp() {
+    console.log('🚀 Initializing app...');
+    
+    // Test server connection
+    fetch('/health')
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Server health check:', data);
+        })
+        .catch(error => {
+            console.error('❌ Server health check failed:', error);
+            showMessage('Warning: Cannot connect to server / Advertencia: No se puede conectar al servidor', 'error');
+        });
+    
     document.getElementById('mainApp').style.display = 'block';
     initNavigation();
     loadDashboard();
@@ -792,6 +805,8 @@ function initApp() {
     setInterval(updateClock, 1000);
     initializeCalendarControls();
     initQuickWins();
+    
+    console.log('✅ App initialized');
 }
 
 // Quick Wins Features
