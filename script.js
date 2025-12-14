@@ -2686,6 +2686,20 @@ async function loadIncidents() {
         });
         
         console.log('🔄 Loading incidents...');
+        
+        // CRITICAL: Before loading, verify test element and other content still exist
+        const testElementBefore = incidentsPage.querySelector('div[style*="TEST"]');
+        const h2Before = incidentsPage.querySelector('h2');
+        const buttonBefore = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
+        console.log('🔍 Before loading incidents:');
+        console.log('  Test element exists:', !!testElementBefore);
+        console.log('  H2 exists:', !!h2Before);
+        console.log('  Button exists:', !!buttonBefore);
+        if (testElementBefore) {
+            console.log('  Test element offsetHeight:', testElementBefore.offsetHeight);
+            console.log('  Test element offsetWidth:', testElementBefore.offsetWidth);
+        }
+        
         const container = document.getElementById('incidentsList');
         if (!container) {
             console.error('❌ incidentsList container not found');
@@ -2694,23 +2708,15 @@ async function loadIncidents() {
         }
         
         // Force container to be visible with !important
-        container.style.setProperty('display', 'block', 'important');
-        container.style.setProperty('visibility', 'visible', 'important');
-        container.style.setProperty('opacity', '1', 'important');
-        container.style.setProperty('position', 'relative', 'important');
-        container.style.setProperty('z-index', '999', 'important');
-        container.style.setProperty('min-height', '200px', 'important');
-        container.style.setProperty('width', '100%', 'important');
-        container.style.setProperty('margin-top', '2rem', 'important');
-        container.style.setProperty('padding', '1rem', 'important');
-        container.style.setProperty('background', 'var(--white)', 'important');
-        container.style.setProperty('border-radius', '8px', 'important');
-        console.log('✅ Container forced visible with !important');
+        container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; min-height: 200px !important; width: 100% !important; margin-top: 2rem !important; padding: 1rem !important; background: var(--white) !important; border-radius: 8px !important;';
+        console.log('✅ Container forced visible with cssText');
         console.log('✅ Container computed display:', window.getComputedStyle(container).display);
         console.log('✅ Container computed visibility:', window.getComputedStyle(container).visibility);
         console.log('✅ Container computed opacity:', window.getComputedStyle(container).opacity);
         console.log('✅ Container computed height:', window.getComputedStyle(container).height);
         console.log('✅ Container computed width:', window.getComputedStyle(container).width);
+        console.log('✅ Container offsetHeight:', container.offsetHeight);
+        console.log('✅ Container offsetWidth:', container.offsetWidth);
         
         // FORCE the header to be visible with !important
         const header = incidentsPage.querySelector('h2');
