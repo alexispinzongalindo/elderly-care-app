@@ -194,8 +194,16 @@ function hideResidentSelector() {
 
 async function handleLogin(event) {
     event.preventDefault();
-    const username = document.getElementById('loginUsername').value;
+    const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
+    
+    // Validate inputs
+    if (!username || !password) {
+        showMessage('Please enter both username and password / Por favor ingrese usuario y contraseña', 'error');
+        return;
+    }
+    
+    console.log('🔐 Attempting login for username:', username);
     
     try {
         const response = await fetch('/api/auth/login', {
@@ -204,20 +212,27 @@ async function handleLogin(event) {
             body: JSON.stringify({ username, password })
         });
         
-        const data = await response.json();
+        console.log('Login response status:', response.status);
+        
+        // Try to parse response
+        let data;
+        try {
+            data = await response.json();
+        } catch (parseError) {
+            const text = await response.text();
+            console.error('Failed to parse login response:', text);
+            showMessage('Server error. Please try again / Error del servidor. Por favor intente de nuevo', 'error');
+            return;
+        }
         
         if (response.ok) {
+            console.log('✅ Login successful!', data);
             authToken = data.token;
             currentStaff = data.staff;
             localStorage.setItem('authToken', authToken);
             localStorage.setItem('currentStaff', JSON.stringify(currentStaff));
             
             document.getElementById('userName').textContent = currentStaff.full_name;
-            const userRoleEl = document.getElementById('userRole');
-            if (userRoleEl) {
-                userRoleEl.textContent = currentStaff.role === 'admin' ? 'Administrator' : 'Caregiver';
-                userRoleEl.style.display = 'inline-block';
-            }
             const userRoleEl = document.getElementById('userRole');
             if (userRoleEl) {
                 userRoleEl.textContent = currentStaff.role === 'admin' ? 'Administrator' : 'Caregiver';
