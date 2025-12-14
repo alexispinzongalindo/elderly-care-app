@@ -1187,8 +1187,8 @@ function initNavigation() {
     }
 }
 
-// Make showPage globally accessible
-window.showPage = function(pageName) {
+// Make showPage globally accessible - CRITICAL FUNCTION
+function showPage(pageName) {
     console.log('%c📄📄📄 showPage() CALLED with: ' + pageName + ' 📄📄📄', 'background: #FF6B6B; color: white; font-size: 18px; font-weight: bold; padding: 10px;');
     console.log('📄 Current URL:', window.location.href);
     console.log('📄 Timestamp:', new Date().toISOString());
@@ -1200,10 +1200,6 @@ window.showPage = function(pageName) {
     
     const pages = document.querySelectorAll('.page');
     console.log('📄 Found', pages.length, 'pages in DOM');
-    
-    if (pageName === 'incidents') {
-        console.log('%c🚨🚨🚨 SHOWING INCIDENTS PAGE 🚨🚨🚨', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
-    }
     
     // CRITICAL: Hide ALL pages first with inline styles to override any forced visibility
     pages.forEach(page => {
@@ -1285,7 +1281,7 @@ window.showPage = function(pageName) {
             loadStaff();
         }
         else if (pageName === 'incidents') {
-            console.log('🚨🚨🚨 SHOWING INCIDENTS PAGE 🚨🚨🚨');
+            console.log('%c🚨🚨🚨 SHOWING INCIDENTS PAGE 🚨🚨🚨', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
             console.log('🚨 Running from: ' + window.location.hostname);
             
             // CRITICAL: Aggressively hide billing page and ALL its content
