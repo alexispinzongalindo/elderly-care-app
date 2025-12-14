@@ -1271,21 +1271,29 @@ function showPage(pageName) {
             loadStaff();
         }
         else if (pageName === 'incidents') {
-            // CRITICAL: Hide billing page and its containers when showing incidents
+            // CRITICAL: Aggressively hide billing page and ALL its content
             const billingPage = document.getElementById('billing');
             if (billingPage) {
+                billingPage.classList.remove('active');
                 billingPage.style.setProperty('display', 'none', 'important');
                 billingPage.style.setProperty('visibility', 'hidden', 'important');
                 billingPage.style.setProperty('opacity', '0', 'important');
-                billingPage.classList.remove('active');
+                billingPage.style.setProperty('position', 'absolute', 'important');
+                billingPage.style.setProperty('left', '-9999px', 'important');
+                billingPage.style.setProperty('z-index', '-1', 'important');
+                // Hide ALL children of billing page
+                const allBillingChildren = billingPage.querySelectorAll('*');
+                allBillingChildren.forEach(child => {
+                    child.style.setProperty('display', 'none', 'important');
+                    child.style.setProperty('visibility', 'hidden', 'important');
+                });
+                console.log('✅ Billing page forcefully hidden');
             }
-            // Also hide all billing-related containers
+            // Also hide all billing-related containers anywhere in the DOM
             const billingContainers = document.querySelectorAll('#billingList, #paymentsList, #accountBalanceCard, [id^="billing"], [id^="payment"]');
             billingContainers.forEach(container => {
-                if (container.closest('#billing')) {
-                    container.style.setProperty('display', 'none', 'important');
-                    container.style.setProperty('visibility', 'hidden', 'important');
-                }
+                container.style.setProperty('display', 'none', 'important');
+                container.style.setProperty('visibility', 'hidden', 'important');
             });
             
             // CRITICAL: Explicitly show incidents page content
