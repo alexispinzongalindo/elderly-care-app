@@ -1231,11 +1231,85 @@ function showPage(pageName) {
     const targetPage = document.getElementById(pageName);
     if (targetPage) {
         targetPage.classList.add('active');
+        
+        // CRITICAL: Force ALL parent elements visible (same as incidents page fix)
+        let currentElement = targetPage;
+        let level = 0;
+        while (currentElement && level < 10) {
+            const computedStyle = window.getComputedStyle(currentElement);
+            const display = computedStyle.display;
+            const visibility = computedStyle.visibility;
+            const opacity = computedStyle.opacity;
+            
+            // Skip billing page if this page is inside it (shouldn't happen, but just in case)
+            if (currentElement.id === 'billing' && pageName !== 'billing') {
+                currentElement = currentElement.parentElement;
+                level++;
+                continue;
+            }
+            
+            // Fix any parent with display:none (except intentionally hidden elements)
+            if (display === 'none' && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm' && currentElement.id !== 'billForm' && currentElement.id !== 'paymentForm') {
+                currentElement.style.setProperty('display', 'block', 'important');
+                currentElement.style.setProperty('visibility', 'visible', 'important');
+                currentElement.style.setProperty('opacity', '1', 'important');
+                currentElement.style.setProperty('position', 'relative', 'important');
+                currentElement.style.setProperty('z-index', '1', 'important');
+            }
+            
+            // Also fix if visibility is hidden or opacity is 0
+            if ((visibility === 'hidden' || opacity === '0') && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm' && currentElement.id !== 'billForm' && currentElement.id !== 'paymentForm') {
+                currentElement.style.setProperty('visibility', 'visible', 'important');
+                currentElement.style.setProperty('opacity', '1', 'important');
+                currentElement.style.setProperty('display', 'block', 'important');
+            }
+            
+            // Stop at mainApp
+            if (currentElement.id === 'mainApp') {
+                currentElement.style.setProperty('display', 'block', 'important');
+                currentElement.style.setProperty('visibility', 'visible', 'important');
+                currentElement.style.setProperty('opacity', '1', 'important');
+                currentElement.style.setProperty('position', 'relative', 'important');
+                currentElement.style.setProperty('z-index', '1', 'important');
+                break;
+            }
+            
+            currentElement = currentElement.parentElement;
+            level++;
+        }
+        
+        // Also ensure main.container is visible
+        const mainContainer = targetPage.closest('main.container');
+        if (mainContainer) {
+            mainContainer.style.setProperty('display', 'block', 'important');
+            mainContainer.style.setProperty('visibility', 'visible', 'important');
+            mainContainer.style.setProperty('opacity', '1', 'important');
+        }
+        
         // Only show the target page with !important
         targetPage.style.setProperty('display', 'block', 'important');
         targetPage.style.setProperty('visibility', 'visible', 'important');
         targetPage.style.setProperty('opacity', '1', 'important');
         targetPage.style.setProperty('position', 'relative', 'important');
+        targetPage.style.removeProperty('left'); // Remove left: -9999px if it was set
+        targetPage.style.removeProperty('right'); // Remove any right positioning
+        targetPage.style.setProperty('z-index', '1', 'important');
+        
+        // Force show ALL direct children
+        Array.from(targetPage.children).forEach((child, index) => {
+            // Skip forms that should be hidden initially
+            if ((child.id === 'incidentForm' || child.id === 'billForm' || child.id === 'paymentForm') && child.style.display === 'none') {
+                return;
+            }
+            // Force show everything else
+            const displayValue = child.tagName === 'BUTTON' ? 'inline-block' : 'block';
+            child.style.setProperty('display', displayValue, 'important');
+            child.style.setProperty('visibility', 'visible', 'important');
+            child.style.setProperty('opacity', '1', 'important');
+            child.style.setProperty('position', 'relative', 'important');
+            child.style.setProperty('z-index', '1', 'important');
+        });
+        
         // Explicitly show all child elements of the target page
         const targetContainers = targetPage.querySelectorAll('h2, h3, button, [id$="List"], [class*="container"], [class*="form-card"], [class*="item-list"]');
         targetContainers.forEach(container => {
@@ -1253,6 +1327,8 @@ function showPage(pageName) {
         });
         console.log('✅ Page activated:', pageName);
         console.log('✅ Target page children count:', targetPage.children.length);
+        console.log('✅ Target page offsetHeight:', targetPage.offsetHeight);
+        console.log('✅ Target page offsetWidth:', targetPage.offsetWidth);
         
         // Update nav links
         document.querySelectorAll('.nav-link').forEach(link => {
