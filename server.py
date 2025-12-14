@@ -1655,20 +1655,39 @@ def mark_all_notifications_read():
     conn.close()
     return jsonify({'message': 'All notifications marked as read'})
 
+# Health check endpoint
+@app.route('/health')
+def health():
+    return jsonify({'status': 'ok', 'message': 'Server is running'}), 200
+
 # Static file serving
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
-
-@app.route('/<path:path>')
-def static_files(path):
-    response = send_from_directory('.', path)
-    # Add aggressive cache control for JS and CSS files to prevent caching
-    if path.endswith('.js') or path.endswith('.css') or path.endswith('.html'):
+    try:
+        response = send_from_directory('.', 'index.html')
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
-    return response
+        return response
+    except Exception as e:
+        return jsonify({'error': f'Error serving index.html: {str(e)}'}), 500
+
+@app.route('/<path:path>')
+def static_files(path):
+    try:
+        # Don't serve API routes as static files
+        if path.startswith('api/'):
+            return jsonify({'error': 'Not found'}), 404
+        
+        response = send_from_directory('.', path)
+        # Add aggressive cache control for JS and CSS files to prevent caching
+        if path.endswith('.js') or path.endswith('.css') or path.endswith('.html'):
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        return response
+    except Exception as e:
+        return jsonify({'error': f'Error serving file {path}: {str(e)}'}), 404
 
 if __name__ == '__main__':
     init_db()
