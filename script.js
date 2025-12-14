@@ -1156,13 +1156,24 @@ function initNavigation() {
 }
 
 function showPage(pageName) {
+    console.log('📄 Showing page:', pageName);
     const pages = document.querySelectorAll('.page');
     pages.forEach(page => page.classList.remove('active'));
     
     const targetPage = document.getElementById(pageName);
     if (targetPage) {
         targetPage.classList.add('active');
+        console.log('✅ Page activated:', pageName);
         
+        // Update nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('data-page') === pageName) {
+                link.classList.add('active');
+            }
+        });
+        
+        // Load page-specific data
         if (pageName === 'dashboard') loadDashboard();
         else if (pageName === 'residents') loadResidents();
         else if (pageName === 'medications') loadMedications();
@@ -1183,6 +1194,7 @@ function showPage(pageName) {
             loadStaff();
         }
         else if (pageName === 'incidents') {
+            console.log('🔄 Calling loadIncidents()...');
             loadIncidents();
         }
         else if (pageName === 'carenotes') {
@@ -1194,6 +1206,8 @@ function showPage(pageName) {
         else if (pageName === 'reports') {
             loadReportsAnalytics();
         }
+    } else {
+        console.error('❌ Page not found:', pageName);
     }
 }
 
@@ -2207,14 +2221,22 @@ function hideIncidentForm() {
 
 async function loadIncidents() {
     try {
+        console.log('🔄 Loading incidents...');
         const container = document.getElementById('incidentsList');
         if (!container) {
-            console.error('incidentsList container not found');
+            console.error('❌ incidentsList container not found');
+            showMessage('Error: Page container not found / Error: Contenedor de página no encontrado', 'error');
             return;
         }
         
+        // Show loading state
+        container.innerHTML = '<div class="empty-state">Loading incidents... / Cargando incidentes...</div>';
+        
         const url = currentResidentId ? `/api/incidents?resident_id=${currentResidentId}` : '/api/incidents';
+        console.log('📡 Fetching incidents from:', url);
+        
         const response = await fetch(url, { headers: getAuthHeaders() });
+        console.log('📥 Response status:', response.status);
         
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
@@ -2223,10 +2245,15 @@ async function loadIncidents() {
         }
         
         if (!response.ok) {
-            throw new Error(`Failed to load incidents: ${response.status}`);
+            const errorText = await response.text();
+            console.error('❌ Failed to load incidents:', response.status, errorText);
+            container.innerHTML = `<div class="empty-state">Error loading incidents (${response.status}). Please try again. / Error al cargar incidentes (${response.status}). Por favor intente nuevamente.</div>`;
+            showMessage(`Error loading incidents / Error al cargar incidentes: ${response.status}`, 'error');
+            return;
         }
         
         const incidents = await response.json();
+        console.log('✅ Loaded incidents:', incidents.length);
         
         if (incidents.length === 0) {
             container.innerHTML = '<div class="empty-state">No incident reports found. / No se encontraron reportes de incidentes.</div>';
@@ -2272,8 +2299,12 @@ async function loadIncidents() {
             `;
         }).join('');
     } catch (error) {
-        console.error('Error loading incidents:', error);
-        showMessage('Error loading incidents / Error al cargar incidentes', 'error');
+        console.error('❌ Error loading incidents:', error);
+        const container = document.getElementById('incidentsList');
+        if (container) {
+            container.innerHTML = `<div class="empty-state">Error loading incidents: ${error.message} / Error al cargar incidentes: ${error.message}</div>`;
+        }
+        showMessage(`Error loading incidents / Error al cargar incidentes: ${error.message}`, 'error');
     }
 }
 
