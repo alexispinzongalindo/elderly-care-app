@@ -5868,6 +5868,17 @@ function setDateTimeToDropdowns(dateTimeString, yearId, monthId, dayId, timeId) 
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Load language from localStorage if available
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+        currentLanguage = savedLanguage;
+        const langSelector = document.getElementById('languageSelector');
+        if (langSelector) {
+            langSelector.value = currentLanguage;
+        }
+        updateTranslations();
+    }
+    
     checkAuth();
     if (authToken && currentStaff && currentResidentId) {
         initApp();
