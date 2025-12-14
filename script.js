@@ -1417,13 +1417,15 @@ function showPage(pageName) {
             console.log('✅ After forcing - offsetHeight:', incidentsPage.offsetHeight);
             console.log('✅ After forcing - offsetWidth:', incidentsPage.offsetWidth);
             
-            // Show ALL direct children of incidents page
+            // Show ALL direct children of incidents page - USE CSS TEXT FOR MAXIMUM CONTROL
             Array.from(incidentsPage.children).forEach((child, index) => {
-                console.log(`✅ Child ${index}:`, child.tagName, child.id || child.className);
+                console.log(`✅ Child ${index}:`, child.tagName, child.id || child.className, 'textContent:', child.textContent?.substring(0, 50));
                 const beforeDisplay = window.getComputedStyle(child).display;
                 const beforeVisibility = window.getComputedStyle(child).visibility;
                 const beforeOpacity = window.getComputedStyle(child).opacity;
-                console.log(`    Before: display=${beforeDisplay}, visibility=${beforeVisibility}, opacity=${beforeOpacity}`);
+                const beforeHeight = child.offsetHeight;
+                const beforeWidth = child.offsetWidth;
+                console.log(`    Before: display=${beforeDisplay}, visibility=${beforeVisibility}, opacity=${beforeOpacity}, height=${beforeHeight}, width=${beforeWidth}`);
                 
                 // Don't hide the form if it's supposed to be hidden
                 if (child.id === 'incidentForm' && child.style.display === 'none') {
@@ -1431,19 +1433,20 @@ function showPage(pageName) {
                     return;
                 }
                 
-                // Use setProperty for maximum control (cssText += can cause issues)
+                // Use cssText to completely replace styles for maximum control
                 const displayValue = child.tagName === 'BUTTON' ? 'inline-block' : 'block';
-                child.style.setProperty('display', displayValue, 'important');
-                child.style.setProperty('visibility', 'visible', 'important');
-                child.style.setProperty('opacity', '1', 'important');
-                child.style.setProperty('position', 'relative', 'important');
-                child.style.setProperty('z-index', '1', 'important');
+                child.style.cssText = `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important;`;
                 
                 const afterDisplay = window.getComputedStyle(child).display;
                 const afterVisibility = window.getComputedStyle(child).visibility;
                 const afterOpacity = window.getComputedStyle(child).opacity;
-                console.log(`    After: display=${afterDisplay}, visibility=${afterVisibility}, opacity=${afterOpacity}`);
-                console.log(`    offsetHeight: ${child.offsetHeight}, offsetWidth: ${child.offsetWidth}`);
+                const afterHeight = child.offsetHeight;
+                const afterWidth = child.offsetWidth;
+                console.log(`    After: display=${afterDisplay}, visibility=${afterVisibility}, opacity=${afterOpacity}, height=${afterHeight}, width=${afterWidth}`);
+                
+                if (afterHeight === 0 && afterWidth === 0) {
+                    console.error(`    ❌❌❌ CHILD ${index} HAS ZERO DIMENSIONS! ❌❌❌`);
+                }
             });
             
             // CRITICAL: Check for test element specifically
