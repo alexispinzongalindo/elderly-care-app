@@ -25,13 +25,57 @@ function getAuthHeaders() {
     return headers;
 }
 
-// Override fetch to include auth token
+// Override fetch to include auth token and log all requests
 const originalFetch = window.fetch;
 window.fetch = function(url, options = {}) {
+    const method = options.method || 'GET';
+    const timestamp = new Date().toISOString();
+    
+    // Log all API requests
+    if (url.startsWith('/api/')) {
+        console.log(`🌐 [${timestamp}] ${method} ${url}`, {
+            url: url,
+            method: method,
+            headers: options.headers,
+            body: options.body
+        });
+    }
+    
+    // Add auth headers for API calls (except login)
     if (url.startsWith('/api/') && !url.includes('/auth/login')) {
         options.headers = { ...getAuthHeaders(), ...(options.headers || {}) };
     }
-    return originalFetch(url, options);
+    
+    // Make the request and log response
+    const fetchPromise = originalFetch(url, options);
+    
+    if (url.startsWith('/api/')) {
+        fetchPromise.then(response => {
+            const responseTimestamp = new Date().toISOString();
+            console.log(`✅ [${responseTimestamp}] ${method} ${url} → ${response.status} ${response.statusText}`, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: Object.fromEntries(response.headers.entries())
+            });
+            
+            // Clone response to read body without consuming it
+            response.clone().json().then(data => {
+                console.log(`📦 [${responseTimestamp}] Response data:`, data);
+            }).catch(() => {
+                // Not JSON, try text
+                response.clone().text().then(text => {
+                    console.log(`📦 [${responseTimestamp}] Response text:`, text.substring(0, 200));
+                }).catch(() => {});
+            });
+            
+            return response;
+        }).catch(error => {
+            const errorTimestamp = new Date().toISOString();
+            console.error(`❌ [${errorTimestamp}] ${method} ${url} → Error:`, error);
+        });
+    }
+    
+    return fetchPromise;
 };
 
 // Check authentication on page load
