@@ -1209,24 +1209,63 @@ function showPage(pageName) {
             loadStaff();
         }
         else if (pageName === 'incidents') {
+            console.log('🔄 Showing incidents page...');
+            
+            // Ensure main app container is visible
+            const mainApp = document.getElementById('mainApp');
+            if (mainApp) {
+                mainApp.style.display = 'block';
+                console.log('✅ Main app container is visible');
+            }
+            
+            // Ensure main container is visible
+            const mainContainer = document.querySelector('main.container');
+            if (mainContainer) {
+                mainContainer.style.display = 'block';
+                mainContainer.style.visibility = 'visible';
+                console.log('✅ Main container is visible');
+            }
+            
+            // Force incidents page to be visible
+            const incidentsPage = document.getElementById('incidents');
+            if (incidentsPage) {
+                incidentsPage.style.display = 'block';
+                incidentsPage.style.visibility = 'visible';
+                incidentsPage.style.opacity = '1';
+                incidentsPage.style.position = 'relative';
+                incidentsPage.style.zIndex = '1';
+                console.log('✅ Incidents page forced visible');
+            }
+            
+            // Force header and button to be visible
+            setTimeout(() => {
+                const header = document.querySelector('#incidents h2');
+                if (header) {
+                    header.style.display = 'block';
+                    header.style.visibility = 'visible';
+                    console.log('✅ Header forced visible');
+                }
+                
+                const reportButton = document.querySelector('#incidents button[onclick="showIncidentForm()"]');
+                if (reportButton) {
+                    reportButton.style.display = 'inline-block';
+                    reportButton.style.visibility = 'visible';
+                    reportButton.style.opacity = '1';
+                    console.log('✅ Button forced visible');
+                    
+                    // Add event listener (backup in case onclick doesn't work)
+                    reportButton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🔘 Report Incident button clicked (via event listener)');
+                        showIncidentForm();
+                    });
+                    console.log('✅ Report Incident button event listener attached');
+                }
+            }, 100);
+            
             console.log('🔄 Calling loadIncidents()...');
             loadIncidents();
-            
-            // Ensure button has event listener (backup in case onclick doesn't work)
-            const reportButton = document.querySelector('#incidents button[onclick="showIncidentForm()"]');
-            if (reportButton) {
-                // Remove any existing listeners to avoid duplicates
-                const newButton = reportButton.cloneNode(true);
-                reportButton.parentNode.replaceChild(newButton, reportButton);
-                // Add click listener
-                newButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('🔘 Report Incident button clicked (via event listener)');
-                    showIncidentForm();
-                });
-                console.log('✅ Report Incident button event listener attached');
-            }
         }
         else if (pageName === 'carenotes') {
             loadCareNotes();
@@ -2327,14 +2366,33 @@ async function loadIncidents() {
         const incidentsPage = document.getElementById('incidents');
         if (incidentsPage) {
             incidentsPage.classList.add('active');
+            incidentsPage.style.display = 'block';
+            incidentsPage.style.visibility = 'visible';
+            incidentsPage.style.opacity = '1';
             console.log('✅ Incidents page is active');
+            console.log('✅ Page display:', window.getComputedStyle(incidentsPage).display);
+        } else {
+            console.error('❌ Incidents page element not found!');
+        }
+        
+        // Ensure the header is visible
+        const header = incidentsPage?.querySelector('h2');
+        if (header) {
+            header.style.display = 'block';
+            header.style.visibility = 'visible';
+            console.log('✅ Header is visible');
         }
         
         // Ensure the button is visible
         const reportButton = incidentsPage?.querySelector('button[onclick="showIncidentForm()"]');
         if (reportButton) {
             reportButton.style.display = 'inline-block';
+            reportButton.style.visibility = 'visible';
+            reportButton.style.opacity = '1';
             console.log('✅ Report Incident button is visible');
+            console.log('✅ Button display:', window.getComputedStyle(reportButton).display);
+        } else {
+            console.error('❌ Report Incident button not found!');
         }
         
         // Show loading state
@@ -2364,8 +2422,15 @@ async function loadIncidents() {
         console.log('✅ Loaded incidents:', incidents.length);
         
         if (incidents.length === 0) {
-            container.innerHTML = '<div class="empty-state" style="padding: 3rem; font-size: 1.1rem; color: var(--text-color);"><p style="margin-bottom: 1rem;">📋 No incident reports found. / No se encontraron reportes de incidentes.</p><p style="font-size: 0.9rem; color: var(--medium-gray);">Click the "+ Report Incident" button above to create your first incident report. / Haga clic en el botón "+ Reportar Incidente" arriba para crear su primer reporte de incidente.</p></div>';
+            const emptyStateHTML = '<div class="empty-state" style="padding: 3rem; font-size: 1.1rem; color: var(--text-color); display: block !important; visibility: visible !important; opacity: 1 !important;"><p style="margin-bottom: 1rem;">📋 No incident reports found. / No se encontraron reportes de incidentes.</p><p style="font-size: 0.9rem; color: var(--medium-gray);">Click the "+ Report Incident" button above to create your first incident report. / Haga clic en el botón "+ Reportar Incidente" arriba para crear su primer reporte de incidente.</p></div>';
+            container.innerHTML = emptyStateHTML;
+            container.style.display = 'block';
+            container.style.visibility = 'visible';
+            container.style.opacity = '1';
             console.log('✅ Empty state message displayed');
+            console.log('✅ Container innerHTML:', container.innerHTML.substring(0, 100));
+            console.log('✅ Container display:', window.getComputedStyle(container).display);
+            console.log('✅ Container visibility:', window.getComputedStyle(container).visibility);
             return;
         }
         

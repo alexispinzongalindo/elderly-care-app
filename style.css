@@ -1834,25 +1834,49 @@ body.dark-mode .notification-time {
 }
 
 /* Ensure incidents page content is always visible */
-#incidents.page.active {
+#incidents.page.active,
+#incidents.page {
     display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     min-height: 400px;
+    position: relative !important;
+    z-index: 1 !important;
 }
 
 #incidents h2 {
     display: block !important;
+    visibility: visible !important;
     margin-bottom: 1.5rem;
+    color: var(--text-color) !important;
 }
 
-#incidents button[onclick="showIncidentForm()"] {
+#incidents button[onclick="showIncidentForm()"],
+#incidents button.btn-primary {
     display: inline-block !important;
+    visibility: visible !important;
     margin-bottom: 1.5rem;
     cursor: pointer;
+    opacity: 1 !important;
 }
 
 #incidentsList {
     display: block !important;
+    visibility: visible !important;
     min-height: 200px;
+    opacity: 1 !important;
+}
+
+#incidentsList .empty-state {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    padding: 3rem !important;
+    text-align: center !important;
+    color: var(--text-color) !important;
+    background: var(--light-gray) !important;
+    border-radius: 8px !important;
+    margin: 2rem 0 !important;
 }
 
 /* Ensure incident form is visible when shown */
