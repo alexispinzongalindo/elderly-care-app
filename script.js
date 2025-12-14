@@ -2754,14 +2754,13 @@ async function loadIncidents() {
         }
         
         // CRITICAL: Force test element visible if it exists
-        // testElement was already declared at line 2630, reuse it
-        const testElementCheck = incidentsPage.querySelector('div[style*="TEST"]');
-        if (testElementCheck) {
-            testElementCheck.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; background: red !important; color: white !important; padding: 1rem !important; margin: 1rem 0 !important; font-size: 1.2rem !important; font-weight: bold !important; position: relative !important; z-index: 9999 !important; width: 100% !important; height: auto !important;';
+        // testElement was already declared at line 2630, reuse it here
+        if (testElement) {
+            testElement.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; background: red !important; color: white !important; padding: 1rem !important; margin: 1rem 0 !important; font-size: 1.2rem !important; font-weight: bold !important; position: relative !important; z-index: 9999 !important; width: 100% !important; height: auto !important;';
             console.log('🔴 TEST ELEMENT FORCED VISIBLE!');
-            console.log('✅ Test element offsetHeight:', testElementCheck.offsetHeight);
-            console.log('✅ Test element offsetWidth:', testElementCheck.offsetWidth);
-            if (testElementCheck.offsetHeight === 0 || testElementCheck.offsetWidth === 0) {
+            console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
+            console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
+            if (testElement.offsetHeight === 0 || testElement.offsetWidth === 0) {
                 console.error('❌❌❌ TEST ELEMENT HAS ZERO DIMENSIONS! ❌❌❌');
             }
         } else {
