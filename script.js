@@ -67,6 +67,150 @@ const translations = {
         'common.success': 'Success',
         'common.markAllRead': 'Mark All Read',
         'common.viewAll': 'View All',
+        'common.select': 'Select',
+        'common.required': 'Required',
+        'common.continue': 'Continue',
+        'common.submit': 'Submit',
+        'common.back': 'Back',
+        'common.next': 'Next',
+        'common.yes': 'Yes',
+        'common.no': 'No',
+        
+        // Login
+        'login.title': 'Elder Care Management',
+        'login.subtitle': 'Login',
+        'login.username': 'Username',
+        'login.password': 'Password',
+        'login.submit': 'Login',
+        'login.placeholder.username': 'Enter username',
+        'login.placeholder.password': 'Enter password',
+        'login.hint': 'Default: admin / admin123',
+        
+        // Resident Selector
+        'resident.select': 'Select Resident',
+        'resident.choose': 'Choose Resident',
+        'resident.selectOption': 'Select a resident',
+        'resident.addNew': 'Add New Resident',
+        
+        // Resident Form
+        'resident.add': 'Add New Resident',
+        'resident.edit': 'Edit Resident',
+        'resident.firstName': 'First Name',
+        'resident.lastName': 'Last Name',
+        'resident.dateOfBirth': 'Date of Birth',
+        'resident.gender': 'Gender',
+        'resident.photo': 'Photo',
+        'resident.roomNumber': 'Room Number',
+        'resident.bedNumber': 'Bed Number',
+        'resident.emergencyContact': 'Emergency Contact Name',
+        'resident.emergencyPhone': 'Emergency Contact Phone',
+        'resident.emergencyRelation': 'Relation',
+        'resident.medicalConditions': 'Medical Conditions',
+        'resident.allergies': 'Allergies',
+        'resident.dietaryRestrictions': 'Dietary Restrictions',
+        'resident.save': 'Save Resident',
+        'resident.year': 'Year',
+        'resident.month': 'Month',
+        'resident.day': 'Day',
+        'resident.gender.male': 'Male',
+        'resident.gender.female': 'Female',
+        'resident.gender.other': 'Other',
+        'resident.relation.placeholder': 'e.g., Son, Daughter',
+        'resident.uploadPhoto': 'Upload Photo',
+        'resident.removePhoto': 'Remove Photo',
+        
+        // Months
+        'month.january': 'January',
+        'month.february': 'February',
+        'month.march': 'March',
+        'month.april': 'April',
+        'month.may': 'May',
+        'month.june': 'June',
+        'month.july': 'July',
+        'month.august': 'August',
+        'month.september': 'September',
+        'month.october': 'October',
+        'month.november': 'November',
+        'month.december': 'December',
+        
+        // Medications
+        'medication.add': 'Add Medication',
+        'medication.edit': 'Edit Medication',
+        'medication.name': 'Medication Name',
+        'medication.dosage': 'Dosage',
+        'medication.frequency': 'Frequency',
+        'medication.startDate': 'Start Date',
+        'medication.endDate': 'End Date',
+        'medication.instructions': 'Instructions',
+        'medication.save': 'Save Medication',
+        
+        // Appointments
+        'appointment.add': 'Add Appointment',
+        'appointment.edit': 'Edit Appointment',
+        'appointment.date': 'Date',
+        'appointment.time': 'Time',
+        'appointment.type': 'Type',
+        'appointment.provider': 'Provider',
+        'appointment.location': 'Location',
+        'appointment.notes': 'Notes',
+        'appointment.save': 'Save Appointment',
+        
+        // Billing
+        'billing.add': 'Add New Bill',
+        'billing.edit': 'Edit Bill',
+        'billing.date': 'Billing Date',
+        'billing.amount': 'Amount',
+        'billing.description': 'Description',
+        'billing.dueDate': 'Due Date',
+        'billing.status': 'Status',
+        'billing.save': 'Save Bill',
+        'billing.status.pending': 'Pending',
+        'billing.status.paid': 'Paid',
+        'billing.status.overdue': 'Overdue',
+        
+        // Vital Signs
+        'vitals.add': 'Add Vital Signs',
+        'vitals.edit': 'Edit Vital Signs',
+        'vitals.date': 'Date',
+        'vitals.time': 'Time',
+        'vitals.bloodPressure': 'Blood Pressure',
+        'vitals.heartRate': 'Heart Rate',
+        'vitals.temperature': 'Temperature',
+        'vitals.oxygenSaturation': 'Oxygen Saturation',
+        'vitals.weight': 'Weight',
+        'vitals.notes': 'Notes',
+        'vitals.save': 'Save Vital Signs',
+        
+        // Care Notes
+        'carenote.add': 'Add Care Note',
+        'carenote.edit': 'Edit Care Note',
+        'carenote.date': 'Date',
+        'carenote.time': 'Time',
+        'carenote.category': 'Category',
+        'carenote.note': 'Note',
+        'carenote.save': 'Save Care Note',
+        
+        // Incidents
+        'incident.add': 'Report Incident',
+        'incident.edit': 'Edit Incident',
+        'incident.date': 'Date',
+        'incident.time': 'Time',
+        'incident.type': 'Type',
+        'incident.description': 'Description',
+        'incident.severity': 'Severity',
+        'incident.actionTaken': 'Action Taken',
+        'incident.save': 'Save Incident',
+        
+        // Staff
+        'staff.add': 'Add New Staff Member',
+        'staff.edit': 'Edit Staff Member',
+        'staff.username': 'Username',
+        'staff.fullName': 'Full Name',
+        'staff.role': 'Role',
+        'staff.email': 'Email',
+        'staff.phone': 'Phone',
+        'staff.password': 'Password',
+        'staff.save': 'Save Staff',
     },
     es: {
         // Navigation
@@ -112,6 +256,150 @@ const translations = {
         'common.success': 'Éxito',
         'common.markAllRead': 'Marcar Todas',
         'common.viewAll': 'Ver Todas',
+        'common.select': 'Seleccionar',
+        'common.required': 'Requerido',
+        'common.continue': 'Continuar',
+        'common.submit': 'Enviar',
+        'common.back': 'Atrás',
+        'common.next': 'Siguiente',
+        'common.yes': 'Sí',
+        'common.no': 'No',
+        
+        // Login
+        'login.title': 'Gestión de Cuidado de Ancianos',
+        'login.subtitle': 'Iniciar Sesión',
+        'login.username': 'Usuario',
+        'login.password': 'Contraseña',
+        'login.submit': 'Iniciar Sesión',
+        'login.placeholder.username': 'Ingrese usuario',
+        'login.placeholder.password': 'Ingrese contraseña',
+        'login.hint': 'Por defecto: admin / admin123',
+        
+        // Resident Selector
+        'resident.select': 'Seleccionar Residente',
+        'resident.choose': 'Elegir Residente',
+        'resident.selectOption': 'Seleccione un residente',
+        'resident.addNew': 'Agregar Nuevo Residente',
+        
+        // Resident Form
+        'resident.add': 'Agregar Nuevo Residente',
+        'resident.edit': 'Editar Residente',
+        'resident.firstName': 'Nombre',
+        'resident.lastName': 'Apellido',
+        'resident.dateOfBirth': 'Fecha de Nacimiento',
+        'resident.gender': 'Género',
+        'resident.photo': 'Foto',
+        'resident.roomNumber': 'Número de Habitación',
+        'resident.bedNumber': 'Número de Cama',
+        'resident.emergencyContact': 'Nombre del Contacto de Emergencia',
+        'resident.emergencyPhone': 'Teléfono de Emergencia',
+        'resident.emergencyRelation': 'Relación',
+        'resident.medicalConditions': 'Condiciones Médicas',
+        'resident.allergies': 'Alergias',
+        'resident.dietaryRestrictions': 'Restricciones Dietéticas',
+        'resident.save': 'Guardar Residente',
+        'resident.year': 'Año',
+        'resident.month': 'Mes',
+        'resident.day': 'Día',
+        'resident.gender.male': 'Masculino',
+        'resident.gender.female': 'Femenino',
+        'resident.gender.other': 'Otro',
+        'resident.relation.placeholder': 'ej., Hijo, Hija',
+        'resident.uploadPhoto': 'Subir Foto',
+        'resident.removePhoto': 'Eliminar Foto',
+        
+        // Months
+        'month.january': 'Enero',
+        'month.february': 'Febrero',
+        'month.march': 'Marzo',
+        'month.april': 'Abril',
+        'month.may': 'Mayo',
+        'month.june': 'Junio',
+        'month.july': 'Julio',
+        'month.august': 'Agosto',
+        'month.september': 'Septiembre',
+        'month.october': 'Octubre',
+        'month.november': 'Noviembre',
+        'month.december': 'Diciembre',
+        
+        // Medications
+        'medication.add': 'Agregar Medicamento',
+        'medication.edit': 'Editar Medicamento',
+        'medication.name': 'Nombre del Medicamento',
+        'medication.dosage': 'Dosis',
+        'medication.frequency': 'Frecuencia',
+        'medication.startDate': 'Fecha de Inicio',
+        'medication.endDate': 'Fecha de Fin',
+        'medication.instructions': 'Instrucciones',
+        'medication.save': 'Guardar Medicamento',
+        
+        // Appointments
+        'appointment.add': 'Agregar Cita',
+        'appointment.edit': 'Editar Cita',
+        'appointment.date': 'Fecha',
+        'appointment.time': 'Hora',
+        'appointment.type': 'Tipo',
+        'appointment.provider': 'Proveedor',
+        'appointment.location': 'Ubicación',
+        'appointment.notes': 'Notas',
+        'appointment.save': 'Guardar Cita',
+        
+        // Billing
+        'billing.add': 'Agregar Nueva Factura',
+        'billing.edit': 'Editar Factura',
+        'billing.date': 'Fecha de Factura',
+        'billing.amount': 'Monto',
+        'billing.description': 'Descripción',
+        'billing.dueDate': 'Fecha de Vencimiento',
+        'billing.status': 'Estado',
+        'billing.save': 'Guardar Factura',
+        'billing.status.pending': 'Pendiente',
+        'billing.status.paid': 'Pagado',
+        'billing.status.overdue': 'Vencido',
+        
+        // Vital Signs
+        'vitals.add': 'Agregar Signos Vitales',
+        'vitals.edit': 'Editar Signos Vitales',
+        'vitals.date': 'Fecha',
+        'vitals.time': 'Hora',
+        'vitals.bloodPressure': 'Presión Arterial',
+        'vitals.heartRate': 'Frecuencia Cardíaca',
+        'vitals.temperature': 'Temperatura',
+        'vitals.oxygenSaturation': 'Saturación de Oxígeno',
+        'vitals.weight': 'Peso',
+        'vitals.notes': 'Notas',
+        'vitals.save': 'Guardar Signos Vitales',
+        
+        // Care Notes
+        'carenote.add': 'Agregar Nota de Cuidado',
+        'carenote.edit': 'Editar Nota de Cuidado',
+        'carenote.date': 'Fecha',
+        'carenote.time': 'Hora',
+        'carenote.category': 'Categoría',
+        'carenote.note': 'Nota',
+        'carenote.save': 'Guardar Nota de Cuidado',
+        
+        // Incidents
+        'incident.add': 'Reportar Incidente',
+        'incident.edit': 'Editar Incidente',
+        'incident.date': 'Fecha',
+        'incident.time': 'Hora',
+        'incident.type': 'Tipo',
+        'incident.description': 'Descripción',
+        'incident.severity': 'Severidad',
+        'incident.actionTaken': 'Acción Tomada',
+        'incident.save': 'Guardar Incidente',
+        
+        // Staff
+        'staff.add': 'Agregar Nuevo Personal',
+        'staff.edit': 'Editar Personal',
+        'staff.username': 'Usuario',
+        'staff.fullName': 'Nombre Completo',
+        'staff.role': 'Rol',
+        'staff.email': 'Correo Electrónico',
+        'staff.phone': 'Teléfono',
+        'staff.password': 'Contraseña',
+        'staff.save': 'Guardar Personal',
     }
 };
 
@@ -154,10 +442,20 @@ function setLanguage(lang) {
 
 // Update all translatable text on the page
 function updateTranslations() {
-    // Update navigation
+    // Update navigation and text content
     document.querySelectorAll('[data-translate]').forEach(el => {
         const key = el.getAttribute('data-translate');
-        el.textContent = t(key);
+        if (el.tagName === 'OPTION') {
+            // For select options, update text but preserve value
+            const value = el.getAttribute('value');
+            if (value && value !== '') {
+                el.textContent = t(key);
+            } else {
+                el.textContent = t(key);
+            }
+        } else {
+            el.textContent = t(key);
+        }
     });
     
     // Update placeholders
@@ -170,6 +468,48 @@ function updateTranslations() {
     document.querySelectorAll('[data-translate-title]').forEach(el => {
         const key = el.getAttribute('data-translate-title');
         el.title = t(key);
+    });
+    
+    // Update select options with data-translate-option
+    document.querySelectorAll('[data-translate-option]').forEach(el => {
+        const key = el.getAttribute('data-translate-option');
+        el.textContent = t(key);
+    });
+    
+    // Update month options dynamically
+    const monthSelects = document.querySelectorAll('select[id*="BirthMonth"], select[id*="birthMonth"]');
+    monthSelects.forEach(select => {
+        Array.from(select.options).forEach(option => {
+            if (option.value && option.value !== '') {
+                const monthKey = `month.${option.value.toLowerCase()}`;
+                const monthNames = {
+                    '01': 'january', '02': 'february', '03': 'march', '04': 'april',
+                    '05': 'may', '06': 'june', '07': 'july', '08': 'august',
+                    '09': 'september', '10': 'october', '11': 'november', '12': 'december'
+                };
+                if (monthNames[option.value]) {
+                    option.textContent = t(`month.${monthNames[option.value]}`);
+                }
+            } else {
+                option.textContent = t('resident.month');
+            }
+        });
+    });
+    
+    // Update gender options
+    const genderSelects = document.querySelectorAll('select[id*="Gender"], select[id*="gender"]');
+    genderSelects.forEach(select => {
+        Array.from(select.options).forEach(option => {
+            if (option.value === 'Male') {
+                option.textContent = t('resident.gender.male');
+            } else if (option.value === 'Female') {
+                option.textContent = t('resident.gender.female');
+            } else if (option.value === 'Other') {
+                option.textContent = t('resident.gender.other');
+            } else if (option.value === '') {
+                option.textContent = t('common.select');
+            }
+        });
     });
 }
 

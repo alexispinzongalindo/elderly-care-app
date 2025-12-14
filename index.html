@@ -26,57 +26,57 @@
     <!-- Login Modal -->
     <div id="loginModal" class="modal" style="display: block;">
         <div class="form-card login-card">
-            <h2 class="login-title">🏥 Elder Care Management</h2>
-            <h3 class="login-subtitle">Iniciar Sesión / Login</h3>
+            <h2 class="login-title" data-translate="login.title">🏥 Elder Care Management</h2>
+            <h3 class="login-subtitle" data-translate="login.subtitle">Login</h3>
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label for="loginUsername">Usuario / Username *</label>
-                    <input type="text" id="loginUsername" required autocomplete="username" placeholder="Enter username">
+                    <label for="loginUsername" data-translate="login.username">Username *</label>
+                    <input type="text" id="loginUsername" required autocomplete="username" data-translate-placeholder="login.placeholder.username" placeholder="Enter username">
                 </div>
                 <div class="form-group">
-                    <label for="loginPassword">Contraseña / Password *</label>
-                    <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Enter password">
+                    <label for="loginPassword" data-translate="login.password">Password *</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password" data-translate-placeholder="login.placeholder.password" placeholder="Enter password">
                 </div>
                 <div class="button-group">
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Iniciar Sesión / Login</button>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" data-translate="login.submit">Login</button>
                 </div>
             </form>
-            <p class="login-hint">Default: admin / admin123</p>
+            <p class="login-hint" data-translate="login.hint">Default: admin / admin123</p>
         </div>
     </div>
 
     <!-- Resident Selector -->
     <div id="residentSelector" class="modal" style="display: none;">
         <div class="form-card">
-            <h2>Select Resident / Seleccionar Residente</h2>
+            <h2 data-translate="resident.select">Select Resident</h2>
             <div class="form-group">
-                <label for="residentSelect">Choose Resident *</label>
+                <label for="residentSelect" data-translate="resident.choose">Choose Resident *</label>
                 <select id="residentSelect" class="form-control" required>
-                    <option value="">-- Select a resident --</option>
+                    <option value="" data-translate="resident.selectOption">-- Select a resident --</option>
                 </select>
             </div>
             <div class="button-group">
-                <button class="btn btn-primary" onclick="selectResident()">Continue / Continuar</button>
-                <button class="btn btn-secondary" onclick="showAddResidentForm()">+ Add New Resident / Agregar Residente</button>
+                <button class="btn btn-primary" onclick="selectResident()" data-translate="common.continue">Continue</button>
+                <button class="btn btn-secondary" onclick="showAddResidentForm()" data-translate="resident.addNew">+ Add New Resident</button>
             </div>
             
             <!-- Add Resident Form -->
             <div id="addResidentForm" class="form-card" style="display: none; margin-top: 2rem; background: var(--light-gray);">
-                <h3>Add New Resident / Agregar Nuevo Residente</h3>
+                <h3 data-translate="resident.add">Add New Resident</h3>
                 <form id="newResidentForm" onsubmit="saveNewResident(event)">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="newFirstName">First Name / Nombre *</label>
+                            <label data-translate="resident.firstName">First Name *</label>
                             <input type="text" id="newFirstName" required>
                         </div>
                         <div class="form-group">
-                            <label for="newLastName">Last Name / Apellido *</label>
+                            <label data-translate="resident.lastName">Last Name *</label>
                             <input type="text" id="newLastName" required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Date of Birth / Fecha de Nacimiento</label>
+                            <label data-translate="resident.dateOfBirth">Date of Birth</label>
                             <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                 <div class="form-group" style="margin: 0;">
                                     <select id="newBirthYear" class="form-control">
@@ -108,7 +108,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="newGender">Gender / Género</label>
+                            <label data-translate="resident.gender">Gender</label>
                             <select id="newGender">
                                 <option value="">-- Select --</option>
                                 <option value="Male">Male / Masculino</option>
@@ -118,7 +118,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Photo / Foto</label>
+                        <label data-translate="resident.photo">Photo</label>
                         <div class="photo-upload-area">
                             <div id="newPhotoPreview" class="photo-preview" style="display: none;">
                                 <img id="newPhotoPreviewImg" src="" alt="Preview">
@@ -128,51 +128,51 @@
                                 <input type="file" id="newPhotoInput" accept="image/*" capture="environment" onchange="handleResidentPhotoUpload(event)" style="display: none;">
                                 <label for="newPhotoInput" class="photo-upload-label">
                                     <span class="photo-upload-icon">📷</span>
-                                    <span class="photo-upload-text">Tap to take photo / Toca para tomar foto</span>
-                                    <span class="photo-upload-hint">Camera will open automatically / La cámara se abrirá automáticamente</span>
+                                    <span class="photo-upload-text" data-translate="resident.uploadPhoto">Tap to take photo</span>
+                                    <span class="photo-upload-hint" data-translate="resident.uploadPhoto">Camera will open automatically</span>
                                 </label>
                             </div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="newRoomNumber">Room Number / Número de Habitación</label>
+                            <label data-translate="resident.roomNumber">Room Number</label>
                             <input type="text" id="newRoomNumber">
                         </div>
                         <div class="form-group">
-                            <label for="newBedNumber">Bed Number / Número de Cama</label>
+                            <label data-translate="resident.bedNumber">Bed Number</label>
                             <input type="text" id="newBedNumber">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="newEmergencyContact">Emergency Contact Name / Nombre del Contacto de Emergencia</label>
+                        <label data-translate="resident.emergencyContact">Emergency Contact Name</label>
                         <input type="text" id="newEmergencyContact">
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="newEmergencyPhone">Emergency Contact Phone / Teléfono</label>
+                            <label data-translate="resident.emergencyPhone">Emergency Contact Phone</label>
                             <input type="tel" id="newEmergencyPhone">
                         </div>
                         <div class="form-group">
-                            <label for="newEmergencyRelation">Relation / Relación</label>
-                            <input type="text" id="newEmergencyRelation" placeholder="e.g., Son, Daughter / Hijo, Hija">
+                            <label for="newEmergencyRelation" data-translate="resident.emergencyRelation">Relation</label>
+                            <input type="text" id="newEmergencyRelation" data-translate-placeholder="resident.relation.placeholder" placeholder="e.g., Son, Daughter">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="newMedicalConditions">Medical Conditions / Condiciones Médicas</label>
+                        <label data-translate="resident.medicalConditions">Medical Conditions</label>
                         <textarea id="newMedicalConditions" rows="2"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="newAllergies">Allergies / Alergias</label>
+                        <label data-translate="resident.allergies">Allergies</label>
                         <textarea id="newAllergies" rows="2"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="newDietaryRestrictions">Dietary Restrictions / Restricciones Dietéticas</label>
+                        <label data-translate="resident.dietaryRestrictions">Dietary Restrictions</label>
                         <textarea id="newDietaryRestrictions" rows="2"></textarea>
                     </div>
                     <div class="button-group">
-                        <button type="submit" class="btn btn-success">Save Resident / Guardar Residente</button>
-                        <button type="button" class="btn btn-secondary" onclick="hideAddResidentForm()">Cancel / Cancelar</button>
+                        <button type="submit" class="btn btn-success" data-translate="resident.save">Save Resident</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddResidentForm()" data-translate="common.cancel">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -319,21 +319,21 @@
                 
                 <!-- Add/Edit Resident Form (for Residents page) -->
                 <div id="addResidentFormPage" class="form-card" style="display: none; margin-top: 2rem;">
-                    <h3>Add New Resident / Agregar Nuevo Residente</h3>
+                    <h3 data-translate="resident.add">Add New Resident</h3>
                     <form id="newResidentFormPage" onsubmit="saveNewResident(event)">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="newFirstNamePage">First Name / Nombre *</label>
+                                <label data-translate="resident.firstName">First Name *</label>
                                 <input type="text" id="newFirstNamePage" required>
                             </div>
                             <div class="form-group">
-                                <label for="newLastNamePage">Last Name / Apellido *</label>
+                                <label data-translate="resident.lastName">Last Name *</label>
                                 <input type="text" id="newLastNamePage" required>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Date of Birth / Fecha de Nacimiento</label>
+                                <label data-translate="resident.dateOfBirth">Date of Birth</label>
                                 <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                     <div class="form-group" style="margin: 0;">
                                         <select id="newBirthYearPage" class="form-control">
@@ -365,7 +365,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="newGenderPage">Gender / Género</label>
+                                <label data-translate="resident.gender">Gender</label>
                                 <select id="newGenderPage">
                                     <option value="">-- Select --</option>
                                     <option value="Male">Male / Masculino</option>
@@ -375,7 +375,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Photo / Foto</label>
+                            <label data-translate="resident.photo">Photo</label>
                             <div class="photo-upload-area">
                                 <div id="newPhotoPreviewPage" class="photo-preview" style="display: none;">
                                     <img id="newPhotoPreviewImgPage" src="" alt="Preview">
@@ -393,21 +393,21 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="newRoomNumberPage">Room Number / Número de Habitación</label>
+                                <label data-translate="resident.roomNumber">Room Number</label>
                                 <input type="text" id="newRoomNumberPage">
                             </div>
                             <div class="form-group">
-                                <label for="newBedNumberPage">Bed Number / Número de Cama</label>
+                                <label data-translate="resident.bedNumber">Bed Number</label>
                                 <input type="text" id="newBedNumberPage">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="newEmergencyContactPage">Emergency Contact Name / Nombre del Contacto de Emergencia</label>
+                            <label data-translate="resident.emergencyContact">Emergency Contact Name</label>
                             <input type="text" id="newEmergencyContactPage">
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="newEmergencyPhonePage">Emergency Contact Phone / Teléfono</label>
+                                <label data-translate="resident.emergencyPhone">Emergency Contact Phone</label>
                                 <input type="tel" id="newEmergencyPhonePage">
                             </div>
                             <div class="form-group">
@@ -416,15 +416,15 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="newMedicalConditionsPage">Medical Conditions / Condiciones Médicas</label>
+                            <label data-translate="resident.medicalConditions">Medical Conditions</label>
                             <textarea id="newMedicalConditionsPage" rows="2"></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="newAllergiesPage">Allergies / Alergias</label>
+                            <label data-translate="resident.allergies">Allergies</label>
                             <textarea id="newAllergiesPage" rows="2"></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="newDietaryRestrictionsPage">Dietary Restrictions / Restricciones Dietéticas</label>
+                            <label data-translate="resident.dietaryRestrictions">Dietary Restrictions</label>
                             <textarea id="newDietaryRestrictionsPage" rows="2"></textarea>
                         </div>
                         <div class="button-group">
@@ -504,7 +504,7 @@
                 <button class="btn btn-primary" onclick="showMedicationForm()">+ Add New Medication / Agregar Medicamento</button>
                 
                 <div id="medicationForm" class="form-card" style="display: none;">
-                    <h3>Add Medication / Agregar Medicamento</h3>
+                    <h3 data-translate="medication.add">Add Medication</h3>
                     <form id="medForm" onsubmit="saveMedication(event)">
                         <div class="form-group">
                             <label for="medName">Medication Name / Nombre del Medicamento *</label>
@@ -639,7 +639,7 @@
                 <button class="btn btn-primary" onclick="showAppointmentForm()">+ Add New Appointment / Agregar Nueva Cita</button>
                 
                 <div id="appointmentForm" class="form-card" style="display: none;">
-                    <h3>Add Appointment / Agregar Cita</h3>
+                    <h3 data-translate="appointment.add">Add Appointment</h3>
                     <form id="apptForm" onsubmit="saveAppointment(event)">
                         <div class="form-group">
                             <label>Date / Fecha *</label>
