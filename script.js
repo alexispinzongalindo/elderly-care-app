@@ -1210,6 +1210,9 @@ function showPage(pageName) {
             page.style.setProperty('display', 'none', 'important');
             page.style.setProperty('visibility', 'hidden', 'important');
             page.style.setProperty('opacity', '0', 'important');
+            page.style.setProperty('position', 'absolute', 'important');
+            page.style.setProperty('left', '-9999px', 'important');
+            page.style.setProperty('z-index', '-1', 'important');
         }
     });
     
@@ -1262,13 +1265,17 @@ function showPage(pageName) {
         else if (pageName === 'billing') {
             console.log('💰 Showing billing page');
             
-            // CRITICAL: Hide incidents page when showing billing
+            // CRITICAL: Aggressively hide incidents page when showing billing
             const incidentsPage = document.getElementById('incidents');
             if (incidentsPage) {
                 incidentsPage.classList.remove('active');
                 incidentsPage.style.setProperty('display', 'none', 'important');
                 incidentsPage.style.setProperty('visibility', 'hidden', 'important');
                 incidentsPage.style.setProperty('opacity', '0', 'important');
+                incidentsPage.style.setProperty('position', 'absolute', 'important');
+                incidentsPage.style.setProperty('left', '-9999px', 'important');
+                incidentsPage.style.setProperty('z-index', '-1', 'important');
+                console.log('✅ Incidents page forcefully hidden');
             }
             
             // CRITICAL: Show billing page and restore its children
@@ -1335,16 +1342,19 @@ function showPage(pageName) {
             console.log('✅ Element classes:', incidentsPageElement.className);
             console.log('✅ Element parent:', incidentsPageElement.parentElement?.tagName, incidentsPageElement.parentElement?.id);
             
-            // CRITICAL: Hide billing page (but don't break it permanently)
+            // CRITICAL: Aggressively hide billing page when showing incidents
             const billingPage = document.getElementById('billing');
             if (billingPage) {
                 billingPage.classList.remove('active');
                 billingPage.style.setProperty('display', 'none', 'important');
                 billingPage.style.setProperty('visibility', 'hidden', 'important');
                 billingPage.style.setProperty('opacity', '0', 'important');
+                billingPage.style.setProperty('position', 'absolute', 'important');
+                billingPage.style.setProperty('left', '-9999px', 'important');
+                billingPage.style.setProperty('z-index', '-1', 'important');
                 // DON'T hide children with !important - just hide the container
                 // This allows billing to be restored when shown again
-                console.log('✅ Billing page hidden (container only)');
+                console.log('✅ Billing page forcefully hidden');
             } else {
                 console.log('⚠️ Billing page element not found (this is OK if it doesn\'t exist)');
             }
