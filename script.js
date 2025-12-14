@@ -32,13 +32,26 @@ window.fetch = function(url, options = {}) {
     const method = options.method || 'GET';
     const timestamp = new Date().toISOString();
     
-    // Log all API requests
+    // Disable cache for all API requests to ensure they show in Network tab
     if (url.startsWith('/api/')) {
+        options.cache = 'no-store'; // Force network request, never use cache
+        options.headers = options.headers || {};
+        
+        // Add cache-control headers
+        if (!options.headers['Cache-Control']) {
+            options.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+        }
+        if (!options.headers['Pragma']) {
+            options.headers['Pragma'] = 'no-cache';
+        }
+        
+        // Log all API requests
         console.log(`🌐 [${timestamp}] ${method} ${url}`, {
             url: url,
             method: method,
             headers: options.headers,
-            body: options.body
+            body: options.body,
+            cache: options.cache
         });
     }
     
