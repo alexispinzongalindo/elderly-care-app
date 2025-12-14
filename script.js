@@ -1260,19 +1260,41 @@ function showPage(pageName) {
             loadCalendar();
         }
         else if (pageName === 'billing') {
-            // CRITICAL: Hide incidents page and its containers when showing billing
+            console.log('💰 Showing billing page');
+            
+            // CRITICAL: Hide incidents page when showing billing
             const incidentsPage = document.getElementById('incidents');
             if (incidentsPage) {
-                incidentsPage.style.display = 'none';
-                incidentsPage.style.visibility = 'hidden';
-                incidentsPage.style.opacity = '0';
                 incidentsPage.classList.remove('active');
+                incidentsPage.style.setProperty('display', 'none', 'important');
+                incidentsPage.style.setProperty('visibility', 'hidden', 'important');
+                incidentsPage.style.setProperty('opacity', '0', 'important');
             }
-            const incidentsList = document.getElementById('incidentsList');
-            if (incidentsList) {
-                incidentsList.style.display = 'none';
-                incidentsList.style.visibility = 'hidden';
+            
+            // CRITICAL: Show billing page and restore its children
+            const billingPage = document.getElementById('billing');
+            if (billingPage) {
+                billingPage.classList.add('active');
+                billingPage.style.setProperty('display', 'block', 'important');
+                billingPage.style.setProperty('visibility', 'visible', 'important');
+                billingPage.style.setProperty('opacity', '1', 'important');
+                billingPage.style.setProperty('position', 'relative', 'important');
+                billingPage.style.setProperty('z-index', '1', 'important');
+                billingPage.style.removeProperty('left'); // Remove left: -9999px if it was set
+                
+                // Restore all billing children visibility
+                const billingChildren = billingPage.querySelectorAll('*');
+                billingChildren.forEach(child => {
+                    // Only restore if it's not a form that should be hidden
+                    if (child.id !== 'billForm' && child.id !== 'paymentForm' && 
+                        !child.classList.contains('form-card') || child.style.display !== 'none') {
+                        child.style.removeProperty('display');
+                        child.style.removeProperty('visibility');
+                    }
+                });
+                console.log('✅ Billing page restored and shown');
             }
+            
             loadBilling();
             loadPayments();
             loadAccountBalance();
@@ -1296,34 +1318,19 @@ function showPage(pageName) {
             console.log('✅ Element classes:', incidentsPageElement.className);
             console.log('✅ Element parent:', incidentsPageElement.parentElement?.tagName, incidentsPageElement.parentElement?.id);
             
-            // CRITICAL: Aggressively hide billing page and ALL its content
+            // CRITICAL: Hide billing page (but don't break it permanently)
             const billingPage = document.getElementById('billing');
             if (billingPage) {
                 billingPage.classList.remove('active');
                 billingPage.style.setProperty('display', 'none', 'important');
                 billingPage.style.setProperty('visibility', 'hidden', 'important');
                 billingPage.style.setProperty('opacity', '0', 'important');
-                billingPage.style.setProperty('position', 'absolute', 'important');
-                billingPage.style.setProperty('left', '-9999px', 'important');
-                billingPage.style.setProperty('z-index', '-1', 'important');
-                // Hide ALL children of billing page
-                const allBillingChildren = billingPage.querySelectorAll('*');
-                allBillingChildren.forEach(child => {
-                    child.style.setProperty('display', 'none', 'important');
-                    child.style.setProperty('visibility', 'hidden', 'important');
-                });
-                console.log('✅ Billing page forcefully hidden');
+                // DON'T hide children with !important - just hide the container
+                // This allows billing to be restored when shown again
+                console.log('✅ Billing page hidden (container only)');
             } else {
                 console.log('⚠️ Billing page element not found (this is OK if it doesn\'t exist)');
             }
-            
-            // Also hide all billing-related containers anywhere in the DOM
-            const billingContainers = document.querySelectorAll('#billingList, #paymentsList, #accountBalanceCard, [id^="billing"], [id^="payment"]');
-            billingContainers.forEach(container => {
-                container.style.setProperty('display', 'none', 'important');
-                container.style.setProperty('visibility', 'hidden', 'important');
-            });
-            console.log('✅ Hidden', billingContainers.length, 'billing containers');
             
             // CRITICAL: Explicitly show incidents page content IMMEDIATELY
             const incidentsPage = document.getElementById('incidents');
