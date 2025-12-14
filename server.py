@@ -1310,28 +1310,34 @@ def incidents():
     
     if request.method == 'GET':
         resident_id = request.args.get('resident_id')
-        if resident_id:
-            cursor.execute('''
-                SELECT ir.*, r.first_name || ' ' || r.last_name as resident_name,
-                       s.full_name as staff_name
-                FROM incident_reports ir
-                JOIN residents r ON ir.resident_id = r.id
-                JOIN staff s ON ir.staff_id = s.id
-                WHERE ir.resident_id = ?
-                ORDER BY ir.incident_date DESC
-            ''', (resident_id,))
-        else:
-            cursor.execute('''
-                SELECT ir.*, r.first_name || ' ' || r.last_name as resident_name,
-                       s.full_name as staff_name
-                FROM incident_reports ir
-                JOIN residents r ON ir.resident_id = r.id
-                JOIN staff s ON ir.staff_id = s.id
-                ORDER BY ir.incident_date DESC
-            ''')
-        incidents = [dict(row) for row in cursor.fetchall()]
-        conn.close()
-        return jsonify(incidents)
+        try:
+            if resident_id:
+                cursor.execute('''
+                    SELECT ir.*, r.first_name || ' ' || r.last_name as resident_name,
+                           s.full_name as staff_name
+                    FROM incident_reports ir
+                    JOIN residents r ON ir.resident_id = r.id
+                    JOIN staff s ON ir.staff_id = s.id
+                    WHERE ir.resident_id = ?
+                    ORDER BY ir.incident_date DESC
+                ''', (resident_id,))
+            else:
+                cursor.execute('''
+                    SELECT ir.*, r.first_name || ' ' || r.last_name as resident_name,
+                           s.full_name as staff_name
+                    FROM incident_reports ir
+                    JOIN residents r ON ir.resident_id = r.id
+                    JOIN staff s ON ir.staff_id = s.id
+                    ORDER BY ir.incident_date DESC
+                ''')
+            incidents = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            print(f'[API] Returning {len(incidents)} incidents')
+            return jsonify(incidents)
+        except Exception as e:
+            conn.close()
+            print(f'[API ERROR] Failed to fetch incidents: {str(e)}')
+            return jsonify({'error': str(e)}), 500
     
     elif request.method == 'POST':
         data = request.json
