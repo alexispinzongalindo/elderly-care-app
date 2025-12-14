@@ -1215,12 +1215,23 @@ function showPage(pageName) {
         targetPage.style.setProperty('visibility', 'visible', 'important');
         targetPage.style.setProperty('opacity', '1', 'important');
         targetPage.style.setProperty('position', 'relative', 'important');
-        // Show all child elements
-        const targetContainers = targetPage.querySelectorAll('[id$="List"], [class*="container"], [class*="form-card"], h2, h3');
+        // Explicitly show all child elements of the target page
+        const targetContainers = targetPage.querySelectorAll('h2, h3, button, [id$="List"], [class*="container"], [class*="form-card"], [class*="item-list"]');
         targetContainers.forEach(container => {
-            container.style.removeProperty('display');
+            // Check if it's a form that should be hidden initially
+            if (container.id === 'incidentForm' && container.style.display === 'none') {
+                // Keep it hidden if it's the form and it's supposed to be hidden
+                return;
+            }
+            // Show everything else
+            container.style.setProperty('display', container.tagName === 'H2' || container.tagName === 'H3' ? 'block' : 
+                                       container.tagName === 'BUTTON' ? 'inline-block' : 
+                                       container.classList.contains('item-list') ? 'block' : 'block', 'important');
+            container.style.setProperty('visibility', 'visible', 'important');
+            container.style.setProperty('opacity', '1', 'important');
         });
         console.log('✅ Page activated:', pageName);
+        console.log('✅ Target page children count:', targetPage.children.length);
         
         // Update nav links
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -1267,19 +1278,47 @@ function showPage(pageName) {
             // CRITICAL: Hide billing page and its containers when showing incidents
             const billingPage = document.getElementById('billing');
             if (billingPage) {
-                billingPage.style.display = 'none';
-                billingPage.style.visibility = 'hidden';
-                billingPage.style.opacity = '0';
+                billingPage.style.setProperty('display', 'none', 'important');
+                billingPage.style.setProperty('visibility', 'hidden', 'important');
+                billingPage.style.setProperty('opacity', '0', 'important');
                 billingPage.classList.remove('active');
             }
             // Also hide all billing-related containers
             const billingContainers = document.querySelectorAll('#billingList, #paymentsList, #accountBalanceCard, [id^="billing"], [id^="payment"]');
             billingContainers.forEach(container => {
                 if (container.closest('#billing')) {
-                    container.style.display = 'none';
-                    container.style.visibility = 'hidden';
+                    container.style.setProperty('display', 'none', 'important');
+                    container.style.setProperty('visibility', 'hidden', 'important');
                 }
             });
+            
+            // CRITICAL: Explicitly show incidents page content
+            const incidentsPage = document.getElementById('incidents');
+            if (incidentsPage) {
+                const incidentsH2 = incidentsPage.querySelector('h2');
+                const incidentsButton = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
+                const incidentsList = document.getElementById('incidentsList');
+                
+                if (incidentsH2) {
+                    incidentsH2.style.setProperty('display', 'block', 'important');
+                    incidentsH2.style.setProperty('visibility', 'visible', 'important');
+                    incidentsH2.style.setProperty('opacity', '1', 'important');
+                    console.log('✅ Incidents H2 shown');
+                }
+                if (incidentsButton) {
+                    incidentsButton.style.setProperty('display', 'inline-block', 'important');
+                    incidentsButton.style.setProperty('visibility', 'visible', 'important');
+                    incidentsButton.style.setProperty('opacity', '1', 'important');
+                    console.log('✅ Incidents button shown');
+                }
+                if (incidentsList) {
+                    incidentsList.style.setProperty('display', 'block', 'important');
+                    incidentsList.style.setProperty('visibility', 'visible', 'important');
+                    incidentsList.style.setProperty('opacity', '1', 'important');
+                    console.log('✅ Incidents list shown');
+                }
+            }
+            
             console.log('🔄 Loading incidents page data...');
             loadIncidents();
         }
