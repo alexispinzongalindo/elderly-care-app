@@ -1400,9 +1400,13 @@ function showPage(pageName) {
                     return;
                 }
                 
-                // Use cssText for maximum control
+                // Use setProperty for maximum control (cssText += can cause issues)
                 const displayValue = child.tagName === 'BUTTON' ? 'inline-block' : 'block';
-                child.style.cssText += `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important;`;
+                child.style.setProperty('display', displayValue, 'important');
+                child.style.setProperty('visibility', 'visible', 'important');
+                child.style.setProperty('opacity', '1', 'important');
+                child.style.setProperty('position', 'relative', 'important');
+                child.style.setProperty('z-index', '1', 'important');
                 
                 const afterDisplay = window.getComputedStyle(child).display;
                 const afterVisibility = window.getComputedStyle(child).visibility;
