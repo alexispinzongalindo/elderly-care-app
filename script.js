@@ -2510,11 +2510,25 @@ async function loadIncidents() {
             console.log('✅ Empty state div display:', window.getComputedStyle(emptyStateDiv).display);
             console.log('✅ Empty state div visibility:', window.getComputedStyle(emptyStateDiv).visibility);
             
-            // Also check parent elements
+            // Also check and fix parent elements
             let parent = container.parentElement;
             let level = 0;
             while (parent && level < 5) {
-                console.log(`✅ Parent ${level} (${parent.tagName}): display=${window.getComputedStyle(parent).display}, visibility=${window.getComputedStyle(parent).visibility}, opacity=${window.getComputedStyle(parent).opacity}`);
+                const computedStyle = window.getComputedStyle(parent);
+                const display = computedStyle.display;
+                const visibility = computedStyle.visibility;
+                const opacity = computedStyle.opacity;
+                
+                console.log(`✅ Parent ${level} (${parent.tagName}): display=${display}, visibility=${visibility}, opacity=${opacity}`);
+                
+                // Fix any parent with display:none (except if it's intentionally hidden)
+                if (display === 'none' && parent.id !== 'loginModal' && parent.id !== 'residentSelector') {
+                    console.log(`⚠️ Fixing Parent ${level} (${parent.tagName}) - setting display to block`);
+                    parent.style.display = 'block';
+                    parent.style.visibility = 'visible';
+                    parent.style.opacity = '1';
+                }
+                
                 parent = parent.parentElement;
                 level++;
             }
