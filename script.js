@@ -2810,7 +2810,19 @@ async function loadIncidents() {
         }
         
         const incidents = await response.json();
-        console.log('✅ Loaded incidents:', incidents.length);
+        console.log('✅ API Response received');
+        console.log('✅ Incidents type:', Array.isArray(incidents) ? 'array' : typeof incidents);
+        console.log('✅ Incidents length:', Array.isArray(incidents) ? incidents.length : 'N/A (not array)');
+        console.log('✅ Incidents data:', incidents);
+        
+        // Validate response is an array
+        if (!Array.isArray(incidents)) {
+            console.error('❌ API did not return an array! Response:', incidents);
+            container.innerHTML = `<div class="empty-state" style="display: block !important; visibility: visible !important; opacity: 1 !important; padding: 2rem !important; background: #fee !important; border: 2px solid #f00 !important; border-radius: 8px !important; color: #c00 !important; font-weight: bold !important;">Error: Server returned invalid data format. Please check console. / Error: El servidor devolvió un formato de datos inválido. Por favor revise la consola.</div>`;
+            container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; min-height: 200px !important; width: 100% !important; margin-top: 2rem !important; padding: 1rem !important; background: var(--white) !important; border-radius: 8px !important;';
+            showMessage('Error: Invalid data format from server / Error: Formato de datos inválido del servidor', 'error');
+            return;
+        }
         
         if (incidents.length === 0) {
             // Create a highly visible empty state with aggressive inline styles
