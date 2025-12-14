@@ -1216,6 +1216,18 @@ function showPage(pageName) {
         }
     });
     
+    // CRITICAL: Ensure mainApp is visible first
+    const mainApp = document.getElementById('mainApp');
+    if (mainApp) {
+        const mainAppDisplay = window.getComputedStyle(mainApp).display;
+        if (mainAppDisplay === 'none') {
+            console.log('⚠️ mainApp is hidden - forcing visibility');
+            mainApp.style.setProperty('display', 'block', 'important');
+            mainApp.style.setProperty('visibility', 'visible', 'important');
+            mainApp.style.setProperty('opacity', '1', 'important');
+        }
+    }
+    
     const targetPage = document.getElementById(pageName);
     if (targetPage) {
         targetPage.classList.add('active');
