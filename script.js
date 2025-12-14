@@ -66,7 +66,30 @@ window.fetch = function(url, options = {}) {
     if (url.startsWith('/api/')) {
         fetchPromise.then(response => {
             const responseTimestamp = new Date().toISOString();
-            console.log(`✅ [${responseTimestamp}] ${method} ${url} → ${response.status} ${response.statusText}`, {
+            
+            // Update network requests log
+            if (window.networkRequests) {
+                const req = window.networkRequests.find(r => r.url === url && r.status === 'pending');
+                if (req) {
+                    req.status = response.status;
+                    req.statusText = response.statusText;
+                    req.completedAt = responseTimestamp;
+                }
+            }
+            
+            // Big, visible console log for response
+            const statusColor = response.ok ? '#4CAF50' : '#f44336';
+            console.log(
+                `%c✅✅✅ NETWORK RESPONSE ✅✅✅\n` +
+                `%c${method} ${url}\n` +
+                `%cStatus: ${response.status} ${response.statusText}\n` +
+                `%cTime: ${responseTimestamp}`,
+                'background: ' + statusColor + '; color: white; font-size: 16px; font-weight: bold; padding: 10px;',
+                'background: #2196F3; color: white; font-size: 14px; padding: 5px;',
+                'color: ' + statusColor + '; font-size: 14px; font-weight: bold;',
+                'color: #666; font-size: 12px;'
+            );
+            console.log('Full response details:', {
                 status: response.status,
                 statusText: response.statusText,
                 headers: Object.fromEntries(response.headers.entries())
@@ -74,18 +97,28 @@ window.fetch = function(url, options = {}) {
             
             // Clone response to read body without consuming it
             response.clone().json().then(data => {
-                console.log(`📦 [${responseTimestamp}] Response data:`, data);
+                console.log(`%c📦 Response data:`, 'background: #FF9800; color: white; padding: 5px;', data);
             }).catch(() => {
                 // Not JSON, try text
                 response.clone().text().then(text => {
-                    console.log(`📦 [${responseTimestamp}] Response text:`, text.substring(0, 200));
+                    console.log(`%c📦 Response text:`, 'background: #FF9800; color: white; padding: 5px;', text.substring(0, 200));
                 }).catch(() => {});
             });
             
             return response;
         }).catch(error => {
             const errorTimestamp = new Date().toISOString();
-            console.error(`❌ [${errorTimestamp}] ${method} ${url} → Error:`, error);
+            console.error(
+                `%c❌❌❌ NETWORK ERROR ❌❌❌\n` +
+                `%c${method} ${url}\n` +
+                `%cError: ${error.message}\n` +
+                `%cTime: ${errorTimestamp}`,
+                'background: #f44336; color: white; font-size: 16px; font-weight: bold; padding: 10px;',
+                'background: #2196F3; color: white; font-size: 14px; padding: 5px;',
+                'color: #f44336; font-size: 14px; font-weight: bold;',
+                'color: #666; font-size: 12px;'
+            );
+            console.error('Full error:', error);
         });
     }
     
