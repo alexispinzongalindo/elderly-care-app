@@ -2460,15 +2460,65 @@ async function loadIncidents() {
         console.log('✅ Loaded incidents:', incidents.length);
         
         if (incidents.length === 0) {
-            const emptyStateHTML = '<div class="empty-state" style="padding: 3rem; font-size: 1.1rem; color: var(--text-color); display: block !important; visibility: visible !important; opacity: 1 !important;"><p style="margin-bottom: 1rem;">📋 No incident reports found. / No se encontraron reportes de incidentes.</p><p style="font-size: 0.9rem; color: var(--medium-gray);">Click the "+ Report Incident" button above to create your first incident report. / Haga clic en el botón "+ Reportar Incidente" arriba para crear su primer reporte de incidente.</p></div>';
-            container.innerHTML = emptyStateHTML;
-            container.style.display = 'block';
-            container.style.visibility = 'visible';
-            container.style.opacity = '1';
+            // Create a highly visible empty state with aggressive inline styles
+            const emptyStateDiv = document.createElement('div');
+            emptyStateDiv.className = 'empty-state';
+            emptyStateDiv.style.cssText = `
+                padding: 3rem !important;
+                font-size: 1.1rem !important;
+                color: #333 !important;
+                background: #f5f5f5 !important;
+                border: 2px solid #ddd !important;
+                border-radius: 8px !important;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: relative !important;
+                z-index: 1000 !important;
+                margin: 2rem 0 !important;
+                text-align: center !important;
+                min-height: 200px !important;
+                width: 100% !important;
+            `;
+            emptyStateDiv.innerHTML = `
+                <p style="margin-bottom: 1rem; font-size: 1.2rem; font-weight: bold; color: #333 !important;">📋 No incident reports found. / No se encontraron reportes de incidentes.</p>
+                <p style="font-size: 0.9rem; color: #666 !important;">Click the "+ Report Incident" button above to create your first incident report. / Haga clic en el botón "+ Reportar Incidente" arriba para crear su primer reporte de incidente.</p>
+            `;
+            
+            // Clear and append
+            container.innerHTML = '';
+            container.appendChild(emptyStateDiv);
+            
+            // Force container visibility
+            container.style.cssText = `
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: relative !important;
+                z-index: 999 !important;
+                min-height: 200px !important;
+                width: 100% !important;
+                margin-top: 2rem !important;
+            `;
+            
             console.log('✅ Empty state message displayed');
-            console.log('✅ Container innerHTML:', container.innerHTML.substring(0, 100));
+            console.log('✅ Container innerHTML length:', container.innerHTML.length);
             console.log('✅ Container display:', window.getComputedStyle(container).display);
             console.log('✅ Container visibility:', window.getComputedStyle(container).visibility);
+            console.log('✅ Container opacity:', window.getComputedStyle(container).opacity);
+            console.log('✅ Container z-index:', window.getComputedStyle(container).zIndex);
+            console.log('✅ Empty state div display:', window.getComputedStyle(emptyStateDiv).display);
+            console.log('✅ Empty state div visibility:', window.getComputedStyle(emptyStateDiv).visibility);
+            
+            // Also check parent elements
+            let parent = container.parentElement;
+            let level = 0;
+            while (parent && level < 5) {
+                console.log(`✅ Parent ${level} (${parent.tagName}): display=${window.getComputedStyle(parent).display}, visibility=${window.getComputedStyle(parent).visibility}, opacity=${window.getComputedStyle(parent).opacity}`);
+                parent = parent.parentElement;
+                level++;
+            }
+            
             return;
         }
         
