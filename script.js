@@ -1373,32 +1373,56 @@ function showPage(pageName) {
             console.log('✅ Incidents page classes:', incidentsPage.className);
             console.log('✅ Incidents page children count:', incidentsPage.children.length);
             
-            // Force incidents page to be visible
+            // Force incidents page to be visible using cssText for maximum control
             incidentsPage.classList.add('active');
-            incidentsPage.style.setProperty('display', 'block', 'important');
-            incidentsPage.style.setProperty('visibility', 'visible', 'important');
-            incidentsPage.style.setProperty('opacity', '1', 'important');
-            incidentsPage.style.setProperty('position', 'relative', 'important');
-            incidentsPage.style.setProperty('z-index', '10', 'important');
-            incidentsPage.style.setProperty('min-height', '400px', 'important');
-            incidentsPage.style.setProperty('width', '100%', 'important');
-            incidentsPage.style.setProperty('background', 'var(--light-gray)', 'important');
-            incidentsPage.style.removeProperty('left'); // Remove left: -9999px if it was set
-            incidentsPage.style.removeProperty('right'); // Remove any right positioning
-            console.log('✅ Incidents page forced visible');
+            incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+            console.log('✅ Incidents page forced visible with cssText');
+            
+            // Verify it worked
+            const computedStyle = window.getComputedStyle(incidentsPage);
+            console.log('✅ After forcing - display:', computedStyle.display);
+            console.log('✅ After forcing - visibility:', computedStyle.visibility);
+            console.log('✅ After forcing - opacity:', computedStyle.opacity);
+            console.log('✅ After forcing - offsetHeight:', incidentsPage.offsetHeight);
+            console.log('✅ After forcing - offsetWidth:', incidentsPage.offsetWidth);
             
             // Show ALL direct children of incidents page
             Array.from(incidentsPage.children).forEach((child, index) => {
                 console.log(`✅ Child ${index}:`, child.tagName, child.id || child.className);
+                const beforeDisplay = window.getComputedStyle(child).display;
+                const beforeVisibility = window.getComputedStyle(child).visibility;
+                const beforeOpacity = window.getComputedStyle(child).opacity;
+                console.log(`    Before: display=${beforeDisplay}, visibility=${beforeVisibility}, opacity=${beforeOpacity}`);
+                
                 // Don't hide the form if it's supposed to be hidden
                 if (child.id === 'incidentForm' && child.style.display === 'none') {
                     console.log('⚠️ Skipping incidentForm (should be hidden)');
                     return;
                 }
-                child.style.setProperty('display', child.tagName === 'BUTTON' ? 'inline-block' : 'block', 'important');
-                child.style.setProperty('visibility', 'visible', 'important');
-                child.style.setProperty('opacity', '1', 'important');
+                
+                // Use cssText for maximum control
+                const displayValue = child.tagName === 'BUTTON' ? 'inline-block' : 'block';
+                child.style.cssText += `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important;`;
+                
+                const afterDisplay = window.getComputedStyle(child).display;
+                const afterVisibility = window.getComputedStyle(child).visibility;
+                const afterOpacity = window.getComputedStyle(child).opacity;
+                console.log(`    After: display=${afterDisplay}, visibility=${afterVisibility}, opacity=${afterOpacity}`);
+                console.log(`    offsetHeight: ${child.offsetHeight}, offsetWidth: ${child.offsetWidth}`);
             });
+            
+            // CRITICAL: Check for test element specifically
+            const testElement = incidentsPage.querySelector('div[style*="TEST"]');
+            if (testElement) {
+                console.log('🔴 TEST ELEMENT FOUND!');
+                console.log('✅ Test element display:', window.getComputedStyle(testElement).display);
+                console.log('✅ Test element visibility:', window.getComputedStyle(testElement).visibility);
+                console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
+                console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
+                console.log('✅ Test element parent:', testElement.parentElement?.id);
+            } else {
+                console.error('❌ TEST ELEMENT NOT FOUND!');
+            }
             
             const incidentsH2 = incidentsPage.querySelector('h2');
             const incidentsButton = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
