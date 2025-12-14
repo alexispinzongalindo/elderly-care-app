@@ -4706,7 +4706,12 @@ function showBillForm() {
     dueDate.setDate(dueDate.getDate() + 30);
     setDateToDropdowns(dueDate.toISOString().split('T')[0], 'billDueYear', 'billDueMonth', 'billDueDay');
     // Update form title
-    document.querySelector('#billForm h3').textContent = 'Add New Bill / Agregar Nueva Factura';
+    const billFormTitle = document.getElementById('billFormTitle') || document.querySelector('#billForm h3');
+    if (billFormTitle) {
+        billFormTitle.textContent = 'Add New Bill / Agregar Nueva Factura';
+    } else {
+        console.error('❌ billFormTitle element not found!');
+    }
 }
 
 async function editBill(id) {
@@ -4725,7 +4730,12 @@ async function editBill(id) {
         document.getElementById('billNotes').value = bill.notes || '';
         
         // Update form title
-        document.querySelector('#billForm h3').textContent = 'Edit Bill / Editar Factura';
+        const billFormTitle = document.getElementById('billFormTitle') || document.querySelector('#billForm h3');
+        if (billFormTitle) {
+            billFormTitle.textContent = 'Edit Bill / Editar Factura';
+        } else {
+            console.error('❌ billFormTitle element not found!');
+        }
         
         // Scroll to form
         document.getElementById('billForm').scrollIntoView({ behavior: 'smooth' });
