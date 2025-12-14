@@ -218,6 +218,11 @@ async function handleLogin(event) {
                 userRoleEl.textContent = currentStaff.role === 'admin' ? 'Administrator' : 'Caregiver';
                 userRoleEl.style.display = 'inline-block';
             }
+            const userRoleEl = document.getElementById('userRole');
+            if (userRoleEl) {
+                userRoleEl.textContent = currentStaff.role === 'admin' ? 'Administrator' : 'Caregiver';
+                userRoleEl.style.display = 'inline-block';
+            }
             document.getElementById('userInfo').style.display = 'flex';
             
             // Show Staff nav link if user is admin
