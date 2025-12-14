@@ -1211,39 +1211,61 @@ function showPage(pageName) {
         else if (pageName === 'incidents') {
             console.log('🔄 Showing incidents page...');
             
-            // Ensure main app container is visible
+            // CRITICAL: Ensure main app container is visible FIRST
             const mainApp = document.getElementById('mainApp');
             if (mainApp) {
                 mainApp.style.display = 'block';
-                console.log('✅ Main app container is visible');
+                mainApp.style.visibility = 'visible';
+                mainApp.style.opacity = '1';
+                console.log('✅ Main app container forced visible');
+                console.log('   - Computed display:', window.getComputedStyle(mainApp).display);
+            } else {
+                console.error('❌ mainApp element not found!');
             }
             
-            // Ensure main container is visible
+            // CRITICAL: Ensure main container is visible
             const mainContainer = document.querySelector('main.container');
             if (mainContainer) {
                 mainContainer.style.display = 'block';
                 mainContainer.style.visibility = 'visible';
-                console.log('✅ Main container is visible');
+                mainContainer.style.opacity = '1';
+                mainContainer.style.position = 'relative';
+                mainContainer.style.zIndex = '1';
+                console.log('✅ Main container forced visible');
+                console.log('   - Computed display:', window.getComputedStyle(mainContainer).display);
+            } else {
+                console.error('❌ main.container element not found!');
             }
             
-            // Force incidents page to be visible
+            // CRITICAL: Force incidents page to be visible
             const incidentsPage = document.getElementById('incidents');
             if (incidentsPage) {
+                incidentsPage.classList.add('active');
                 incidentsPage.style.display = 'block';
                 incidentsPage.style.visibility = 'visible';
                 incidentsPage.style.opacity = '1';
                 incidentsPage.style.position = 'relative';
-                incidentsPage.style.zIndex = '1';
+                incidentsPage.style.zIndex = '10';
+                incidentsPage.style.minHeight = '400px';
                 console.log('✅ Incidents page forced visible');
+                console.log('   - Computed display:', window.getComputedStyle(incidentsPage).display);
+                console.log('   - Has active class:', incidentsPage.classList.contains('active'));
+            } else {
+                console.error('❌ incidents page element not found!');
             }
             
-            // Force header and button to be visible
+            // Force ALL child elements to be visible
             setTimeout(() => {
                 const header = document.querySelector('#incidents h2');
                 if (header) {
                     header.style.display = 'block';
                     header.style.visibility = 'visible';
+                    header.style.opacity = '1';
+                    header.style.color = 'var(--text-color)';
                     console.log('✅ Header forced visible');
+                    console.log('   - Header text:', header.textContent);
+                } else {
+                    console.error('❌ Header not found!');
                 }
                 
                 const reportButton = document.querySelector('#incidents button[onclick="showIncidentForm()"]');
@@ -1251,7 +1273,11 @@ function showPage(pageName) {
                     reportButton.style.display = 'inline-block';
                     reportButton.style.visibility = 'visible';
                     reportButton.style.opacity = '1';
+                    reportButton.style.position = 'relative';
+                    reportButton.style.zIndex = '20';
                     console.log('✅ Button forced visible');
+                    console.log('   - Button text:', reportButton.textContent);
+                    console.log('   - Computed display:', window.getComputedStyle(reportButton).display);
                     
                     // Add event listener (backup in case onclick doesn't work)
                     reportButton.addEventListener('click', function(e) {
@@ -1261,6 +1287,18 @@ function showPage(pageName) {
                         showIncidentForm();
                     });
                     console.log('✅ Report Incident button event listener attached');
+                } else {
+                    console.error('❌ Report Incident button not found!');
+                }
+                
+                // Check incidentsList container
+                const incidentsList = document.getElementById('incidentsList');
+                if (incidentsList) {
+                    console.log('✅ incidentsList container found');
+                    console.log('   - Computed display:', window.getComputedStyle(incidentsList).display);
+                    console.log('   - Has content:', incidentsList.innerHTML.length > 0);
+                } else {
+                    console.error('❌ incidentsList container not found!');
                 }
             }, 100);
             

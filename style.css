@@ -262,6 +262,11 @@ body {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1.5rem;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
 }
 
 .page {
@@ -269,7 +274,11 @@ body {
 }
 
 .page.active {
-    display: block;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
 }
 
 h2 {
