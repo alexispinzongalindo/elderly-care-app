@@ -213,6 +213,11 @@ async function handleLogin(event) {
             localStorage.setItem('currentStaff', JSON.stringify(currentStaff));
             
             document.getElementById('userName').textContent = currentStaff.full_name;
+            const userRoleEl = document.getElementById('userRole');
+            if (userRoleEl) {
+                userRoleEl.textContent = currentStaff.role === 'admin' ? 'Administrator' : 'Caregiver';
+                userRoleEl.style.display = 'inline-block';
+            }
             document.getElementById('userInfo').style.display = 'flex';
             
             // Show Staff nav link if user is admin
