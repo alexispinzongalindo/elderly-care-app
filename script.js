@@ -2753,8 +2753,8 @@ async function loadIncidents() {
             console.error('Available buttons:', incidentsPage.querySelectorAll('button'));
         }
         
-        // CRITICAL: Force test element visible if it exists
-        const testElement = incidentsPage.querySelector('div[style*="TEST"]');
+        // CRITICAL: Force test element visible if it exists (using variable from line 2596)
+        // testElement already declared above, just use it
         if (testElement) {
             testElement.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; background: red !important; color: white !important; padding: 1rem !important; margin: 1rem 0 !important; font-size: 1.2rem !important; font-weight: bold !important; position: relative !important; z-index: 9999 !important; width: 100% !important; height: auto !important;';
             console.log('🔴 TEST ELEMENT FORCED VISIBLE!');
