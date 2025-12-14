@@ -2362,8 +2362,7 @@ async function loadIncidents() {
             return;
         }
         
-        // Ensure the page is visible
-        const incidentsPage = document.getElementById('incidents');
+        // Ensure the page is visible (incidentsPage already declared above)
         if (incidentsPage) {
             incidentsPage.classList.add('active');
             incidentsPage.style.display = 'block';
