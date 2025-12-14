@@ -1141,9 +1141,9 @@
             </div>
 
             <!-- Incident Reports Page -->
-            <div id="incidents" class="page" style="display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important;">
-                <h2 style="display: block !important; visibility: visible !important; opacity: 1 !important; color: var(--text-color) !important; margin-bottom: 1.5rem !important; font-size: 1.8rem !important; font-weight: bold !important;">Incident Reports / Reportes de Incidentes</h2>
-                <button class="btn btn-primary" onclick="showIncidentForm()" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1.5rem !important; cursor: pointer !important; padding: 0.75rem 1.5rem !important; font-size: 1rem !important;">+ Report Incident / Reportar Incidente</button>
+            <div id="incidents" class="page">
+                <h2>Incident Reports / Reportes de Incidentes</h2>
+                <button class="btn btn-primary" onclick="showIncidentForm()">+ Report Incident / Reportar Incidente</button>
                 
                 <!-- Incident Form -->
                 <div id="incidentForm" class="form-card" style="display: none; margin-top: 2rem;">
@@ -1503,7 +1503,41 @@
         console.log('📄 index.html loaded');
         console.log('🌐 Current URL:', window.location.href);
         console.log('📍 Hostname:', window.location.hostname);
+        
+        // Check if script.js loads
+        window.addEventListener('error', function(e) {
+            console.error('❌❌❌ SCRIPT LOAD ERROR:', e.filename, e.message, e.lineno);
+        }, true);
+        
+        // Verify script loaded after a delay
+        setTimeout(function() {
+            if (typeof showPage === 'undefined') {
+                console.error('❌❌❌ script.js DID NOT LOAD - showPage function not found!');
+                alert('ERROR: script.js failed to load! Check Network tab.');
+            } else {
+                console.log('✅ script.js loaded - showPage function exists');
+            }
+        }, 2000);
     </script>
-    <script src="script.js?v=1765622000"></script>
+    <script src="script.js?v=1765623000" onerror="console.error('❌❌❌ FAILED TO LOAD script.js!'); alert('ERROR: Cannot load script.js!');"></script>
+    <script>
+        // Force show incidents page content immediately if page is active
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOMContentLoaded fired');
+            const incidentsPage = document.getElementById('incidents');
+            if (incidentsPage) {
+                console.log('✅ Incidents page element found in DOM');
+                // Check if it has active class or if incidents nav is selected
+                const incidentsNav = document.querySelector('.nav-link[data-page="incidents"]');
+                if (incidentsNav && incidentsNav.classList.contains('active')) {
+                    console.log('✅ Incidents nav is active - forcing page visibility');
+                    incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important;';
+                    incidentsPage.classList.add('active');
+                }
+            } else {
+                console.error('❌ Incidents page element NOT FOUND in DOM!');
+            }
+        });
+    </script>
 </body>
 </html>

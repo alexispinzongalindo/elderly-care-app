@@ -273,12 +273,56 @@ body {
     display: none;
 }
 
+.page {
+    display: none;
+}
+
 .page.active {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
     position: relative !important;
     z-index: 1 !important;
+}
+
+/* CRITICAL: Force incidents page to show when active */
+#incidents.page.active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 10 !important;
+    min-height: 400px !important;
+    width: 100% !important;
+    background: var(--light-gray) !important;
+}
+
+#incidents.page.active h2 {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: var(--text-color) !important;
+    margin-bottom: 1.5rem !important;
+    font-size: 1.8rem !important;
+    font-weight: bold !important;
+}
+
+#incidents.page.active button.btn-primary {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 1.5rem !important;
+    cursor: pointer !important;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
+}
+
+#incidents.page.active #incidentsList {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 200px !important;
+    width: 100% !important;
 }
 
 h2 {
