@@ -1740,6 +1740,105 @@ def index():
     except Exception as e:
         return jsonify({'error': f'Error serving index.html: {str(e)}'}), 500
 
+# Alert Management API Endpoints
+@app.route('/api/alerts/thresholds', methods=['GET', 'POST'])
+@require_auth
+def alert_thresholds():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        resident_id = request.args.get('resident_id', type=int)
+        if resident_id:
+            cursor.execute('SELECT * FROM alert_thresholds WHERE resident_id = ?', (resident_id,))
+        else:
+            cursor.execute('SELECT * FROM alert_thresholds')
+        thresholds = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(thresholds)
+    
+    elif request.method == 'POST':
+        data = request.json
+        cursor.execute('''
+            INSERT OR REPLACE INTO alert_thresholds 
+            (resident_id, vital_type, min_value, max_value, enabled)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (
+            data.get('resident_id'),
+            data.get('vital_type'),
+            data.get('min_value'),
+            data.get('max_value'),
+            data.get('enabled', 1)
+        ))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Threshold updated successfully'})
+
+@app.route('/api/alerts/history', methods=['GET'])
+@require_auth
+def alert_history():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    resident_id = request.args.get('resident_id', type=int)
+    limit = request.args.get('limit', 50, type=int)
+    
+    if resident_id:
+        cursor.execute('''
+            SELECT ah.*, r.first_name, r.last_name, s.full_name as recipient_name
+            FROM alert_history ah
+            JOIN residents r ON ah.resident_id = r.id
+            LEFT JOIN staff s ON ah.recipient_id = s.id
+            WHERE ah.resident_id = ?
+            ORDER BY ah.sent_at DESC
+            LIMIT ?
+        ''', (resident_id, limit))
+    else:
+        cursor.execute('''
+            SELECT ah.*, r.first_name, r.last_name, s.full_name as recipient_name
+            FROM alert_history ah
+            JOIN residents r ON ah.resident_id = r.id
+            LEFT JOIN staff s ON ah.recipient_id = s.id
+            ORDER BY ah.sent_at DESC
+            LIMIT ?
+        ''', (limit,))
+    
+    alerts = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify(alerts)
+
+@app.route('/api/alerts/preferences', methods=['GET', 'POST'])
+@require_auth
+def notification_preferences():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        staff_id = request.args.get('staff_id', type=int)
+        if staff_id:
+            cursor.execute('SELECT * FROM notification_preferences WHERE staff_id = ?', (staff_id,))
+        else:
+            cursor.execute('SELECT * FROM notification_preferences')
+        preferences = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(preferences)
+    
+    elif request.method == 'POST':
+        data = request.json
+        cursor.execute('''
+            INSERT OR REPLACE INTO notification_preferences 
+            (staff_id, alert_type, email_enabled, whatsapp_enabled)
+            VALUES (?, ?, ?, ?)
+        ''', (
+            data.get('staff_id') or request.current_staff['id'],
+            data.get('alert_type', 'all'),
+            data.get('email_enabled', 1),
+            data.get('whatsapp_enabled', 0)
+        ))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Preferences updated successfully'})
+
 @app.route('/<path:path>')
 def static_files(path):
     try:
