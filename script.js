@@ -514,6 +514,40 @@ function updateTranslations() {
             }
         });
     });
+    
+    // Update frequency options in medication forms
+    const frequencySelects = document.querySelectorAll('select[id*="Frequency"], select[id*="frequency"]');
+    frequencySelects.forEach(select => {
+        Array.from(select.options).forEach(option => {
+            const freqMap = {
+                'Once daily': currentLanguage === 'es' ? 'Una vez al día' : 'Once daily',
+                'Twice daily': currentLanguage === 'es' ? 'Dos veces al día' : 'Twice daily',
+                'Three times daily': currentLanguage === 'es' ? 'Tres veces al día' : 'Three times daily',
+                'Every 4 hours': currentLanguage === 'es' ? 'Cada 4 horas' : 'Every 4 hours',
+                'Every 6 hours': currentLanguage === 'es' ? 'Cada 6 horas' : 'Every 6 hours',
+                'Every 8 hours': currentLanguage === 'es' ? 'Cada 8 horas' : 'Every 8 hours',
+                'At intervals': currentLanguage === 'es' ? 'A intervalos' : 'At intervals',
+                'As needed': currentLanguage === 'es' ? 'Según sea necesario' : 'As needed'
+            };
+            if (freqMap[option.value]) {
+                option.textContent = freqMap[option.value];
+            }
+        });
+    });
+    
+    // Update billing status options
+    const statusSelects = document.querySelectorAll('select[id*="Status"], select[id*="status"]');
+    statusSelects.forEach(select => {
+        Array.from(select.options).forEach(option => {
+            if (option.value === 'pending' || option.value === 'Pending') {
+                option.textContent = t('billing.status.pending');
+            } else if (option.value === 'paid' || option.value === 'Paid') {
+                option.textContent = t('billing.status.paid');
+            } else if (option.value === 'overdue' || option.value === 'Overdue') {
+                option.textContent = t('billing.status.overdue');
+            }
+        });
+    });
 }
 
 // Set auth token for all API calls
