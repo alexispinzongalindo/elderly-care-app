@@ -1381,6 +1381,28 @@ function initApp() {
     initQuickWins();
     
     console.log('✅ App initialized');
+    
+    // Add resize handler to fix dashboard grid layout
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const statsGrid = document.querySelector('.stats-grid');
+            if (statsGrid && document.getElementById('dashboard')?.classList.contains('active')) {
+                const width = window.innerWidth;
+                if (width >= 1025) {
+                    statsGrid.style.setProperty('grid-template-columns', 'repeat(3, 1fr)', 'important');
+                } else if (width >= 769) {
+                    statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+                } else if (width >= 481) {
+                    statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+                } else {
+                    statsGrid.style.setProperty('grid-template-columns', '1fr', 'important');
+                }
+                statsGrid.style.setProperty('display', 'grid', 'important');
+            }
+        }, 250);
+    });
 }
 
 // Quick Wins Features
@@ -1911,7 +1933,26 @@ function showPage(pageName) {
         });
         
         // Load page-specific data
-        if (pageName === 'dashboard') loadDashboard();
+        if (pageName === 'dashboard') {
+            // Force grid layout immediately
+            setTimeout(() => {
+                const statsGrid = document.querySelector('.stats-grid');
+                if (statsGrid) {
+                    const width = window.innerWidth;
+                    if (width >= 1025) {
+                        statsGrid.style.setProperty('grid-template-columns', 'repeat(3, 1fr)', 'important');
+                    } else if (width >= 769) {
+                        statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+                    } else if (width >= 481) {
+                        statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+                    } else {
+                        statsGrid.style.setProperty('grid-template-columns', '1fr', 'important');
+                    }
+                    statsGrid.style.setProperty('display', 'grid', 'important');
+                }
+            }, 100);
+            loadDashboard();
+        }
         else if (pageName === 'residents') loadResidents();
         else if (pageName === 'medications') loadMedications();
         else if (pageName === 'appointments') loadAppointments();
@@ -2259,6 +2300,22 @@ function showMessage(message, type = 'success') {
 // Dashboard
 async function loadDashboard() {
     try {
+        // Force stats-grid to display side-by-side (backup for CSS)
+        const statsGrid = document.querySelector('.stats-grid');
+        if (statsGrid) {
+            const width = window.innerWidth;
+            if (width >= 1025) {
+                statsGrid.style.setProperty('grid-template-columns', 'repeat(3, 1fr)', 'important');
+            } else if (width >= 769) {
+                statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+            } else if (width >= 481) {
+                statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+            } else {
+                statsGrid.style.setProperty('grid-template-columns', '1fr', 'important');
+            }
+            statsGrid.style.setProperty('display', 'grid', 'important');
+        }
+        
         // Set dashboard date - only in selected language
         const dateEl = document.getElementById('dashboardDate');
         if (dateEl) {
