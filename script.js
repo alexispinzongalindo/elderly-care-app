@@ -443,6 +443,15 @@ function setLanguage(lang) {
     // Update all translatable elements
     updateTranslations();
     
+    // Update dashboard date to new language
+    const dateEl = document.getElementById('dashboardDate');
+    if (dateEl) {
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const locale = currentLanguage === 'es' ? 'es-PR' : 'en-US';
+        dateEl.textContent = today.toLocaleDateString(locale, options);
+    }
+    
     // Save to server if user is logged in
     if (currentUser && authToken) {
         fetch('/api/staff/language', {
