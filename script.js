@@ -38,6 +38,10 @@ const translations = {
         'nav.reports': 'Reports',
         'nav.staff': 'Staff',
         'nav.logout': 'Logout',
+        'nav.group.care': 'Care Management',
+        'nav.group.records': 'Records & Reports',
+        'nav.group.financial': 'Financial',
+        'nav.group.system': 'System',
         
         // Dashboard
         'dashboard.title': 'Dashboard',
@@ -228,6 +232,10 @@ const translations = {
         'nav.reports': 'Reportes',
         'nav.staff': 'Personal',
         'nav.logout': 'Cerrar Sesión',
+        'nav.group.care': 'Gestión de Cuidado',
+        'nav.group.records': 'Registros y Reportes',
+        'nav.group.financial': 'Financiero',
+        'nav.group.system': 'Sistema',
         
         // Dashboard
         'dashboard.title': 'Panel de Control',

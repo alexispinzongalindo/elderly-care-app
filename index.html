@@ -241,19 +241,32 @@
                 </div>
                 <!-- Navigation Menu -->
                 <ul class="nav-menu" id="navMenu">
-                    <li><a href="#" class="nav-link active" data-page="dashboard" data-translate="nav.dashboard">Dashboard</a></li>
-                    <li><a href="#" class="nav-link" data-page="residents" data-translate="nav.residents">Residents</a></li>
-                    <li><a href="#" class="nav-link" data-page="medications" data-translate="nav.medications">Medications</a></li>
-                    <li><a href="#" class="nav-link" data-page="appointments" data-translate="nav.appointments">Appointments</a></li>
-                    <li><a href="#" class="nav-link" data-page="vitalsigns" data-translate="nav.vitalSigns">Vital Signs</a></li>
-                    <li><a href="#" class="nav-link" data-page="calendar" data-translate="nav.calendar">Calendar</a></li>
-                    <li><a href="#" class="nav-link" data-page="billing" data-translate="nav.billing">Billing</a></li>
-                    <li><a href="#" class="nav-link" data-page="incidents" data-translate="nav.incidents" onclick="event.preventDefault(); console.log('🔴 INCIDENTS LINK CLICKED'); if(typeof showPage === 'function') { showPage('incidents'); } else { console.error('❌ showPage not defined!'); alert('Error: showPage function not found. Check console.'); } return false;">Incidents</a></li>
-                    <li><a href="#" class="nav-link" data-page="carenotes" data-translate="nav.careNotes">Care Notes</a></li>
-                    <li><a href="#" class="nav-link" data-page="notifications" data-translate="nav.notifications">Notifications</a></li>
-                    <li><a href="#" class="nav-link" data-page="reports" data-translate="nav.reports">Reports</a></li>
-                    <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;" data-translate="nav.staff">Staff</a></li>
-                    <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;" style="color: var(--danger-color);" data-translate="nav.logout">Logout</a></li>
+                    <!-- Main Navigation -->
+                    <li><a href="#" class="nav-link active" data-page="dashboard"><span class="nav-icon">📊</span><span data-translate="nav.dashboard">Dashboard</span></a></li>
+                    
+                    <!-- Care Management Group -->
+                    <li class="nav-group-header"><span data-translate="nav.group.care">Care Management</span></li>
+                    <li><a href="#" class="nav-link" data-page="residents"><span class="nav-icon">👥</span><span data-translate="nav.residents">Residents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="medications"><span class="nav-icon">💊</span><span data-translate="nav.medications">Medications</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="appointments"><span class="nav-icon">📅</span><span data-translate="nav.appointments">Appointments</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="vitalsigns"><span class="nav-icon">❤️</span><span data-translate="nav.vitalSigns">Vital Signs</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="carenotes"><span class="nav-icon">📝</span><span data-translate="nav.careNotes">Care Notes</span></a></li>
+                    
+                    <!-- Records & Reports Group -->
+                    <li class="nav-group-header"><span data-translate="nav.group.records">Records & Reports</span></li>
+                    <li><a href="#" class="nav-link" data-page="incidents" onclick="event.preventDefault(); console.log('🔴 INCIDENTS LINK CLICKED'); if(typeof showPage === 'function') { showPage('incidents'); } else { console.error('❌ showPage not defined!'); alert('Error: showPage function not found. Check console.'); } return false;"><span class="nav-icon">⚠️</span><span data-translate="nav.incidents">Incidents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="calendar"><span class="nav-icon">📆</span><span data-translate="nav.calendar">Calendar</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="reports"><span class="nav-icon">📈</span><span data-translate="nav.reports">Reports</span></a></li>
+                    
+                    <!-- Financial Group -->
+                    <li class="nav-group-header"><span data-translate="nav.group.financial">Financial</span></li>
+                    <li><a href="#" class="nav-link" data-page="billing"><span class="nav-icon">💰</span><span data-translate="nav.billing">Billing</span></a></li>
+                    
+                    <!-- System Group -->
+                    <li class="nav-group-header"><span data-translate="nav.group.system">System</span></li>
+                    <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon">🔔</span><span data-translate="nav.notifications">Notifications</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon">👤</span><span data-translate="nav.staff">Staff</span></a></li>
+                    <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon">🚪</span><span data-translate="nav.logout">Logout</span></a></li>
                 </ul>
             </div>
         </nav>
