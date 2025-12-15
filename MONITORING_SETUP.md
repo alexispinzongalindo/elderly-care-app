@@ -15,6 +15,7 @@ You need SMTP credentials. Options:
 - **Twilio Account**: Sign up at https://www.twilio.com
 - Get Account SID and Auth Token
 - Enable WhatsApp Sandbox (free for testing)
+- **Note**: New accounts may require verification - see `twilio_response_template.md` if your account is suspended
 
 ## 🔧 Setup Instructions
 
