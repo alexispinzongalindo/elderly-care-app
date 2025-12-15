@@ -32,6 +32,7 @@ const translations = {
         'nav.vitalSigns': 'Vital Signs',
         'nav.calendar': 'Calendar',
         'nav.billing': 'Billing',
+        'nav.financial': 'Financial Management',
         'nav.incidents': 'Incidents',
         'nav.careNotes': 'Care Notes',
         'nav.notifications': 'Notifications',
@@ -226,6 +227,7 @@ const translations = {
         'nav.vitalSigns': 'Signos Vitales',
         'nav.calendar': 'Calendario',
         'nav.billing': 'Facturación',
+        'nav.financial': 'Gestión Financiera',
         'nav.incidents': 'Incidentes',
         'nav.careNotes': 'Notas de Cuidado',
         'nav.notifications': 'Notificaciones',
@@ -713,6 +715,14 @@ function checkAuth() {
             staffNavLink.style.display = 'block';
         } else if (staffNavLink) {
             staffNavLink.style.display = 'none';
+        }
+        
+        // Show Financial Management nav link if user is admin
+        const financialNavLink = document.getElementById('financialNavLink');
+        if (financialNavLink && currentStaff.role === 'admin') {
+            financialNavLink.style.display = 'block';
+        } else if (financialNavLink) {
+            financialNavLink.style.display = 'none';
         }
         
         if (!currentResidentId) {
@@ -2303,6 +2313,9 @@ function showPage(pageName) {
         }
         else if (pageName === 'reports') {
             loadReportsAnalytics();
+        }
+        else if (pageName === 'financial') {
+            initFinancialPage();
         }
     } else {
         console.error('❌ Page not found:', pageName);
@@ -6393,6 +6406,554 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDateDropdowns();
 });
 
+// ==================== FINANCIAL MANAGEMENT FUNCTIONS (Admin Only) ====================
 
+// Financial Tab Navigation
+function showFinancialTab(tab) {
+    // Hide all tabs
+    document.querySelectorAll('.financial-tab').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('#financial .button-group button').forEach(b => {
+        b.classList.remove('btn-primary');
+        b.classList.add('btn-secondary');
+    });
+    
+    // Show selected tab
+    const tabElement = document.getElementById(`financial${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+    if (tabElement) {
+        tabElement.style.display = 'block';
+    }
+    
+    // Update button styles
+    const buttonId = `tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`;
+    const button = document.getElementById(buttonId);
+    if (button) {
+        button.classList.remove('btn-secondary');
+        button.classList.add('btn-primary');
+    }
+    
+    // Load data for the tab
+    if (tab === 'accounts') {
+        loadBankAccounts();
+    } else if (tab === 'transactions') {
+        loadTransactions();
+        loadBankAccountsForSelect('transactionBankAccount');
+    } else if (tab === 'reconciliation') {
+        loadBankAccountsForSelect('reconcileBankAccount');
+    } else if (tab === 'receipts') {
+        // Receipts tab - no initial load needed
+    }
+}
 
+// Bank Accounts Functions
+async function loadBankAccounts() {
+    try {
+        const response = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
+        if (!response.ok) {
+            if (response.status === 403) {
+                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+                return;
+            }
+            throw new Error('Failed to load bank accounts');
+        }
+        const accounts = await response.json();
+        const listEl = document.getElementById('bankAccountsList');
+        if (!listEl) return;
+        
+        if (accounts.length === 0) {
+            listEl.innerHTML = '<div class="empty-state">No bank accounts found. Add your first account to get started.</div>';
+            return;
+        }
+        
+        listEl.innerHTML = accounts.map(account => `
+            <div class="item-card">
+                <div class="item-header">
+                    <div>
+                        <h3 class="item-title">${account.account_name}</h3>
+                        <p class="item-details">${account.bank_name} • ${account.account_type} • Balance: $${parseFloat(account.current_balance || 0).toFixed(2)}</p>
+                        ${account.account_number ? `<p class="item-details">Account: ****${account.account_number.slice(-4)}</p>` : ''}
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-sm btn-primary" onclick="editBankAccount(${account.id})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteBankAccount(${account.id})">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading bank accounts:', error);
+        showMessage('Error loading bank accounts / Error al cargar cuentas bancarias', 'error');
+    }
+}
 
+function showBankAccountForm() {
+    document.getElementById('bankAccountForm').style.display = 'block';
+    if (!editingBankAccountId) {
+        document.getElementById('newBankAccountForm').reset();
+        document.getElementById('openingBalance').value = '0.00';
+    }
+}
+
+function hideBankAccountForm() {
+    document.getElementById('bankAccountForm').style.display = 'none';
+    editingBankAccountId = null;
+    document.getElementById('newBankAccountForm').reset();
+}
+
+let editingBankAccountId = null;
+
+async function editBankAccount(id) {
+    try {
+        const response = await fetch(`/api/bank-accounts/${id}`, { headers: getAuthHeaders() });
+        if (!response.ok) throw new Error('Failed to load bank account');
+        const account = await response.json();
+        
+        editingBankAccountId = id;
+        document.getElementById('accountName').value = account.account_name;
+        document.getElementById('bankName').value = account.bank_name;
+        document.getElementById('accountNumber').value = account.account_number || '';
+        document.getElementById('routingNumber').value = account.routing_number || '';
+        document.getElementById('accountType').value = account.account_type;
+        document.getElementById('openingBalance').value = account.opening_balance || 0;
+        document.getElementById('accountNotes').value = account.notes || '';
+        
+        showBankAccountForm();
+    } catch (error) {
+        console.error('Error loading bank account:', error);
+        showMessage('Error loading bank account / Error al cargar cuenta bancaria', 'error');
+    }
+}
+
+async function deleteBankAccount(id) {
+    if (!confirm('Are you sure you want to delete this bank account? / ¿Está seguro de que desea eliminar esta cuenta bancaria?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/bank-accounts/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        
+        if (!response.ok) {
+            if (response.status === 403) {
+                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+                return;
+            }
+            throw new Error('Failed to delete bank account');
+        }
+        
+        showMessage('Bank account deleted successfully / Cuenta bancaria eliminada exitosamente', 'success');
+        loadBankAccounts();
+    } catch (error) {
+        console.error('Error deleting bank account:', error);
+        showMessage('Error deleting bank account / Error al eliminar cuenta bancaria', 'error');
+    }
+}
+
+async function saveBankAccount(event) {
+    event.preventDefault();
+    try {
+        const accountData = {
+            account_name: document.getElementById('accountName').value,
+            bank_name: document.getElementById('bankName').value,
+            account_number: document.getElementById('accountNumber').value,
+            routing_number: document.getElementById('routingNumber').value,
+            account_type: document.getElementById('accountType').value,
+            opening_balance: parseFloat(document.getElementById('openingBalance').value) || 0,
+            notes: document.getElementById('accountNotes').value
+        };
+        
+        const url = editingBankAccountId 
+            ? `/api/bank-accounts/${editingBankAccountId}`
+            : '/api/bank-accounts';
+        const method = editingBankAccountId ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: getAuthHeaders(),
+            body: JSON.stringify(accountData)
+        });
+        
+        if (!response.ok) {
+            if (response.status === 403) {
+                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+                return;
+            }
+            throw new Error('Failed to save bank account');
+        }
+        
+        showMessage(editingBankAccountId 
+            ? 'Bank account updated successfully / Cuenta bancaria actualizada exitosamente'
+            : 'Bank account saved successfully / Cuenta bancaria guardada exitosamente', 'success');
+        editingBankAccountId = null;
+        hideBankAccountForm();
+        loadBankAccounts();
+    } catch (error) {
+        console.error('Error saving bank account:', error);
+        showMessage('Error saving bank account / Error al guardar cuenta bancaria', 'error');
+    }
+}
+
+// Transactions Functions
+async function loadTransactions() {
+    try {
+        const accountId = document.getElementById('filterTransactionAccount')?.value || '';
+        const reconciled = document.getElementById('filterReconciled')?.value || '';
+        
+        let url = '/api/transactions?';
+        if (accountId) url += `bank_account_id=${accountId}&`;
+        if (reconciled) url += `reconciled=${reconciled}`;
+        
+        const response = await fetch(url, { headers: getAuthHeaders() });
+        if (!response.ok) {
+            if (response.status === 403) {
+                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+                return;
+            }
+            throw new Error('Failed to load transactions');
+        }
+        const transactions = await response.json();
+        const listEl = document.getElementById('transactionsList');
+        if (!listEl) return;
+        
+        if (transactions.length === 0) {
+            listEl.innerHTML = '<div class="empty-state">No transactions found.</div>';
+            return;
+        }
+        
+        listEl.innerHTML = transactions.map(trans => `
+            <div class="item-card ${trans.reconciled ? 'completed' : ''}">
+                <div class="item-header">
+                    <div>
+                        <h3 class="item-title">${trans.description}</h3>
+                        <p class="item-details">
+                            ${trans.account_name} • ${trans.transaction_type} • 
+                            ${trans.transaction_date} • 
+                            <strong style="color: ${trans.transaction_type === 'deposit' ? 'var(--success-green)' : 'var(--error-red)'}">
+                                ${trans.transaction_type === 'deposit' ? '+' : '-'}$${parseFloat(trans.amount).toFixed(2)}
+                            </strong>
+                        </p>
+                        ${trans.check_number ? `<p class="item-details">Check #: ${trans.check_number}</p>` : ''}
+                        ${trans.reconciled ? '<span class="badge badge-success">Reconciled</span>' : '<span class="badge badge-warning">Unreconciled</span>'}
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-sm btn-primary" onclick="editTransaction(${trans.id})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${trans.id})">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading transactions:', error);
+        showMessage('Error loading transactions / Error al cargar transacciones', 'error');
+    }
+}
+
+async function loadBankAccountsForSelect(selectId) {
+    try {
+        const response = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
+        if (!response.ok) return;
+        const accounts = await response.json();
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">Select Account / Seleccionar Cuenta</option>' +
+            accounts.map(acc => `<option value="${acc.id}">${acc.account_name} (${acc.bank_name})</option>`).join('');
+        
+        // Also populate filter selects
+        if (selectId === 'transactionBankAccount') {
+            const filterSelect = document.getElementById('filterTransactionAccount');
+            if (filterSelect) {
+                filterSelect.innerHTML = '<option value="">All Accounts / Todas las Cuentas</option>' +
+                    accounts.map(acc => `<option value="${acc.id}">${acc.account_name}</option>`).join('');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading bank accounts for select:', error);
+    }
+}
+
+function showTransactionForm() {
+    document.getElementById('transactionForm').style.display = 'block';
+    if (!editingTransactionId) {
+        document.getElementById('newTransactionForm').reset();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('transactionDate').value = today;
+    }
+    loadBankAccountsForSelect('transactionBankAccount');
+}
+
+function hideTransactionForm() {
+    document.getElementById('transactionForm').style.display = 'none';
+    editingTransactionId = null;
+    document.getElementById('newTransactionForm').reset();
+}
+
+let editingTransactionId = null;
+
+async function editTransaction(id) {
+    try {
+        const response = await fetch(`/api/transactions?bank_account_id=`, { headers: getAuthHeaders() });
+        if (!response.ok) throw new Error('Failed to load transactions');
+        const transactions = await response.json();
+        const transaction = transactions.find(t => t.id === id);
+        if (!transaction) throw new Error('Transaction not found');
+        
+        editingTransactionId = id;
+        document.getElementById('transactionBankAccount').value = transaction.bank_account_id;
+        document.getElementById('transactionDate').value = transaction.transaction_date;
+        document.getElementById('transactionType').value = transaction.transaction_type;
+        document.getElementById('transactionDescription').value = transaction.description;
+        document.getElementById('transactionAmount').value = transaction.amount;
+        document.getElementById('transactionCheckNumber').value = transaction.check_number || '';
+        document.getElementById('transactionPayee').value = transaction.payee || '';
+        document.getElementById('transactionCategory').value = transaction.category || '';
+        document.getElementById('transactionNotes').value = transaction.notes || '';
+        
+        loadBankAccountsForSelect('transactionBankAccount');
+        showTransactionForm();
+    } catch (error) {
+        console.error('Error loading transaction:', error);
+        showMessage('Error loading transaction / Error al cargar transacción', 'error');
+    }
+}
+
+async function deleteTransaction(id) {
+    if (!confirm('Are you sure you want to delete this transaction? / ¿Está seguro de que desea eliminar esta transacción?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/transactions/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        
+        if (!response.ok) {
+            if (response.status === 403) {
+                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+                return;
+            }
+            throw new Error('Failed to delete transaction');
+        }
+        
+        showMessage('Transaction deleted successfully / Transacción eliminada exitosamente', 'success');
+        loadTransactions();
+        loadBankAccounts(); // Update account balances
+    } catch (error) {
+        console.error('Error deleting transaction:', error);
+        showMessage('Error deleting transaction / Error al eliminar transacción', 'error');
+    }
+}
+
+async function saveTransaction(event) {
+    event.preventDefault();
+    try {
+        const transactionData = {
+            bank_account_id: parseInt(document.getElementById('transactionBankAccount').value),
+            transaction_date: document.getElementById('transactionDate').value,
+            transaction_type: document.getElementById('transactionType').value,
+            description: document.getElementById('transactionDescription').value,
+            amount: parseFloat(document.getElementById('transactionAmount').value),
+            check_number: document.getElementById('transactionCheckNumber').value,
+            payee: document.getElementById('transactionPayee').value,
+            category: document.getElementById('transactionCategory').value,
+            notes: document.getElementById('transactionNotes').value
+        };
+        
+        const url = editingTransactionId 
+            ? `/api/transactions/${editingTransactionId}`
+            : '/api/transactions';
+        const method = editingTransactionId ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: getAuthHeaders(),
+            body: JSON.stringify(transactionData)
+        });
+        
+        if (!response.ok) {
+            if (response.status === 403) {
+                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+                return;
+            }
+            throw new Error('Failed to save transaction');
+        }
+        
+        showMessage(editingTransactionId 
+            ? 'Transaction updated successfully / Transacción actualizada exitosamente'
+            : 'Transaction saved successfully / Transacción guardada exitosamente', 'success');
+        editingTransactionId = null;
+        hideTransactionForm();
+        loadTransactions();
+        loadBankAccounts(); // Update account balances
+    } catch (error) {
+        console.error('Error saving transaction:', error);
+        showMessage('Error saving transaction / Error al guardar transacción', 'error');
+    }
+}
+
+// Reconciliation Functions
+async function loadUnreconciledTransactions() {
+    const accountId = document.getElementById('reconcileBankAccount').value;
+    if (!accountId) return;
+    
+    try {
+        // Load account balance
+        const accountsResponse = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
+        if (accountsResponse.ok) {
+            const accounts = await accountsResponse.json();
+            const account = accounts.find(a => a.id == accountId);
+            if (account) {
+                document.getElementById('currentAccountBalance').value = `$${parseFloat(account.current_balance || 0).toFixed(2)}`;
+            }
+        }
+        
+        // Load unreconciled transactions
+        const response = await fetch(`/api/transactions?bank_account_id=${accountId}&reconciled=false`, { headers: getAuthHeaders() });
+        if (!response.ok) return;
+        const transactions = await response.json();
+        const container = document.getElementById('unreconciledTransactions');
+        if (!container) return;
+        
+        if (transactions.length === 0) {
+            container.innerHTML = '<p>No unreconciled transactions found.</p>';
+            return;
+        }
+        
+        container.innerHTML = transactions.map(trans => `
+            <label style="display: flex; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--light-gray);">
+                <input type="checkbox" name="reconcile_trans" value="${trans.id}" style="margin-right: 1rem;">
+                <div style="flex: 1;">
+                    <strong>${trans.description}</strong><br>
+                    <small>${trans.transaction_date} • ${trans.transaction_type} • $${parseFloat(trans.amount).toFixed(2)}</small>
+                </div>
+            </label>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading unreconciled transactions:', error);
+    }
+}
+
+async function reconcileAccount(event) {
+    event.preventDefault();
+    try {
+        const accountId = document.getElementById('reconcileBankAccount').value;
+        const selectedTransactions = Array.from(document.querySelectorAll('input[name="reconcile_trans"]:checked')).map(cb => parseInt(cb.value));
+        
+        const reconciliationData = {
+            bank_account_id: parseInt(accountId),
+            statement_date: document.getElementById('statementDate').value,
+            statement_balance: parseFloat(document.getElementById('statementBalance').value),
+            transaction_ids: selectedTransactions,
+            notes: document.getElementById('reconciliationNotes').value
+        };
+        
+        const response = await fetch('/api/reconciliation', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(reconciliationData)
+        });
+        
+        if (!response.ok) {
+            if (response.status === 403) {
+                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+                return;
+            }
+            throw new Error('Failed to reconcile account');
+        }
+        
+        const result = await response.json();
+        showMessage(`Reconciliation completed. Difference: $${result.difference.toFixed(2)} / Conciliación completada. Diferencia: $${result.difference.toFixed(2)}`, 'success');
+        document.getElementById('reconciliationForm').reset();
+        loadTransactions();
+        loadBankAccounts();
+    } catch (error) {
+        console.error('Error reconciling account:', error);
+        showMessage('Error reconciling account / Error al conciliar cuenta', 'error');
+    }
+}
+
+// Receipt Functions
+async function searchReceipt() {
+    const search = document.getElementById('receiptSearch').value.trim();
+    if (!search) {
+        showMessage('Please enter a receipt number or payment ID / Por favor ingrese un número de recibo o ID de pago', 'error');
+        return;
+    }
+    
+    try {
+        // Try as payment ID first
+        let paymentId = parseInt(search);
+        if (isNaN(paymentId)) {
+            // Search by receipt number
+            const paymentsResponse = await fetch('/api/payments', { headers: getAuthHeaders() });
+            if (paymentsResponse.ok) {
+                const payments = await paymentsResponse.json();
+                const payment = payments.find(p => p.receipt_number === search);
+                if (payment) paymentId = payment.id;
+            }
+        }
+        
+        if (!paymentId) {
+            showMessage('Receipt not found / Recibo no encontrado', 'error');
+            return;
+        }
+        
+        const response = await fetch(`/api/payments/${paymentId}/receipt`, { headers: getAuthHeaders() });
+        if (!response.ok) {
+            if (response.status === 403) {
+                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+                return;
+            }
+            throw new Error('Receipt not found');
+        }
+        
+        const receipt = await response.json();
+        displayReceipt(receipt);
+    } catch (error) {
+        console.error('Error searching receipt:', error);
+        showMessage('Error searching receipt / Error al buscar recibo', 'error');
+    }
+}
+
+function displayReceipt(receipt) {
+    const container = document.getElementById('receiptDisplay');
+    if (!container) return;
+    
+    container.style.display = 'block';
+    container.innerHTML = `
+        <div style="text-align: center; border: 2px solid var(--primary-color); padding: 2rem; border-radius: 8px;">
+            <h2>PAYMENT RECEIPT / RECIBO DE PAGO</h2>
+            <hr style="margin: 1rem 0;">
+            <p><strong>Receipt Number / Número de Recibo:</strong> ${receipt.receipt_number || 'N/A'}</p>
+            <p><strong>Date / Fecha:</strong> ${receipt.payment_date}</p>
+            <p><strong>Resident / Residente:</strong> ${receipt.first_name} ${receipt.last_name}</p>
+            ${receipt.room_number ? `<p><strong>Room / Habitación:</strong> ${receipt.room_number}</p>` : ''}
+            <hr style="margin: 1rem 0;">
+            <p><strong>Amount / Monto:</strong> $${parseFloat(receipt.amount).toFixed(2)}</p>
+            <p><strong>Payment Method / Método de Pago:</strong> ${receipt.payment_method || 'N/A'}</p>
+            ${receipt.reference_number ? `<p><strong>Reference / Referencia:</strong> ${receipt.reference_number}</p>` : ''}
+            ${receipt.notes ? `<p><strong>Notes / Notas:</strong> ${receipt.notes}</p>` : ''}
+            ${receipt.staff_name ? `<p><strong>Processed by / Procesado por:</strong> ${receipt.staff_name}</p>` : ''}
+            <hr style="margin: 1rem 0;">
+            <button class="btn btn-primary" onclick="window.print()">Print Receipt / Imprimir Recibo</button>
+        </div>
+    `;
+}
+
+// Initialize financial page when shown
+function initFinancialPage() {
+    if (currentStaff && currentStaff.role === 'admin') {
+        showFinancialTab('accounts');
+    } else {
+        showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+        showPage('dashboard');
+    }
+}
+
+// Update showPage to handle financial page
+const originalShowPage = window.showPage;
+if (typeof originalShowPage === 'function') {
+    // This will be handled in the existing showPage function
+}

@@ -261,6 +261,7 @@
                     <!-- Financial Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.financial">Financial</span></li>
                     <li><a href="#" class="nav-link" data-page="billing"><span class="nav-icon">💰</span><span data-translate="nav.billing">Billing</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="financial" id="financialNavLink" style="display: none;"><span class="nav-icon">💳</span><span data-translate="nav.financial">Financial Management</span></a></li>
                     
                     <!-- System Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.system">System</span></li>
@@ -1384,6 +1385,223 @@
                     <button class="btn btn-primary" onclick="loadNotificationsPage()">Refresh / Actualizar</button>
                 </div>
                 <div id="notificationsPageList" class="item-list"></div>
+            </div>
+
+            <!-- Financial Management Page (Admin Only) -->
+            <div id="financial" class="page">
+                <h2>Financial Management / Gestión Financiera</h2>
+                <p style="color: var(--dark-gray); margin-bottom: 2rem;">Manage bank accounts, transactions, and reconciliation / Gestionar cuentas bancarias, transacciones y conciliación</p>
+                
+                <!-- Tabs Navigation -->
+                <div class="button-group" style="margin-bottom: 2rem; border-bottom: 2px solid var(--light-gray); padding-bottom: 1rem;">
+                    <button class="btn btn-primary" onclick="showFinancialTab('accounts')" id="tabAccounts">Bank Accounts / Cuentas Bancarias</button>
+                    <button class="btn btn-secondary" onclick="showFinancialTab('transactions')" id="tabTransactions">Transactions / Transacciones</button>
+                    <button class="btn btn-secondary" onclick="showFinancialTab('reconciliation')" id="tabReconciliation">Reconciliation / Conciliación</button>
+                    <button class="btn btn-secondary" onclick="showFinancialTab('receipts')" id="tabReceipts">Payment Receipts / Recibos de Pago</button>
+                </div>
+
+                <!-- Bank Accounts Tab -->
+                <div id="financialAccounts" class="financial-tab">
+                    <div class="form-card">
+                        <h3>Bank Accounts / Cuentas Bancarias</h3>
+                        <button class="btn btn-primary" onclick="showBankAccountForm()">+ Add Bank Account / Agregar Cuenta Bancaria</button>
+                        
+                        <div id="bankAccountForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
+                            <form id="newBankAccountForm" onsubmit="saveBankAccount(event)">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Account Name / Nombre de Cuenta *</label>
+                                        <input type="text" id="accountName" required placeholder="e.g., Main Checking">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Bank Name / Nombre del Banco *</label>
+                                        <input type="text" id="bankName" required placeholder="e.g., Banco Popular">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Account Number / Número de Cuenta</label>
+                                        <input type="text" id="accountNumber" placeholder="****1234">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Routing Number / Número de Ruta</label>
+                                        <input type="text" id="routingNumber" placeholder="000000000">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Account Type / Tipo de Cuenta</label>
+                                        <select id="accountType">
+                                            <option value="checking">Checking / Corriente</option>
+                                            <option value="savings">Savings / Ahorros</option>
+                                            <option value="other">Other / Otro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Opening Balance / Saldo Inicial ($)</label>
+                                        <input type="number" id="openingBalance" step="0.01" value="0.00">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Notes / Notas</label>
+                                    <textarea id="accountNotes" rows="2"></textarea>
+                                </div>
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-success">Save Account / Guardar Cuenta</button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideBankAccountForm()">Cancel / Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="bankAccountsList" class="item-list" style="margin-top: 2rem;"></div>
+                </div>
+
+                <!-- Transactions Tab -->
+                <div id="financialTransactions" class="financial-tab" style="display: none;">
+                    <div class="form-card">
+                        <h3>Transactions / Transacciones</h3>
+                        <button class="btn btn-primary" onclick="showTransactionForm()">+ Add Transaction / Agregar Transacción</button>
+                        
+                        <div id="transactionForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
+                            <form id="newTransactionForm" onsubmit="saveTransaction(event)">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Bank Account / Cuenta Bancaria *</label>
+                                        <select id="transactionBankAccount" required></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Transaction Type / Tipo de Transacción *</label>
+                                        <select id="transactionType" required>
+                                            <option value="deposit">Deposit / Depósito</option>
+                                            <option value="withdrawal">Withdrawal / Retiro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Date / Fecha *</label>
+                                        <input type="date" id="transactionDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Amount / Monto ($) *</label>
+                                        <input type="number" id="transactionAmount" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Description / Descripción *</label>
+                                    <input type="text" id="transactionDescription" required placeholder="e.g., Payment from Resident">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Check Number / Número de Cheque</label>
+                                        <input type="text" id="transactionCheckNumber" placeholder="Optional">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Payee / Beneficiario</label>
+                                        <input type="text" id="transactionPayee" placeholder="Optional">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Category / Categoría</label>
+                                        <input type="text" id="transactionCategory" placeholder="e.g., Payment, Expense">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Reconciled / Conciliado</label>
+                                        <select id="transactionReconciled">
+                                            <option value="0">No / No</option>
+                                            <option value="1">Yes / Sí</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Notes / Notas</label>
+                                    <textarea id="transactionNotes" rows="2"></textarea>
+                                </div>
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-success">Save Transaction / Guardar Transacción</button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideTransactionForm()">Cancel / Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="form-card" style="margin-top: 2rem;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Filter by Account / Filtrar por Cuenta</label>
+                                <select id="filterTransactionAccount" onchange="loadTransactions()">
+                                    <option value="">All Accounts / Todas las Cuentas</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Show Reconciled / Mostrar Conciliados</label>
+                                <select id="filterReconciled" onchange="loadTransactions()">
+                                    <option value="">All / Todos</option>
+                                    <option value="true">Reconciled Only / Solo Conciliados</option>
+                                    <option value="false">Unreconciled Only / Solo No Conciliados</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="transactionsList" class="item-list" style="margin-top: 2rem;"></div>
+                </div>
+
+                <!-- Reconciliation Tab -->
+                <div id="financialReconciliation" class="financial-tab" style="display: none;">
+                    <div class="form-card">
+                        <h3>Reconcile Account / Conciliar Cuenta</h3>
+                        <form id="reconciliationForm" onsubmit="reconcileAccount(event)">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Bank Account / Cuenta Bancaria *</label>
+                                    <select id="reconcileBankAccount" required onchange="loadUnreconciledTransactions()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Statement Date / Fecha del Estado de Cuenta *</label>
+                                    <input type="date" id="statementDate" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Statement Balance / Saldo del Estado ($) *</label>
+                                    <input type="number" id="statementBalance" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Current Balance / Saldo Actual</label>
+                                    <input type="text" id="currentAccountBalance" readonly style="background: var(--light-gray);">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Transactions to Reconcile / Seleccionar Transacciones a Conciliar</label>
+                                <div id="unreconciledTransactions" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--medium-gray); padding: 1rem; border-radius: 8px; background: var(--white);"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Notes / Notas</label>
+                                <textarea id="reconciliationNotes" rows="2"></textarea>
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-success">Reconcile / Conciliar</button>
+                                <button type="button" class="btn btn-secondary" onclick="loadReconciliationHistory()">View History / Ver Historial</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="reconciliationHistory" class="item-list" style="margin-top: 2rem; display: none;"></div>
+                </div>
+
+                <!-- Payment Receipts Tab -->
+                <div id="financialReceipts" class="financial-tab" style="display: none;">
+                    <div class="form-card">
+                        <h3>Payment Receipts / Recibos de Pago</h3>
+                        <div class="form-group">
+                            <label>Search by Receipt Number or Payment ID / Buscar por Número de Recibo o ID de Pago</label>
+                            <div class="form-row">
+                                <input type="text" id="receiptSearch" class="form-control" placeholder="Receipt Number or Payment ID">
+                                <button class="btn btn-primary" onclick="searchReceipt()">Search / Buscar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="receiptDisplay" class="form-card" style="margin-top: 2rem; display: none;"></div>
+                </div>
             </div>
 
             <!-- Reports Page -->

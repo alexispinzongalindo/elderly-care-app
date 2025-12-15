@@ -2134,3 +2134,54 @@ body:has(#billing.active) #incidents:not(.active) {
     visibility: hidden !important;
     opacity: 0 !important;
 }
+
+/* Financial Management Styles */
+.financial-tab {
+    display: block;
+}
+
+.financial-tab .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.financial-tab .button-group button {
+    flex: 1;
+    min-width: 150px;
+}
+
+#unreconciledTransactions label {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#unreconciledTransactions label:hover {
+    background-color: var(--light-gray);
+}
+
+#receiptDisplay {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#receiptDisplay h2 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+#receiptDisplay hr {
+    border: none;
+    border-top: 1px solid var(--medium-gray);
+}
+
+@media (max-width: 768px) {
+    .financial-tab .button-group {
+        flex-direction: column;
+    }
+    
+    .financial-tab .button-group button {
+        width: 100%;
+    }
+}

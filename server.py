@@ -1178,9 +1178,9 @@ def get_account_balance(resident_id):
         'overdue_amount': overdue_amount
     })
 
-# Bank Accounts endpoints
+# Bank Accounts endpoints (Admin only)
 @app.route('/api/bank-accounts', methods=['GET', 'POST'])
-@require_auth
+@require_role('admin')
 def bank_accounts():
     conn = get_db()
     cursor = conn.cursor()
@@ -1212,7 +1212,7 @@ def bank_accounts():
         return jsonify({'id': account_id, 'message': 'Bank account created successfully'}), 201
 
 @app.route('/api/bank-accounts/<int:id>', methods=['GET', 'PUT', 'DELETE'])
-@require_auth
+@require_role('admin')
 def bank_account_detail(id):
     conn = get_db()
     cursor = conn.cursor()
@@ -1252,9 +1252,9 @@ def bank_account_detail(id):
         conn.close()
         return jsonify({'message': 'Bank account deactivated successfully'})
 
-# Transactions endpoints
+# Transactions endpoints (Admin only)
 @app.route('/api/transactions', methods=['GET', 'POST'])
-@require_auth
+@require_role('admin')
 def transactions():
     conn = get_db()
     cursor = conn.cursor()
@@ -1314,7 +1314,7 @@ def transactions():
         return jsonify({'id': transaction_id, 'message': 'Transaction recorded successfully'}), 201
 
 @app.route('/api/transactions/<int:id>', methods=['PUT', 'DELETE'])
-@require_auth
+@require_role('admin')
 def transaction_detail(id):
     conn = get_db()
     cursor = conn.cursor()
@@ -1387,9 +1387,9 @@ def transaction_detail(id):
         conn.close()
         return jsonify({'message': 'Transaction deleted successfully'})
 
-# Reconciliation endpoints
+# Reconciliation endpoints (Admin only)
 @app.route('/api/reconciliation', methods=['POST'])
-@require_auth
+@require_role('admin')
 def reconcile_account():
     conn = get_db()
     cursor = conn.cursor()
@@ -1469,7 +1469,7 @@ def reconcile_account():
     }), 201
 
 @app.route('/api/reconciliation/<int:bank_account_id>', methods=['GET'])
-@require_auth
+@require_role('admin')
 def get_reconciliation_history(bank_account_id):
     conn = get_db()
     cursor = conn.cursor()
