@@ -1702,6 +1702,17 @@ function updateClock() {
     if (clockEl) clockEl.textContent = timeString;
 }
 
+// Mobile menu toggle function (global for onclick handler)
+function toggleMobileMenu() {
+    const navMenu = document.getElementById('navMenu');
+    if (navMenu) {
+        navMenu.classList.toggle('active');
+        console.log('🍔 Mobile menu toggled, active:', navMenu.classList.contains('active'));
+    } else {
+        console.error('❌ navMenu element not found!');
+    }
+}
+
 function initNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
     const menuToggle = document.getElementById('menuToggle');
@@ -1716,13 +1727,17 @@ function initNavigation() {
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
             
+            // Close mobile menu when a link is clicked
             if (navMenu) navMenu.classList.remove('active');
         });
     });
     
+    // Add event listener to menu toggle button (backup to onclick)
     if (menuToggle && navMenu) {
-        menuToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
+        menuToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMobileMenu();
         });
     }
 }
