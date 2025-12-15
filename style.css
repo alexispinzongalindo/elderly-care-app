@@ -551,8 +551,9 @@ h2 {
 /* Quick Actions Grid */
 .quick-actions-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1rem;
+    max-width: 100%;
 }
 
 .quick-action-btn {
@@ -577,14 +578,21 @@ h2 {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+.quick-action-btn:hover .quick-action-icon {
+    transform: scale(1.1);
+}
+
 .quick-action-icon {
-    font-size: 2rem;
+    font-size: 1.5rem;
     line-height: 1;
+    flex-shrink: 0;
+    transition: transform 0.2s;
 }
 
 .quick-action-btn span:last-child {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 500;
+    flex: 1;
 }
 
 /* Upcoming List */
