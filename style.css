@@ -1234,10 +1234,24 @@ h2 {
         gap: 1rem;
     }
     
+    /* Keep desktop-like layout for financial page */
+    #financial .item-header {
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+    
     .item-actions {
         width: 100%;
         justify-content: stretch;
         flex-wrap: wrap;
+    }
+    
+    /* Keep desktop-like layout for financial page */
+    #financial .item-actions {
+        width: auto !important;
+        justify-content: flex-end !important;
+        flex-wrap: nowrap !important;
     }
     
     .item-actions .btn {
@@ -1245,8 +1259,20 @@ h2 {
         min-width: 120px;
     }
     
+    /* Keep desktop-like button sizes for financial page */
+    #financial .item-actions .btn {
+        flex: 0 0 auto !important;
+        min-width: auto !important;
+        padding: 0.5rem 1rem !important;
+    }
+    
     .form-row {
         grid-template-columns: 1fr;
+    }
+    
+    /* Override for financial page to keep desktop-like layout */
+    #financial .form-row {
+        grid-template-columns: repeat(2, 1fr) !important;
     }
     
     .form-group {
@@ -2176,12 +2202,122 @@ body:has(#billing.active) #incidents:not(.active) {
     border-top: 1px solid var(--medium-gray);
 }
 
+/* Financial Management Mobile Styles - Match Desktop */
 @media (max-width: 768px) {
+    /* Keep tabs horizontal on mobile, allow scrolling if needed */
     .financial-tab .button-group {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        padding-bottom: 0.5rem;
     }
     
     .financial-tab .button-group button {
-        width: 100%;
+        flex: 0 0 auto;
+        min-width: 140px;
+        white-space: nowrap;
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    /* Keep form rows as grid on mobile for better desktop-like appearance */
+    #financial .form-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    /* Full width for single form groups on very small screens */
+    @media (max-width: 480px) {
+        #financial .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Ensure form cards look the same */
+    #financial .form-card {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Item cards should look similar to desktop */
+    #financial .item-card {
+        padding: 1.25rem;
+    }
+    
+    #financial .item-header {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    #financial .item-actions {
+        flex-shrink: 0;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    /* Button groups in forms should stay horizontal */
+    #financial .button-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    #financial .button-group button {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    /* Receipt display should be full width on mobile */
+    #receiptDisplay {
+        max-width: 100%;
+        padding: 1.5rem;
+    }
+    
+    /* Unreconciled transactions list */
+    #unreconciledTransactions {
+        max-height: 400px;
+    }
+    
+    #unreconciledTransactions label {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Filter row should stay horizontal */
+    #financialTransactions .form-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Ensure financial page container matches desktop spacing */
+    #financial.page {
+        padding: 1.5rem 1rem;
+    }
+    
+    #financial h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    #financial .form-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 480px) {
+        #financialTransactions .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        /* On very small screens, still try to keep some desktop-like features */
+        #financial .item-header {
+            flex-direction: column;
+        }
+        
+        #financial .item-actions {
+            width: 100%;
+            justify-content: flex-start;
+        }
     }
 }
