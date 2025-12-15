@@ -1934,23 +1934,45 @@ function showPage(pageName) {
         
         // Load page-specific data
         if (pageName === 'dashboard') {
-            // Force grid layout immediately
-            setTimeout(() => {
+            // Force grid layout immediately - run multiple times to ensure it sticks
+            const forceGridLayout = () => {
                 const statsGrid = document.querySelector('.stats-grid');
                 if (statsGrid) {
                     const width = window.innerWidth;
+                    console.log('🔧 [showPage] Fixing dashboard grid. Width:', width);
+                    let columns = 'repeat(3, 1fr)';
                     if (width >= 1025) {
-                        statsGrid.style.setProperty('grid-template-columns', 'repeat(3, 1fr)', 'important');
+                        columns = 'repeat(3, 1fr)';
                     } else if (width >= 769) {
-                        statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+                        columns = 'repeat(2, 1fr)';
                     } else if (width >= 481) {
-                        statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+                        columns = 'repeat(2, 1fr)';
                     } else {
-                        statsGrid.style.setProperty('grid-template-columns', '1fr', 'important');
+                        columns = '1fr';
                     }
                     statsGrid.style.setProperty('display', 'grid', 'important');
+                    statsGrid.style.setProperty('grid-template-columns', columns, 'important');
+                    statsGrid.style.setProperty('width', '100%', 'important');
+                    statsGrid.style.setProperty('max-width', '100%', 'important');
+                    console.log('✅ [showPage] Applied grid:', columns);
+                    
+                    // Force cards to not be full width
+                    const cards = statsGrid.querySelectorAll('.stat-card');
+                    cards.forEach(card => {
+                        card.style.setProperty('width', 'auto', 'important');
+                        card.style.setProperty('max-width', '100%', 'important');
+                    });
+                } else {
+                    console.warn('⚠️ [showPage] stats-grid not found');
                 }
-            }, 100);
+            };
+            
+            // Run immediately and after short delays to ensure it sticks
+            forceGridLayout();
+            setTimeout(forceGridLayout, 50);
+            setTimeout(forceGridLayout, 200);
+            setTimeout(forceGridLayout, 500);
+            
             loadDashboard();
         }
         else if (pageName === 'residents') loadResidents();
@@ -2304,16 +2326,32 @@ async function loadDashboard() {
         const statsGrid = document.querySelector('.stats-grid');
         if (statsGrid) {
             const width = window.innerWidth;
+            console.log('🔧 Fixing dashboard grid layout. Window width:', width);
+            let columns = 'repeat(3, 1fr)';
             if (width >= 1025) {
-                statsGrid.style.setProperty('grid-template-columns', 'repeat(3, 1fr)', 'important');
+                columns = 'repeat(3, 1fr)';
             } else if (width >= 769) {
-                statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+                columns = 'repeat(2, 1fr)';
             } else if (width >= 481) {
-                statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+                columns = 'repeat(2, 1fr)';
             } else {
-                statsGrid.style.setProperty('grid-template-columns', '1fr', 'important');
+                columns = '1fr';
             }
             statsGrid.style.setProperty('display', 'grid', 'important');
+            statsGrid.style.setProperty('grid-template-columns', columns, 'important');
+            statsGrid.style.setProperty('width', '100%', 'important');
+            statsGrid.style.setProperty('max-width', '100%', 'important');
+            console.log('✅ Applied grid layout:', columns);
+            
+            // Also force each stat-card to not be full width
+            const statCards = statsGrid.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.style.setProperty('width', 'auto', 'important');
+                card.style.setProperty('max-width', '100%', 'important');
+                card.style.setProperty('flex-shrink', '1', 'important');
+            });
+        } else {
+            console.warn('⚠️ stats-grid element not found!');
         }
         
         // Set dashboard date - only in selected language
