@@ -255,20 +255,7 @@ body {
 }
 
 .nav-group-header {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: var(--dark-gray);
-    background: var(--light-gray);
-    margin-top: 0.5rem;
-    border-top: 1px solid var(--medium-gray);
-}
-
-.nav-group-header:first-child {
-    margin-top: 0;
-    border-top: none;
+    display: none; /* Hide group headers on desktop */
 }
 
 .nav-link {
@@ -1123,6 +1110,7 @@ h2 {
     }
     
     .nav-icon {
+        display: inline-block; /* Show icons on mobile */
         font-size: 1.3rem;
         margin-right: 0.75rem;
         width: 24px;
