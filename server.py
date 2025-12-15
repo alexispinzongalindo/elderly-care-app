@@ -173,10 +173,76 @@ def init_db():
             reference_number TEXT,
             notes TEXT,
             staff_id INTEGER,
+            receipt_number TEXT UNIQUE,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (billing_id) REFERENCES billing (id),
             FOREIGN KEY (resident_id) REFERENCES residents (id),
             FOREIGN KEY (staff_id) REFERENCES staff (id)
+        )
+    ''')
+    
+    # Add receipt_number column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE payments ADD COLUMN receipt_number TEXT UNIQUE')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+    
+    # Bank Accounts table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS bank_accounts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            account_name TEXT NOT NULL,
+            account_number TEXT,
+            bank_name TEXT NOT NULL,
+            account_type TEXT DEFAULT 'checking',
+            routing_number TEXT,
+            opening_balance REAL DEFAULT 0,
+            current_balance REAL DEFAULT 0,
+            active BOOLEAN DEFAULT 1,
+            notes TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Transactions table (for checkbook reconciliation)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bank_account_id INTEGER NOT NULL,
+            transaction_date DATE NOT NULL,
+            transaction_type TEXT NOT NULL,
+            description TEXT NOT NULL,
+            amount REAL NOT NULL,
+            check_number TEXT,
+            payee TEXT,
+            category TEXT,
+            reconciled BOOLEAN DEFAULT 0,
+            reconciled_date DATE,
+            payment_id INTEGER,
+            notes TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (bank_account_id) REFERENCES bank_accounts (id),
+            FOREIGN KEY (payment_id) REFERENCES payments (id)
+        )
+    ''')
+    
+    # Reconciliation records
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS reconciliation_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bank_account_id INTEGER NOT NULL,
+            statement_date DATE NOT NULL,
+            statement_balance REAL NOT NULL,
+            cleared_balance REAL NOT NULL,
+            outstanding_deposits REAL DEFAULT 0,
+            outstanding_checks REAL DEFAULT 0,
+            difference REAL DEFAULT 0,
+            reconciled_by INTEGER,
+            notes TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (bank_account_id) REFERENCES bank_accounts (id),
+            FOREIGN KEY (reconciled_by) REFERENCES staff (id)
         )
     ''')
     
@@ -993,9 +1059,13 @@ def payments():
     
     elif request.method == 'POST':
         data = request.json
+        
+        # Generate receipt number
+        receipt_number = f"RCP-{datetime.now().strftime('%Y%m%d')}-{secrets.token_hex(4).upper()[:6]}"
+        
         cursor.execute('''
-            INSERT INTO payments (billing_id, resident_id, payment_date, amount, payment_method, reference_number, notes, staff_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO payments (billing_id, resident_id, payment_date, amount, payment_method, reference_number, notes, staff_id, receipt_number)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data.get('billing_id'),
             data.get('resident_id'),
@@ -1004,7 +1074,8 @@ def payments():
             data.get('payment_method', 'Cash'),
             data.get('reference_number', ''),
             data.get('notes', ''),
-            request.current_staff['id']
+            request.current_staff['id'],
+            receipt_number
         ))
         
         # Update billing status if linked
@@ -1013,8 +1084,33 @@ def payments():
         
         conn.commit()
         payment_id = cursor.lastrowid
+        
+        # Create transaction record if bank account is specified
+        if data.get('bank_account_id'):
+            cursor.execute('''
+                INSERT INTO transactions (bank_account_id, transaction_date, transaction_type, description, amount, check_number, payee, category, payment_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                data.get('bank_account_id'),
+                data.get('payment_date'),
+                'deposit',
+                f"Payment from Resident ID {data.get('resident_id')}",
+                data.get('amount'),
+                data.get('reference_number', ''),
+                '',  # payee
+                'Payment',
+                payment_id
+            ))
+            # Update bank account balance
+            cursor.execute('UPDATE bank_accounts SET current_balance = current_balance + ? WHERE id = ?', 
+                         (data.get('amount'), data.get('bank_account_id')))
+            conn.commit()
+        
+        # Get the created payment with receipt number
+        cursor.execute('SELECT * FROM payments WHERE id = ?', (payment_id,))
+        payment = dict(cursor.fetchone())
         conn.close()
-        return jsonify({'id': payment_id, 'message': 'Payment recorded successfully'}), 201
+        return jsonify({'id': payment_id, 'receipt_number': receipt_number, 'payment': payment, 'message': 'Payment recorded successfully'}), 201
 
 @app.route('/api/payments/<int:id>', methods=['PUT', 'DELETE'])
 @require_auth
@@ -1081,6 +1177,334 @@ def get_account_balance(resident_id):
         'pending_amount': pending_amount,
         'overdue_amount': overdue_amount
     })
+
+# Bank Accounts endpoints
+@app.route('/api/bank-accounts', methods=['GET', 'POST'])
+@require_auth
+def bank_accounts():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        cursor.execute('SELECT * FROM bank_accounts WHERE active = 1 ORDER BY account_name')
+        accounts = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(accounts)
+    
+    elif request.method == 'POST':
+        data = request.json
+        cursor.execute('''
+            INSERT INTO bank_accounts (account_name, account_number, bank_name, account_type, routing_number, opening_balance, current_balance, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data.get('account_name'),
+            data.get('account_number', ''),
+            data.get('bank_name'),
+            data.get('account_type', 'checking'),
+            data.get('routing_number', ''),
+            data.get('opening_balance', 0),
+            data.get('opening_balance', 0),  # current_balance starts same as opening
+            data.get('notes', '')
+        ))
+        conn.commit()
+        account_id = cursor.lastrowid
+        conn.close()
+        return jsonify({'id': account_id, 'message': 'Bank account created successfully'}), 201
+
+@app.route('/api/bank-accounts/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@require_auth
+def bank_account_detail(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        cursor.execute('SELECT * FROM bank_accounts WHERE id = ?', (id,))
+        account = cursor.fetchone()
+        if not account:
+            conn.close()
+            return jsonify({'error': 'Bank account not found'}), 404
+        conn.close()
+        return jsonify(dict(account))
+    
+    elif request.method == 'PUT':
+        data = request.json
+        cursor.execute('''
+            UPDATE bank_accounts 
+            SET account_name = ?, account_number = ?, bank_name = ?, account_type = ?, 
+                routing_number = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ''', (
+            data.get('account_name'),
+            data.get('account_number', ''),
+            data.get('bank_name'),
+            data.get('account_type', 'checking'),
+            data.get('routing_number', ''),
+            data.get('notes', ''),
+            id
+        ))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Bank account updated successfully'})
+    
+    elif request.method == 'DELETE':
+        cursor.execute('UPDATE bank_accounts SET active = 0 WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Bank account deactivated successfully'})
+
+# Transactions endpoints
+@app.route('/api/transactions', methods=['GET', 'POST'])
+@require_auth
+def transactions():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'GET':
+        bank_account_id = request.args.get('bank_account_id')
+        reconciled = request.args.get('reconciled')
+        query = 'SELECT t.*, ba.account_name FROM transactions t JOIN bank_accounts ba ON t.bank_account_id = ba.id'
+        params = []
+        
+        if bank_account_id:
+            query += ' WHERE t.bank_account_id = ?'
+            params.append(bank_account_id)
+        
+        if reconciled is not None:
+            if bank_account_id:
+                query += ' AND t.reconciled = ?'
+            else:
+                query += ' WHERE t.reconciled = ?'
+            params.append(1 if reconciled.lower() == 'true' else 0)
+        
+        query += ' ORDER BY t.transaction_date DESC, t.id DESC'
+        cursor.execute(query, params)
+        transactions_list = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(transactions_list)
+    
+    elif request.method == 'POST':
+        data = request.json
+        cursor.execute('''
+            INSERT INTO transactions (bank_account_id, transaction_date, transaction_type, description, amount, check_number, payee, category, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data.get('bank_account_id'),
+            data.get('transaction_date'),
+            data.get('transaction_type'),  # 'deposit' or 'withdrawal'
+            data.get('description'),
+            data.get('amount'),
+            data.get('check_number', ''),
+            data.get('payee', ''),
+            data.get('category', ''),
+            data.get('notes', '')
+        ))
+        
+        # Update bank account balance
+        amount = data.get('amount')
+        if data.get('transaction_type') == 'deposit':
+            cursor.execute('UPDATE bank_accounts SET current_balance = current_balance + ? WHERE id = ?', 
+                         (amount, data.get('bank_account_id')))
+        else:  # withdrawal
+            cursor.execute('UPDATE bank_accounts SET current_balance = current_balance - ? WHERE id = ?', 
+                         (amount, data.get('bank_account_id')))
+        
+        conn.commit()
+        transaction_id = cursor.lastrowid
+        conn.close()
+        return jsonify({'id': transaction_id, 'message': 'Transaction recorded successfully'}), 201
+
+@app.route('/api/transactions/<int:id>', methods=['PUT', 'DELETE'])
+@require_auth
+def transaction_detail(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    if request.method == 'PUT':
+        # Get old transaction to reverse balance change
+        cursor.execute('SELECT * FROM transactions WHERE id = ?', (id,))
+        old_trans = dict(cursor.fetchone())
+        
+        data = request.json
+        cursor.execute('''
+            UPDATE transactions 
+            SET transaction_date = ?, transaction_type = ?, description = ?, amount = ?, 
+                check_number = ?, payee = ?, category = ?, notes = ?
+            WHERE id = ?
+        ''', (
+            data.get('transaction_date'),
+            data.get('transaction_type'),
+            data.get('description'),
+            data.get('amount'),
+            data.get('check_number', ''),
+            data.get('payee', ''),
+            data.get('category', ''),
+            data.get('notes', ''),
+            id
+        ))
+        
+        # Reverse old balance change and apply new one
+        old_amount = old_trans['amount']
+        old_type = old_trans['transaction_type']
+        new_amount = data.get('amount')
+        new_type = data.get('transaction_type')
+        bank_account_id = old_trans['bank_account_id']
+        
+        # Reverse old
+        if old_type == 'deposit':
+            cursor.execute('UPDATE bank_accounts SET current_balance = current_balance - ? WHERE id = ?', 
+                         (old_amount, bank_account_id))
+        else:
+            cursor.execute('UPDATE bank_accounts SET current_balance = current_balance + ? WHERE id = ?', 
+                         (old_amount, bank_account_id))
+        
+        # Apply new
+        if new_type == 'deposit':
+            cursor.execute('UPDATE bank_accounts SET current_balance = current_balance + ? WHERE id = ?', 
+                         (new_amount, bank_account_id))
+        else:
+            cursor.execute('UPDATE bank_accounts SET current_balance = current_balance - ? WHERE id = ?', 
+                         (new_amount, bank_account_id))
+        
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Transaction updated successfully'})
+    
+    elif request.method == 'DELETE':
+        # Get transaction to reverse balance
+        cursor.execute('SELECT * FROM transactions WHERE id = ?', (id,))
+        trans = dict(cursor.fetchone())
+        
+        # Reverse balance change
+        if trans['transaction_type'] == 'deposit':
+            cursor.execute('UPDATE bank_accounts SET current_balance = current_balance - ? WHERE id = ?', 
+                         (trans['amount'], trans['bank_account_id']))
+        else:
+            cursor.execute('UPDATE bank_accounts SET current_balance = current_balance + ? WHERE id = ?', 
+                         (trans['amount'], trans['bank_account_id']))
+        
+        cursor.execute('DELETE FROM transactions WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Transaction deleted successfully'})
+
+# Reconciliation endpoints
+@app.route('/api/reconciliation', methods=['POST'])
+@require_auth
+def reconcile_account():
+    conn = get_db()
+    cursor = conn.cursor()
+    data = request.json
+    
+    bank_account_id = data.get('bank_account_id')
+    statement_date = data.get('statement_date')
+    statement_balance = data.get('statement_balance')
+    transaction_ids = data.get('transaction_ids', [])  # List of transaction IDs to mark as reconciled
+    
+    # Mark transactions as reconciled
+    if transaction_ids:
+        placeholders = ','.join(['?'] * len(transaction_ids))
+        cursor.execute(f'''
+            UPDATE transactions 
+            SET reconciled = 1, reconciled_date = ? 
+            WHERE id IN ({placeholders})
+        ''', [statement_date] + transaction_ids)
+    
+    # Calculate cleared balance
+    cursor.execute('''
+        SELECT COALESCE(SUM(CASE WHEN transaction_type = 'deposit' THEN amount ELSE -amount END), 0) as cleared
+        FROM transactions 
+        WHERE bank_account_id = ? AND reconciled = 1
+    ''', (bank_account_id,))
+    cleared_result = cursor.fetchone()
+    cleared_balance = cleared_result['cleared'] if cleared_result else 0
+    
+    # Get account opening balance
+    cursor.execute('SELECT opening_balance FROM bank_accounts WHERE id = ?', (bank_account_id,))
+    opening_balance = cursor.fetchone()['opening_balance'] or 0
+    cleared_balance += opening_balance
+    
+    # Calculate outstanding items
+    cursor.execute('''
+        SELECT COALESCE(SUM(amount), 0) as total FROM transactions 
+        WHERE bank_account_id = ? AND transaction_type = 'deposit' AND reconciled = 0
+    ''', (bank_account_id,))
+    outstanding_deposits = cursor.fetchone()['total'] or 0
+    
+    cursor.execute('''
+        SELECT COALESCE(SUM(amount), 0) as total FROM transactions 
+        WHERE bank_account_id = ? AND transaction_type = 'withdrawal' AND reconciled = 0
+    ''', (bank_account_id,))
+    outstanding_checks = cursor.fetchone()['total'] or 0
+    
+    difference = statement_balance - cleared_balance
+    
+    # Create reconciliation record
+    cursor.execute('''
+        INSERT INTO reconciliation_records 
+        (bank_account_id, statement_date, statement_balance, cleared_balance, outstanding_deposits, outstanding_checks, difference, reconciled_by, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        bank_account_id,
+        statement_date,
+        statement_balance,
+        cleared_balance,
+        outstanding_deposits,
+        outstanding_checks,
+        difference,
+        request.current_staff['id'],
+        data.get('notes', '')
+    ))
+    
+    conn.commit()
+    reconciliation_id = cursor.lastrowid
+    conn.close()
+    
+    return jsonify({
+        'id': reconciliation_id,
+        'cleared_balance': cleared_balance,
+        'outstanding_deposits': outstanding_deposits,
+        'outstanding_checks': outstanding_checks,
+        'difference': difference,
+        'message': 'Reconciliation completed successfully'
+    }), 201
+
+@app.route('/api/reconciliation/<int:bank_account_id>', methods=['GET'])
+@require_auth
+def get_reconciliation_history(bank_account_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT * FROM reconciliation_records 
+        WHERE bank_account_id = ? 
+        ORDER BY statement_date DESC
+    ''', (bank_account_id,))
+    records = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify(records)
+
+# Payment Receipt endpoint
+@app.route('/api/payments/<int:id>/receipt', methods=['GET'])
+@require_auth
+def get_payment_receipt(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT p.*, r.first_name, r.last_name, r.room_number, s.full_name as staff_name
+        FROM payments p
+        JOIN residents r ON p.resident_id = r.id
+        LEFT JOIN staff s ON p.staff_id = s.id
+        WHERE p.id = ?
+    ''', (id,))
+    payment = cursor.fetchone()
+    
+    if not payment:
+        conn.close()
+        return jsonify({'error': 'Payment not found'}), 404
+    
+    payment_dict = dict(payment)
+    conn.close()
+    return jsonify(payment_dict)
 
 # Calendar endpoint
 @app.route('/api/calendar', methods=['GET'])
