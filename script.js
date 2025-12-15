@@ -2259,12 +2259,13 @@ function showMessage(message, type = 'success') {
 // Dashboard
 async function loadDashboard() {
     try {
-        // Set dashboard date
+        // Set dashboard date - only in selected language
         const dateEl = document.getElementById('dashboardDate');
         if (dateEl) {
             const today = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            dateEl.textContent = today.toLocaleDateString('en-US', options) + ' / ' + today.toLocaleDateString('es-PR', options);
+            const locale = currentLanguage === 'es' ? 'es-PR' : 'en-US';
+            dateEl.textContent = today.toLocaleDateString(locale, options);
         }
         
         const url = currentResidentId 
