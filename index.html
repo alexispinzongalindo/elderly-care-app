@@ -310,6 +310,43 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Quick Access Actions -->
+                <div class="quick-actions-grid" style="margin-top: 2rem;">
+                    <h3 style="grid-column: 1 / -1; margin-bottom: 1rem; color: var(--text-color);" data-translate="dashboard.quickAccess">Quick Access</h3>
+                    <button class="quick-action-btn" onclick="showPage('medications'); setTimeout(() => showMedicationForm(), 100);" data-translate-title="medication.add">
+                        <span class="quick-action-icon">💊</span>
+                        <span data-translate="medication.add">Add Medication</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="showPage('appointments'); setTimeout(() => showAppointmentForm(), 100);" data-translate-title="appointment.add">
+                        <span class="quick-action-icon">📅</span>
+                        <span data-translate="appointment.add">Add Appointment</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="showPage('vitalsigns'); setTimeout(() => showVitalSignForm(), 100);" data-translate-title="vitals.add">
+                        <span class="quick-action-icon">❤️</span>
+                        <span data-translate="vitals.add">Add Vital Signs</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="showPage('carenotes'); setTimeout(() => showCareNoteForm(), 100);" data-translate-title="carenote.add">
+                        <span class="quick-action-icon">📝</span>
+                        <span data-translate="carenote.add">Add Care Note</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="showPage('incidents'); setTimeout(() => showIncidentForm(), 100);" data-translate-title="incident.add">
+                        <span class="quick-action-icon">⚠️</span>
+                        <span data-translate="incident.add">Report Incident</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="showPage('billing'); setTimeout(() => showBillForm(), 100);" data-translate-title="billing.add">
+                        <span class="quick-action-icon">💰</span>
+                        <span data-translate="billing.add">Add Bill</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="showPage('residents'); setTimeout(() => showAddResidentForm(), 100);" data-translate-title="resident.add">
+                        <span class="quick-action-icon">👥</span>
+                        <span data-translate="resident.add">Add Resident</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="showPage('calendar');" data-translate-title="nav.calendar">
+                        <span class="quick-action-icon">📆</span>
+                        <span data-translate="nav.calendar">View Calendar</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Residents Page -->

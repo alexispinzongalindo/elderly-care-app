@@ -52,6 +52,7 @@ const translations = {
         'dashboard.accountBalance': 'Account Balance',
         'dashboard.balance': 'Balance',
         'dashboard.overdue': 'Overdue',
+        'dashboard.quickAccess': 'Quick Access',
         
         // Common
         'common.search': 'Search',
@@ -241,6 +242,7 @@ const translations = {
         'dashboard.accountBalance': 'Saldo de Cuenta',
         'dashboard.balance': 'Saldo',
         'dashboard.overdue': 'Vencido',
+        'dashboard.quickAccess': 'Acceso Rápido',
         
         // Common
         'common.search': 'Buscar',
