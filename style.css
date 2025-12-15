@@ -1073,33 +1073,66 @@ h2 {
     
     .nav-menu {
         display: none;
-        position: absolute;
-        top: 100%;
+        position: fixed;
+        top: 0;
         left: 0;
         right: 0;
+        bottom: 0;
         background-color: var(--white);
         flex-direction: column;
-        padding: 1rem;
+        padding: 0;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         z-index: 1000;
-        max-height: 80vh;
         overflow-y: auto;
         overflow-x: hidden;
         white-space: normal;
+        max-height: 100vh;
     }
     
     .nav-menu.active {
-        display: flex;
+        display: flex !important;
     }
     
     .nav-menu li {
         width: 100%;
+        margin: 0;
+    }
+    
+    .nav-group-header {
+        padding: 0.75rem 1rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--dark-gray);
+        background: var(--light-gray);
+        border-bottom: 1px solid var(--medium-gray);
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
     
     .nav-link {
         width: 100%;
+        padding: 0.875rem 1rem;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid var(--light-gray);
+        font-size: 0.95rem;
         text-align: left;
-        padding: 0.75rem 1rem;
+    }
+    
+    .nav-icon {
+        font-size: 1.3rem;
+        margin-right: 0.75rem;
+        width: 24px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+    
+    .nav-link.logout-link {
+        color: var(--danger-color);
+        font-weight: 600;
     }
     
     .nav-container {
