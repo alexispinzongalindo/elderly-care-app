@@ -2567,9 +2567,33 @@ function showPage(pageName) {
                 }
             });
             
-            // IMMEDIATE FIX: Show empty state directly if no accounts
+            // IMMEDIATE FIX: Show form-card, button, and empty state directly
             setTimeout(() => {
+                const accountsTab = document.getElementById('financialAccounts');
+                const formCard = document.querySelector('#financialAccounts .form-card');
+                const addButton = document.querySelector('#financialAccounts .form-card button');
                 const bankAccountsList = document.getElementById('bankAccountsList');
+                
+                if (accountsTab) {
+                    accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important;';
+                }
+                
+                // Force form-card visible
+                if (formCard) {
+                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 1.5rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 1000 !important; min-height: 100px !important; width: 100% !important; box-sizing: border-box !important;';
+                    console.log('✅✅✅ FORM-CARD FORCED VISIBLE IMMEDIATELY IN showPage ✅✅✅');
+                } else {
+                    console.error('❌ FORM-CARD NOT FOUND IN IMMEDIATE FIX!');
+                }
+                
+                // Force button visible
+                if (addButton) {
+                    addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1001 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; font-size: 1rem !important; font-weight: 500 !important; margin: 1rem 0 !important; width: auto !important; height: auto !important;';
+                    console.log('✅✅✅ ADD BANK ACCOUNT BUTTON FORCED VISIBLE IMMEDIATELY IN showPage ✅✅✅');
+                } else {
+                    console.error('❌❌❌ BUTTON NOT FOUND IN IMMEDIATE FIX!');
+                }
+                
                 if (bankAccountsList) {
                     bankAccountsList.style.setProperty('display', 'block', 'important');
                     bankAccountsList.style.setProperty('visibility', 'visible', 'important');
