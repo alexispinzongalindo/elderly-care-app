@@ -2369,36 +2369,104 @@ function showPage(pageName) {
             loadReportsAnalytics();
         }
         else if (pageName === 'financial') {
-            console.log('💰 Financial page requested - setting up immediately...');
+            console.log('💰💰💰 FINANCIAL PAGE - COMPLETE REWRITE APPROACH 💰💰💰');
             
-            // IMMEDIATELY force financial page to be visible with dimensions
             const financialPage = document.getElementById('financial');
-            if (financialPage) {
-                // Remove any absolute positioning that might have been set
-                financialPage.style.removeProperty('left');
-                financialPage.style.removeProperty('right');
-                financialPage.style.removeProperty('top');
-                
-                // Force visible with explicit dimensions
-                financialPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; height: 600px !important; min-height: 600px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important; box-sizing: border-box !important;';
-                
-                // Force all children visible immediately
-                Array.from(financialPage.children).forEach((child) => {
-                    if (child.tagName === 'SCRIPT') return;
-                    const display = child.classList.contains('button-group') ? 'flex' : 
-                                  child.tagName === 'BUTTON' ? 'inline-block' : 'block';
-                    child.style.setProperty('display', display, 'important');
-                    child.style.setProperty('visibility', 'visible', 'important');
-                    child.style.setProperty('opacity', '1', 'important');
-                });
-                
-                console.log('✅ Financial page forced visible in showPage, height:', financialPage.offsetHeight);
+            if (!financialPage) {
+                console.error('❌ Financial page not found!');
+                return;
             }
             
-            // Then initialize after a small delay to ensure styles are applied
+            // COMPLETE REWRITE: Remove all inline styles and start fresh
+            financialPage.removeAttribute('style');
+            financialPage.className = 'page active';
+            
+            // Check parent chain
+            let parent = financialPage.parentElement;
+            let level = 0;
+            while (parent && level < 5) {
+                const parentStyle = window.getComputedStyle(parent);
+                console.log(`🔍 Parent level ${level}:`, parent.tagName, parent.className, {
+                    display: parentStyle.display,
+                    visibility: parentStyle.visibility,
+                    height: parent.offsetHeight,
+                    width: parent.offsetWidth
+                });
+                
+                // Force parent visible if needed
+                if (parentStyle.display === 'none' || parent.offsetHeight === 0) {
+                    parent.style.setProperty('display', 'block', 'important');
+                    parent.style.setProperty('visibility', 'visible', 'important');
+                    parent.style.setProperty('min-height', '600px', 'important');
+                    console.log(`⚠️ Fixed parent level ${level}`);
+                }
+                
+                parent = parent.parentElement;
+                level++;
+            }
+            
+            // Now set the financial page with ALL possible CSS properties
+            financialPage.style.cssText = `
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: relative !important;
+                z-index: 999 !important;
+                height: 800px !important;
+                min-height: 800px !important;
+                max-height: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 2rem !important;
+                margin: 0 !important;
+                overflow: visible !important;
+                background: #f5f5f5 !important;
+                box-sizing: border-box !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: auto !important;
+            `;
+            
+            // Force ALL children with explicit content
+            Array.from(financialPage.children).forEach((child, idx) => {
+                if (child.tagName === 'SCRIPT') return;
+                
+                let css = '';
+                if (child.tagName === 'H2') {
+                    css = 'display: block !important; visibility: visible !important; height: 50px !important; min-height: 50px !important; margin: 1rem 0 !important; font-size: 2rem !important;';
+                } else if (child.tagName === 'P') {
+                    css = 'display: block !important; visibility: visible !important; height: 40px !important; min-height: 40px !important; margin: 1rem 0 2rem 0 !important;';
+                } else if (child.classList.contains('button-group')) {
+                    css = 'display: flex !important; visibility: visible !important; height: 80px !important; min-height: 80px !important; margin: 2rem 0 !important; padding: 1rem 0 !important;';
+                } else if (child.classList.contains('financial-tab')) {
+                    css = 'display: block !important; visibility: visible !important; height: 500px !important; min-height: 500px !important; margin: 1rem 0 !important;';
+                } else {
+                    css = 'display: block !important; visibility: visible !important; height: auto !important; min-height: 100px !important;';
+                }
+                
+                child.style.cssText = css;
+                console.log(`✅ Child ${idx} (${child.tagName}) forced, height:`, child.offsetHeight);
+            });
+            
+            // Add a test div to verify rendering works
+            const testDiv = document.createElement('div');
+            testDiv.id = 'financialTestDiv';
+            testDiv.style.cssText = 'display: block !important; height: 100px !important; width: 100% !important; background: red !important; color: white !important; padding: 20px !important; margin: 20px 0 !important; font-size: 20px !important; z-index: 1000 !important;';
+            testDiv.textContent = 'TEST: If you see this red box, rendering works!';
+            financialPage.insertBefore(testDiv, financialPage.firstChild);
+            
+            console.log('✅ Financial page completely rewritten, test div added');
+            console.log('🔍 Financial page dimensions:', {
+                height: financialPage.offsetHeight,
+                width: financialPage.offsetWidth,
+                display: window.getComputedStyle(financialPage).display
+            });
+            
+            // Initialize after delay
             setTimeout(() => {
                 initFinancialPage();
-            }, 50);
+            }, 100);
         }
     } else {
         console.error('❌ Page not found:', pageName);
