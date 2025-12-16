@@ -1950,8 +1950,17 @@ function showPage(pageName) {
             if ((child.id === 'incidentForm' || child.id === 'billForm' || child.id === 'paymentForm') && child.style.display === 'none') {
                 return;
             }
-            // Force show everything else
-            const displayValue = child.tagName === 'BUTTON' ? 'inline-block' : 'block';
+            // Skip script tags
+            if (child.tagName === 'SCRIPT') {
+                return;
+            }
+            // Determine correct display value
+            let displayValue = 'block';
+            if (child.tagName === 'BUTTON') {
+                displayValue = 'inline-block';
+            } else if (child.classList.contains('button-group')) {
+                displayValue = 'flex';
+            }
             child.style.setProperty('display', displayValue, 'important');
             child.style.setProperty('visibility', 'visible', 'important');
             child.style.setProperty('opacity', '1', 'important');
