@@ -1919,6 +1919,31 @@ function showPage(pageName) {
         targetPage.style.removeProperty('right'); // Remove any right positioning
         targetPage.style.setProperty('z-index', '1', 'important');
         
+        // SPECIAL HANDLING FOR FINANCIAL PAGE - Force dimensions immediately
+        if (pageName === 'financial') {
+            targetPage.style.setProperty('min-height', '500px', 'important');
+            targetPage.style.setProperty('width', '100%', 'important');
+            targetPage.style.setProperty('padding', '2rem', 'important');
+            // Force all children visible immediately
+            Array.from(targetPage.children).forEach((child) => {
+                if (child.tagName === 'SCRIPT') return;
+                const display = child.classList.contains('button-group') ? 'flex' : 
+                              child.tagName === 'BUTTON' ? 'inline-block' : 'block';
+                child.style.setProperty('display', display, 'important');
+                child.style.setProperty('visibility', 'visible', 'important');
+                child.style.setProperty('opacity', '1', 'important');
+                if (child.tagName === 'H2') {
+                    child.style.setProperty('min-height', '30px', 'important');
+                } else if (child.tagName === 'P') {
+                    child.style.setProperty('min-height', '20px', 'important');
+                } else if (child.classList.contains('button-group')) {
+                    child.style.setProperty('min-height', '50px', 'important');
+                } else if (child.classList.contains('financial-tab')) {
+                    child.style.setProperty('min-height', '300px', 'important');
+                }
+            });
+        }
+        
         // Force show ALL direct children
         Array.from(targetPage.children).forEach((child, index) => {
             // Skip forms that should be hidden initially
