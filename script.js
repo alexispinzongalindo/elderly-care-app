@@ -2335,6 +2335,28 @@ function showPage(pageName) {
             loadReportsAnalytics();
         }
         else if (pageName === 'financial') {
+            console.log('💰 Financial page requested in showPage');
+            // Ensure financial page and its content are visible
+            const financialPage = document.getElementById('financial');
+            if (financialPage) {
+                // Force show the page
+                financialPage.style.setProperty('display', 'block', 'important');
+                financialPage.style.setProperty('visibility', 'visible', 'important');
+                financialPage.style.setProperty('opacity', '1', 'important');
+                
+                // Force show all children (h2, p, button-group, tabs)
+                Array.from(financialPage.children).forEach((child) => {
+                    child.style.setProperty('display', child.tagName === 'BUTTON' ? 'inline-block' : 'block', 'important');
+                    child.style.setProperty('visibility', 'visible', 'important');
+                    child.style.setProperty('opacity', '1', 'important');
+                });
+                
+                // Ensure button group is visible
+                const buttonGroup = financialPage.querySelector('.button-group');
+                if (buttonGroup) {
+                    buttonGroup.style.setProperty('display', 'flex', 'important');
+                }
+            }
             initFinancialPage();
         }
     } else {
