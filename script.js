@@ -7089,11 +7089,33 @@ function initFinancialPage() {
     // AGGRESSIVE FIX - Same approach as incidents page
     console.log('🔴 Starting aggressive financial page fix...');
     
-    // Ensure main container is visible
+    // Ensure main container is visible and has dimensions
     const mainContainer = financialPage.closest('main.container');
     if (mainContainer) {
-        mainContainer.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important;';
+        const containerHeight = mainContainer.offsetHeight;
+        const containerWidth = mainContainer.offsetWidth;
+        console.log('🔍 Main container dimensions:', { height: containerHeight, width: containerWidth });
+        
+        mainContainer.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; min-height: 600px !important; width: 100% !important;';
+        
+        // If container has zero dimensions, force it
+        if (containerHeight === 0 || containerWidth === 0) {
+            mainContainer.style.cssText += 'height: 600px !important; padding: 2rem !important;';
+            console.log('⚠️ Main container had zero dimensions - forced height');
+        }
         console.log('✅ main.container forced visible');
+    }
+    
+    // Also check mainApp
+    const mainApp = document.getElementById('mainApp');
+    if (mainApp) {
+        const appHeight = mainApp.offsetHeight;
+        const appWidth = mainApp.offsetWidth;
+        console.log('🔍 MainApp dimensions:', { height: appHeight, width: appWidth });
+        if (appHeight === 0 || appWidth === 0) {
+            mainApp.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 600px !important; width: 100% !important;';
+            console.log('⚠️ MainApp had zero dimensions - forced height');
+        }
     }
     
     // Force financial page visible with cssText (same as incidents)
