@@ -6705,13 +6705,53 @@ function showFinancialTab(tab) {
         tabElement.style.setProperty('display', 'block', 'important');
         tabElement.style.setProperty('visibility', 'visible', 'important');
         tabElement.style.setProperty('opacity', '1', 'important');
+        tabElement.style.setProperty('min-height', '400px', 'important');
+        tabElement.style.setProperty('padding', '1rem', 'important');
+        tabElement.style.setProperty('background', 'white', 'important');
         console.log('✅ Tab element shown:', tabElement.id);
         
         // Force show all children of the tab
         Array.from(tabElement.children).forEach((child) => {
+            const computedStyle = window.getComputedStyle(child);
+            console.log(`  Child: ${child.tagName} ${child.id || child.className}, display: ${computedStyle.display}`);
             child.style.setProperty('display', 'block', 'important');
             child.style.setProperty('visibility', 'visible', 'important');
+            child.style.setProperty('opacity', '1', 'important');
+            
+            // Special handling for form-card and item-list
+            if (child.classList.contains('form-card')) {
+                child.style.setProperty('margin-bottom', '1rem', 'important');
+                child.style.setProperty('padding', '1.5rem', 'important');
+                child.style.setProperty('background', 'white', 'important');
+                child.style.setProperty('border-radius', '8px', 'important');
+                child.style.setProperty('box-shadow', '0 2px 8px rgba(0,0,0,0.1)', 'important');
+            }
+            if (child.id === 'bankAccountsList') {
+                child.style.setProperty('display', 'block', 'important');
+                child.style.setProperty('min-height', '200px', 'important');
+                child.style.setProperty('visibility', 'visible', 'important');
+                child.style.setProperty('opacity', '1', 'important');
+                child.style.setProperty('margin-top', '2rem', 'important');
+                console.log('  ✅ bankAccountsList forced visible');
+                
+                // If empty, show empty state immediately
+                if (!child.innerHTML || child.innerHTML.trim() === '') {
+                    child.innerHTML = '<div class="empty-state" style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex !important; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd; visibility: visible !important; opacity: 1 !important;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
+                    console.log('  ✅✅✅ Empty state set directly in showFinancialTab ✅✅✅');
+                }
+            }
         });
+        
+        // Double-check visibility after a short delay
+        setTimeout(() => {
+            const finalStyle = window.getComputedStyle(tabElement);
+            console.log(`🔍 Final tab state for ${tabElement.id}:`, {
+                display: finalStyle.display,
+                visibility: finalStyle.visibility,
+                height: tabElement.offsetHeight,
+                width: tabElement.offsetWidth
+            });
+        }, 50);
     } else {
         console.error('❌ Tab element not found:', `financial${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
     }
@@ -6726,7 +6766,10 @@ function showFinancialTab(tab) {
     
     // Load data for the tab
     if (tab === 'accounts') {
-        loadBankAccounts();
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+            loadBankAccounts();
+        }, 100);
     } else if (tab === 'transactions') {
         loadTransactions();
         loadBankAccountsForSelect('transactionBankAccount');
@@ -6740,8 +6783,13 @@ function showFinancialTab(tab) {
 // Bank Accounts Functions
 async function loadBankAccounts() {
     try {
-        if (!checkFinancialAuth()) return;
+        console.log('💰 loadBankAccounts() called');
+        if (!checkFinancialAuth()) {
+            console.error('❌ Financial auth check failed');
+            return;
+        }
         
+        console.log('✅ Fetching bank accounts...');
         const response = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
         if (!response.ok) {
             const handled = await handleFinancialApiError(response, 'Failed to load bank accounts');
@@ -6750,11 +6798,52 @@ async function loadBankAccounts() {
             throw new Error(errorData.error || 'Failed to load bank accounts');
         }
         const accounts = await response.json();
+        console.log('✅ Bank accounts response:', accounts);
+        
         const listEl = document.getElementById('bankAccountsList');
-        if (!listEl) return;
+        if (!listEl) {
+            console.error('❌ bankAccountsList element not found!');
+            // Try to find the parent tab and make sure it's visible
+            const accountsTab = document.getElementById('financialAccounts');
+            if (accountsTab) {
+                console.log('⚠️ Found financialAccounts tab, ensuring it\'s visible...');
+                accountsTab.style.setProperty('display', 'block', 'important');
+                accountsTab.style.setProperty('visibility', 'visible', 'important');
+                // Try again after a short delay
+                setTimeout(() => {
+                    const retryEl = document.getElementById('bankAccountsList');
+                    if (retryEl) {
+                        console.log('✅ Found bankAccountsList on retry');
+                        if (accounts.length === 0) {
+                            retryEl.innerHTML = '<div class="empty-state" style="padding: 2rem; text-align: center; color: #666; background: #f5f5f5; border-radius: 8px; margin: 2rem 0;"><p style="font-size: 1.1rem; margin-bottom: 0.5rem;">No bank accounts found.</p><p>Add your first account to get started.</p></div>';
+                        }
+                    }
+                }, 100);
+            }
+            return;
+        }
+        
+        console.log('✅ Found bankAccountsList element, updating content...');
+        // Ensure the list element is visible
+        listEl.style.setProperty('display', 'block', 'important');
+        listEl.style.setProperty('visibility', 'visible', 'important');
+        listEl.style.setProperty('opacity', '1', 'important');
+        listEl.style.setProperty('min-height', '100px', 'important');
         
         if (accounts.length === 0) {
-            listEl.innerHTML = '<div class="empty-state">No bank accounts found. Add your first account to get started.</div>';
+            listEl.innerHTML = '<div class="empty-state" style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex !important; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd; visibility: visible !important; opacity: 1 !important;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
+            console.log('✅✅✅ Empty state message displayed with enhanced styling ✅✅✅');
+            // Force the parent and list element to be visible
+            listEl.style.setProperty('display', 'block', 'important');
+            listEl.style.setProperty('visibility', 'visible', 'important');
+            listEl.style.setProperty('opacity', '1', 'important');
+            listEl.style.setProperty('min-height', '250px', 'important');
+            // Also ensure parent tab is visible
+            const parentTab = listEl.closest('#financialAccounts');
+            if (parentTab) {
+                parentTab.style.setProperty('display', 'block', 'important');
+                parentTab.style.setProperty('visibility', 'visible', 'important');
+            }
             return;
         }
         
@@ -6773,8 +6862,9 @@ async function loadBankAccounts() {
                 </div>
             </div>
         `).join('');
+        console.log('✅ Bank accounts list rendered, count:', accounts.length);
     } catch (error) {
-        console.error('Error loading bank accounts:', error);
+        console.error('❌ Error loading bank accounts:', error);
         showMessage('Error loading bank accounts / Error al cargar cuentas bancarias', 'error');
     }
 }
@@ -7420,6 +7510,33 @@ function initFinancialPage() {
     // Now show only the accounts tab (this will hide the others)
     showFinancialTab('accounts');
     
+    // AGGRESSIVE: Directly ensure bankAccountsList shows empty state immediately
+    setTimeout(() => {
+        const bankAccountsList = document.getElementById('bankAccountsList');
+        const accountsTab = document.getElementById('financialAccounts');
+        
+        if (accountsTab) {
+            accountsTab.style.setProperty('display', 'block', 'important');
+            accountsTab.style.setProperty('visibility', 'visible', 'important');
+            accountsTab.style.setProperty('opacity', '1', 'important');
+        }
+        
+        if (bankAccountsList) {
+            bankAccountsList.style.setProperty('display', 'block', 'important');
+            bankAccountsList.style.setProperty('visibility', 'visible', 'important');
+            bankAccountsList.style.setProperty('opacity', '1', 'important');
+            bankAccountsList.style.setProperty('min-height', '200px', 'important');
+            
+            // If empty, show empty state immediately
+            if (!bankAccountsList.innerHTML || bankAccountsList.innerHTML.trim() === '') {
+                bankAccountsList.innerHTML = '<div class="empty-state" style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
+                console.log('✅✅✅ EMPTY STATE SET DIRECTLY IN INITFINANCIALPAGE ✅✅✅');
+            }
+        } else {
+            console.error('❌❌❌ bankAccountsList still not found after all fixes!');
+        }
+    }, 200);
+    
     // Double-check accounts tab is visible after showFinancialTab
     setTimeout(() => {
         const accountsTab = document.getElementById('financialAccounts');
@@ -7438,7 +7555,7 @@ function initFinancialPage() {
                 accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; padding: 1rem !important; background: white !important;';
             }
         }
-    }, 100);
+    }, 300);
     
     // Verify dimensions after a delay and force if still zero
     setTimeout(() => {
