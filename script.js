@@ -719,10 +719,16 @@ function checkAuth() {
         
         // Show Financial Management nav link if user is admin
         const financialNavLink = document.getElementById('financialNavLink');
-        if (financialNavLink && currentStaff.role === 'admin') {
-            financialNavLink.style.display = 'block';
-        } else if (financialNavLink) {
-            financialNavLink.style.display = 'none';
+        if (financialNavLink) {
+            if (currentStaff.role === 'admin') {
+                financialNavLink.style.display = 'block';
+                console.log('✅ Financial Management link shown for admin user (checkAuth)');
+            } else {
+                financialNavLink.style.display = 'none';
+                console.log('❌ Financial Management link hidden - user is not admin. Role:', currentStaff.role);
+            }
+        } else {
+            console.error('❌ Financial Management nav link element not found!');
         }
         
         if (!currentResidentId) {
@@ -830,6 +836,20 @@ async function handleLogin(event) {
                 staffNavLink.style.display = 'block';
             } else if (staffNavLink) {
                 staffNavLink.style.display = 'none';
+            }
+            
+            // Show Financial Management nav link if user is admin
+            const financialNavLink = document.getElementById('financialNavLink');
+            if (financialNavLink) {
+                if (currentStaff.role === 'admin') {
+                    financialNavLink.style.display = 'block';
+                    console.log('✅ Financial Management link shown for admin user');
+                } else {
+                    financialNavLink.style.display = 'none';
+                    console.log('❌ Financial Management link hidden - user is not admin. Role:', currentStaff.role);
+                }
+            } else {
+                console.error('❌ Financial Management nav link element not found!');
             }
             
             hideLoginModal();
@@ -6408,6 +6428,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ==================== FINANCIAL MANAGEMENT FUNCTIONS (Admin Only) ====================
 
+// Helper function to check authentication and handle errors
+function checkFinancialAuth() {
+    if (!authToken || !currentStaff) {
+        showMessage('Please log in to access this feature / Por favor inicie sesión para acceder a esta función', 'error');
+        checkAuth();
+        return false;
+    }
+    if (currentStaff.role !== 'admin') {
+        showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+        return false;
+    }
+    return true;
+}
+
+// Helper function to handle API response errors
+async function handleFinancialApiError(response, defaultMessage) {
+    if (response.status === 401) {
+        console.error('Authentication failed - token expired');
+        showMessage('Session expired. Please log in again / Sesión expirada. Por favor inicie sesión nuevamente', 'error');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentStaff');
+        authToken = null;
+        currentStaff = null;
+        checkAuth();
+        return true; // Indicates auth error was handled
+    }
+    if (response.status === 403) {
+        showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+        return true; // Indicates error was handled
+    }
+    return false; // Error not handled, let caller handle it
+}
+
 // Financial Tab Navigation
 function showFinancialTab(tab) {
     // Hide all tabs
@@ -6447,13 +6500,14 @@ function showFinancialTab(tab) {
 // Bank Accounts Functions
 async function loadBankAccounts() {
     try {
+        if (!checkFinancialAuth()) return;
+        
         const response = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
         if (!response.ok) {
-            if (response.status === 403) {
-                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
-                return;
-            }
-            throw new Error('Failed to load bank accounts');
+            const handled = await handleFinancialApiError(response, 'Failed to load bank accounts');
+            if (handled) return;
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(errorData.error || 'Failed to load bank accounts');
         }
         const accounts = await response.json();
         const listEl = document.getElementById('bankAccountsList');
@@ -6529,16 +6583,16 @@ async function deleteBankAccount(id) {
     }
     
     try {
+        if (!checkFinancialAuth()) return;
+        
         const response = await fetch(`/api/bank-accounts/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
         
         if (!response.ok) {
-            if (response.status === 403) {
-                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
-                return;
-            }
+            const handled = await handleFinancialApiError(response, 'Failed to delete bank account');
+            if (handled) return;
             throw new Error('Failed to delete bank account');
         }
         
@@ -6553,6 +6607,8 @@ async function deleteBankAccount(id) {
 async function saveBankAccount(event) {
     event.preventDefault();
     try {
+        if (!checkFinancialAuth()) return;
+        
         const accountData = {
             account_name: document.getElementById('accountName').value,
             bank_name: document.getElementById('bankName').value,
@@ -6575,10 +6631,8 @@ async function saveBankAccount(event) {
         });
         
         if (!response.ok) {
-            if (response.status === 403) {
-                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
-                return;
-            }
+            const handled = await handleFinancialApiError(response, 'Failed to save bank account');
+            if (handled) return;
             throw new Error('Failed to save bank account');
         }
         
@@ -6597,6 +6651,8 @@ async function saveBankAccount(event) {
 // Transactions Functions
 async function loadTransactions() {
     try {
+        if (!checkFinancialAuth()) return;
+        
         const accountId = document.getElementById('filterTransactionAccount')?.value || '';
         const reconciled = document.getElementById('filterReconciled')?.value || '';
         
@@ -6606,10 +6662,8 @@ async function loadTransactions() {
         
         const response = await fetch(url, { headers: getAuthHeaders() });
         if (!response.ok) {
-            if (response.status === 403) {
-                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
-                return;
-            }
+            const handled = await handleFinancialApiError(response, 'Failed to load transactions');
+            if (handled) return;
             throw new Error('Failed to load transactions');
         }
         const transactions = await response.json();
@@ -6651,8 +6705,13 @@ async function loadTransactions() {
 
 async function loadBankAccountsForSelect(selectId) {
     try {
+        if (!checkFinancialAuth()) return;
+        
         const response = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
-        if (!response.ok) return;
+        if (!response.ok) {
+            await handleFinancialApiError(response, 'Failed to load bank accounts');
+            return;
+        }
         const accounts = await response.json();
         const select = document.getElementById(selectId);
         if (!select) return;
@@ -6724,16 +6783,16 @@ async function deleteTransaction(id) {
     }
     
     try {
+        if (!checkFinancialAuth()) return;
+        
         const response = await fetch(`/api/transactions/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
         
         if (!response.ok) {
-            if (response.status === 403) {
-                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
-                return;
-            }
+            const handled = await handleFinancialApiError(response, 'Failed to delete transaction');
+            if (handled) return;
             throw new Error('Failed to delete transaction');
         }
         
@@ -6749,6 +6808,8 @@ async function deleteTransaction(id) {
 async function saveTransaction(event) {
     event.preventDefault();
     try {
+        if (!checkFinancialAuth()) return;
+        
         const transactionData = {
             bank_account_id: parseInt(document.getElementById('transactionBankAccount').value),
             transaction_date: document.getElementById('transactionDate').value,
@@ -6773,10 +6834,8 @@ async function saveTransaction(event) {
         });
         
         if (!response.ok) {
-            if (response.status === 403) {
-                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
-                return;
-            }
+            const handled = await handleFinancialApiError(response, 'Failed to save transaction');
+            if (handled) return;
             throw new Error('Failed to save transaction');
         }
         
@@ -6799,6 +6858,8 @@ async function loadUnreconciledTransactions() {
     if (!accountId) return;
     
     try {
+        if (!checkFinancialAuth()) return;
+        
         // Load account balance
         const accountsResponse = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
         if (accountsResponse.ok) {
@@ -6807,11 +6868,16 @@ async function loadUnreconciledTransactions() {
             if (account) {
                 document.getElementById('currentAccountBalance').value = `$${parseFloat(account.current_balance || 0).toFixed(2)}`;
             }
+        } else {
+            await handleFinancialApiError(accountsResponse, 'Failed to load account balance');
         }
         
         // Load unreconciled transactions
         const response = await fetch(`/api/transactions?bank_account_id=${accountId}&reconciled=false`, { headers: getAuthHeaders() });
-        if (!response.ok) return;
+        if (!response.ok) {
+            await handleFinancialApiError(response, 'Failed to load transactions');
+            return;
+        }
         const transactions = await response.json();
         const container = document.getElementById('unreconciledTransactions');
         if (!container) return;
@@ -6838,6 +6904,8 @@ async function loadUnreconciledTransactions() {
 async function reconcileAccount(event) {
     event.preventDefault();
     try {
+        if (!checkFinancialAuth()) return;
+        
         const accountId = document.getElementById('reconcileBankAccount').value;
         const selectedTransactions = Array.from(document.querySelectorAll('input[name="reconcile_trans"]:checked')).map(cb => parseInt(cb.value));
         
@@ -6856,10 +6924,8 @@ async function reconcileAccount(event) {
         });
         
         if (!response.ok) {
-            if (response.status === 403) {
-                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
-                return;
-            }
+            const handled = await handleFinancialApiError(response, 'Failed to reconcile account');
+            if (handled) return;
             throw new Error('Failed to reconcile account');
         }
         
@@ -6883,6 +6949,8 @@ async function searchReceipt() {
     }
     
     try {
+        if (!checkFinancialAuth()) return;
+        
         // Try as payment ID first
         let paymentId = parseInt(search);
         if (isNaN(paymentId)) {
@@ -6892,6 +6960,8 @@ async function searchReceipt() {
                 const payments = await paymentsResponse.json();
                 const payment = payments.find(p => p.receipt_number === search);
                 if (payment) paymentId = payment.id;
+            } else {
+                await handleFinancialApiError(paymentsResponse, 'Failed to search payments');
             }
         }
         
@@ -6902,10 +6972,8 @@ async function searchReceipt() {
         
         const response = await fetch(`/api/payments/${paymentId}/receipt`, { headers: getAuthHeaders() });
         if (!response.ok) {
-            if (response.status === 403) {
-                showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
-                return;
-            }
+            const handled = await handleFinancialApiError(response, 'Receipt not found');
+            if (handled) return;
             throw new Error('Receipt not found');
         }
         
@@ -6944,7 +7012,15 @@ function displayReceipt(receipt) {
 
 // Initialize financial page when shown
 function initFinancialPage() {
-    if (currentStaff && currentStaff.role === 'admin') {
+    // Check authentication first
+    if (!authToken || !currentStaff) {
+        showMessage('Please log in to access this feature / Por favor inicie sesión para acceder a esta función', 'error');
+        checkAuth();
+        return;
+    }
+    
+    // Check if user is admin
+    if (currentStaff.role === 'admin') {
         showFinancialTab('accounts');
     } else {
         showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');

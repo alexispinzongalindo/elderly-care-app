@@ -890,7 +890,7 @@ def vital_signs():
     
     elif request.method == 'POST':
         data = request.json
-        cursor.execute('''
+    cursor.execute('''
             INSERT INTO vital_signs (resident_id, recorded_at, systolic, diastolic, glucose, weight, temperature, heart_rate, notes, staff_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
@@ -907,7 +907,7 @@ def vital_signs():
         ))
         conn.commit()
         sign_id = cursor.lastrowid
-        conn.close()
+    conn.close()
         return jsonify({'id': sign_id, 'message': 'Vital signs recorded successfully'}), 201
 
 @app.route('/api/vital-signs/<int:sign_id>', methods=['GET', 'PUT', 'DELETE'])
@@ -1010,7 +1010,7 @@ def billing_detail(id):
         return jsonify(dict(bill))
     
     elif request.method == 'PUT':
-        data = request.json
+    data = request.json
         cursor.execute('''
             UPDATE billing 
             SET billing_date = ?, due_date = ?, amount = ?, description = ?, 
@@ -1062,8 +1062,8 @@ def payments():
         
         # Generate receipt number
         receipt_number = f"RCP-{datetime.now().strftime('%Y%m%d')}-{secrets.token_hex(4).upper()[:6]}"
-        
-        cursor.execute('''
+    
+    cursor.execute('''
             INSERT INTO payments (billing_id, resident_id, payment_date, amount, payment_method, reference_number, notes, staff_id, receipt_number)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
@@ -1082,7 +1082,7 @@ def payments():
         if data.get('billing_id'):
             cursor.execute('UPDATE billing SET status = ? WHERE id = ?', ('paid', data.get('billing_id')))
         
-        conn.commit()
+    conn.commit()
         payment_id = cursor.lastrowid
         
         # Create transaction record if bank account is specified
@@ -1109,7 +1109,7 @@ def payments():
         # Get the created payment with receipt number
         cursor.execute('SELECT * FROM payments WHERE id = ?', (payment_id,))
         payment = dict(cursor.fetchone())
-        conn.close()
+    conn.close()
         return jsonify({'id': payment_id, 'receipt_number': receipt_number, 'payment': payment, 'message': 'Payment recorded successfully'}), 201
 
 @app.route('/api/payments/<int:id>', methods=['PUT', 'DELETE'])
@@ -1120,7 +1120,7 @@ def payment_detail(id):
     
     if request.method == 'PUT':
         data = request.json
-        cursor.execute('''
+    cursor.execute('''
             UPDATE payments 
             SET payment_date = ?, amount = ?, payment_method = ?, reference_number = ?, notes = ?
             WHERE id = ?
@@ -1133,7 +1133,7 @@ def payment_detail(id):
             id
         ))
         conn.commit()
-        conn.close()
+    conn.close()
         return jsonify({'message': 'Payment updated successfully'})
     
     elif request.method == 'DELETE':
@@ -1522,8 +1522,8 @@ def calendar():
     # Build query with filters
     med_query = '''
         SELECT ml.*, m.name as medication_name, m.dosage, m.resident_id
-        FROM medication_logs ml
-        JOIN medications m ON ml.medication_id = m.id
+            FROM medication_logs ml
+            JOIN medications m ON ml.medication_id = m.id
         WHERE 1=1
     '''
     med_params = []
@@ -1727,11 +1727,11 @@ def staff_detail(id):
         # If password is provided, hash it; otherwise keep existing password
         if data.get('password'):
             password_hash = hash_password(data.get('password'))
-            cursor.execute('''
+        cursor.execute('''
                 UPDATE staff 
                 SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, active = ?
-                WHERE id = ?
-            ''', (
+            WHERE id = ?
+        ''', (
                 data.get('username'),
                 data.get('full_name'),
                 data.get('role', 'caregiver'),
@@ -1755,7 +1755,7 @@ def staff_detail(id):
                 data.get('phone'),
                 data.get('active', True),
                 id
-            ))
+        ))
         conn.commit()
         conn.close()
         return jsonify({'message': 'Staff member updated successfully'})
@@ -1806,11 +1806,11 @@ def incidents():
             return jsonify({'error': str(e)}), 500
     
     elif request.method == 'POST':
-        data = request.json
-        
+    data = request.json
+    
         # Validate required fields
         if not data.get('resident_id'):
-            conn.close()
+        conn.close()
             return jsonify({'error': 'Resident ID is required / Se requiere ID de residente'}), 400
         if not data.get('incident_date'):
             conn.close()
@@ -1854,11 +1854,11 @@ def incidents():
             incident_id = cursor.lastrowid
             
             # Create notification for incident
-            try:
-                cursor.execute('''
+        try:
+            cursor.execute('''
                     INSERT INTO notifications (resident_id, notification_type, title, message, priority)
                     VALUES (?, ?, ?, ?, ?)
-                ''', (
+            ''', (
                     int(data.get('resident_id')),
                     'incident',
                     f'New Incident Report - {data.get("incident_type", "Incident")}',
@@ -1937,8 +1937,8 @@ def incident_detail(id):
                     photos = ?, residents_involved = ?
                 WHERE id = ?
             ''', (*update_fields, id))
-        conn.commit()
-        conn.close()
+    conn.commit()
+    conn.close()
         return jsonify({'message': 'Incident report updated successfully'})
     
     elif request.method == 'DELETE':
@@ -2030,7 +2030,7 @@ def care_note_detail(id):
             WHERE cn.id = ?
         ''', (id,))
         note = cursor.fetchone()
-        conn.close()
+    conn.close()
         if not note:
             return jsonify({'error': 'Care note not found'}), 404
         return jsonify(dict(note))
@@ -2077,7 +2077,7 @@ def care_note_detail(id):
 def notifications():
     conn = get_db()
     cursor = conn.cursor()
-    
+        
     if request.method == 'GET':
         resident_id = request.args.get('resident_id')
         unread_only = request.args.get('unread_only', 'false') == 'true'
