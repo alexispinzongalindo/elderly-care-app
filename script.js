@@ -2555,8 +2555,21 @@ function showPage(pageName) {
                 }
             });
             
-            // Initialize after delay
+            // IMMEDIATE FIX: Show empty state directly if no accounts
             setTimeout(() => {
+                const bankAccountsList = document.getElementById('bankAccountsList');
+                if (bankAccountsList) {
+                    bankAccountsList.style.setProperty('display', 'block', 'important');
+                    bankAccountsList.style.setProperty('visibility', 'visible', 'important');
+                    bankAccountsList.style.setProperty('opacity', '1', 'important');
+                    bankAccountsList.style.setProperty('min-height', '250px', 'important');
+                    
+                    // If list is empty, show message immediately
+                    if (!bankAccountsList.innerHTML || bankAccountsList.innerHTML.trim() === '') {
+                        bankAccountsList.innerHTML = '<div style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex !important; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd; visibility: visible !important; opacity: 1 !important; width: 100%; box-sizing: border-box;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
+                        console.log('✅✅✅ EMPTY STATE SET IMMEDIATELY IN showPage ✅✅✅');
+                    }
+                }
                 initFinancialPage();
             }, 100);
         }
