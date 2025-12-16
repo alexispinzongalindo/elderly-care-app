@@ -1828,6 +1828,10 @@ function showPage(pageName) {
     // CRITICAL: Hide ALL pages first with inline styles to override any forced visibility
     pages.forEach(page => {
         if (page.id !== pageName) {
+            // SPECIAL: Don't hide financial page if we're showing it
+            if (page.id === 'financial' && pageName === 'financial') {
+                return;
+            }
             page.classList.remove('active');
             // Use !important via setProperty to override any CSS - only hide the page container itself
             // Don't hide children here as it can interfere with the target page's children
