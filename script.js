@@ -6463,8 +6463,14 @@ async function handleFinancialApiError(response, defaultMessage) {
 
 // Financial Tab Navigation
 function showFinancialTab(tab) {
+    console.log('💰 Showing financial tab:', tab);
+    
     // Hide all tabs
-    document.querySelectorAll('.financial-tab').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.financial-tab').forEach(t => {
+        t.style.setProperty('display', 'none', 'important');
+    });
+    
+    // Update button styles
     document.querySelectorAll('#financial .button-group button').forEach(b => {
         b.classList.remove('btn-primary');
         b.classList.add('btn-secondary');
@@ -6473,7 +6479,18 @@ function showFinancialTab(tab) {
     // Show selected tab
     const tabElement = document.getElementById(`financial${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
     if (tabElement) {
-        tabElement.style.display = 'block';
+        tabElement.style.setProperty('display', 'block', 'important');
+        tabElement.style.setProperty('visibility', 'visible', 'important');
+        tabElement.style.setProperty('opacity', '1', 'important');
+        console.log('✅ Tab element shown:', tabElement.id);
+        
+        // Force show all children of the tab
+        Array.from(tabElement.children).forEach((child) => {
+            child.style.setProperty('display', 'block', 'important');
+            child.style.setProperty('visibility', 'visible', 'important');
+        });
+    } else {
+        console.error('❌ Tab element not found:', `financial${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
     }
     
     // Update button styles
@@ -7029,7 +7046,23 @@ function initFinancialPage() {
             financialPage.style.setProperty('display', 'block', 'important');
             financialPage.style.setProperty('visibility', 'visible', 'important');
             financialPage.style.setProperty('opacity', '1', 'important');
+            financialPage.style.setProperty('position', 'relative', 'important');
+            financialPage.style.setProperty('z-index', '1', 'important');
             console.log('✅ Financial page made visible');
+            
+            // Force show all direct children of financial page
+            Array.from(financialPage.children).forEach((child) => {
+                child.style.setProperty('display', 'block', 'important');
+                child.style.setProperty('visibility', 'visible', 'important');
+                child.style.setProperty('opacity', '1', 'important');
+            });
+            
+            // Ensure tabs container and buttons are visible
+            const buttonGroup = financialPage.querySelector('.button-group');
+            if (buttonGroup) {
+                buttonGroup.style.setProperty('display', 'flex', 'important');
+                buttonGroup.style.setProperty('visibility', 'visible', 'important');
+            }
         } else {
             console.error('❌ Financial page element not found!');
         }
