@@ -2369,8 +2369,36 @@ function showPage(pageName) {
             loadReportsAnalytics();
         }
         else if (pageName === 'financial') {
-            console.log('💰 Financial page requested - initializing...');
-            initFinancialPage();
+            console.log('💰 Financial page requested - setting up immediately...');
+            
+            // IMMEDIATELY force financial page to be visible with dimensions
+            const financialPage = document.getElementById('financial');
+            if (financialPage) {
+                // Remove any absolute positioning that might have been set
+                financialPage.style.removeProperty('left');
+                financialPage.style.removeProperty('right');
+                financialPage.style.removeProperty('top');
+                
+                // Force visible with explicit dimensions
+                financialPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; height: 600px !important; min-height: 600px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important; box-sizing: border-box !important;';
+                
+                // Force all children visible immediately
+                Array.from(financialPage.children).forEach((child) => {
+                    if (child.tagName === 'SCRIPT') return;
+                    const display = child.classList.contains('button-group') ? 'flex' : 
+                                  child.tagName === 'BUTTON' ? 'inline-block' : 'block';
+                    child.style.setProperty('display', display, 'important');
+                    child.style.setProperty('visibility', 'visible', 'important');
+                    child.style.setProperty('opacity', '1', 'important');
+                });
+                
+                console.log('✅ Financial page forced visible in showPage, height:', financialPage.offsetHeight);
+            }
+            
+            // Then initialize after a small delay to ensure styles are applied
+            setTimeout(() => {
+                initFinancialPage();
+            }, 50);
         }
     } else {
         console.error('❌ Page not found:', pageName);
