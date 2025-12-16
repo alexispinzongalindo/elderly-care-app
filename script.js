@@ -2368,36 +2368,38 @@ function showPage(pageName) {
                     }
                     
                     let displayValue = 'block';
+                    let additionalStyles = '';
+                    
                     if (child.tagName === 'BUTTON') {
                         displayValue = 'inline-block';
                     } else if (child.classList.contains('button-group')) {
                         displayValue = 'flex';
-                    } else if (child.tagName === 'H2' || child.tagName === 'P') {
+                        additionalStyles = 'margin-bottom: 2rem !important; border-bottom: 2px solid var(--light-gray) !important; padding-bottom: 1rem !important;';
+                    } else if (child.tagName === 'H2') {
                         displayValue = 'block';
+                        additionalStyles = 'margin-bottom: 1rem !important; font-size: 1.5rem !important; font-weight: bold !important; color: var(--text-color) !important;';
+                    } else if (child.tagName === 'P') {
+                        displayValue = 'block';
+                        additionalStyles = 'margin-bottom: 2rem !important; color: var(--dark-gray) !important;';
                     } else if (child.classList.contains('financial-tab')) {
                         displayValue = 'block';
+                        additionalStyles = 'min-height: 200px !important;';
                     }
                     
-                    child.style.cssText = `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important; min-height: auto !important;`;
-                    
-                    // Force specific elements to have content
-                    if (child.tagName === 'H2') {
-                        child.style.cssText += 'margin-bottom: 1rem !important; font-size: 1.5rem !important;';
-                    }
-                    if (child.tagName === 'P') {
-                        child.style.cssText += 'margin-bottom: 2rem !important;';
-                    }
+                    // Build complete cssText with all styles
+                    child.style.cssText = `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important; min-height: auto !important; ${additionalStyles}`;
                     
                     const afterDisplay = window.getComputedStyle(child).display;
                     const afterHeight = child.offsetHeight;
                     const afterWidth = child.offsetWidth;
                     console.log(`    After: display=${afterDisplay}, height=${afterHeight}, width=${afterWidth}`);
                     
-                    if (afterHeight === 0 && afterWidth === 0) {
+                    if (afterHeight === 0 && afterWidth === 0 && child.tagName !== 'SCRIPT') {
                         console.error(`    ❌❌❌ CHILD ${index} HAS ZERO DIMENSIONS! ❌❌❌`);
-                        // Try forcing content
+                        // Force minimum height for elements with content
                         if (child.textContent && child.textContent.trim()) {
-                            child.style.cssText += 'content: attr(data-content) !important;';
+                            child.style.setProperty('min-height', '20px', 'important');
+                            child.style.setProperty('line-height', '1.5', 'important');
                         }
                     }
                 });
