@@ -7012,6 +7012,8 @@ function displayReceipt(receipt) {
 
 // Initialize financial page when shown
 function initFinancialPage() {
+    console.log('💰 Initializing Financial Management page...');
+    
     // Check authentication first
     if (!authToken || !currentStaff) {
         showMessage('Please log in to access this feature / Por favor inicie sesión para acceder a esta función', 'error');
@@ -7021,6 +7023,18 @@ function initFinancialPage() {
     
     // Check if user is admin
     if (currentStaff.role === 'admin') {
+        // Ensure financial page is visible
+        const financialPage = document.getElementById('financial');
+        if (financialPage) {
+            financialPage.style.setProperty('display', 'block', 'important');
+            financialPage.style.setProperty('visibility', 'visible', 'important');
+            financialPage.style.setProperty('opacity', '1', 'important');
+            console.log('✅ Financial page made visible');
+        } else {
+            console.error('❌ Financial page element not found!');
+        }
+        
+        // Show the accounts tab (this will also load bank accounts)
         showFinancialTab('accounts');
     } else {
         showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
