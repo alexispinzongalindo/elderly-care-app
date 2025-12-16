@@ -6745,22 +6745,19 @@ function showFinancialTab(tab) {
             
             // Special handling for form-card and item-list
             if (child.classList.contains('form-card')) {
-                child.style.setProperty('display', 'block', 'important');
-                child.style.setProperty('visibility', 'visible', 'important');
-                child.style.setProperty('opacity', '1', 'important');
-                child.style.setProperty('margin-bottom', '1rem', 'important');
-                child.style.setProperty('padding', '1.5rem', 'important');
-                child.style.setProperty('background', 'white', 'important');
-                child.style.setProperty('border-radius', '8px', 'important');
-                child.style.setProperty('box-shadow', '0 2px 8px rgba(0,0,0,0.1)', 'important');
-                child.style.setProperty('position', 'relative', 'important');
-                child.style.setProperty('z-index', '1', 'important');
+                child.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 1.5rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 1000 !important; min-height: 100px !important; width: 100% !important; box-sizing: border-box !important;';
+                console.log('✅✅✅ FORM-CARD FORCED VISIBLE WITH CSS TEXT ✅✅✅');
                 
-                // Also ensure all children of form-card are visible (including the button)
+                // Also ensure all children of form-card are visible (including the button and h3)
                 Array.from(child.children).forEach(grandChild => {
-                    grandChild.style.setProperty('display', grandChild.tagName === 'BUTTON' ? 'inline-block' : 'block', 'important');
-                    grandChild.style.setProperty('visibility', 'visible', 'important');
-                    grandChild.style.setProperty('opacity', '1', 'important');
+                    if (grandChild.tagName === 'BUTTON') {
+                        grandChild.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1001 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; font-size: 1rem !important; font-weight: 500 !important; margin: 1rem 0 !important; width: auto !important; height: auto !important;';
+                        console.log('✅✅✅ BUTTON FORCED VISIBLE IN showFinancialTab ✅✅✅');
+                    } else {
+                        grandChild.style.setProperty('display', grandChild.tagName === 'H3' ? 'block' : 'block', 'important');
+                        grandChild.style.setProperty('visibility', 'visible', 'important');
+                        grandChild.style.setProperty('opacity', '1', 'important');
+                    }
                 });
             }
             if (child.id === 'bankAccountsList') {
