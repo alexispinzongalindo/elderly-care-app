@@ -7086,6 +7086,20 @@ function initFinancialPage() {
         return;
     }
     
+    // CRITICAL: Check if element is actually in the DOM
+    if (!financialPage.parentElement) {
+        console.error('❌❌❌ FINANCIAL PAGE HAS NO PARENT! ELEMENT NOT IN DOM! ❌❌❌');
+        return;
+    }
+    
+    // Check if element is connected to the document
+    if (!financialPage.isConnected) {
+        console.error('❌❌❌ FINANCIAL PAGE NOT CONNECTED TO DOCUMENT! ❌❌❌');
+        return;
+    }
+    
+    console.log('✅ Financial page is in DOM, parent:', financialPage.parentElement?.tagName, financialPage.parentElement?.className);
+    
     // AGGRESSIVE FIX - Same approach as incidents page
     console.log('🔴 Starting aggressive financial page fix...');
     
@@ -7227,11 +7241,37 @@ function initFinancialPage() {
             setTimeout(() => {
                 const finalHeight = financialPage.offsetHeight;
                 const finalWidth = financialPage.offsetWidth;
-                console.log('🔍 After last resort fix:', { height: finalHeight, width: finalWidth });
+                const computedStyle = window.getComputedStyle(financialPage);
+                console.log('🔍 After last resort fix:', { 
+                    height: finalHeight, 
+                    width: finalWidth,
+                    display: computedStyle.display,
+                    visibility: computedStyle.visibility,
+                    opacity: computedStyle.opacity,
+                    position: computedStyle.position,
+                    zIndex: computedStyle.zIndex
+                });
+                
                 if (finalHeight > 0 && finalWidth > 0) {
                     console.log('✅✅✅ LAST RESORT FIX WORKED! ✅✅✅');
                 } else {
                     console.error('❌❌❌ LAST RESORT FIX FAILED - PAGE STILL ZERO DIMENSIONS ❌❌❌');
+                    console.error('🔍 Computed styles:', {
+                        display: computedStyle.display,
+                        visibility: computedStyle.visibility,
+                        height: computedStyle.height,
+                        width: computedStyle.width,
+                        position: computedStyle.position,
+                        top: computedStyle.top,
+                        left: computedStyle.left
+                    });
+                    
+                    // FINAL ATTEMPT: Clone and replace the element
+                    console.log('🔄 Attempting to clone and replace element...');
+                    const clone = financialPage.cloneNode(true);
+                    financialPage.parentElement.replaceChild(clone, financialPage);
+                    clone.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; height: 600px !important; min-height: 600px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important;';
+                    console.log('✅ Element cloned and replaced');
                 }
             }, 100);
         } else {
