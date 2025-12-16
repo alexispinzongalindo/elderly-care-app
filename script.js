@@ -2450,9 +2450,13 @@ function showPage(pageName) {
             });
             
             // Add a test div to verify rendering works
+            const existingTestDiv = document.getElementById('financialTestDiv');
+            if (existingTestDiv) {
+                existingTestDiv.remove();
+            }
             const testDiv = document.createElement('div');
             testDiv.id = 'financialTestDiv';
-            testDiv.style.cssText = 'display: block !important; height: 100px !important; width: 100% !important; background: red !important; color: white !important; padding: 20px !important; margin: 20px 0 !important; font-size: 20px !important; z-index: 1000 !important;';
+            testDiv.style.cssText = 'display: block !important; height: 100px !important; width: 100% !important; background: red !important; color: white !important; padding: 20px !important; margin: 20px 0 !important; font-size: 20px !important; z-index: 1000 !important; position: relative !important;';
             testDiv.textContent = 'TEST: If you see this red box, rendering works!';
             financialPage.insertBefore(testDiv, financialPage.firstChild);
             
@@ -2461,6 +2465,41 @@ function showPage(pageName) {
                 height: financialPage.offsetHeight,
                 width: financialPage.offsetWidth,
                 display: window.getComputedStyle(financialPage).display
+            });
+            
+            // CRITICAL: Show accounts tab IMMEDIATELY before initFinancialPage
+            console.log('🔴 CRITICAL: Showing accounts tab IMMEDIATELY...');
+            const accountsTab = document.getElementById('financialAccounts');
+            if (accountsTab) {
+                accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important; position: relative !important;';
+                console.log('✅ Accounts tab forced visible immediately, height:', accountsTab.offsetHeight);
+                
+                // Force all children of accounts tab visible
+                Array.from(accountsTab.children).forEach((child) => {
+                    child.style.setProperty('display', 'block', 'important');
+                    child.style.setProperty('visibility', 'visible', 'important');
+                    child.style.setProperty('opacity', '1', 'important');
+                });
+            }
+            
+            // Hide other tabs
+            ['financialTransactions', 'financialReconciliation', 'financialReceipts'].forEach(tabId => {
+                const tab = document.getElementById(tabId);
+                if (tab) {
+                    tab.style.setProperty('display', 'none', 'important');
+                }
+            });
+            
+            // Update button styles
+            const tabButtons = financialPage.querySelectorAll('.button-group button');
+            tabButtons.forEach((btn, idx) => {
+                if (idx === 0) {
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('btn-primary');
+                } else {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-secondary');
+                }
             });
             
             // Initialize after delay
