@@ -2449,16 +2449,37 @@ function showPage(pageName) {
                 console.log(`✅ Child ${idx} (${child.tagName}) forced, height:`, child.offsetHeight);
             });
             
-            // Add a test div to verify rendering works
+            // Add a test div to verify rendering works - USE APPENDCHILD to ensure it's in DOM
             const existingTestDiv = document.getElementById('financialTestDiv');
             if (existingTestDiv) {
                 existingTestDiv.remove();
             }
             const testDiv = document.createElement('div');
             testDiv.id = 'financialTestDiv';
-            testDiv.style.cssText = 'display: block !important; height: 100px !important; width: 100% !important; background: red !important; color: white !important; padding: 20px !important; margin: 20px 0 !important; font-size: 20px !important; z-index: 1000 !important; position: relative !important;';
-            testDiv.textContent = 'TEST: If you see this red box, rendering works!';
-            financialPage.insertBefore(testDiv, financialPage.firstChild);
+            testDiv.innerHTML = '<strong>🔴 TEST DIV: If you see this red box, rendering works! 🔴</strong>';
+            // Use appendChild instead of insertBefore to ensure it's definitely in the DOM
+            financialPage.appendChild(testDiv);
+            // Now force it to the top with CSS
+            testDiv.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: 100px !important; min-height: 100px !important; width: 100% !important; max-width: 100% !important; background: red !important; color: white !important; padding: 20px !important; margin: 20px 0 !important; font-size: 20px !important; font-weight: bold !important; z-index: 10000 !important; position: relative !important; box-sizing: border-box !important;';
+            
+            // Verify test div is in DOM and has dimensions
+            setTimeout(() => {
+                const testDivCheck = document.getElementById('financialTestDiv');
+                if (testDivCheck) {
+                    console.log('🔍 Test div check:', {
+                        inDOM: testDivCheck.isConnected,
+                        parent: testDivCheck.parentElement?.id,
+                        height: testDivCheck.offsetHeight,
+                        width: testDivCheck.offsetWidth,
+                        display: window.getComputedStyle(testDivCheck).display,
+                        visibility: window.getComputedStyle(testDivCheck).visibility,
+                        opacity: window.getComputedStyle(testDivCheck).opacity,
+                        background: window.getComputedStyle(testDivCheck).backgroundColor
+                    });
+                } else {
+                    console.error('❌ Test div not found after creation!');
+                }
+            }, 50);
             
             console.log('✅ Financial page completely rewritten, test div added');
             console.log('🔍 Financial page dimensions:', {
