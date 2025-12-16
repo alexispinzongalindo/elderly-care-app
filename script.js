@@ -2586,10 +2586,35 @@ function showPage(pageName) {
                     console.error('❌ FORM-CARD NOT FOUND IN IMMEDIATE FIX!');
                 }
                 
-                // Force button visible
+                // Force button visible - WITH FLASHING ANIMATION
                 if (addButton) {
-                    addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1001 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; font-size: 1rem !important; font-weight: 500 !important; margin: 1rem 0 !important; width: auto !important; height: auto !important;';
-                    console.log('✅✅✅ ADD BANK ACCOUNT BUTTON FORCED VISIBLE IMMEDIATELY IN showPage ✅✅✅');
+                    addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10000 !important; background: #FF0000 !important; color: white !important; padding: 1rem 2rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.2rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 20px rgba(255,0,0,0.8) !important; animation: flashButton 0.5s infinite !important;';
+                    
+                    // Add flashing animation CSS if not already added
+                    if (!document.getElementById('flashButtonStyle')) {
+                        const style = document.createElement('style');
+                        style.id = 'flashButtonStyle';
+                        style.textContent = `
+                            @keyframes flashButton {
+                                0%, 100% { 
+                                    background: #FF0000 !important; 
+                                    border-color: yellow !important;
+                                    transform: scale(1);
+                                    box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
+                                }
+                                50% { 
+                                    background: #FFFF00 !important; 
+                                    border-color: red !important;
+                                    transform: scale(1.1);
+                                    box-shadow: 0 0 30px rgba(255,255,0,1) !important;
+                                }
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+                    
+                    console.log('✅✅✅ ADD BANK ACCOUNT BUTTON FORCED VISIBLE WITH FLASHING IN showPage ✅✅✅');
+                    console.log('🔍 Button position:', addButton.getBoundingClientRect());
                 } else {
                     console.error('❌❌❌ BUTTON NOT FOUND IN IMMEDIATE FIX!');
                 }
@@ -6775,8 +6800,32 @@ function showFinancialTab(tab) {
                 // Also ensure all children of form-card are visible (including the button and h3)
                 Array.from(child.children).forEach(grandChild => {
                     if (grandChild.tagName === 'BUTTON') {
-                        grandChild.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1001 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; font-size: 1rem !important; font-weight: 500 !important; margin: 1rem 0 !important; width: auto !important; height: auto !important;';
-                        console.log('✅✅✅ BUTTON FORCED VISIBLE IN showFinancialTab ✅✅✅');
+                        grandChild.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10000 !important; background: #FF0000 !important; color: white !important; padding: 1rem 2rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.2rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 20px rgba(255,0,0,0.8) !important; animation: flashButton 0.5s infinite !important;';
+                        
+                        // Add flashing animation CSS if not already added
+                        if (!document.getElementById('flashButtonStyle')) {
+                            const style = document.createElement('style');
+                            style.id = 'flashButtonStyle';
+                            style.textContent = `
+                                @keyframes flashButton {
+                                    0%, 100% { 
+                                        background: #FF0000 !important; 
+                                        border-color: yellow !important;
+                                        transform: scale(1);
+                                        box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
+                                    }
+                                    50% { 
+                                        background: #FFFF00 !important; 
+                                        border-color: red !important;
+                                        transform: scale(1.1);
+                                        box-shadow: 0 0 30px rgba(255,255,0,1) !important;
+                                    }
+                                }
+                            `;
+                            document.head.appendChild(style);
+                        }
+                        
+                        console.log('✅✅✅ BUTTON FORCED VISIBLE WITH FLASHING IN showFinancialTab ✅✅✅');
                     } else {
                         grandChild.style.setProperty('display', grandChild.tagName === 'H3' ? 'block' : 'block', 'important');
                         grandChild.style.setProperty('visibility', 'visible', 'important');
@@ -6918,25 +6967,38 @@ async function loadBankAccounts() {
                 formCard.style.setProperty('padding', '1.5rem', 'important');
                 formCard.style.setProperty('margin-bottom', '1rem', 'important');
                 
-                // Also ensure the button inside is visible
+                // Also ensure the button inside is visible - WITH FLASHING ANIMATION
                 const addButton = formCard.querySelector('button');
                 if (addButton) {
-                    addButton.style.setProperty('display', 'inline-block', 'important');
-                    addButton.style.setProperty('visibility', 'visible', 'important');
-                    addButton.style.setProperty('opacity', '1', 'important');
-                    addButton.style.setProperty('position', 'relative', 'important');
-                    addButton.style.setProperty('z-index', '1001', 'important');
-                    addButton.style.setProperty('background', '#2196F3', 'important');
-                    addButton.style.setProperty('color', 'white', 'important');
-                    addButton.style.setProperty('padding', '0.75rem 1.5rem', 'important');
-                    addButton.style.setProperty('border', 'none', 'important');
-                    addButton.style.setProperty('border-radius', '4px', 'important');
-                    addButton.style.setProperty('cursor', 'pointer', 'important');
-                    addButton.style.setProperty('font-size', '1rem', 'important');
-                    addButton.style.setProperty('font-weight', '500', 'important');
-                    console.log('✅✅✅ Add Bank Account button forced visible with full styling ✅✅✅');
+                    addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10000 !important; background: #FF0000 !important; color: white !important; padding: 1rem 2rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.2rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 20px rgba(255,0,0,0.8) !important; animation: flashButton 0.5s infinite !important;';
+                    
+                    // Add flashing animation CSS if not already added
+                    if (!document.getElementById('flashButtonStyle')) {
+                        const style = document.createElement('style');
+                        style.id = 'flashButtonStyle';
+                        style.textContent = `
+                            @keyframes flashButton {
+                                0%, 100% { 
+                                    background: #FF0000 !important; 
+                                    border-color: yellow !important;
+                                    transform: scale(1);
+                                    box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
+                                }
+                                50% { 
+                                    background: #FFFF00 !important; 
+                                    border-color: red !important;
+                                    transform: scale(1.1);
+                                    box-shadow: 0 0 30px rgba(255,255,0,1) !important;
+                                }
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+                    
+                    console.log('✅✅✅ Add Bank Account button FORCED VISIBLE WITH FLASHING ANIMATION ✅✅✅');
                     console.log('🔍 Button text:', addButton.textContent);
                     console.log('🔍 Button computed display:', window.getComputedStyle(addButton).display);
+                    console.log('🔍 Button position:', addButton.getBoundingClientRect());
                 } else {
                     console.error('❌ Button not found inside form-card!');
                 }
