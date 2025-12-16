@@ -6903,7 +6903,21 @@ async function loadBankAccounts() {
                     addButton.style.setProperty('display', 'inline-block', 'important');
                     addButton.style.setProperty('visibility', 'visible', 'important');
                     addButton.style.setProperty('opacity', '1', 'important');
-                    console.log('✅✅✅ Add Bank Account button forced visible ✅✅✅');
+                    addButton.style.setProperty('position', 'relative', 'important');
+                    addButton.style.setProperty('z-index', '1001', 'important');
+                    addButton.style.setProperty('background', '#2196F3', 'important');
+                    addButton.style.setProperty('color', 'white', 'important');
+                    addButton.style.setProperty('padding', '0.75rem 1.5rem', 'important');
+                    addButton.style.setProperty('border', 'none', 'important');
+                    addButton.style.setProperty('border-radius', '4px', 'important');
+                    addButton.style.setProperty('cursor', 'pointer', 'important');
+                    addButton.style.setProperty('font-size', '1rem', 'important');
+                    addButton.style.setProperty('font-weight', '500', 'important');
+                    console.log('✅✅✅ Add Bank Account button forced visible with full styling ✅✅✅');
+                    console.log('🔍 Button text:', addButton.textContent);
+                    console.log('🔍 Button computed display:', window.getComputedStyle(addButton).display);
+                } else {
+                    console.error('❌ Button not found inside form-card!');
                 }
             } else {
                 console.error('❌ form-card not found in financialAccounts!');
