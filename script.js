@@ -2428,28 +2428,32 @@ function showPage(pageName) {
                 bottom: auto !important;
             `;
             
-            // Force ALL children with explicit content
+            // Force ALL children with explicit content - MORE AGGRESSIVE
             Array.from(financialPage.children).forEach((child, idx) => {
                 if (child.tagName === 'SCRIPT') return;
                 
                 let css = '';
                 if (child.tagName === 'H2') {
-                    css = 'display: block !important; visibility: visible !important; height: 50px !important; min-height: 50px !important; margin: 1rem 0 !important; font-size: 2rem !important;';
+                    css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 50px !important; margin: 1rem 0 !important; padding: 0.5rem 0 !important; font-size: 2rem !important; font-weight: bold !important; color: #333 !important; background: transparent !important; position: relative !important; z-index: 100 !important;';
                 } else if (child.tagName === 'P') {
-                    css = 'display: block !important; visibility: visible !important; height: 40px !important; min-height: 40px !important; margin: 1rem 0 2rem 0 !important;';
+                    css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 40px !important; margin: 1rem 0 2rem 0 !important; padding: 0.5rem 0 !important; color: #666 !important; background: transparent !important; position: relative !important; z-index: 100 !important;';
                 } else if (child.classList.contains('button-group')) {
-                    css = 'display: flex !important; visibility: visible !important; height: 80px !important; min-height: 80px !important; margin: 2rem 0 !important; padding: 1rem 0 !important;';
+                    css = 'display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 80px !important; margin: 2rem 0 !important; padding: 1rem 0 !important; background: transparent !important; position: relative !important; z-index: 100 !important; flex-wrap: wrap !important; gap: 1rem !important;';
                 } else if (child.classList.contains('financial-tab')) {
-                    css = 'display: block !important; visibility: visible !important; height: 500px !important; min-height: 500px !important; margin: 1rem 0 !important;';
+                    css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 500px !important; margin: 1rem 0 !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important; position: relative !important; z-index: 100 !important;';
                 } else {
-                    css = 'display: block !important; visibility: visible !important; height: auto !important; min-height: 100px !important;';
+                    css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 100px !important; position: relative !important; z-index: 100 !important;';
                 }
                 
                 child.style.cssText = css;
-                console.log(`✅ Child ${idx} (${child.tagName}) forced, height:`, child.offsetHeight);
+                // Also set individual properties as backup
+                child.style.setProperty('display', child.tagName === 'H2' || child.classList.contains('button-group') ? (child.classList.contains('button-group') ? 'flex' : 'block') : 'block', 'important');
+                child.style.setProperty('visibility', 'visible', 'important');
+                child.style.setProperty('opacity', '1', 'important');
+                console.log(`✅ Child ${idx} (${child.tagName || child.className}) forced, height:`, child.offsetHeight, 'display:', window.getComputedStyle(child).display);
             });
             
-            // Add a test div to verify rendering works - USE APPENDCHILD to ensure it's in DOM
+            // Add a test div at the BEGINNING to verify rendering works
             const existingTestDiv = document.getElementById('financialTestDiv');
             if (existingTestDiv) {
                 existingTestDiv.remove();
@@ -2457,13 +2461,41 @@ function showPage(pageName) {
             const testDiv = document.createElement('div');
             testDiv.id = 'financialTestDiv';
             testDiv.innerHTML = '<strong>🔴 TEST DIV: If you see this red box, rendering works! 🔴</strong>';
-            // Use appendChild instead of insertBefore to ensure it's definitely in the DOM
-            financialPage.appendChild(testDiv);
-            // Now force it to the top with CSS
+            // Insert at the BEGINNING so we can see it immediately
+            financialPage.insertBefore(testDiv, financialPage.firstChild);
+            // Force it visible with maximum priority
             testDiv.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: 100px !important; min-height: 100px !important; width: 100% !important; max-width: 100% !important; background: red !important; color: white !important; padding: 20px !important; margin: 20px 0 !important; font-size: 20px !important; font-weight: bold !important; z-index: 10000 !important; position: relative !important; box-sizing: border-box !important;';
             
-            // Verify test div is in DOM and has dimensions
+            // Verify ALL children are visible with detailed logging
             setTimeout(() => {
+                console.log('🔍🔍🔍 DETAILED CHILD VISIBILITY CHECK 🔍🔍🔍');
+                Array.from(financialPage.children).forEach((child, idx) => {
+                    if (child.tagName === 'SCRIPT') return;
+                    const computed = window.getComputedStyle(child);
+                    console.log(`Child ${idx} (${child.tagName || child.className}):`, {
+                        tagName: child.tagName,
+                        className: child.className,
+                        id: child.id,
+                        inDOM: child.isConnected,
+                        offsetHeight: child.offsetHeight,
+                        offsetWidth: child.offsetWidth,
+                        display: computed.display,
+                        visibility: computed.visibility,
+                        opacity: computed.opacity,
+                        backgroundColor: computed.backgroundColor,
+                        position: computed.position,
+                        zIndex: computed.zIndex
+                    });
+                    
+                    // If child has zero height but should be visible, force it again
+                    if (child.offsetHeight === 0 && computed.display !== 'none') {
+                        console.warn(`⚠️ Child ${idx} has zero height! Forcing again...`);
+                        child.style.setProperty('display', 'block', 'important');
+                        child.style.setProperty('min-height', '50px', 'important');
+                        child.style.setProperty('height', 'auto', 'important');
+                    }
+                });
+                
                 const testDivCheck = document.getElementById('financialTestDiv');
                 if (testDivCheck) {
                     console.log('🔍 Test div check:', {
@@ -2479,7 +2511,7 @@ function showPage(pageName) {
                 } else {
                     console.error('❌ Test div not found after creation!');
                 }
-            }, 50);
+            }, 100);
             
             console.log('✅ Financial page completely rewritten, test div added');
             console.log('🔍 Financial page dimensions:', {
