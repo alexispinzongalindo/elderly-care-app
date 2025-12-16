@@ -338,16 +338,42 @@ body {
     opacity: 1 !important;
     position: relative !important;
     z-index: 10 !important;
-    min-height: 400px !important;
+    min-height: 500px !important;
     width: 100% !important;
     padding: 2rem !important;
     overflow: visible !important;
-    position: relative !important;
-    z-index: 10 !important;
-    min-height: 400px !important;
-    width: 100% !important;
-    background: var(--light-gray) !important;
-    padding: 2rem !important;
+    height: auto !important;
+}
+
+/* Ensure financial page children have dimensions */
+#financial.page h2 {
+    display: block !important;
+    margin-bottom: 1rem !important;
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+    height: auto !important;
+    min-height: 30px !important;
+}
+
+#financial.page p {
+    display: block !important;
+    margin-bottom: 2rem !important;
+    height: auto !important;
+    min-height: 20px !important;
+}
+
+#financial.page .button-group {
+    display: flex !important;
+    margin-bottom: 2rem !important;
+    padding-bottom: 1rem !important;
+    height: auto !important;
+    min-height: 50px !important;
+}
+
+#financial.page .financial-tab {
+    display: block !important;
+    min-height: 300px !important;
+    height: auto !important;
 }
 
 /* CRITICAL: Force ALL children of incidents page to be visible */
