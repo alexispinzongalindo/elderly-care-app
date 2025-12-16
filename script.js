@@ -7301,6 +7301,53 @@ function initFinancialPage() {
         console.log('✅ First tab forced visible, height:', firstTab.offsetHeight);
     }
     
+    // CRITICAL FIX: Show the first tab (accounts) by default
+    // All tabs are hidden by default, so we need to explicitly show one
+    console.log('🔴 CRITICAL: Showing accounts tab by default...');
+    
+    // Force ALL financial-tab divs to be visible with explicit content
+    const allTabs = financialPage.querySelectorAll('.financial-tab');
+    console.log('🔍 Found financial tabs:', allTabs.length);
+    allTabs.forEach((tab, idx) => {
+        const computedStyle = window.getComputedStyle(tab);
+        console.log(`  Tab ${idx}:`, tab.id, 'display:', computedStyle.display, 'visibility:', computedStyle.visibility, 'height:', tab.offsetHeight);
+        
+        // Force visible with explicit dimensions
+        tab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important;';
+        
+        // Force ALL children of each tab to be visible
+        Array.from(tab.children).forEach((child) => {
+            child.style.setProperty('display', 'block', 'important');
+            child.style.setProperty('visibility', 'visible', 'important');
+            child.style.setProperty('opacity', '1', 'important');
+        });
+        
+        console.log(`  After fix - Tab ${idx} height:`, tab.offsetHeight);
+    });
+    
+    // Now show only the accounts tab (this will hide the others)
+    showFinancialTab('accounts');
+    
+    // Double-check accounts tab is visible after showFinancialTab
+    setTimeout(() => {
+        const accountsTab = document.getElementById('financialAccounts');
+        if (accountsTab) {
+            const finalStyle = window.getComputedStyle(accountsTab);
+            console.log('🔍 Accounts tab final state:', {
+                display: finalStyle.display,
+                visibility: finalStyle.visibility,
+                height: accountsTab.offsetHeight,
+                width: accountsTab.offsetWidth
+            });
+            
+            // If still hidden, force it
+            if (finalStyle.display === 'none' || accountsTab.offsetHeight === 0) {
+                console.error('⚠️ Accounts tab still hidden - forcing visible!');
+                accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; padding: 1rem !important; background: white !important;';
+            }
+        }
+    }, 100);
+    
     // Verify dimensions after a delay and force if still zero
     setTimeout(() => {
         const computedHeight = financialPage.offsetHeight;
