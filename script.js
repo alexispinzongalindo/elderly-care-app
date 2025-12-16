@@ -1914,6 +1914,14 @@ function showPage(pageName) {
         targetPage.style.setProperty('display', 'block', 'important');
         targetPage.style.setProperty('visibility', 'visible', 'important');
         targetPage.style.setProperty('opacity', '1', 'important');
+        
+        // For financial page, ensure it stays visible
+        if (pageName === 'financial') {
+            targetPage.style.setProperty('position', 'relative', 'important');
+            targetPage.style.setProperty('z-index', '10', 'important');
+        }
+        targetPage.style.setProperty('visibility', 'visible', 'important');
+        targetPage.style.setProperty('opacity', '1', 'important');
         targetPage.style.setProperty('position', 'relative', 'important');
         targetPage.style.removeProperty('left'); // Remove left: -9999px if it was set
         targetPage.style.removeProperty('right'); // Remove any right positioning
@@ -6844,18 +6852,31 @@ async function loadBankAccounts() {
         listEl.style.setProperty('min-height', '100px', 'important');
         
         if (accounts.length === 0) {
-            listEl.innerHTML = '<div class="empty-state" style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex !important; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd; visibility: visible !important; opacity: 1 !important;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
+            listEl.innerHTML = '<div class="empty-state" style="padding: 3rem !important; text-align: center !important; color: #333 !important; background: #f5f5f5 !important; border-radius: 8px !important; margin: 2rem 0 !important; min-height: 200px !important; height: auto !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; border: 2px dashed #999 !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; position: relative !important; z-index: 1000 !important;"><p style="font-size: 1.2rem !important; margin-bottom: 0.5rem !important; font-weight: 500 !important; color: #333 !important;">No bank accounts found.</p><p style="color: #666 !important; font-size: 0.95rem !important;">Click "Add Bank Account" above to create your first account.</p></div>';
             console.log('✅✅✅ Empty state message displayed with enhanced styling ✅✅✅');
             // Force the parent and list element to be visible
             listEl.style.setProperty('display', 'block', 'important');
             listEl.style.setProperty('visibility', 'visible', 'important');
             listEl.style.setProperty('opacity', '1', 'important');
             listEl.style.setProperty('min-height', '250px', 'important');
+            listEl.style.setProperty('width', '100%', 'important');
+            listEl.style.setProperty('position', 'relative', 'important');
+            listEl.style.setProperty('z-index', '1000', 'important');
             // Also ensure parent tab is visible
             const parentTab = listEl.closest('#financialAccounts');
             if (parentTab) {
                 parentTab.style.setProperty('display', 'block', 'important');
                 parentTab.style.setProperty('visibility', 'visible', 'important');
+                parentTab.style.setProperty('opacity', '1', 'important');
+                parentTab.style.setProperty('position', 'relative', 'important');
+                parentTab.style.setProperty('z-index', '999', 'important');
+            }
+            // Ensure form-card is visible too
+            const formCard = document.querySelector('#financialAccounts .form-card');
+            if (formCard) {
+                formCard.style.setProperty('display', 'block', 'important');
+                formCard.style.setProperty('visibility', 'visible', 'important');
+                formCard.style.setProperty('opacity', '1', 'important');
             }
             return;
         }
