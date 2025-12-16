@@ -2362,17 +2362,43 @@ function showPage(pageName) {
                     const beforeWidth = child.offsetWidth;
                     console.log(`    Before: display=${beforeDisplay}, height=${beforeHeight}, width=${beforeWidth}`);
                     
-                    const displayValue = child.tagName === 'BUTTON' ? 'inline-block' : 
-                                       child.classList.contains('button-group') ? 'flex' : 'block';
-                    child.style.cssText = `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important;`;
+                    // Skip script tags
+                    if (child.tagName === 'SCRIPT') {
+                        return;
+                    }
+                    
+                    let displayValue = 'block';
+                    if (child.tagName === 'BUTTON') {
+                        displayValue = 'inline-block';
+                    } else if (child.classList.contains('button-group')) {
+                        displayValue = 'flex';
+                    } else if (child.tagName === 'H2' || child.tagName === 'P') {
+                        displayValue = 'block';
+                    } else if (child.classList.contains('financial-tab')) {
+                        displayValue = 'block';
+                    }
+                    
+                    child.style.cssText = `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important; min-height: auto !important;`;
+                    
+                    // Force specific elements to have content
+                    if (child.tagName === 'H2') {
+                        child.style.cssText += 'margin-bottom: 1rem !important; font-size: 1.5rem !important;';
+                    }
+                    if (child.tagName === 'P') {
+                        child.style.cssText += 'margin-bottom: 2rem !important;';
+                    }
                     
                     const afterDisplay = window.getComputedStyle(child).display;
                     const afterHeight = child.offsetHeight;
                     const afterWidth = child.offsetWidth;
                     console.log(`    After: display=${afterDisplay}, height=${afterHeight}, width=${afterWidth}`);
                     
-                    if (afterHeight === 0 && afterWidth === 0 && child.tagName !== 'SCRIPT') {
+                    if (afterHeight === 0 && afterWidth === 0) {
                         console.error(`    ❌❌❌ CHILD ${index} HAS ZERO DIMENSIONS! ❌❌❌`);
+                        // Try forcing content
+                        if (child.textContent && child.textContent.trim()) {
+                            child.style.cssText += 'content: attr(data-content) !important;';
+                        }
                     }
                 });
                 
