@@ -7169,16 +7169,49 @@ function initFinancialPage() {
         console.log('✅ First tab forced visible, height:', firstTab.offsetHeight);
     }
     
-    // Verify dimensions after a delay
+    // Verify dimensions after a delay and force if still zero
     setTimeout(() => {
         const computedHeight = financialPage.offsetHeight;
         const computedWidth = financialPage.offsetWidth;
         console.log('🔍 Final financial page dimensions:', { height: computedHeight, width: computedWidth });
         
         if (computedHeight === 0 || computedWidth === 0) {
-            console.error('❌❌❌ FINANCIAL PAGE STILL HAS ZERO DIMENSIONS AFTER ALL FIXES! ❌❌❌');
-            // Last resort - force content
-            financialPage.innerHTML = financialPage.innerHTML; // Force re-render
+            console.error('❌❌❌ FINANCIAL PAGE STILL HAS ZERO DIMENSIONS! Applying LAST RESORT FIX... ❌❌❌');
+            
+            // LAST RESORT: Force absolute positioning and explicit dimensions
+            financialPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; height: 600px !important; min-height: 600px !important; width: 100% !important; max-width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important; box-sizing: border-box !important;';
+            
+            // Force ALL children to have explicit heights
+            Array.from(financialPage.children).forEach((child) => {
+                if (child.tagName === 'SCRIPT') return;
+                
+                const childHeight = child.offsetHeight;
+                if (childHeight === 0) {
+                    if (child.tagName === 'H2') {
+                        child.style.cssText = 'display: block !important; visibility: visible !important; height: 40px !important; min-height: 40px !important; margin-bottom: 1rem !important; font-size: 1.5rem !important;';
+                    } else if (child.tagName === 'P') {
+                        child.style.cssText = 'display: block !important; visibility: visible !important; height: 30px !important; min-height: 30px !important; margin-bottom: 2rem !important;';
+                    } else if (child.classList.contains('button-group')) {
+                        child.style.cssText = 'display: flex !important; visibility: visible !important; height: 60px !important; min-height: 60px !important; margin-bottom: 2rem !important; padding-bottom: 1rem !important;';
+                    } else if (child.classList.contains('financial-tab')) {
+                        child.style.cssText = 'display: block !important; visibility: visible !important; height: 400px !important; min-height: 400px !important;';
+                    } else {
+                        child.style.cssText = 'display: block !important; visibility: visible !important; height: auto !important; min-height: 50px !important;';
+                    }
+                }
+            });
+            
+            // Check again after forcing
+            setTimeout(() => {
+                const finalHeight = financialPage.offsetHeight;
+                const finalWidth = financialPage.offsetWidth;
+                console.log('🔍 After last resort fix:', { height: finalHeight, width: finalWidth });
+                if (finalHeight > 0 && finalWidth > 0) {
+                    console.log('✅✅✅ LAST RESORT FIX WORKED! ✅✅✅');
+                } else {
+                    console.error('❌❌❌ LAST RESORT FIX FAILED - PAGE STILL ZERO DIMENSIONS ❌❌❌');
+                }
+            }, 100);
         } else {
             console.log('✅✅✅ FINANCIAL PAGE HAS DIMENSIONS! ✅✅✅');
         }
