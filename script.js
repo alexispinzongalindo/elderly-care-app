@@ -6745,11 +6745,23 @@ function showFinancialTab(tab) {
             
             // Special handling for form-card and item-list
             if (child.classList.contains('form-card')) {
+                child.style.setProperty('display', 'block', 'important');
+                child.style.setProperty('visibility', 'visible', 'important');
+                child.style.setProperty('opacity', '1', 'important');
                 child.style.setProperty('margin-bottom', '1rem', 'important');
                 child.style.setProperty('padding', '1.5rem', 'important');
                 child.style.setProperty('background', 'white', 'important');
                 child.style.setProperty('border-radius', '8px', 'important');
                 child.style.setProperty('box-shadow', '0 2px 8px rgba(0,0,0,0.1)', 'important');
+                child.style.setProperty('position', 'relative', 'important');
+                child.style.setProperty('z-index', '1', 'important');
+                
+                // Also ensure all children of form-card are visible (including the button)
+                Array.from(child.children).forEach(grandChild => {
+                    grandChild.style.setProperty('display', grandChild.tagName === 'BUTTON' ? 'inline-block' : 'block', 'important');
+                    grandChild.style.setProperty('visibility', 'visible', 'important');
+                    grandChild.style.setProperty('opacity', '1', 'important');
+                });
             }
             if (child.id === 'bankAccountsList') {
                 child.style.setProperty('display', 'block', 'important');
@@ -6881,6 +6893,20 @@ async function loadBankAccounts() {
                 formCard.style.setProperty('display', 'block', 'important');
                 formCard.style.setProperty('visibility', 'visible', 'important');
                 formCard.style.setProperty('opacity', '1', 'important');
+                formCard.style.setProperty('background', 'white', 'important');
+                formCard.style.setProperty('padding', '1.5rem', 'important');
+                formCard.style.setProperty('margin-bottom', '1rem', 'important');
+                
+                // Also ensure the button inside is visible
+                const addButton = formCard.querySelector('button');
+                if (addButton) {
+                    addButton.style.setProperty('display', 'inline-block', 'important');
+                    addButton.style.setProperty('visibility', 'visible', 'important');
+                    addButton.style.setProperty('opacity', '1', 'important');
+                    console.log('✅✅✅ Add Bank Account button forced visible ✅✅✅');
+                }
+            } else {
+                console.error('❌ form-card not found in financialAccounts!');
             }
             return;
         }
