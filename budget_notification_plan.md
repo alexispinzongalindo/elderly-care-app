@@ -25,24 +25,28 @@
 ---
 
 ### Phase 2: Add WhatsApp Later (Only if Needed)
-**Cost: Pay-per-message (no monthly fee)**
+**⚠️ UPDATE: Most services now require monthly subscriptions**
 
-Wait until you have revenue, then add WhatsApp notifications.
+#### Reality Check:
+- **Plivo**: $25/month + usage charges (not pay-per-message only)
+- **Wati.io**: $49/month + usage
+- **360dialog**: Pay-per-message but requires business verification
 
-#### Cheapest Options:
-1. **Plivo** - $0.005 per message
-   - 100 alerts/month = $0.50/month
-   - No monthly subscription
-   - Just pay for what you use
+#### Best Option: WhatsApp Business API (Meta) - Direct Integration
+- **Cost**: ~$0.005-0.01 per message
+- **Monthly Fee**: $0 (if you use their direct API)
+- **Requirement**: Business verification (free but takes time)
+- **Best for**: Long-term, cost-effective solution
 
-2. **WhatsApp Business API (Meta)** - ~$0.005-0.01/message
-   - Official API
-   - Pay per message only
-   - No monthly fee
+#### Alternative: Use Email + SMS (Cheaper than WhatsApp)
+- **Email**: FREE (Gmail SMTP)
+- **SMS via Twilio**: $0.0075 per SMS (no monthly fee for basic usage)
+- **Total**: Email free + SMS only when needed
 
-#### Example: If you send 50 WhatsApp alerts/month
-- Plivo: 50 × $0.005 = **$0.25/month** ✅
-- WhatsApp Business API: 50 × $0.01 = **$0.50/month** ✅
+#### Example: If you send 50 alerts/month
+- Email: **$0/month** ✅
+- SMS (Twilio): 50 × $0.0075 = **$0.38/month** ✅
+- WhatsApp (Meta API): 50 × $0.01 = **$0.50/month** ✅
 
 ---
 
@@ -125,28 +129,52 @@ def send_medication_alert(resident_name, medication, staff_email):
 
 ---
 
-## WhatsApp Integration (Add Later - Optional)
+## WhatsApp/SMS Integration (Add Later - Optional)
 
-### Plivo (Cheapest Option)
+### Option 1: SMS via Twilio (Cheaper than WhatsApp)
 ```python
-import plivo
+from twilio.rest import Client
+
+def send_sms_alert(phone_number, message):
+    """
+    Send SMS alert via Twilio
+    Cost: $0.0075 per SMS (no monthly fee for basic usage)
+    """
+    account_sid = 'YOUR_ACCOUNT_SID'
+    auth_token = 'YOUR_AUTH_TOKEN'
+    client = Client(account_sid, auth_token)
+    
+    message = client.messages.create(
+        body=message,
+        from_='+1234567890',  # Your Twilio number
+        to=phone_number
+    )
+    return message
+```
+
+### Option 2: WhatsApp Business API (Meta) - Direct Integration
+```python
+import requests
 
 def send_whatsapp_alert(phone_number, message):
     """
-    Send WhatsApp alert via Plivo (Pay per message only)
-    Cost: $0.005 per message
+    Send WhatsApp via Meta's WhatsApp Business API
+    Cost: ~$0.01 per message, no monthly fee
+    Requires: Business verification (free)
     """
-    client = plivo.RestClient(
-        auth_id='YOUR_AUTH_ID',
-        auth_token='YOUR_AUTH_TOKEN'
-    )
-    
-    response = client.messages.create(
-        src='whatsapp:+1234567890',  # Your WhatsApp Business number
-        dst=f'whatsapp:{phone_number}',
-        text=message
-    )
-    return response
+    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "messaging_product": "whatsapp",
+        "to": phone_number,
+        "type": "text",
+        "text": {"body": message}
+    }
+    response = requests.post(url, json=data, headers=headers)
+    return response.json()
 ```
 
 ---
@@ -156,16 +184,25 @@ def send_whatsapp_alert(phone_number, message):
 | Solution | Monthly Cost | Setup Time |
 |----------|-------------|------------|
 | **Email Only (Gmail)** | **$0** ✅ | 1 hour |
-| Email + WhatsApp (Plivo, 50 alerts) | **$0.25** ✅ | 3 hours |
-| Email + WhatsApp (100 alerts) | **$0.50** ✅ | 3 hours |
+| Email + SMS (Twilio, 50 alerts) | **$0.38** ✅ | 2 hours |
+| Email + SMS (100 alerts) | **$0.75** ✅ | 2 hours |
+| Email + WhatsApp (Meta API, 50 alerts) | **$0.50** ✅ | 4 hours* |
+| Email + WhatsApp (Meta API, 100 alerts) | **$1.00** ✅ | 4 hours* |
+
+*Requires business verification (free but takes 1-3 days)
 
 ---
 
 ## Recommendation for Your Startup
 
-1. **Start NOW with Email** - Implement email notifications today (FREE)
+1. **Start NOW with Email** - Implement email notifications today (FREE) ✅
 2. **Test & Validate** - See if email alerts work well for your team
-3. **Add WhatsApp Later** - Only if email isn't enough (still very cheap)
+3. **Add SMS Later** - If you need instant alerts, SMS is cheaper than WhatsApp
+   - Twilio SMS: $0.0075 per message (no monthly fee for basic usage)
+   - 100 alerts/month = $0.75/month
+4. **Add WhatsApp Later** - Only if SMS isn't enough
+   - Meta WhatsApp Business API: ~$0.01 per message (no monthly fee)
+   - Requires business verification (free but takes time)
 
 ### Why This Approach?
 - ✅ Zero upfront cost
