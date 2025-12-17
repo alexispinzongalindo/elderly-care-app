@@ -7011,9 +7011,45 @@ async function loadBankAccounts() {
                     // Check if button is off-screen and fix it
                     if (rect.x < 0 || rect.x > window.innerWidth) {
                         console.warn('⚠️ Button is off-screen! x position:', rect.x);
-                        // Force it to be visible by resetting all positioning
+                        
+                        // Walk up the entire parent chain and fix ALL containers
+                        let current = addButton.parentElement;
+                        let level = 0;
+                        while (current && current !== document.body && level < 10) {
+                            const computedStyle = window.getComputedStyle(current);
+                            const hasTransform = computedStyle.transform && computedStyle.transform !== 'none';
+                            const hasNegativeLeft = computedStyle.left && parseFloat(computedStyle.left) < 0;
+                            
+                            if (hasTransform || hasNegativeLeft || current.id === 'financialAccounts' || current.classList.contains('form-card') || current.classList.contains('financial-tab')) {
+                                console.log(`🔧 Fixing parent level ${level}:`, current.tagName, current.className, current.id);
+                                current.style.setProperty('position', 'relative', 'important');
+                                current.style.setProperty('left', '0', 'important');
+                                current.style.setProperty('right', 'auto', 'important');
+                                current.style.setProperty('transform', 'none', 'important');
+                                current.style.setProperty('margin-left', '0', 'important');
+                                current.style.setProperty('margin-right', 'auto', 'important');
+                                current.style.setProperty('width', '100%', 'important');
+                                current.style.setProperty('max-width', '100%', 'important');
+                                current.style.setProperty('overflow', 'visible', 'important');
+                            }
+                            current = current.parentElement;
+                            level++;
+                        }
+                        
+                        // Force button to be visible by resetting all positioning
                         addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: static !important; left: auto !important; right: auto !important; transform: none !important; margin: 1rem 0 !important; width: auto !important;';
-                        console.log('✅ Button position reset to static');
+                        console.log('✅ Button position reset to static, all parents fixed');
+                        
+                        // Re-check position after fix
+                        setTimeout(() => {
+                            const newRect = addButton.getBoundingClientRect();
+                            console.log('🔍 Button position after fix:', newRect);
+                            if (newRect.x < 0 || newRect.x > window.innerWidth) {
+                                console.error('❌ Button still off-screen after fix! Trying emergency reposition...');
+                                // Emergency: Move button to a safe location
+                                addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 200px !important; left: 50px !important; z-index: 9999 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important;';
+                            }
+                        }, 100);
                     }
                     
                     // Also ensure parent form-card is positioned correctly
