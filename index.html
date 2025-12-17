@@ -1772,5 +1772,78 @@
             }
         });
     </script>
+    
+    <!-- IMMEDIATE FIX: Force financial page button visible on page load -->
+    <script>
+        // Run immediately when DOM is ready
+        (function() {
+            function forceFinancialButtonVisible() {
+                console.log('🔴 IMMEDIATE FIX: Checking financial page...');
+                
+                // Add fixed position button that's impossible to miss
+                if (!document.getElementById('financialFixedButton')) {
+                    const fixedButton = document.createElement('button');
+                    fixedButton.id = 'financialFixedButton';
+                    fixedButton.innerHTML = '🔴 FLASHING: + Add Bank Account / Agregar Cuenta Bancaria 🔴';
+                    fixedButton.onclick = function() { 
+                        if (typeof showBankAccountForm === 'function') {
+                            showBankAccountForm();
+                        } else {
+                            alert('Function showBankAccountForm not found. Check console.');
+                        }
+                    };
+                    fixedButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 150px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999999 !important; background: #FF0000 !important; color: white !important; padding: 2rem 4rem !important; border: 10px solid yellow !important; border-radius: 12px !important; cursor: pointer !important; font-size: 2rem !important; font-weight: bold !important; box-shadow: 0 0 50px rgba(255,0,0,1) !important; animation: flashButtonFixed 0.3s infinite !important;';
+                    
+                    // Add flashing animation
+                    if (!document.getElementById('flashButtonFixedStyle')) {
+                        const style = document.createElement('style');
+                        style.id = 'flashButtonFixedStyle';
+                        style.textContent = `
+                            @keyframes flashButtonFixed {
+                                0%, 100% { 
+                                    background: #FF0000 !important; 
+                                    border-color: yellow !important;
+                                    transform: translateX(-50%) scale(1);
+                                    box-shadow: 0 0 50px rgba(255,0,0,1) !important;
+                                }
+                                50% { 
+                                    background: #FFFF00 !important; 
+                                    border-color: red !important;
+                                    transform: translateX(-50%) scale(1.2);
+                                    box-shadow: 0 0 80px rgba(255,255,0,1) !important;
+                                }
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+                    
+                    document.body.appendChild(fixedButton);
+                    console.log('✅✅✅ FIXED POSITION FLASHING BUTTON ADDED TO BODY ✅✅✅');
+                }
+                
+                // Also try to find and force the regular button
+                setTimeout(() => {
+                    const accountsTab = document.getElementById('financialAccounts');
+                    const formCard = document.querySelector('#financialAccounts .form-card');
+                    const regularButton = document.querySelector('#financialAccounts .form-card button');
+                    
+                    if (regularButton) {
+                        regularButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; background: #FF0000 !important; color: white !important; padding: 1.5rem 3rem !important; border: 5px solid yellow !important; font-size: 1.5rem !important; font-weight: bold !important; animation: flashButtonFixed 0.3s infinite !important;';
+                        console.log('✅✅✅ REGULAR BUTTON ALSO FOUND AND FORCED VISIBLE ✅✅✅');
+                    }
+                }, 500);
+            }
+            
+            // Run immediately
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', forceFinancialButtonVisible);
+            } else {
+                forceFinancialButtonVisible();
+            }
+            
+            // Also run after a delay
+            setTimeout(forceFinancialButtonVisible, 1000);
+        })();
+    </script>
 </body>
 </html>
