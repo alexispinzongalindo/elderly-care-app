@@ -57,6 +57,12 @@ def init_db():
     except sqlite3.OperationalError:
         pass  # Column already exists
     
+    # Add emergency_contact_email column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE residents ADD COLUMN emergency_contact_email TEXT')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+    
     # Residents table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS residents (
@@ -575,9 +581,9 @@ def residents():
                 INSERT INTO residents (
                     first_name, last_name, date_of_birth, room_number, bed_number,
                     gender, emergency_contact_name, emergency_contact_phone,
-                    emergency_contact_relation, insurance_provider, insurance_number,
+                    emergency_contact_relation, emergency_contact_email, insurance_provider, insurance_number,
                     medical_conditions, allergies, dietary_restrictions, notes, photo_path
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 data.get('first_name'),
                 data.get('last_name'),
@@ -588,6 +594,7 @@ def residents():
                 data.get('emergency_contact_name'),
                 data.get('emergency_contact_phone'),
                 data.get('emergency_contact_relation'),
+                data.get('emergency_contact_email'),
                 data.get('insurance_provider'),
                 data.get('insurance_number'),
                 data.get('medical_conditions'),
@@ -633,7 +640,7 @@ def resident_detail(id):
             SET first_name = ?, last_name = ?, date_of_birth = ?, room_number = ?,
                 bed_number = ?, gender = ?, emergency_contact_name = ?,
                 emergency_contact_phone = ?, emergency_contact_relation = ?,
-                insurance_provider = ?, insurance_number = ?, medical_conditions = ?,
+                emergency_contact_email = ?, insurance_provider = ?, insurance_number = ?, medical_conditions = ?,
                 allergies = ?, dietary_restrictions = ?, notes = ?, photo_path = ?,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
@@ -647,6 +654,7 @@ def resident_detail(id):
             data.get('emergency_contact_name'),
             data.get('emergency_contact_phone'),
             data.get('emergency_contact_relation'),
+            data.get('emergency_contact_email'),
             data.get('insurance_provider'),
             data.get('insurance_number'),
             data.get('medical_conditions'),

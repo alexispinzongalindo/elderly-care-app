@@ -1335,6 +1335,7 @@ async function saveNewResident(event) {
     const emergencyEl = usePageForm ? document.getElementById('newEmergencyContactPage') : document.getElementById('newEmergencyContact');
     const phoneEl = usePageForm ? document.getElementById('newEmergencyPhonePage') : document.getElementById('newEmergencyPhone');
     const relationEl = usePageForm ? document.getElementById('newEmergencyRelationPage') : document.getElementById('newEmergencyRelation');
+    const emailEl = usePageForm ? document.getElementById('newEmergencyEmailPage') : document.getElementById('newEmergencyEmail');
     const conditionsEl = usePageForm ? document.getElementById('newMedicalConditionsPage') : document.getElementById('newMedicalConditions');
     const allergiesEl = usePageForm ? document.getElementById('newAllergiesPage') : document.getElementById('newAllergies');
     const dietaryEl = usePageForm ? document.getElementById('newDietaryRestrictionsPage') : document.getElementById('newDietaryRestrictions');
@@ -1410,6 +1411,7 @@ async function saveNewResident(event) {
         emergency_contact_name: emergencyEl ? emergencyEl.value : '',
         emergency_contact_phone: phoneEl ? phoneEl.value : '',
         emergency_contact_relation: relationEl ? relationEl.value : '',
+        emergency_contact_email: emailEl ? emailEl.value : '',
         insurance_provider: insuranceProviderEl ? insuranceProviderEl.value : null,
         insurance_number: insuranceNumberEl ? insuranceNumberEl.value : null,
         medical_conditions: conditionsEl ? conditionsEl.value : '',
@@ -3367,6 +3369,7 @@ async function editResident(id) {
         setValue('newEmergencyContactPage', 'newEmergencyContact', resident.emergency_contact_name);
         setValue('newEmergencyPhonePage', 'newEmergencyPhone', resident.emergency_contact_phone);
         setValue('newEmergencyRelationPage', 'newEmergencyRelation', resident.emergency_contact_relation);
+        setValue('newEmergencyEmailPage', 'newEmergencyEmail', resident.emergency_contact_email);
         setValue('newMedicalConditionsPage', 'newMedicalConditions', resident.medical_conditions);
         setValue('newAllergiesPage', 'newAllergies', resident.allergies);
         setValue('newDietaryRestrictionsPage', 'newDietaryRestrictions', resident.dietary_restrictions);
