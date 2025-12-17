@@ -2545,6 +2545,49 @@ function showPage(pageName) {
                     child.style.setProperty('visibility', 'visible', 'important');
                     child.style.setProperty('opacity', '1', 'important');
                 });
+                
+                // AGGRESSIVE: Find and force form-card visible
+                const formCard = accountsTab.querySelector('.form-card');
+                if (formCard) {
+                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important; border: 3px solid red !important;';
+                    console.log('✅✅✅ FORM-CARD FOUND AND FORCED VISIBLE IN showPage ✅✅✅');
+                    
+                    // Find and force button visible
+                    const button = formCard.querySelector('button');
+                    if (button) {
+                        button.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10001 !important; background: #FF0000 !important; color: white !important; padding: 1.5rem 3rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.5rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 30px rgba(255,0,0,1) !important; animation: flashButton 0.3s infinite !important;';
+                        
+                        // Add flashing animation
+                        if (!document.getElementById('flashButtonStyle')) {
+                            const style = document.createElement('style');
+                            style.id = 'flashButtonStyle';
+                            style.textContent = `
+                                @keyframes flashButton {
+                                    0%, 100% { 
+                                        background: #FF0000 !important; 
+                                        border-color: yellow !important;
+                                        transform: scale(1);
+                                        box-shadow: 0 0 30px rgba(255,0,0,1) !important;
+                                    }
+                                    50% { 
+                                        background: #FFFF00 !important; 
+                                        border-color: red !important;
+                                        transform: scale(1.15);
+                                        box-shadow: 0 0 50px rgba(255,255,0,1) !important;
+                                    }
+                                }
+                            `;
+                            document.head.appendChild(style);
+                        }
+                        
+                        console.log('✅✅✅ BUTTON FOUND AND FORCED VISIBLE IN showPage ✅✅✅');
+                        console.log('🔍 Button position:', button.getBoundingClientRect());
+                    } else {
+                        console.error('❌❌❌ BUTTON NOT FOUND IN FORM-CARD!');
+                    }
+                } else {
+                    console.error('❌❌❌ FORM-CARD NOT FOUND IN ACCOUNTS TAB!');
+                }
             }
             
             // Hide other tabs
