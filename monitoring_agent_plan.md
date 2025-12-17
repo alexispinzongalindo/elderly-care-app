@@ -40,11 +40,34 @@ Create an automated monitoring agent that tracks residents, medications, vital s
 4. Compare values against thresholds
 5. Generate alerts when thresholds exceeded
 
-### Phase 3: Notification System
-1. Email integration (SMTP - Gmail, SendGrid, etc.)
-2. WhatsApp integration (Twilio WhatsApp API or WhatsApp Business API)
-3. Notification templates
-4. Multi-language support (English/Spanish)
+### Phase 3: Notification System (Budget-Friendly Startup Approach)
+
+**🎯 Strategy: Start FREE, Add Paid Options Later**
+
+1. **Email integration (START HERE - FREE)** ✅
+   - **Gmail SMTP** - Completely FREE, unlimited emails
+   - Cost: $0/month
+   - Works immediately, reliable, instant delivery
+   - Everyone checks email on their phone
+
+2. **WhatsApp integration (Add Later - Pay Per Message Only)**
+   - **Plivo** - Cheapest option: $0.005 per message
+     - Example: 100 alerts/month = $0.50/month
+     - No monthly subscription, pay only for what you use
+   - **WhatsApp Business API** - Official: ~$0.01 per message
+   - Avoid: Services with monthly fees (like Wati.io at $49/month)
+
+3. **SMS integration (Optional - for backup)**
+   - **Plivo** - Same account, $0.005 per SMS
+   - Very cheap backup option
+
+4. Notification templates
+5. Multi-language support (English/Spanish)
+
+**Cost Summary:**
+- Email: $0/month ✅
+- WhatsApp (100 alerts/month): $0.50/month ✅
+- **Total: ~$0.50/month** (vs $49/month with other services!)
 
 ### Phase 4: Dashboard & Configuration
 1. Alert configuration page
@@ -62,10 +85,38 @@ Create an automated monitoring agent that tracks residents, medications, vital s
 - Attachment support (PDF reports)
 
 ### WhatsApp Integration
-- Twilio WhatsApp API (recommended)
-- OR WhatsApp Business API
+**Recommended Alternatives to Twilio:**
+1. **WhatsApp Business API (Official)** - Direct integration with Meta
+   - Best for production, requires business verification
+   - Official API, most reliable
+   - Setup: https://developers.facebook.com/docs/whatsapp
+
+2. **360dialog** - WhatsApp Business API Provider
+   - Easy setup, good documentation
+   - Python SDK available
+   - Pricing: Pay per message
+   - Website: https://360dialog.com/
+
+3. **Wati.io** - WhatsApp Business API Platform
+   - User-friendly dashboard
+   - Python SDK available
+   - Good for small to medium businesses
+   - Website: https://www.wati.io/
+
+4. **MessageBird** - Communication Platform
+   - WhatsApp API + SMS + Voice
+   - Good documentation
+   - Website: https://www.messagebird.com/
+
+5. **WhatsApp Web API (via whatsapp-web.js)** - Unofficial but free
+   - For development/testing only
+   - Not recommended for production
+   - Uses WhatsApp Web protocol
+
+**Quick Start Recommendation:** Start with **360dialog** or **Wati.io** for faster setup
 - Message templates
 - Media support (charts, images)
+- Multi-language support (English/Spanish)
 
 ### Monitoring Service
 - Python background service
