@@ -2610,68 +2610,94 @@ function showPage(pageName) {
                 }
             });
             
-            // IMMEDIATE FIX: Show form-card, button, and empty state directly
+            // ULTRA AGGRESSIVE FIX: Add test div and create button if missing
             setTimeout(() => {
-                const accountsTab = document.getElementById('financialAccounts');
-                const formCard = document.querySelector('#financialAccounts .form-card');
-                const addButton = document.querySelector('#financialAccounts .form-card button');
-                const bankAccountsList = document.getElementById('bankAccountsList');
-                
-                if (accountsTab) {
-                    accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important;';
-                }
-                
-                // Force form-card visible
-                if (formCard) {
-                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 1.5rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 1000 !important; min-height: 100px !important; width: 100% !important; box-sizing: border-box !important;';
-                    console.log('✅✅✅ FORM-CARD FORCED VISIBLE IMMEDIATELY IN showPage ✅✅✅');
-                } else {
-                    console.error('❌ FORM-CARD NOT FOUND IN IMMEDIATE FIX!');
-                }
-                
-                // Force button visible - WITH FLASHING ANIMATION
-                if (addButton) {
-                    addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10000 !important; background: #FF0000 !important; color: white !important; padding: 1rem 2rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.2rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 20px rgba(255,0,0,0.8) !important; animation: flashButton 0.5s infinite !important;';
-                    
-                    // Add flashing animation CSS if not already added
-                    if (!document.getElementById('flashButtonStyle')) {
-                        const style = document.createElement('style');
-                        style.id = 'flashButtonStyle';
-                        style.textContent = `
-                            @keyframes flashButton {
-                                0%, 100% { 
-                                    background: #FF0000 !important; 
-                                    border-color: yellow !important;
-                                    transform: scale(1);
-                                    box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
-                                }
-                                50% { 
-                                    background: #FFFF00 !important; 
-                                    border-color: red !important;
-                                    transform: scale(1.1);
-                                    box-shadow: 0 0 30px rgba(255,255,0,1) !important;
-                                }
+                // Add flashing animation CSS first
+                if (!document.getElementById('flashButtonStyle')) {
+                    const style = document.createElement('style');
+                    style.id = 'flashButtonStyle';
+                    style.textContent = `
+                        @keyframes flashButton {
+                            0%, 100% { 
+                                background: #FF0000 !important; 
+                                border-color: yellow !important;
+                                transform: scale(1);
+                                box-shadow: 0 0 30px rgba(255,0,0,1) !important;
                             }
-                        `;
-                        document.head.appendChild(style);
-                    }
-                    
-                    console.log('✅✅✅ ADD BANK ACCOUNT BUTTON FORCED VISIBLE WITH FLASHING IN showPage ✅✅✅');
-                    console.log('🔍 Button position:', addButton.getBoundingClientRect());
-                } else {
-                    console.error('❌❌❌ BUTTON NOT FOUND IN IMMEDIATE FIX!');
+                            50% { 
+                                background: #FFFF00 !important; 
+                                border-color: red !important;
+                                transform: scale(1.15);
+                                box-shadow: 0 0 50px rgba(255,255,0,1) !important;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
                 }
                 
+                // Add a TEST DIV at the very top of financial page to verify rendering
+                const testDiv = document.createElement('div');
+                testDiv.id = 'financialTestButtonDiv';
+                testDiv.innerHTML = '<button onclick="showBankAccountForm()" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 100px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 99999 !important; background: #FF0000 !important; color: white !important; padding: 2rem 4rem !important; border: 10px solid yellow !important; border-radius: 12px !important; cursor: pointer !important; font-size: 2rem !important; font-weight: bold !important; box-shadow: 0 0 50px rgba(255,0,0,1) !important; animation: flashButton 0.3s infinite !important;">🔴 FLASHING: + Add Bank Account / Agregar Cuenta Bancaria 🔴</button>';
+                financialPage.insertBefore(testDiv, financialPage.firstChild);
+                console.log('✅✅✅ TEST BUTTON ADDED AT TOP OF FINANCIAL PAGE ✅✅✅');
+                
+                const accountsTab = document.getElementById('financialAccounts');
+                if (!accountsTab) {
+                    console.error('❌❌❌ ACCOUNTS TAB NOT FOUND!');
+                    return;
+                }
+                
+                accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; min-height: 500px !important;';
+                
+                // Try multiple selectors to find form-card
+                let formCard = accountsTab.querySelector('.form-card');
+                if (!formCard) {
+                    formCard = document.querySelector('#financialAccounts .form-card');
+                }
+                if (!formCard) {
+                    // Create form-card if it doesn't exist
+                    formCard = document.createElement('div');
+                    formCard.className = 'form-card';
+                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; padding: 2rem !important; background: white !important; border: 5px solid red !important; margin-bottom: 1rem !important; min-height: 200px !important;';
+                    formCard.innerHTML = '<h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Bank Accounts / Cuentas Bancarias</h3>';
+                    accountsTab.insertBefore(formCard, accountsTab.firstChild);
+                    console.log('✅✅✅ CREATED FORM-CARD BECAUSE IT WAS MISSING ✅✅✅');
+                } else {
+                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important; border: 5px solid red !important;';
+                    console.log('✅✅✅ FORM-CARD FOUND AND FORCED VISIBLE ✅✅✅');
+                }
+                
+                // Find or create button
+                let addButton = formCard.querySelector('button');
+                if (!addButton) {
+                    addButton = document.querySelector('#financialAccounts button');
+                }
+                
+                if (!addButton) {
+                    // CREATE BUTTON if it doesn't exist
+                    addButton = document.createElement('button');
+                    addButton.className = 'btn btn-primary';
+                    addButton.textContent = '+ Add Bank Account / Agregar Cuenta Bancaria';
+                    addButton.onclick = function() { showBankAccountForm(); };
+                    formCard.appendChild(addButton);
+                    console.log('✅✅✅ CREATED BUTTON BECAUSE IT WAS MISSING ✅✅✅');
+                }
+                
+                // Force button visible with flashing
+                addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10001 !important; background: #FF0000 !important; color: white !important; padding: 1.5rem 3rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.5rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 30px rgba(255,0,0,1) !important; animation: flashButton 0.3s infinite !important;';
+                console.log('✅✅✅ BUTTON FORCED VISIBLE WITH FLASHING ✅✅✅');
+                console.log('🔍 Button position:', addButton.getBoundingClientRect());
+                
+                const bankAccountsList = document.getElementById('bankAccountsList');
                 if (bankAccountsList) {
                     bankAccountsList.style.setProperty('display', 'block', 'important');
                     bankAccountsList.style.setProperty('visibility', 'visible', 'important');
                     bankAccountsList.style.setProperty('opacity', '1', 'important');
                     bankAccountsList.style.setProperty('min-height', '250px', 'important');
                     
-                    // If list is empty, show message immediately
                     if (!bankAccountsList.innerHTML || bankAccountsList.innerHTML.trim() === '') {
                         bankAccountsList.innerHTML = '<div style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex !important; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd; visibility: visible !important; opacity: 1 !important; width: 100%; box-sizing: border-box;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
-                        console.log('✅✅✅ EMPTY STATE SET IMMEDIATELY IN showPage ✅✅✅');
                     }
                 }
                 initFinancialPage();
