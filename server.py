@@ -8,6 +8,19 @@ from datetime import datetime, timedelta
 from functools import wraps
 import os
 
+# Import email service
+try:
+    from email_service import (
+        send_medication_alert,
+        send_vital_signs_alert,
+        send_incident_alert,
+        send_custom_alert
+    )
+    EMAIL_SERVICE_AVAILABLE = True
+except ImportError:
+    EMAIL_SERVICE_AVAILABLE = False
+    print("⚠️ Email service not available. Email notifications will be disabled.")
+
 app = Flask(__name__, static_folder='.')
 CORS(app)
 
@@ -2262,6 +2275,69 @@ def notification_preferences():
         conn.commit()
         conn.close()
         return jsonify({'message': 'Preferences updated successfully'})
+
+# Email notification endpoints
+@app.route('/api/email/test', methods=['POST'])
+@require_auth
+def test_email():
+    """Test email notification endpoint"""
+    if not EMAIL_SERVICE_AVAILABLE:
+        return jsonify({'error': 'Email service not configured'}), 400
+    
+    data = request.json
+    to_email = data.get('email')
+    if not to_email:
+        return jsonify({'error': 'Email address required'}), 400
+    
+    language = request.current_staff.get('preferred_language', 'en')
+    
+    success = send_custom_alert(
+        to_email=to_email,
+        subject="Test Email - Elder Care Management",
+        message="This is a test email from the Elder Care Management system. If you receive this, your email notifications are working correctly!",
+        language=language
+    )
+    
+    if success:
+        return jsonify({'message': 'Test email sent successfully'})
+    else:
+        return jsonify({'error': 'Failed to send test email'}), 500
+
+@app.route('/api/email/send', methods=['POST'])
+@require_auth
+def send_email_notification():
+    """Send custom email notification"""
+    if not EMAIL_SERVICE_AVAILABLE:
+        return jsonify({'error': 'Email service not configured'}), 400
+    
+    data = request.json
+    to_email = data.get('email')
+    subject = data.get('subject')
+    message = data.get('message')
+    alert_type = data.get('alert_type', 'custom')
+    language = request.current_staff.get('preferred_language', 'en')
+    
+    if not to_email or not subject or not message:
+        return jsonify({'error': 'Email, subject, and message are required'}), 400
+    
+    # Get staff email if not provided
+    if not to_email:
+        to_email = request.current_staff.get('email')
+    
+    if not to_email:
+        return jsonify({'error': 'No email address available'}), 400
+    
+    success = send_custom_alert(
+        to_email=to_email,
+        subject=subject,
+        message=message,
+        language=language
+    )
+    
+    if success:
+        return jsonify({'message': 'Email sent successfully'})
+    else:
+        return jsonify({'error': 'Failed to send email'}), 500
 
 @app.route('/<path:path>')
 def static_files(path):
