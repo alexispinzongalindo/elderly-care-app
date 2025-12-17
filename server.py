@@ -1909,27 +1909,38 @@ def incidents():
                         ''', (int(staff_id),))
                         staff_emails = [row['email'] for row in cursor.fetchall()]
                         
-                        if not staff_emails:
-                            print(f"⚠️ No staff emails found to send incident alert for {resident_name}")
-                            print("   Add email addresses to staff records (admin/manager roles)")
+                        # Get emergency contact email for the resident
+                        cursor.execute('SELECT emergency_contact_email FROM residents WHERE id = ?', (data.get('resident_id'),))
+                        emergency_contact = cursor.fetchone()
+                        emergency_contact_email = emergency_contact['emergency_contact_email'] if emergency_contact and emergency_contact['emergency_contact_email'] else None
+                        
+                        # Combine all recipient emails
+                        all_recipients = list(staff_emails)
+                        if emergency_contact_email:
+                            all_recipients.append(emergency_contact_email)
+                            print(f"📧 Will also notify emergency contact: {emergency_contact_email}")
+                        
+                        if not all_recipients:
+                            print(f"⚠️ No email addresses found to send incident alert for {resident_name}")
+                            print("   Add email addresses to staff records (admin/manager roles) or resident emergency contact")
                         else:
                             # Get language preference (default to 'en')
                             language = request.current_staff.get('preferred_language', 'en') if hasattr(request, 'current_staff') else 'en'
                             
-                            # Send email to all relevant staff
+                            # Send email to all recipients (staff + emergency contact)
                             emails_sent = 0
-                            for staff_email in staff_emails:
+                            for recipient_email in all_recipients:
                                 if send_incident_alert(
                                     resident_name=resident_name,
                                     incident_type=data.get('incident_type', 'Unknown'),
                                     severity=data.get('severity', 'medium').title(),
-                                    staff_email=staff_email,
+                                    staff_email=recipient_email,
                                     language=language
                                 ):
                                     emails_sent += 1
                             
                             if emails_sent > 0:
-                                print(f"✅ Sent {emails_sent} incident alert email(s) for {resident_name}")
+                                print(f"✅ Sent {emails_sent} incident alert email(s) for {resident_name} (staff + emergency contact)")
                             else:
                                 print(f"⚠️ Failed to send incident alert emails. Check email configuration.")
                     else:
