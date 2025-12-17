@@ -429,51 +429,97 @@ function replaceDualLanguageText() {
     // Pattern: "English / Spanish" -> extract only the needed language
     const dualLangPattern = /([^/]+)\s*\/\s*([^/]+)/g;
     
-    // Process all text nodes and element text content
-    function processNode(node) {
-        if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent;
-            if (text && text.includes(' / ')) {
-                // Replace dual-language text
-                const newText = text.replace(dualLangPattern, (match, englishPart, spanishPart) => {
-                    // Trim whitespace from both parts
-                    const en = englishPart.trim();
-                    const es = spanishPart.trim();
-                    // Return only the appropriate language
-                    return currentLanguage === 'es' ? es : en;
-                });
-                if (newText !== text) {
-                    node.textContent = newText;
-                }
+    function replaceText(text) {
+        if (!text || !text.includes(' / ')) return text;
+        return text.replace(dualLangPattern, (match, englishPart, spanishPart) => {
+            const en = englishPart.trim();
+            const es = spanishPart.trim();
+            return currentLanguage === 'es' ? es : en;
+        });
+    }
+    
+    // Process all text nodes directly
+    const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
+    
+    let textNode;
+    while (textNode = walker.nextNode()) {
+        // Skip text nodes inside script, style, and noscript tags
+        const parent = textNode.parentElement;
+        if (parent && (parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE' || parent.tagName === 'NOSCRIPT')) {
+            continue;
+        }
+        
+        // Skip if parent has data-translate (handled by updateTranslations)
+        if (parent && (parent.hasAttribute('data-translate') || 
+            parent.hasAttribute('data-translate-placeholder') || 
+            parent.hasAttribute('data-translate-title'))) {
+            continue;
+        }
+        
+        const text = textNode.textContent;
+        if (text && text.includes(' / ')) {
+            const newText = replaceText(text);
+            if (newText !== text) {
+                textNode.textContent = newText;
             }
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-            // Process text content of elements (but skip if it has data-translate, as updateTranslations handles that)
-            if (!node.hasAttribute('data-translate') && 
-                !node.hasAttribute('data-translate-placeholder') && 
-                !node.hasAttribute('data-translate-title')) {
-                // Check element's direct text content
-                if (node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE) {
-                    const text = node.textContent;
-                    if (text && text.includes(' / ')) {
-                        const newText = text.replace(dualLangPattern, (match, englishPart, spanishPart) => {
-                            const en = englishPart.trim();
-                            const es = spanishPart.trim();
-                            return currentLanguage === 'es' ? es : en;
-                        });
-                        if (newText !== text) {
-                            node.textContent = newText;
-                        }
-                    }
-                }
-            }
-            // Process child nodes
-            Array.from(node.childNodes).forEach(processNode);
         }
     }
     
-    // Also process specific attributes that might contain dual-language text
-    document.querySelectorAll('[placeholder], [title], label, option').forEach(el => {
-        // Skip elements with data-translate attributes as they're handled by updateTranslations
+    // Process element textContent for headings, buttons, labels, options, etc.
+    // This handles cases where text might be in element.textContent but not in a direct text node
+    // For headings and buttons, be more aggressive and process them directly
+    const elementsToProcess = document.querySelectorAll('h1, h2, h3, h4, h5, h6, button, label, option, span, div, p, td, th, li, a');
+    elementsToProcess.forEach(el => {
+        // Skip elements with data-translate (handled by updateTranslations)
+        if (el.hasAttribute('data-translate') || 
+            el.hasAttribute('data-translate-placeholder') || 
+            el.hasAttribute('data-translate-title')) {
+            return;
+        }
+        
+        // Skip script, style, noscript
+        if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || el.tagName === 'NOSCRIPT') {
+            return;
+        }
+        
+        // For headings and buttons, always process textContent directly if it contains dual-language pattern
+        // For other elements, only process if they have simple text content (not nested elements)
+        const isHeadingOrButton = el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3' || 
+                                  el.tagName === 'H4' || el.tagName === 'H5' || el.tagName === 'H6' || 
+                                  el.tagName === 'BUTTON';
+        
+        if (el.textContent && el.textContent.includes(' / ')) {
+            if (isHeadingOrButton) {
+                // For headings and buttons, always process textContent
+                const newText = replaceText(el.textContent);
+                if (newText !== el.textContent) {
+                    el.textContent = newText;
+                }
+            } else {
+                // For other elements, only process if it has simple text content
+                const hasOnlyTextNodes = Array.from(el.childNodes).every(node => 
+                    node.nodeType === Node.TEXT_NODE || 
+                    (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length === 0)
+                );
+                
+                if (hasOnlyTextNodes) {
+                    const newText = replaceText(el.textContent);
+                    if (newText !== el.textContent) {
+                        el.textContent = newText;
+                    }
+                }
+            }
+        }
+    });
+    
+    // Process attributes (placeholder, title, value)
+    document.querySelectorAll('[placeholder], [title], [value], option, button').forEach(el => {
+        // Skip elements with data-translate attributes
         if (el.hasAttribute('data-translate') || 
             el.hasAttribute('data-translate-placeholder') || 
             el.hasAttribute('data-translate-title')) {
@@ -482,47 +528,19 @@ function replaceDualLanguageText() {
         
         // Process placeholder
         if (el.placeholder && el.placeholder.includes(' / ')) {
-            el.placeholder = el.placeholder.replace(dualLangPattern, (match, englishPart, spanishPart) => {
-                const en = englishPart.trim();
-                const es = spanishPart.trim();
-                return currentLanguage === 'es' ? es : en;
-            });
+            el.placeholder = replaceText(el.placeholder);
         }
         
         // Process title
         if (el.title && el.title.includes(' / ')) {
-            el.title = el.title.replace(dualLangPattern, (match, englishPart, spanishPart) => {
-                const en = englishPart.trim();
-                const es = spanishPart.trim();
-                return currentLanguage === 'es' ? es : en;
-            });
+            el.title = replaceText(el.title);
         }
         
-        // Process text content for labels and options
-        if ((el.tagName === 'LABEL' || el.tagName === 'OPTION') && el.textContent && el.textContent.includes(' / ')) {
-            el.textContent = el.textContent.replace(dualLangPattern, (match, englishPart, spanishPart) => {
-                const en = englishPart.trim();
-                const es = spanishPart.trim();
-                return currentLanguage === 'es' ? es : en;
-            });
+        // Process value (for input elements)
+        if (el.value && el.value.includes(' / ')) {
+            el.value = replaceText(el.value);
         }
     });
-    
-    // Process all text nodes in the document body
-    const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
-        null,
-        false
-    );
-    
-    let node;
-    const nodesToProcess = [];
-    while (node = walker.nextNode()) {
-        nodesToProcess.push(node);
-    }
-    
-    nodesToProcess.forEach(processNode);
 }
 
 function setLanguage(lang) {
@@ -2772,6 +2790,9 @@ function showPage(pageName) {
     } else {
         console.error('❌ Page not found:', pageName);
     }
+    
+    // Replace dual-language text with single language after page is shown
+    replaceDualLanguageText();
 }
 
 function showMessage(message, type = 'success') {
