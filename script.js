@@ -6994,7 +6994,7 @@ async function loadBankAccounts() {
                         document.head.appendChild(style);
                     }
                     
-                    console.log('✅✅✅ Add Bank Account button FORCED VISIBLE WITH FLASHING ANIMATION ✅✅✅');
+                    console.log('✅✅✅ Add Bank Account button FORCED VISIBLE WITH NORMAL STYLING ✅✅✅');
                     console.log('🔍 Button text:', addButton.textContent);
                     console.log('🔍 Button computed display:', window.getComputedStyle(addButton).display);
                     console.log('🔍 Button position:', addButton.getBoundingClientRect());
