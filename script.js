@@ -1860,6 +1860,16 @@ function showPage(pageName) {
     if (targetPage) {
         targetPage.classList.add('active');
         
+        // CRITICAL: For financial page, scroll to top immediately
+        if (pageName === 'financial') {
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            // Also scroll the page container to top
+            targetPage.scrollTop = 0;
+            // Ensure no excessive top margin/padding causing offset
+            targetPage.style.setProperty('margin-top', '0', 'important');
+            targetPage.style.setProperty('padding-top', '2rem', 'important');
+        }
+        
         // CRITICAL: Force ALL parent elements visible (same as incidents page fix)
         let currentElement = targetPage;
         let level = 0;
@@ -6874,6 +6884,16 @@ function showFinancialTab(tab) {
     if (tab === 'accounts') {
         // Small delay to ensure DOM is ready
         setTimeout(() => {
+            // Scroll to top of the accounts tab to ensure content is visible
+            const accountsTabElement = document.getElementById('financialAccounts');
+            if (accountsTabElement) {
+                accountsTabElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Also scroll window to top if needed
+                const rect = accountsTabElement.getBoundingClientRect();
+                if (rect.top < 0 || rect.top > window.innerHeight) {
+                    window.scrollTo({ top: Math.max(0, rect.top + window.scrollY - 100), behavior: 'smooth' });
+                }
+            }
             loadBankAccounts();
         }, 100);
     } else if (tab === 'transactions') {
@@ -7008,9 +7028,20 @@ async function loadBankAccounts() {
                     console.log('🔍 Button computed display:', window.getComputedStyle(addButton).display);
                     console.log('🔍 Button position:', rect);
                     
-                    // Check if button is off-screen and fix it
-                    if (rect.x < 0 || rect.x > window.innerWidth) {
-                        console.warn('⚠️ Button is off-screen! x position:', rect.x);
+                    // Check if button is off-screen (horizontally OR vertically)
+                    const isOffScreenX = rect.x < 0 || rect.x > window.innerWidth;
+                    const isOffScreenY = rect.y < 0 || rect.y > window.innerHeight;
+                    
+                    if (isOffScreenX || isOffScreenY) {
+                        console.warn('⚠️ Button is off-screen! x:', rect.x, 'y:', rect.y, 'viewport height:', window.innerHeight);
+                        
+                        // If button is below viewport, scroll to it
+                        if (isOffScreenY && rect.y > window.innerHeight) {
+                            console.log('📍 Button is below viewport - scrolling to it...');
+                            addButton.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+                            // Also try scrolling the window
+                            window.scrollTo({ top: Math.max(0, rect.top + window.scrollY - 100), behavior: 'smooth' });
+                        }
                         
                         // Walk up the entire parent chain and fix ALL containers
                         let current = addButton.parentElement;
@@ -7044,10 +7075,35 @@ async function loadBankAccounts() {
                         setTimeout(() => {
                             const newRect = addButton.getBoundingClientRect();
                             console.log('🔍 Button position after fix:', newRect);
-                            if (newRect.x < 0 || newRect.x > window.innerWidth) {
-                                console.error('❌ Button still off-screen after fix! Trying emergency reposition...');
-                                // Emergency: Move button to a safe location
-                                addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 200px !important; left: 50px !important; z-index: 9999 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important;';
+                            const isStillOffScreenX = newRect.x < 0 || newRect.x > window.innerWidth;
+                            const isStillOffScreenY = newRect.y < 0 || newRect.y > window.innerHeight;
+                            
+                            if (isStillOffScreenX || isStillOffScreenY) {
+                                console.error('❌ Button still off-screen after fix! x:', newRect.x, 'y:', newRect.y, 'viewport height:', window.innerHeight);
+                                
+                                // Try scrolling to the button first
+                                if (isStillOffScreenY) {
+                                    console.log('📍 Attempting scroll to button...');
+                                    addButton.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+                                    window.scrollTo({ top: Math.max(0, newRect.top + window.scrollY - 50), behavior: 'smooth' });
+                                    
+                                    // After scroll, check again
+                                    setTimeout(() => {
+                                        const finalRect = addButton.getBoundingClientRect();
+                                        if (finalRect.y < 0 || finalRect.y > window.innerHeight) {
+                                            console.error('❌❌ Button still off-screen after scroll - using emergency fix');
+                                            // Emergency: Move button to a safe location at top of viewport
+                                            addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 150px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 9999 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;';
+                                        } else {
+                                            console.log('✅ Button visible after scroll! y:', finalRect.y);
+                                        }
+                                    }, 300);
+                                } else {
+                                    // Only x is off-screen, use emergency fix
+                                    addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 150px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 9999 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;';
+                                }
+                            } else {
+                                console.log('✅ Button is visible after fix! y:', newRect.y);
                             }
                         }, 100);
                     }
