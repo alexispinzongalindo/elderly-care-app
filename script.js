@@ -6997,13 +6997,24 @@ async function loadBankAccounts() {
                     // Force button to be positioned correctly (fix negative x position)
                     addButton.style.setProperty('position', 'relative', 'important');
                     addButton.style.setProperty('left', '0', 'important');
+                    addButton.style.setProperty('right', 'auto', 'important');
                     addButton.style.setProperty('transform', 'none', 'important');
                     addButton.style.setProperty('margin-left', '0', 'important');
+                    addButton.style.setProperty('margin-right', 'auto', 'important');
                     
+                    const rect = addButton.getBoundingClientRect();
                     console.log('✅✅✅ Add Bank Account button FORCED VISIBLE WITH NORMAL STYLING ✅✅✅');
                     console.log('🔍 Button text:', addButton.textContent);
                     console.log('🔍 Button computed display:', window.getComputedStyle(addButton).display);
-                    console.log('🔍 Button position:', addButton.getBoundingClientRect());
+                    console.log('🔍 Button position:', rect);
+                    
+                    // Check if button is off-screen and fix it
+                    if (rect.x < 0 || rect.x > window.innerWidth) {
+                        console.warn('⚠️ Button is off-screen! x position:', rect.x);
+                        // Force it to be visible by resetting all positioning
+                        addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: static !important; left: auto !important; right: auto !important; transform: none !important; margin: 1rem 0 !important; width: auto !important;';
+                        console.log('✅ Button position reset to static');
+                    }
                     
                     // Also ensure parent form-card is positioned correctly
                     if (formCard) {
