@@ -7176,6 +7176,23 @@ async function loadBankAccounts() {
             </div>
         `).join('');
         console.log('✅ Bank accounts list rendered, count:', accounts.length);
+        
+        // Ensure the Add Bank Account button is always visible, even when accounts exist
+        const formCard = document.querySelector('#financialAccounts .form-card');
+        if (formCard) {
+            formCard.style.setProperty('display', 'block', 'important');
+            formCard.style.setProperty('visibility', 'visible', 'important');
+            formCard.style.setProperty('opacity', '1', 'important');
+            
+            const addButton = formCard.querySelector('button[onclick*="showBankAccountForm"]');
+            if (addButton) {
+                addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; margin: 1rem 0 !important;';
+                addButton.style.setProperty('position', 'relative', 'important');
+                addButton.style.setProperty('left', '0', 'important');
+                addButton.style.setProperty('transform', 'none', 'important');
+                console.log('✅ Add Bank Account button ensured visible after accounts loaded');
+            }
+        }
     } catch (error) {
         console.error('❌ Error loading bank accounts:', error);
         showMessage('Error loading bank accounts / Error al cargar cuentas bancarias', 'error');
@@ -7194,6 +7211,20 @@ function hideBankAccountForm() {
     document.getElementById('bankAccountForm').style.display = 'none';
     editingBankAccountId = null;
     document.getElementById('newBankAccountForm').reset();
+    
+    // Ensure the Add Bank Account button remains visible after hiding the form
+    const formCard = document.querySelector('#financialAccounts .form-card');
+    if (formCard) {
+        formCard.style.setProperty('display', 'block', 'important');
+        formCard.style.setProperty('visibility', 'visible', 'important');
+        formCard.style.setProperty('opacity', '1', 'important');
+        
+        const addButton = formCard.querySelector('button[onclick*="showBankAccountForm"]');
+        if (addButton) {
+            addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; margin: 1rem 0 !important;';
+            console.log('✅ Add Bank Account button ensured visible after form hidden');
+        }
+    }
 }
 
 let editingBankAccountId = null;
