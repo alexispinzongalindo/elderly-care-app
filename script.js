@@ -5122,6 +5122,7 @@ function showMedicationForm() {
     document.getElementById('medTimesGroup').style.display = 'block';
     // Update form title
     document.querySelector('#medicationForm h3').textContent = 'Add Medication / Agregar Medicamento';
+    replaceDualLanguageText();
 }
 
 async function editMedication(id) {
@@ -5197,6 +5198,7 @@ async function editMedication(id) {
         
         // Update form title
         document.querySelector('#medicationForm h3').textContent = 'Edit Medication / Editar Medicamento';
+        replaceDualLanguageText();
         
         // Scroll to form
         document.getElementById('medicationForm').scrollIntoView({ behavior: 'smooth' });
@@ -5429,6 +5431,7 @@ function showAppointmentForm() {
     document.getElementById('apptTime').value = '';
     // Update form title
     document.querySelector('#appointmentForm h3').textContent = 'Add Appointment / Agregar Cita';
+    replaceDualLanguageText();
 }
 
 async function editAppointment(id) {
@@ -5480,6 +5483,7 @@ async function editAppointment(id) {
         
         // Update form title
         document.querySelector('#appointmentForm h3').textContent = 'Edit Appointment / Editar Cita';
+        replaceDualLanguageText();
         
         // Scroll to form
         document.getElementById('appointmentForm').scrollIntoView({ behavior: 'smooth' });
@@ -5673,7 +5677,10 @@ function showVitalSignsForm() {
     clearVitalSignsForm();
     // Update form title
     const formTitle = document.querySelector('#vitalSignsForm h3');
-    if (formTitle) formTitle.textContent = 'Record Vital Signs / Registrar Signos Vitales';
+    if (formTitle) {
+        formTitle.textContent = 'Record Vital Signs / Registrar Signos Vitales';
+        replaceDualLanguageText();
+    }
 }
 
 function clearVitalSignsForm() {
@@ -5743,7 +5750,10 @@ async function editVitalSign(id) {
         
         // Update form title
         const formTitle = document.querySelector('#vitalSignsForm h3');
-        if (formTitle) formTitle.textContent = 'Edit Vital Signs / Editar Signos Vitales';
+        if (formTitle) {
+            formTitle.textContent = 'Edit Vital Signs / Editar Signos Vitales';
+            replaceDualLanguageText();
+        }
         
         // Scroll to form
         document.getElementById('vitalSignsForm').scrollIntoView({ behavior: 'smooth' });
@@ -6262,6 +6272,7 @@ function showPaymentForm() {
     loadBilling(); // Load bills for dropdown
     // Update form title
     document.querySelector('#paymentForm h3').textContent = 'Record Payment / Registrar Pago';
+    replaceDualLanguageText();
 }
 
 async function editPayment(id) {
@@ -6286,6 +6297,7 @@ async function editPayment(id) {
         
         // Update form title
         document.querySelector('#paymentForm h3').textContent = 'Edit Payment / Editar Pago';
+        replaceDualLanguageText();
         
         // Scroll to form
         document.getElementById('paymentForm').scrollIntoView({ behavior: 'smooth' });
