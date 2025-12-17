@@ -3468,6 +3468,8 @@ function showAddStaffForm() {
     document.getElementById('staffPasswordHint').textContent = '(Required for new staff / Requerido para nuevo personal)';
     document.getElementById('staffActiveGroup').style.display = 'none';
     document.getElementById('newStaffForm').reset();
+    // Process dual-language text for form header
+    replaceDualLanguageText();
     // Scroll to form
     document.getElementById('addStaffForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -3567,6 +3569,7 @@ async function editStaff(id) {
         document.getElementById('staffActiveGroup').style.display = 'block';
         
         document.getElementById('staffFormTitle').textContent = 'Edit Staff Member / Editar Personal';
+        replaceDualLanguageText();
         document.getElementById('addStaffForm').style.display = 'block';
         document.getElementById('addStaffForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } catch (error) {
@@ -3701,7 +3704,10 @@ async function showIncidentForm() {
         
         // Reset form
         const formTitle = document.getElementById('incidentFormTitle');
-        if (formTitle) formTitle.textContent = 'Report Incident / Reportar Incidente';
+        if (formTitle) {
+            formTitle.textContent = 'Report Incident / Reportar Incidente';
+            replaceDualLanguageText();
+        }
         
         const newForm = document.getElementById('newIncidentForm');
         if (newForm) newForm.reset();
@@ -4380,6 +4386,7 @@ async function editIncident(id) {
         document.getElementById('followUpNotesGroup').style.display = incident.follow_up_required ? 'block' : 'none';
         
         document.getElementById('incidentFormTitle').textContent = 'Edit Incident Report / Editar Reporte de Incidente';
+        replaceDualLanguageText();
         document.getElementById('incidentForm').style.display = 'block';
         document.getElementById('incidentForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } catch (error) {
@@ -4515,6 +4522,7 @@ function showCareNoteForm() {
     editingCareNoteId = null;
     document.getElementById('careNoteForm').style.display = 'block';
     document.getElementById('careNoteFormTitle').textContent = 'Add Care Note / Agregar Nota de Cuidado';
+    replaceDualLanguageText();
     const form = document.getElementById('newCareNoteForm');
     if (form) form.reset();
     // Set default date to today
@@ -4602,6 +4610,7 @@ async function editCareNote(id) {
         document.getElementById('generalNotes').value = note.general_notes || '';
         
         document.getElementById('careNoteFormTitle').textContent = 'Edit Care Note / Editar Nota de Cuidado';
+        replaceDualLanguageText();
         document.getElementById('careNoteForm').style.display = 'block';
         document.getElementById('careNoteForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } catch (error) {
@@ -5961,6 +5970,7 @@ function showBillForm() {
     const billFormTitle = document.getElementById('billFormTitle') || document.querySelector('#billForm h3');
     if (billFormTitle) {
         billFormTitle.textContent = 'Add New Bill / Agregar Nueva Factura';
+        replaceDualLanguageText();
     } else {
         console.error('❌ billFormTitle element not found!');
     }
@@ -5999,6 +6009,7 @@ async function editBill(id) {
         const billFormTitle = document.getElementById('billFormTitle') || document.querySelector('#billForm h3');
         if (billFormTitle) {
             billFormTitle.textContent = 'Edit Bill / Editar Factura';
+            replaceDualLanguageText();
         } else {
             console.error('❌ billFormTitle element not found!');
         }
