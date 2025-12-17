@@ -6884,16 +6884,43 @@ function showFinancialTab(tab) {
     if (tab === 'accounts') {
         // Small delay to ensure DOM is ready
         setTimeout(() => {
-            // Scroll to top of the accounts tab to ensure content is visible
-            const accountsTabElement = document.getElementById('financialAccounts');
-            if (accountsTabElement) {
-                accountsTabElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                // Also scroll window to top if needed
-                const rect = accountsTabElement.getBoundingClientRect();
-                if (rect.top < 0 || rect.top > window.innerHeight) {
-                    window.scrollTo({ top: Math.max(0, rect.top + window.scrollY - 100), behavior: 'smooth' });
+            // First ensure the main container and financial page don't have overflow hidden
+            const mainContainer = document.querySelector('.container');
+            if (mainContainer) {
+                mainContainer.style.setProperty('overflow', 'visible', 'important');
+                mainContainer.style.setProperty('overflow-x', 'visible', 'important');
+                mainContainer.style.setProperty('overflow-y', 'visible', 'important');
+            }
+            const financialPage = document.getElementById('financial');
+            if (financialPage) {
+                financialPage.style.setProperty('overflow', 'visible', 'important');
+                financialPage.style.setProperty('overflow-x', 'visible', 'important');
+                financialPage.style.setProperty('overflow-y', 'visible', 'important');
+            }
+            const accountsTab = document.getElementById('financialAccounts');
+            if (accountsTab) {
+                accountsTab.style.setProperty('overflow', 'visible', 'important');
+                accountsTab.style.setProperty('overflow-x', 'visible', 'important');
+                accountsTab.style.setProperty('overflow-y', 'visible', 'important');
+            }
+            
+            // Scroll window to top to ensure content is visible (button was at y:1300, way below viewport)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Also scroll to the form-card button specifically
+            const formCard = document.querySelector('#financialAccounts .form-card');
+            if (formCard) {
+                const addButton = formCard.querySelector('button');
+                if (addButton) {
+                    setTimeout(() => {
+                        addButton.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                        // Also try window scroll as backup
+                        const rect = addButton.getBoundingClientRect();
+                        window.scrollTo({ top: Math.max(0, rect.top + window.scrollY - 100), behavior: 'smooth' });
+                    }, 200);
                 }
             }
+            
             loadBankAccounts();
         }, 100);
     } else if (tab === 'transactions') {
@@ -6986,33 +7013,11 @@ async function loadBankAccounts() {
                 formCard.style.setProperty('padding', '1.5rem', 'important');
                 formCard.style.setProperty('margin-bottom', '1rem', 'important');
                 
-                // Also ensure the button inside is visible - WITH FLASHING ANIMATION
+                // Also ensure the button inside is visible - SUPER VISIBLE FOR DEBUGGING
                 const addButton = formCard.querySelector('button');
                 if (addButton) {
-                    addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10000 !important; background: #FF0000 !important; color: white !important; padding: 1rem 2rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.2rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 20px rgba(255,0,0,0.8) !important; animation: flashButton 0.5s infinite !important;';
-                    
-                    // Add flashing animation CSS if not already added
-                    if (!document.getElementById('flashButtonStyle')) {
-                        const style = document.createElement('style');
-                        style.id = 'flashButtonStyle';
-                        style.textContent = `
-                            @keyframes flashButton {
-                                0%, 100% { 
-                                    background: #FF0000 !important; 
-                                    border-color: yellow !important;
-                                    transform: scale(1);
-                                    box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
-                                }
-                                50% { 
-                                    background: #FFFF00 !important; 
-                                    border-color: red !important;
-                                    transform: scale(1.1);
-                                    box-shadow: 0 0 30px rgba(255,255,0,1) !important;
-                                }
-                            }
-                        `;
-                        document.head.appendChild(style);
-                    }
+                    // Make button SUPER visible with bright red background and yellow border
+                    addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 99999 !important; background: #FF0000 !important; color: white !important; padding: 1rem 2rem !important; border: 5px solid #FFFF00 !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.2rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; min-height: 50px !important; box-shadow: 0 0 30px rgba(255,0,0,1) !important;';
                     
                     // Force button to be positioned correctly (fix negative x position)
                     addButton.style.setProperty('position', 'relative', 'important');
@@ -7021,6 +7026,24 @@ async function loadBankAccounts() {
                     addButton.style.setProperty('transform', 'none', 'important');
                     addButton.style.setProperty('margin-left', '0', 'important');
                     addButton.style.setProperty('margin-right', 'auto', 'important');
+                    
+                    // Ensure ALL parent containers have overflow: visible
+                    let parent = addButton.parentElement;
+                    let level = 0;
+                    while (parent && parent !== document.body && level < 15) {
+                        parent.style.setProperty('overflow', 'visible', 'important');
+                        parent.style.setProperty('overflow-x', 'visible', 'important');
+                        parent.style.setProperty('overflow-y', 'visible', 'important');
+                        parent.style.setProperty('height', 'auto', 'important');
+                        parent.style.setProperty('min-height', 'auto', 'important');
+                        if (parent.id === 'financialAccounts' || parent.classList.contains('form-card') || parent.classList.contains('financial-tab') || parent.classList.contains('page') || parent.id === 'financial') {
+                            parent.style.setProperty('display', 'block', 'important');
+                            parent.style.setProperty('visibility', 'visible', 'important');
+                            parent.style.setProperty('opacity', '1', 'important');
+                        }
+                        parent = parent.parentElement;
+                        level++;
+                    }
                     
                     const rect = addButton.getBoundingClientRect();
                     console.log('✅✅✅ Add Bank Account button FORCED VISIBLE WITH NORMAL STYLING ✅✅✅');
