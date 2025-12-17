@@ -306,6 +306,7 @@ const translations = {
         'resident.emergencyContact': 'Nombre del Contacto de Emergencia',
         'resident.emergencyPhone': 'Teléfono de Emergencia',
         'resident.emergencyRelation': 'Relación',
+        'resident.emergencyEmail': 'Correo de Contacto de Emergencia',
         'resident.medicalConditions': 'Condiciones Médicas',
         'resident.allergies': 'Alergias',
         'resident.dietaryRestrictions': 'Restricciones Dietéticas',
