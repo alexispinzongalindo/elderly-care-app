@@ -6994,10 +6994,37 @@ async function loadBankAccounts() {
                         document.head.appendChild(style);
                     }
                     
+                    // Force button to be positioned correctly (fix negative x position)
+                    addButton.style.setProperty('position', 'relative', 'important');
+                    addButton.style.setProperty('left', '0', 'important');
+                    addButton.style.setProperty('transform', 'none', 'important');
+                    addButton.style.setProperty('margin-left', '0', 'important');
+                    
                     console.log('✅✅✅ Add Bank Account button FORCED VISIBLE WITH NORMAL STYLING ✅✅✅');
                     console.log('🔍 Button text:', addButton.textContent);
                     console.log('🔍 Button computed display:', window.getComputedStyle(addButton).display);
                     console.log('🔍 Button position:', addButton.getBoundingClientRect());
+                    
+                    // Also ensure parent form-card is positioned correctly
+                    if (formCard) {
+                        formCard.style.setProperty('position', 'relative', 'important');
+                        formCard.style.setProperty('left', '0', 'important');
+                        formCard.style.setProperty('transform', 'none', 'important');
+                        formCard.style.setProperty('margin-left', '0', 'important');
+                        formCard.style.setProperty('width', '100%', 'important');
+                        formCard.style.setProperty('max-width', '100%', 'important');
+                    }
+                    
+                    // Ensure accounts tab is positioned correctly
+                    const accountsTab = listEl.closest('#financialAccounts');
+                    if (accountsTab) {
+                        accountsTab.style.setProperty('position', 'relative', 'important');
+                        accountsTab.style.setProperty('left', '0', 'important');
+                        accountsTab.style.setProperty('transform', 'none', 'important');
+                        accountsTab.style.setProperty('width', '100%', 'important');
+                        accountsTab.style.setProperty('max-width', '100%', 'important');
+                        accountsTab.style.setProperty('overflow', 'visible', 'important');
+                    }
                 } else {
                     console.error('❌ Button not found inside form-card!');
                 }
