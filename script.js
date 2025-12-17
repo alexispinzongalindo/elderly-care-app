@@ -424,6 +424,107 @@ function t(key) {
 }
 
 // Set language and update UI
+// Replace dual-language text (English / Spanish) with single language
+function replaceDualLanguageText() {
+    // Pattern: "English / Spanish" -> extract only the needed language
+    const dualLangPattern = /([^/]+)\s*\/\s*([^/]+)/g;
+    
+    // Process all text nodes and element text content
+    function processNode(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent;
+            if (text && text.includes(' / ')) {
+                // Replace dual-language text
+                const newText = text.replace(dualLangPattern, (match, englishPart, spanishPart) => {
+                    // Trim whitespace from both parts
+                    const en = englishPart.trim();
+                    const es = spanishPart.trim();
+                    // Return only the appropriate language
+                    return currentLanguage === 'es' ? es : en;
+                });
+                if (newText !== text) {
+                    node.textContent = newText;
+                }
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            // Process text content of elements (but skip if it has data-translate, as updateTranslations handles that)
+            if (!node.hasAttribute('data-translate') && 
+                !node.hasAttribute('data-translate-placeholder') && 
+                !node.hasAttribute('data-translate-title')) {
+                // Check element's direct text content
+                if (node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    if (text && text.includes(' / ')) {
+                        const newText = text.replace(dualLangPattern, (match, englishPart, spanishPart) => {
+                            const en = englishPart.trim();
+                            const es = spanishPart.trim();
+                            return currentLanguage === 'es' ? es : en;
+                        });
+                        if (newText !== text) {
+                            node.textContent = newText;
+                        }
+                    }
+                }
+            }
+            // Process child nodes
+            Array.from(node.childNodes).forEach(processNode);
+        }
+    }
+    
+    // Also process specific attributes that might contain dual-language text
+    document.querySelectorAll('[placeholder], [title], label, option').forEach(el => {
+        // Skip elements with data-translate attributes as they're handled by updateTranslations
+        if (el.hasAttribute('data-translate') || 
+            el.hasAttribute('data-translate-placeholder') || 
+            el.hasAttribute('data-translate-title')) {
+            return;
+        }
+        
+        // Process placeholder
+        if (el.placeholder && el.placeholder.includes(' / ')) {
+            el.placeholder = el.placeholder.replace(dualLangPattern, (match, englishPart, spanishPart) => {
+                const en = englishPart.trim();
+                const es = spanishPart.trim();
+                return currentLanguage === 'es' ? es : en;
+            });
+        }
+        
+        // Process title
+        if (el.title && el.title.includes(' / ')) {
+            el.title = el.title.replace(dualLangPattern, (match, englishPart, spanishPart) => {
+                const en = englishPart.trim();
+                const es = spanishPart.trim();
+                return currentLanguage === 'es' ? es : en;
+            });
+        }
+        
+        // Process text content for labels and options
+        if ((el.tagName === 'LABEL' || el.tagName === 'OPTION') && el.textContent && el.textContent.includes(' / ')) {
+            el.textContent = el.textContent.replace(dualLangPattern, (match, englishPart, spanishPart) => {
+                const en = englishPart.trim();
+                const es = spanishPart.trim();
+                return currentLanguage === 'es' ? es : en;
+            });
+        }
+    });
+    
+    // Process all text nodes in the document body
+    const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+        null,
+        false
+    );
+    
+    let node;
+    const nodesToProcess = [];
+    while (node = walker.nextNode()) {
+        nodesToProcess.push(node);
+    }
+    
+    nodesToProcess.forEach(processNode);
+}
+
 function setLanguage(lang) {
     if (lang !== 'en' && lang !== 'es') {
         console.error('Invalid language:', lang);
@@ -441,6 +542,9 @@ function setLanguage(lang) {
     if (langSelector) {
         langSelector.value = lang;
     }
+    
+    // Replace all dual-language text with single language
+    replaceDualLanguageText();
     
     // Update all translatable elements
     updateTranslations();
@@ -6736,15 +6840,13 @@ function setDateTimeToDropdowns(dateTimeString, yearId, monthId, dayId, timeId) 
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    // Load language from localStorage if available
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
-        currentLanguage = savedLanguage;
-        const langSelector = document.getElementById('languageSelector');
-        if (langSelector) {
-            langSelector.value = currentLanguage;
+    // Load language from localStorage if available (but wait for login to use staff preferred_language)
+    // Only set language from localStorage if user is not logged in yet
+    if (!authToken || !currentStaff) {
+        const savedLanguage = localStorage.getItem('preferredLanguage');
+        if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+            setLanguage(savedLanguage); // Use setLanguage to ensure replaceDualLanguageText is called
         }
-        updateTranslations();
     }
     
     checkAuth();
