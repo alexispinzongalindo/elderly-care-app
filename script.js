@@ -111,6 +111,7 @@ const translations = {
         'resident.emergencyContact': 'Emergency Contact Name',
         'resident.emergencyPhone': 'Emergency Contact Phone',
         'resident.emergencyRelation': 'Relation',
+        'resident.emergencyEmail': 'Emergency Contact Email',
         'resident.medicalConditions': 'Medical Conditions',
         'resident.allergies': 'Allergies',
         'resident.dietaryRestrictions': 'Dietary Restrictions',
