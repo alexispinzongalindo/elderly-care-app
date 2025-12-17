@@ -29,7 +29,11 @@ def send_email(to_email, subject, html_body, text_body=None):
         bool: True if email sent successfully, False otherwise
     """
     if not SENDER_EMAIL or not SENDER_PASSWORD:
-        print("⚠️ Email not configured. Set SENDER_EMAIL and SENDER_PASSWORD environment variables.")
+        error_msg = "⚠️ Email not configured. Set SENDER_EMAIL and SENDER_PASSWORD environment variables."
+        print(error_msg)
+        print(f"   SENDER_EMAIL: {'SET' if SENDER_EMAIL else 'NOT SET'}")
+        print(f"   SENDER_PASSWORD: {'SET' if SENDER_PASSWORD else 'NOT SET'}")
+        print("   See EMAIL_SETUP.md for instructions")
         return False
     
     if not to_email:

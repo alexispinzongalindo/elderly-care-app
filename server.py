@@ -1909,20 +1909,35 @@ def incidents():
                         ''', (int(staff_id),))
                         staff_emails = [row['email'] for row in cursor.fetchall()]
                         
-                        # Get language preference (default to 'en')
-                        language = request.current_staff.get('preferred_language', 'en') if hasattr(request, 'current_staff') else 'en'
-                        
-                        # Send email to all relevant staff
-                        for staff_email in staff_emails:
-                            send_incident_alert(
-                                resident_name=resident_name,
-                                incident_type=data.get('incident_type', 'Unknown'),
-                                severity=data.get('severity', 'medium').title(),
-                                staff_email=staff_email,
-                                language=language
-                            )
+                        if not staff_emails:
+                            print(f"⚠️ No staff emails found to send incident alert for {resident_name}")
+                            print("   Add email addresses to staff records (admin/manager roles)")
+                        else:
+                            # Get language preference (default to 'en')
+                            language = request.current_staff.get('preferred_language', 'en') if hasattr(request, 'current_staff') else 'en'
+                            
+                            # Send email to all relevant staff
+                            emails_sent = 0
+                            for staff_email in staff_emails:
+                                if send_incident_alert(
+                                    resident_name=resident_name,
+                                    incident_type=data.get('incident_type', 'Unknown'),
+                                    severity=data.get('severity', 'medium').title(),
+                                    staff_email=staff_email,
+                                    language=language
+                                ):
+                                    emails_sent += 1
+                            
+                            if emails_sent > 0:
+                                print(f"✅ Sent {emails_sent} incident alert email(s) for {resident_name}")
+                            else:
+                                print(f"⚠️ Failed to send incident alert emails. Check email configuration.")
+                    else:
+                        print(f"⚠️ Resident not found for incident email alert (resident_id: {data.get('resident_id')})")
                 except Exception as email_error:
-                    print(f'Warning: Could not send incident email: {email_error}')
+                    print(f'❌ Error sending incident email: {email_error}')
+                    import traceback
+                    traceback.print_exc()
             
             conn.close()
             return jsonify({'id': incident_id, 'message': 'Incident report created successfully'}), 201
