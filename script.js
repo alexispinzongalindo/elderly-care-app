@@ -2555,30 +2555,9 @@ function showPage(pageName) {
                     // Find and force button visible
                     const button = formCard.querySelector('button');
                     if (button) {
-                        button.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10001 !important; background: #FF0000 !important; color: white !important; padding: 1.5rem 3rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.5rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 30px rgba(255,0,0,1) !important; animation: flashButton 0.3s infinite !important;';
-                        
-                        // Add flashing animation
-                        if (!document.getElementById('flashButtonStyle')) {
-                            const style = document.createElement('style');
-                            style.id = 'flashButtonStyle';
-                            style.textContent = `
-                                @keyframes flashButton {
-                                    0%, 100% { 
-                                        background: #FF0000 !important; 
-                                        border-color: yellow !important;
-                                        transform: scale(1);
-                                        box-shadow: 0 0 30px rgba(255,0,0,1) !important;
-                                    }
-                                    50% { 
-                                        background: #FFFF00 !important; 
-                                        border-color: red !important;
-                                        transform: scale(1.15);
-                                        box-shadow: 0 0 50px rgba(255,255,0,1) !important;
-                                    }
-                                }
-                            `;
-                            document.head.appendChild(style);
-                        }
+                        button.style.setProperty('display', 'inline-block', 'important');
+                        button.style.setProperty('visibility', 'visible', 'important');
+                        button.style.setProperty('opacity', '1', 'important');
                         
                         console.log('✅✅✅ BUTTON FOUND AND FORCED VISIBLE IN showPage ✅✅✅');
                         console.log('🔍 Button position:', button.getBoundingClientRect());
@@ -2612,35 +2591,6 @@ function showPage(pageName) {
             
             // ULTRA AGGRESSIVE FIX: Add test div and create button if missing
             setTimeout(() => {
-                // Add flashing animation CSS first
-                if (!document.getElementById('flashButtonStyle')) {
-                    const style = document.createElement('style');
-                    style.id = 'flashButtonStyle';
-                    style.textContent = `
-                        @keyframes flashButton {
-                            0%, 100% { 
-                                background: #FF0000 !important; 
-                                border-color: yellow !important;
-                                transform: scale(1);
-                                box-shadow: 0 0 30px rgba(255,0,0,1) !important;
-                            }
-                            50% { 
-                                background: #FFFF00 !important; 
-                                border-color: red !important;
-                                transform: scale(1.15);
-                                box-shadow: 0 0 50px rgba(255,255,0,1) !important;
-                            }
-                        }
-                    `;
-                    document.head.appendChild(style);
-                }
-                
-                // Add a TEST DIV at the very top of financial page to verify rendering
-                const testDiv = document.createElement('div');
-                testDiv.id = 'financialTestButtonDiv';
-                testDiv.innerHTML = '<button onclick="showBankAccountForm()" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 100px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 99999 !important; background: #FF0000 !important; color: white !important; padding: 2rem 4rem !important; border: 10px solid yellow !important; border-radius: 12px !important; cursor: pointer !important; font-size: 2rem !important; font-weight: bold !important; box-shadow: 0 0 50px rgba(255,0,0,1) !important; animation: flashButton 0.3s infinite !important;">🔴 FLASHING: + Add Bank Account / Agregar Cuenta Bancaria 🔴</button>';
-                financialPage.insertBefore(testDiv, financialPage.firstChild);
-                console.log('✅✅✅ TEST BUTTON ADDED AT TOP OF FINANCIAL PAGE ✅✅✅');
                 
                 const accountsTab = document.getElementById('financialAccounts');
                 if (!accountsTab) {
@@ -2684,9 +2634,11 @@ function showPage(pageName) {
                     console.log('✅✅✅ CREATED BUTTON BECAUSE IT WAS MISSING ✅✅✅');
                 }
                 
-                // Force button visible with flashing
-                addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10001 !important; background: #FF0000 !important; color: white !important; padding: 1.5rem 3rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.5rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 30px rgba(255,0,0,1) !important; animation: flashButton 0.3s infinite !important;';
-                console.log('✅✅✅ BUTTON FORCED VISIBLE WITH FLASHING ✅✅✅');
+                // Force button visible with normal styling
+                addButton.style.setProperty('display', 'inline-block', 'important');
+                addButton.style.setProperty('visibility', 'visible', 'important');
+                addButton.style.setProperty('opacity', '1', 'important');
+                console.log('✅✅✅ BUTTON FORCED VISIBLE WITH NORMAL STYLING ✅✅✅');
                 console.log('🔍 Button position:', addButton.getBoundingClientRect());
                 
                 const bankAccountsList = document.getElementById('bankAccountsList');
@@ -6869,32 +6821,10 @@ function showFinancialTab(tab) {
                 // Also ensure all children of form-card are visible (including the button and h3)
                 Array.from(child.children).forEach(grandChild => {
                     if (grandChild.tagName === 'BUTTON') {
-                        grandChild.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10000 !important; background: #FF0000 !important; color: white !important; padding: 1rem 2rem !important; border: 5px solid yellow !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.2rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; box-shadow: 0 0 20px rgba(255,0,0,0.8) !important; animation: flashButton 0.5s infinite !important;';
-                        
-                        // Add flashing animation CSS if not already added
-                        if (!document.getElementById('flashButtonStyle')) {
-                            const style = document.createElement('style');
-                            style.id = 'flashButtonStyle';
-                            style.textContent = `
-                                @keyframes flashButton {
-                                    0%, 100% { 
-                                        background: #FF0000 !important; 
-                                        border-color: yellow !important;
-                                        transform: scale(1);
-                                        box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
-                                    }
-                                    50% { 
-                                        background: #FFFF00 !important; 
-                                        border-color: red !important;
-                                        transform: scale(1.1);
-                                        box-shadow: 0 0 30px rgba(255,255,0,1) !important;
-                                    }
-                                }
-                            `;
-                            document.head.appendChild(style);
-                        }
-                        
-                        console.log('✅✅✅ BUTTON FORCED VISIBLE WITH FLASHING IN showFinancialTab ✅✅✅');
+                        grandChild.style.setProperty('display', 'inline-block', 'important');
+                        grandChild.style.setProperty('visibility', 'visible', 'important');
+                        grandChild.style.setProperty('opacity', '1', 'important');
+                        console.log('✅✅✅ BUTTON FORCED VISIBLE WITH NORMAL STYLING IN showFinancialTab ✅✅✅');
                     } else {
                         grandChild.style.setProperty('display', grandChild.tagName === 'H3' ? 'block' : 'block', 'important');
                         grandChild.style.setProperty('visibility', 'visible', 'important');
