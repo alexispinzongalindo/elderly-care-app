@@ -1882,6 +1882,40 @@ def incidents():
             except Exception as notif_error:
                 print(f'Warning: Could not create notification: {notif_error}')
             
+            # Send email alert for high/critical severity incidents
+            if EMAIL_SERVICE_AVAILABLE and data.get('severity') in ['major', 'critical', 'high']:
+                try:
+                    # Get resident name
+                    cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (data.get('resident_id'),))
+                    resident = cursor.fetchone()
+                    if resident:
+                        resident_name = f"{resident['first_name']} {resident['last_name']}"
+                        
+                        # Get staff emails for notification (managers, admins, or assigned staff)
+                        cursor.execute('''
+                            SELECT email FROM staff 
+                            WHERE (role IN ('admin', 'manager') OR id = ?) 
+                            AND email IS NOT NULL 
+                            AND email != '' 
+                            AND active = 1
+                        ''', (int(staff_id),))
+                        staff_emails = [row['email'] for row in cursor.fetchall()]
+                        
+                        # Get language preference (default to 'en')
+                        language = request.current_staff.get('preferred_language', 'en') if hasattr(request, 'current_staff') else 'en'
+                        
+                        # Send email to all relevant staff
+                        for staff_email in staff_emails:
+                            send_incident_alert(
+                                resident_name=resident_name,
+                                incident_type=data.get('incident_type', 'Unknown'),
+                                severity=data.get('severity', 'medium').title(),
+                                staff_email=staff_email,
+                                language=language
+                            )
+                except Exception as email_error:
+                    print(f'Warning: Could not send incident email: {email_error}')
+            
             conn.close()
             return jsonify({'id': incident_id, 'message': 'Incident report created successfully'}), 201
         except sqlite3.IntegrityError as e:
