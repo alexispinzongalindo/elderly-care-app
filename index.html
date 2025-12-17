@@ -1768,105 +1768,51 @@
         });
     </script>
     
-    <!-- IMMEDIATE FIX: Force financial page button visible - only on financial page -->
+    <!-- Ensure financial page button is visible with normal styling -->
     <script>
-        // Run immediately when DOM is ready
+        // Run when DOM is ready to ensure button visibility
         (function() {
-            function forceFinancialButtonVisible() {
-                // Only show if we're on the financial page
-                const financialPage = document.getElementById('financial');
-                const isFinancialPageActive = financialPage && (
-                    financialPage.classList.contains('active') || 
-                    window.getComputedStyle(financialPage).display !== 'none' ||
-                    document.querySelector('.nav-link[data-page="financial"]')?.classList.contains('active')
-                );
-                
-                // Check if financial nav button is active
-                const financialNav = document.querySelector('.nav-link[data-page="financial"]');
-                const isNavActive = financialNav && financialNav.classList.contains('active');
-                
-                if (!isFinancialPageActive && !isNavActive) {
-                    // Hide button if not on financial page
-                    const existingButton = document.getElementById('financialFixedButton');
-                    if (existingButton) {
-                        existingButton.style.display = 'none';
-                    }
-                    return;
+            function ensureFinancialButtonVisible() {
+                // Remove any fixed position flashing buttons
+                const fixedButton = document.getElementById('financialFixedButton');
+                if (fixedButton) {
+                    fixedButton.remove();
                 }
                 
-                console.log('🔴 IMMEDIATE FIX: Checking financial page...');
-                
-                // Add fixed position button that's impossible to miss
-                let fixedButton = document.getElementById('financialFixedButton');
-                if (!fixedButton) {
-                    fixedButton = document.createElement('button');
-                    fixedButton.id = 'financialFixedButton';
-                    fixedButton.innerHTML = '🔴 FLASHING: + Add Bank Account / Agregar Cuenta Bancaria 🔴';
-                    fixedButton.onclick = function() { 
-                        if (typeof showBankAccountForm === 'function') {
-                            showBankAccountForm();
-                        } else {
-                            alert('Function showBankAccountForm not found. Check console.');
-                        }
-                    };
-                    
-                    // Add flashing animation
-                    if (!document.getElementById('flashButtonFixedStyle')) {
-                        const style = document.createElement('style');
-                        style.id = 'flashButtonFixedStyle';
-                        style.textContent = `
-                            @keyframes flashButtonFixed {
-                                0%, 100% { 
-                                    background: #FF0000 !important; 
-                                    border-color: yellow !important;
-                                    transform: translateX(-50%) scale(1);
-                                    box-shadow: 0 0 50px rgba(255,0,0,1) !important;
-                                }
-                                50% { 
-                                    background: #FFFF00 !important; 
-                                    border-color: red !important;
-                                    transform: translateX(-50%) scale(1.1);
-                                    box-shadow: 0 0 80px rgba(255,255,0,1) !important;
-                                }
-                            }
-                        `;
-                        document.head.appendChild(style);
-                    }
-                    
-                    document.body.appendChild(fixedButton);
-                    console.log('✅✅✅ FIXED POSITION FLASHING BUTTON ADDED TO BODY ✅✅✅');
-                }
-                
-                // Show the button
-                fixedButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 150px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999999 !important; background: #FF0000 !important; color: white !important; padding: 2rem 4rem !important; border: 10px solid yellow !important; border-radius: 12px !important; cursor: pointer !important; font-size: 2rem !important; font-weight: bold !important; box-shadow: 0 0 50px rgba(255,0,0,1) !important; animation: flashButtonFixed 0.3s infinite !important;';
-                
-                // Also try to find and force the regular button
+                // Find and ensure the regular button is visible
                 setTimeout(() => {
                     const accountsTab = document.getElementById('financialAccounts');
                     const formCard = document.querySelector('#financialAccounts .form-card');
                     const regularButton = document.querySelector('#financialAccounts .form-card button');
                     
                     if (regularButton) {
-                        regularButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; font-size: 1rem !important; font-weight: 500 !important;';
-                        console.log('✅✅✅ REGULAR BUTTON FOUND AND FORCED VISIBLE (normal blue style) ✅✅✅');
+                        // Normal blue styling - ensure visibility
+                        regularButton.style.setProperty('display', 'inline-block', 'important');
+                        regularButton.style.setProperty('visibility', 'visible', 'important');
+                        regularButton.style.setProperty('opacity', '1', 'important');
+                        console.log('✅ Button visible with normal styling');
                     }
-                }, 500);
+                    
+                    // Ensure form-card is visible
+                    if (formCard) {
+                        formCard.style.setProperty('display', 'block', 'important');
+                        formCard.style.setProperty('visibility', 'visible', 'important');
+                        formCard.style.setProperty('opacity', '1', 'important');
+                    }
+                }, 100);
             }
             
-            // Run immediately
+            // Run on load
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', forceFinancialButtonVisible);
+                document.addEventListener('DOMContentLoaded', ensureFinancialButtonVisible);
             } else {
-                forceFinancialButtonVisible();
+                ensureFinancialButtonVisible();
             }
             
-            // Also run after a delay and when navigation changes
-            setTimeout(forceFinancialButtonVisible, 1000);
-            
-            // Monitor navigation changes
+            // Run when navigating to financial page
             document.addEventListener('click', function(e) {
-                if (e.target.closest('.nav-link')) {
-                    setTimeout(forceFinancialButtonVisible, 100);
+                if (e.target.closest('.nav-link[data-page="financial"]')) {
+                    setTimeout(ensureFinancialButtonVisible, 200);
                 }
             });
         })();
