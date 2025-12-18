@@ -1890,65 +1890,84 @@ def incidents():
             except Exception as notif_error:
                 print(f'Warning: Could not create notification: {notif_error}')
             
-            # Send email alert for high/critical severity incidents
-            if EMAIL_SERVICE_AVAILABLE and data.get('severity') in ['major', 'critical', 'high']:
-                try:
-                    # Get resident name
-                    cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (data.get('resident_id'),))
-                    resident = cursor.fetchone()
-                    if resident:
-                        resident_name = f"{resident['first_name']} {resident['last_name']}"
-                        
-                        # Get staff emails for notification (managers, admins, or assigned staff)
-                        cursor.execute('''
-                            SELECT email FROM staff 
-                            WHERE (role IN ('admin', 'manager') OR id = ?) 
-                            AND email IS NOT NULL 
-                            AND email != '' 
-                            AND active = 1
-                        ''', (int(staff_id),))
-                        staff_emails = [row['email'] for row in cursor.fetchall()]
-                        
-                        # Get emergency contact email for the resident
-                        cursor.execute('SELECT emergency_contact_email FROM residents WHERE id = ?', (data.get('resident_id'),))
-                        emergency_contact = cursor.fetchone()
-                        emergency_contact_email = emergency_contact['emergency_contact_email'] if emergency_contact and emergency_contact['emergency_contact_email'] else None
-                        
-                        # Combine all recipient emails
-                        all_recipients = list(staff_emails)
-                        if emergency_contact_email:
-                            all_recipients.append(emergency_contact_email)
-                            print(f"📧 Will also notify emergency contact: {emergency_contact_email}")
-                        
-                        if not all_recipients:
-                            print(f"⚠️ No email addresses found to send incident alert for {resident_name}")
-                            print("   Add email addresses to staff records (admin/manager roles) or resident emergency contact")
-                        else:
-                            # Get language preference (default to 'en')
-                            language = request.current_staff.get('preferred_language', 'en') if hasattr(request, 'current_staff') else 'en'
-                            
-                            # Send email to all recipients (staff + emergency contact)
-                            emails_sent = 0
-                            for recipient_email in all_recipients:
-                                if send_incident_alert(
-                                    resident_name=resident_name,
-                                    incident_type=data.get('incident_type', 'Unknown'),
-                                    severity=data.get('severity', 'medium').title(),
-                                    staff_email=recipient_email,
-                                    language=language
-                                ):
-                                    emails_sent += 1
-                            
-                            if emails_sent > 0:
-                                print(f"✅ Sent {emails_sent} incident alert email(s) for {resident_name} (staff + emergency contact)")
-                            else:
-                                print(f"⚠️ Failed to send incident alert emails. Check email configuration.")
-                    else:
-                        print(f"⚠️ Resident not found for incident email alert (resident_id: {data.get('resident_id')})")
-                except Exception as email_error:
-                    print(f'❌ Error sending incident email: {email_error}')
-                    import traceback
-                    traceback.print_exc()
+            # EMAIL NOTIFICATIONS DISABLED - Email alerts for incidents are disabled
+            # # Send email alert for high/critical severity incidents
+            # severity_value = data.get('severity', '').lower() if data.get('severity') else ''
+            # print(f"🔍 Incident severity check: '{data.get('severity')}' -> '{severity_value}' (EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE})")
+            # 
+            # if EMAIL_SERVICE_AVAILABLE and severity_value in ['major', 'critical', 'high']:
+            #     print(f"✅ Severity '{severity_value}' qualifies for email alert")
+            #     try:
+            #         # Get resident name
+            #         cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (data.get('resident_id'),))
+            #         resident = cursor.fetchone()
+            #         if resident:
+            #             resident_name = f"{resident['first_name']} {resident['last_name']}"
+            #             print(f"📋 Resident: {resident_name}")
+            #             
+            #             # Get staff emails for notification (managers, admins, or assigned staff)
+            #             cursor.execute('''
+            #                 SELECT email FROM staff 
+            #                 WHERE (role IN ('admin', 'manager') OR id = ?) 
+            #                 AND email IS NOT NULL 
+            #                 AND email != '' 
+            #                 AND active = 1
+            #             ''', (int(staff_id),))
+            #             staff_emails = [row['email'] for row in cursor.fetchall()]
+            #             print(f"👥 Found {len(staff_emails)} staff email(s): {staff_emails}")
+            #             
+            #             # Get emergency contact email for the resident
+            #             cursor.execute('SELECT emergency_contact_email FROM residents WHERE id = ?', (data.get('resident_id'),))
+            #             emergency_contact = cursor.fetchone()
+            #             emergency_contact_email = emergency_contact['emergency_contact_email'] if emergency_contact and emergency_contact['emergency_contact_email'] else None
+            #             print(f"📞 Emergency contact email: {emergency_contact_email if emergency_contact_email else 'None'}")
+            #             
+            #             # Combine all recipient emails
+            #             all_recipients = list(staff_emails)
+            #             if emergency_contact_email:
+            #                 all_recipients.append(emergency_contact_email)
+            #                 print(f"📧 Will also notify emergency contact: {emergency_contact_email}")
+            #             
+            #             if not all_recipients:
+            #                 print(f"⚠️ No email addresses found to send incident alert for {resident_name}")
+            #                 print("   Add email addresses to staff records (admin/manager roles) or resident emergency contact")
+            #             else:
+            #                 print(f"📬 Preparing to send emails to {len(all_recipients)} recipient(s): {all_recipients}")
+            #                 # Get language preference (default to 'en')
+            #                 language = request.current_staff.get('preferred_language', 'en') if hasattr(request, 'current_staff') else 'en'
+            #                 print(f"🌐 Language preference: {language}")
+            #                 
+            #                 # Send email to all recipients (staff + emergency contact)
+            #                 emails_sent = 0
+            #                 for recipient_email in all_recipients:
+            #                     print(f"📤 Sending incident alert to {recipient_email}...")
+            #                     if send_incident_alert(
+            #                         resident_name=resident_name,
+            #                         incident_type=data.get('incident_type', 'Unknown'),
+            #                         severity=data.get('severity', 'medium').title(),
+            #                         staff_email=recipient_email,
+            #                         language=language
+            #                     ):
+            #                         emails_sent += 1
+            #                         print(f"✅ Email sent successfully to {recipient_email}")
+            #                     else:
+            #                         print(f"❌ Failed to send email to {recipient_email}")
+            #                 
+            #                 if emails_sent > 0:
+            #                     print(f"✅ Sent {emails_sent}/{len(all_recipients)} incident alert email(s) for {resident_name} (staff + emergency contact)")
+            #                 else:
+            #                     print(f"⚠️ Failed to send incident alert emails. Check email configuration.")
+            #         else:
+            #             print(f"⚠️ Resident not found for incident email alert (resident_id: {data.get('resident_id')})")
+            #     except Exception as email_error:
+            #         print(f'❌ Error sending incident email: {email_error}')
+            #         import traceback
+            #         traceback.print_exc()
+            # else:
+            #     if not EMAIL_SERVICE_AVAILABLE:
+            #         print(f"⚠️ Email service not available (EMAIL_SERVICE_AVAILABLE=False)")
+            #     else:
+            #         print(f"ℹ️ Severity '{severity_value}' does not qualify for email alert (must be 'major', 'critical', or 'high')")
             
             conn.close()
             return jsonify({'id': incident_id, 'message': 'Incident report created successfully'}), 201
@@ -2406,6 +2425,94 @@ def send_email_notification():
         return jsonify({'message': 'Email sent successfully'})
     else:
         return jsonify({'error': 'Failed to send email'}), 500
+
+@app.route('/api/email/test-incident-alert', methods=['POST'])
+@require_auth
+def test_incident_alert():
+    """Test incident alert email - simulates sending an incident alert"""
+    if not EMAIL_SERVICE_AVAILABLE:
+        return jsonify({'error': 'Email service not configured'}), 400
+    
+    data = request.json
+    resident_id = data.get('resident_id')
+    to_email = data.get('email')  # Optional - will use resident's emergency contact and staff emails if not provided
+    
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    try:
+        if resident_id:
+            # Get resident info
+            cursor.execute('SELECT first_name, last_name, emergency_contact_email FROM residents WHERE id = ?', (resident_id,))
+            resident = cursor.fetchone()
+            if not resident:
+                conn.close()
+                return jsonify({'error': 'Resident not found'}), 404
+            
+            resident_name = f"{resident['first_name']} {resident['last_name']}"
+            emergency_email = resident['emergency_contact_email'] if resident['emergency_contact_email'] else None
+            
+            # Get staff emails
+            cursor.execute('''
+                SELECT email FROM staff 
+                WHERE role IN ('admin', 'manager') 
+                AND email IS NOT NULL 
+                AND email != '' 
+                AND active = 1
+            ''')
+            staff_emails = [row['email'] for row in cursor.fetchall()]
+            
+            # Combine recipients
+            recipients = list(staff_emails)
+            if emergency_email:
+                recipients.append(emergency_email)
+        else:
+            # No resident ID - just use provided email or current staff email
+            if not to_email:
+                to_email = request.current_staff.get('email')
+            if not to_email:
+                conn.close()
+                return jsonify({'error': 'No email address provided'}), 400
+            recipients = [to_email]
+            resident_name = "Test Resident"
+        
+        if to_email and to_email not in recipients:
+            recipients.append(to_email)
+        
+        if not recipients:
+            conn.close()
+            return jsonify({'error': 'No email addresses found'}), 400
+        
+        language = request.current_staff.get('preferred_language', 'en')
+        emails_sent = 0
+        
+        for recipient in recipients:
+            if send_incident_alert(
+                resident_name=resident_name,
+                incident_type=data.get('incident_type', 'Test Incident'),
+                severity=data.get('severity', 'Major'),
+                staff_email=recipient,
+                language=language
+            ):
+                emails_sent += 1
+        
+        conn.close()
+        
+        if emails_sent > 0:
+            return jsonify({
+                'message': f'Test incident alert sent to {emails_sent} recipient(s)',
+                'recipients': recipients,
+                'emails_sent': emails_sent
+            })
+        else:
+            return jsonify({'error': 'Failed to send test incident alert'}), 500
+            
+    except Exception as e:
+        conn.close()
+        print(f'❌ Error in test_incident_alert: {e}')
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/<path:path>')
 def static_files(path):
