@@ -1959,10 +1959,15 @@ def incidents():
                     print(f"🔍 [Background] Email thread started for incident")
                     print(f"   EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE}")
                     
-                    # Check email configuration
+                    # Check email configuration (Resend OR SMTP)
                     import os
+                    bg_resend_api_key = os.getenv('RESEND_API_KEY', '')
+                    bg_resend_from_email = os.getenv('RESEND_FROM_EMAIL', '')
                     bg_sender_email = os.getenv('SENDER_EMAIL', '')
                     bg_sender_password = os.getenv('SENDER_PASSWORD', '')
+                    
+                    print(f"   RESEND_API_KEY: {'SET' if bg_resend_api_key else 'NOT SET'}")
+                    print(f"   RESEND_FROM_EMAIL: {'SET (' + bg_resend_from_email + ')' if bg_resend_from_email else 'NOT SET'}")
                     print(f"   SENDER_EMAIL: {'SET (' + bg_sender_email + ')' if bg_sender_email else 'NOT SET'}")
                     print(f"   SENDER_PASSWORD: {'SET' if bg_sender_password else 'NOT SET'}")
                     
@@ -1970,9 +1975,20 @@ def incidents():
                         print(f"⚠️ [Background] Email service not available (module import failed)")
                         return
                     
-                    if not bg_sender_email or not bg_sender_password:
-                        print(f"⚠️ [Background] Email service not configured (missing environment variables)")
+                    # Check if either Resend OR SMTP is configured
+                    has_resend = bool(bg_resend_api_key and bg_resend_from_email)
+                    has_smtp = bool(bg_sender_email and bg_sender_password)
+                    
+                    if not has_resend and not has_smtp:
+                        print(f"⚠️ [Background] Email service not configured:")
+                        print(f"   Resend: {'✓' if has_resend else '✗'} (needs RESEND_API_KEY + RESEND_FROM_EMAIL)")
+                        print(f"   SMTP: {'✓' if has_smtp else '✗'} (needs SENDER_EMAIL + SENDER_PASSWORD)")
                         return
+                    
+                    if has_resend:
+                        print(f"✅ [Background] Using Resend API for email sending")
+                    else:
+                        print(f"✅ [Background] Using SMTP for email sending (Resend not configured)")
                     
                     raw_severity = severity_for_email
                     severity_value = raw_severity.lower() if raw_severity else ''
