@@ -7,6 +7,7 @@ import secrets
 from datetime import datetime, timedelta
 from functools import wraps
 import os
+import threading
 
 # Import email service
 try:
@@ -1787,7 +1788,7 @@ def staff_detail(id):
                 data.get('phone'),
                 data.get('active', True),
                 id
-            ))
+        ))
         conn.commit()
         conn.close()
         return jsonify({'message': 'Staff member updated successfully'})
@@ -1838,7 +1839,18 @@ def incidents():
             return jsonify({'error': str(e)}), 500
     
     elif request.method == 'POST':
+        # Check if request has JSON data
+        if not request.is_json:
+            print(f"❌ Request is not JSON")
+            conn.close()
+            return jsonify({'error': 'Request must be JSON / La solicitud debe ser JSON'}), 400
+        
         data = request.json
+        if not data:
+            print(f"❌ Request JSON data is None or empty")
+            conn.close()
+            return jsonify({'error': 'Request data is required / Se requieren datos de solicitud'}), 400
+        
         print(f"\n{'='*60}")
         print(f"📝 INCIDENT CREATION REQUEST RECEIVED")
         print(f"{'='*60}")
@@ -1910,7 +1922,7 @@ def incidents():
             else:
                 print(f"❌ CRITICAL: Incident {incident_id} NOT FOUND after commit!")
             
-            # Create notification for incident
+            # Create notification for incident (non-critical, don't fail if this errors)
             try:
                 cursor.execute('''
                     INSERT INTO notifications (resident_id, notification_type, title, message, priority)
@@ -1924,122 +1936,146 @@ def incidents():
                 ))
                 conn.commit()
             except Exception as notif_error:
-                print(f'Warning: Could not create notification: {notif_error}')
+                print(f'⚠️ Warning: Could not create notification (non-critical): {notif_error}')
             
-            # Send email alert for major/critical severity incidents
-            raw_severity = data.get('severity', '')
-            severity_value = raw_severity.lower() if raw_severity else ''
-            print(f"🔍 Incident severity check:")
-            print(f"   Raw severity from request: '{raw_severity}' (type: {type(raw_severity)})")
-            print(f"   Normalized severity: '{severity_value}'")
-            print(f"   EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE}")
-            print(f"   Will send email? {EMAIL_SERVICE_AVAILABLE and severity_value in ['major', 'critical']}")
+            # Close connection IMMEDIATELY - return response right away
+            conn.close()
+            print(f"✅ Database connection closed. Returning response immediately.")
             
-            email_status = None
-            if EMAIL_SERVICE_AVAILABLE and severity_value in ['major', 'critical']:
-                print(f"✅ Severity '{severity_value}' qualifies for email alert")
+            # Prepare response data AFTER closing connection
+            response_data = {'id': incident_id, 'message': 'Incident report created successfully', 'email_status': 'Email processing in background'}
+            print(f"📤 Returning success response immediately.")
+            print(f"📦 Response data: {response_data}")
+            print(f"{'='*60}\n")
+            
+            # Start email sending in background thread (AFTER connection closed)
+            def send_emails_background():
+                # Capture data from outer scope
+                resident_id_for_email = data.get('resident_id')
+                staff_id_for_email = int(staff_id)
+                incident_type_for_email = data.get('incident_type', 'Unknown')
+                severity_for_email = data.get('severity', 'minor')
                 try:
+                    raw_severity = severity_for_email
+                    severity_value = raw_severity.lower() if raw_severity else ''
+                    print(f"🔍 [Background] Incident severity check:")
+                    print(f"   Raw severity: '{raw_severity}'")
+                    print(f"   Normalized severity: '{severity_value}'")
+                    print(f"   EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE}")
+                    
+                    if not EMAIL_SERVICE_AVAILABLE:
+                        print(f"⚠️ [Background] Email service not available")
+                        return
+                    
+                    if severity_value not in ['major', 'critical']:
+                        print(f"ℹ️ [Background] Severity '{severity_value}' does not qualify for email alert")
+                        return
+                    
+                    print(f"✅ [Background] Severity '{severity_value}' qualifies for email alert")
+                    
+                    # Create new database connection in background thread
+                    bg_conn = get_db()
+                    bg_cursor = bg_conn.cursor()
+                    
                     # Get resident name
-                    cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (data.get('resident_id'),))
-                    resident = cursor.fetchone()
-                    if resident:
-                        resident_name = f"{resident['first_name']} {resident['last_name']}"
-                        print(f"📋 Resident: {resident_name}")
-                        
-                        # Get staff emails for notification (managers, admins, or assigned staff)
-                        cursor.execute('''
+                    bg_cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (resident_id_for_email,))
+                    resident = bg_cursor.fetchone()
+                    if not resident:
+                        print(f"⚠️ [Background] Resident not found (resident_id: {resident_id_for_email})")
+                        bg_conn.close()
+                        return
+                    
+                    resident_name = f"{resident['first_name']} {resident['last_name']}"
+                    print(f"📋 [Background] Resident: {resident_name}")
+                    
+                    # Get staff emails for notification (managers, admins, or assigned staff)
+                    bg_cursor.execute('''
+                        SELECT email FROM staff 
+                        WHERE (role IN ('admin', 'manager') OR id = ?) 
+                        AND email IS NOT NULL 
+                        AND email != '' 
+                        AND active = 1
+                    ''', (staff_id_for_email,))
+                    staff_emails = [row['email'] for row in bg_cursor.fetchall()]
+                    print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}")
+                    
+                    # Get emergency contact email for the resident
+                    bg_cursor.execute('SELECT emergency_contact_email FROM residents WHERE id = ?', (resident_id_for_email,))
+                    emergency_contact = bg_cursor.fetchone()
+                    emergency_contact_email = emergency_contact['emergency_contact_email'] if emergency_contact and emergency_contact['emergency_contact_email'] else None
+                    print(f"📞 [Background] Emergency contact email: {emergency_contact_email if emergency_contact_email else 'None'}")
+                    
+                    # Combine all recipient emails
+                    all_recipients = list(staff_emails)
+                    if emergency_contact_email:
+                        all_recipients.append(emergency_contact_email)
+                        print(f"📧 [Background] Will also notify emergency contact: {emergency_contact_email}")
+                    
+                    # Fallback: If no recipients found, try to get ANY staff email as last resort
+                    if not all_recipients:
+                        print(f"⚠️ [Background] No email addresses found, trying fallback...")
+                        bg_cursor.execute('''
                             SELECT email FROM staff 
-                            WHERE (role IN ('admin', 'manager') OR id = ?) 
-                            AND email IS NOT NULL 
+                            WHERE email IS NOT NULL 
                             AND email != '' 
                             AND active = 1
-                        ''', (int(staff_id),))
-                        staff_emails = [row['email'] for row in cursor.fetchall()]
-                        print(f"👥 Found {len(staff_emails)} staff email(s): {staff_emails}")
-                        
-                        # Get emergency contact email for the resident
-                        cursor.execute('SELECT emergency_contact_email FROM residents WHERE id = ?', (data.get('resident_id'),))
-                        emergency_contact = cursor.fetchone()
-                        emergency_contact_email = emergency_contact['emergency_contact_email'] if emergency_contact and emergency_contact['emergency_contact_email'] else None
-                        print(f"📞 Emergency contact email: {emergency_contact_email if emergency_contact_email else 'None'}")
-                        
-                        # Combine all recipient emails
-                        all_recipients = list(staff_emails)
-                        if emergency_contact_email:
-                            all_recipients.append(emergency_contact_email)
-                            print(f"📧 Will also notify emergency contact: {emergency_contact_email}")
-                        
-                        # Fallback: If no recipients found, try to get ANY staff email as last resort
-                        if not all_recipients:
-                            print(f"⚠️ No email addresses found in admin/manager/creator or emergency contact")
-                            cursor.execute('''
-                                SELECT email FROM staff 
-                                WHERE email IS NOT NULL 
-                                AND email != '' 
-                                AND active = 1
-                                LIMIT 1
-                            ''')
-                            fallback_staff = cursor.fetchone()
-                            if fallback_staff and fallback_staff['email']:
-                                all_recipients.append(fallback_staff['email'])
-                                print(f"⚠️ Using fallback staff email: {fallback_staff['email']}")
-                        
-                        if not all_recipients:
-                            print(f"❌ No email addresses found to send incident alert for {resident_name}")
-                            print("   Add email addresses to staff records (admin/manager roles) or resident emergency contact")
-                            email_status = "No email recipients found"
+                            LIMIT 1
+                        ''')
+                        fallback_staff = bg_cursor.fetchone()
+                        if fallback_staff and fallback_staff['email']:
+                            all_recipients.append(fallback_staff['email'])
+                            print(f"⚠️ [Background] Using fallback staff email: {fallback_staff['email']}")
+                    
+                    bg_conn.close()  # Close connection before sending emails
+                    
+                    if not all_recipients:
+                        print(f"❌ [Background] No email addresses found to send incident alert for {resident_name}")
+                        return
+                    
+                    # Default to English for language (we can't access request.current_staff in background thread)
+                    language_for_email = 'en'
+                    
+                    print(f"📬 [Background] Preparing to send emails to {len(all_recipients)} recipient(s): {all_recipients}")
+                    
+                    # Send email to all recipients (staff + emergency contact)
+                    emails_sent = 0
+                    for recipient_email in all_recipients:
+                        print(f"📤 [Background] Sending incident alert to {recipient_email}...")
+                        if send_incident_alert(
+                            resident_name=resident_name,
+                            incident_type=incident_type_for_email,
+                            severity=severity_for_email.title(),
+                            staff_email=recipient_email,
+                            language=language_for_email
+                        ):
+                            emails_sent += 1
+                            print(f"✅ [Background] Email sent successfully to {recipient_email}")
                         else:
-                            print(f"📬 Preparing to send emails to {len(all_recipients)} recipient(s): {all_recipients}")
-                            # Get language preference (default to 'en')
-                            language = request.current_staff.get('preferred_language', 'en') if hasattr(request, 'current_staff') else 'en'
-                            print(f"🌐 Language preference: {language}")
-                            
-                            # Send email to all recipients (staff + emergency contact)
-                            emails_sent = 0
-                            for recipient_email in all_recipients:
-                                print(f"📤 Sending incident alert to {recipient_email}...")
-                                if send_incident_alert(
-                                    resident_name=resident_name,
-                                    incident_type=data.get('incident_type', 'Unknown'),
-                                    severity=data.get('severity', 'medium').title(),
-                                    staff_email=recipient_email,
-                                    language=language
-                                ):
-                                    emails_sent += 1
-                                    print(f"✅ Email sent successfully to {recipient_email}")
-                                else:
-                                    print(f"❌ Failed to send email to {recipient_email}")
-                            
-                            if emails_sent > 0:
-                                print(f"✅ Sent {emails_sent}/{len(all_recipients)} incident alert email(s) for {resident_name} (staff + emergency contact)")
-                                email_status = f"Email sent to {emails_sent} recipient(s)"
-                            else:
-                                print(f"⚠️ Failed to send incident alert emails. Check email configuration.")
-                                email_status = "Email sending failed - check server logs"
+                            print(f"❌ [Background] Failed to send email to {recipient_email}")
+                    
+                    if emails_sent > 0:
+                        print(f"✅ [Background] Sent {emails_sent}/{len(all_recipients)} incident alert email(s) for {resident_name}")
                     else:
-                        print(f"⚠️ Resident not found for incident email alert (resident_id: {data.get('resident_id')})")
-                        email_status = "Resident not found for email"
-                except Exception as email_error:
-                    print(f'❌ Error sending incident email: {email_error}')
+                        print(f"⚠️ [Background] Failed to send incident alert emails. Check email configuration.")
+                except Exception as bg_error:
+                    print(f"❌ [Background] Error in email sending thread: {bg_error}")
                     import traceback
                     traceback.print_exc()
-                    email_status = f"Email error: {str(email_error)}"
-            else:
-                if not EMAIL_SERVICE_AVAILABLE:
-                    print(f"⚠️ Email service not available (EMAIL_SERVICE_AVAILABLE=False)")
-                    email_status = "Email service not configured"
-                else:
-                    print(f"ℹ️ Severity '{severity_value}' does not qualify for email alert (must be 'major' or 'critical')")
-                    email_status = f"Email not sent - severity '{severity_value}' is not 'major' or 'critical'"
             
-            print(f"📤 Sending success response with incident_id: {incident_id}")
-            conn.close()
-            print(f"✅ Connection closed. Returning success response.")
-            print(f"{'='*60}\n")
-            response_data = {'id': incident_id, 'message': 'Incident report created successfully'}
-            if email_status:
-                response_data['email_status'] = email_status
-            return jsonify(response_data), 201
+            # Start email thread (don't wait for it - happens in background)
+            try:
+                email_thread = threading.Thread(target=send_emails_background, daemon=True)
+                email_thread.start()
+                print(f"🚀 Email thread started in background (non-blocking)")
+            except Exception as thread_error:
+                print(f"⚠️ Failed to start email thread (non-critical): {thread_error}")
+                # Don't fail the request if thread creation fails
+            
+            # Return response IMMEDIATELY - this happens regardless of email thread
+            print(f"📤 SENDING HTTP RESPONSE NOW - Status 201")
+            response = jsonify(response_data)
+            print(f"✅ Response object created: {response}")
+            return response, 201
         except sqlite3.IntegrityError as e:
             print(f"\n❌ INTEGRITY ERROR: {e}")
             import traceback
@@ -2119,10 +2155,33 @@ def incident_detail(id):
         return jsonify({'message': 'Incident report updated successfully'})
     
     elif request.method == 'DELETE':
-        cursor.execute('DELETE FROM incident_reports WHERE id = ?', (id,))
-        conn.commit()
-        conn.close()
-        return jsonify({'message': 'Incident report deleted successfully'})
+        try:
+            # First check if the incident exists
+            cursor.execute('SELECT id FROM incident_reports WHERE id = ?', (id,))
+            incident = cursor.fetchone()
+            
+            if not incident:
+                conn.close()
+                return jsonify({'error': 'Incident report not found'}), 404
+            
+            # Delete the incident
+            cursor.execute('DELETE FROM incident_reports WHERE id = ?', (id,))
+            
+            # Check if deletion was successful
+            if cursor.rowcount == 0:
+                conn.close()
+                return jsonify({'error': 'Failed to delete incident report'}), 500
+            
+            conn.commit()
+            conn.close()
+            print(f"✅ Incident {id} deleted successfully")
+            return jsonify({'message': 'Incident report deleted successfully'})
+        except Exception as e:
+            conn.close()
+            print(f"❌ Error deleting incident {id}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': f'Error deleting incident: {str(e)}'}), 500
 
 # Daily Care Notes
 @app.route('/api/care-notes', methods=['GET', 'POST'])
@@ -2328,6 +2387,16 @@ def mark_all_notifications_read():
 @app.route('/health')
 def health():
     return jsonify({'status': 'ok', 'message': 'Server is running'}), 200
+
+# Simple test endpoint for POST
+@app.route('/api/test-post', methods=['POST'])
+@require_auth
+def test_post():
+    try:
+        data = request.json
+        return jsonify({'status': 'ok', 'message': 'POST works!', 'received': data}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Static file serving
 @app.route('/')

@@ -4595,7 +4595,11 @@ async function editIncident(id) {
 }
 
 async function saveIncident(event) {
-    event.preventDefault();
+    if (event) {
+        event.preventDefault();
+    }
+    console.log('💾💾💾 SAVE INCIDENT FUNCTION CALLED 💾💾💾');
+    console.log('💾 Event:', event);
     console.log('💾 Saving incident...');
     
     // Validate required fields
@@ -4652,14 +4656,33 @@ async function saveIncident(event) {
         const method = editingIncidentId ? 'PUT' : 'POST';
         
         console.log(`🌐 ${method} ${url}`);
+        console.log(`📤 Request body:`, incidentData);
         
-        const response = await fetch(url, {
-            method: method,
-            headers: getAuthHeaders(),
-            body: JSON.stringify(incidentData)
-        });
+        // Create AbortController for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
+        let response;
+        try {
+            response = await fetch(url, {
+                method: method,
+                headers: getAuthHeaders(),
+                body: JSON.stringify(incidentData),
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+        } catch (fetchError) {
+            clearTimeout(timeoutId);
+            if (fetchError.name === 'AbortError') {
+                console.error('❌ Request timeout after 30 seconds');
+                showMessage('Request timeout. The server may be slow. Please try again. / Tiempo de espera agotado. El servidor puede estar lento. Por favor intente de nuevo.', 'error');
+                return;
+            }
+            throw fetchError; // Re-throw other errors
+        }
         
         console.log('📥 Response status:', response.status);
+        console.log('📥 Response headers:', [...response.headers.entries()]);
         
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
@@ -4699,21 +4722,38 @@ async function saveIncident(event) {
 async function deleteIncident(id) {
     if (!confirm('Are you sure you want to delete this incident report? / ¿Está seguro de que desea eliminar este reporte?')) return;
     
+    console.log(`🗑️ Attempting to delete incident ${id}...`);
+    
     try {
         const response = await fetch(`/api/incidents/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
         
+        console.log(`📡 Delete response status: ${response.status}`);
+        
         if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Delete successful:', result);
             showMessage('Incident deleted successfully / Incidente eliminado exitosamente', 'success');
             loadIncidents();
         } else {
-            showMessage('Error deleting incident / Error al eliminar incidente', 'error');
+            // Try to get error message from response
+            let errorMessage = 'Error deleting incident / Error al eliminar incidente';
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.error || errorMessage;
+                console.error('❌ Delete failed:', errorData);
+            } catch (e) {
+                const errorText = await response.text();
+                console.error('❌ Delete failed (non-JSON):', errorText);
+                errorMessage = errorText || errorMessage;
+            }
+            showMessage(errorMessage, 'error');
         }
     } catch (error) {
-        console.error('Error deleting incident:', error);
-        showMessage('Error deleting incident / Error al eliminar incidente', 'error');
+        console.error('❌ Error deleting incident:', error);
+        showMessage(`Error deleting incident: ${error.message} / Error al eliminar incidente: ${error.message}`, 'error');
     }
 }
 
@@ -7098,8 +7138,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load language from localStorage if available (but wait for login to use staff preferred_language)
     // Only set language from localStorage if user is not logged in yet
     if (!authToken || !currentStaff) {
-        const savedLanguage = localStorage.getItem('preferredLanguage');
-        if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
             setLanguage(savedLanguage); // Use setLanguage to ensure replaceDualLanguageText is called
         }
     }
@@ -7278,7 +7318,7 @@ function showFinancialTab(tab) {
                 }
             }
             
-            loadBankAccounts();
+        loadBankAccounts();
         }, 100);
     } else if (tab === 'transactions') {
         loadTransactions();
