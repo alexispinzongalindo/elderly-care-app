@@ -139,14 +139,9 @@ except Exception as e:
 print("3️⃣ EMAIL SERVICE CHECK")
 print("-" * 70)
 try:
-    from email_service import send_email, send_incident_alert, EMAIL_SERVICE_AVAILABLE
+    from email_service import send_email, send_incident_alert
     print("✅ Email service module imported successfully")
-    
-    if EMAIL_SERVICE_AVAILABLE:
-        print("✅ EMAIL_SERVICE_AVAILABLE = True")
-    else:
-        print("❌ EMAIL_SERVICE_AVAILABLE = False")
-        print("   Email notifications are disabled!")
+    print("✅ Email service functions are available")
     
     print()
     
