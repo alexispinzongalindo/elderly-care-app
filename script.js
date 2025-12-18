@@ -3704,32 +3704,64 @@ async function loadStaff() {
 
 async function editStaff(id) {
     try {
+        // Ensure staff page is visible first
+        const staffPage = document.getElementById('staff');
+        if (staffPage) {
+            showPage('staff');
+            // Wait a moment for page to render
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
         editingStaffId = id;
         const response = await fetch(`/api/staff/${id}`, {
             headers: getAuthHeaders()
         });
         
         if (!response.ok) {
-            throw new Error(`Failed to load staff: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`Failed to load staff: ${response.status} ${response.statusText} - ${errorText}`);
         }
         
         const staff = await response.json();
         
-        document.getElementById('staffFullName').value = staff.full_name || '';
-        document.getElementById('staffUsername').value = staff.username || '';
-        document.getElementById('staffEmail').value = staff.email || '';
-        document.getElementById('staffPhone').value = staff.phone || '';
-        document.getElementById('staffRole').value = staff.role || 'caregiver';
-        document.getElementById('staffActive').checked = staff.active !== 0;
-        document.getElementById('staffPassword').value = '';
-        document.getElementById('staffPassword').required = false;
-        document.getElementById('staffPasswordHint').textContent = t('staff.passwordHint.edit');
-        document.getElementById('staffActiveGroup').style.display = 'block';
+        // Check if form elements exist before trying to populate them
+        const elements = {
+            'staffFullName': document.getElementById('staffFullName'),
+            'staffUsername': document.getElementById('staffUsername'),
+            'staffEmail': document.getElementById('staffEmail'),
+            'staffPhone': document.getElementById('staffPhone'),
+            'staffRole': document.getElementById('staffRole'),
+            'staffActive': document.getElementById('staffActive'),
+            'staffPassword': document.getElementById('staffPassword'),
+            'staffPasswordHint': document.getElementById('staffPasswordHint'),
+            'staffActiveGroup': document.getElementById('staffActiveGroup'),
+            'staffFormTitle': document.getElementById('staffFormTitle'),
+            'addStaffForm': document.getElementById('addStaffForm')
+        };
         
-        document.getElementById('staffFormTitle').textContent = t('staff.edit');
+        // Check for missing elements
+        const missingElements = Object.entries(elements).filter(([name, el]) => !el).map(([name]) => name);
+        if (missingElements.length > 0) {
+            console.error('Missing form elements:', missingElements);
+            throw new Error(`Missing form elements: ${missingElements.join(', ')}`);
+        }
+        
+        // Populate form fields
+        elements.staffFullName.value = staff.full_name || '';
+        elements.staffUsername.value = staff.username || '';
+        elements.staffEmail.value = staff.email || '';
+        elements.staffPhone.value = staff.phone || '';
+        elements.staffRole.value = staff.role || 'caregiver';
+        elements.staffActive.checked = staff.active !== 0;
+        elements.staffPassword.value = '';
+        elements.staffPassword.required = false;
+        elements.staffPasswordHint.textContent = t('staff.passwordHint.edit');
+        elements.staffActiveGroup.style.display = 'block';
+        
+        elements.staffFormTitle.textContent = t('staff.edit');
         replaceDualLanguageText();
-        document.getElementById('addStaffForm').style.display = 'block';
-        document.getElementById('addStaffForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        elements.addStaffForm.style.display = 'block';
+        elements.addStaffForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } catch (error) {
         console.error('Error loading staff for edit:', error);
         showMessage('Error loading staff member / Error al cargar miembro del personal', 'error');

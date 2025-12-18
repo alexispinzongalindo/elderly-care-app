@@ -1776,7 +1776,7 @@ def staff_detail(id):
                 data.get('phone'),
                 data.get('active', True),
                 id
-        ))
+            ))
         conn.commit()
         conn.close()
         return jsonify({'message': 'Staff member updated successfully'})
