@@ -3725,7 +3725,7 @@ async function editStaff(id) {
         const staff = await response.json();
         
         // Check if form elements exist before trying to populate them
-        const elements = {
+        const requiredElements = {
             'staffFullName': document.getElementById('staffFullName'),
             'staffUsername': document.getElementById('staffUsername'),
             'staffEmail': document.getElementById('staffEmail'),
@@ -3733,17 +3733,24 @@ async function editStaff(id) {
             'staffRole': document.getElementById('staffRole'),
             'staffActive': document.getElementById('staffActive'),
             'staffPassword': document.getElementById('staffPassword'),
-            'staffPasswordHint': document.getElementById('staffPasswordHint'),
             'staffActiveGroup': document.getElementById('staffActiveGroup'),
             'staffFormTitle': document.getElementById('staffFormTitle'),
             'addStaffForm': document.getElementById('addStaffForm')
         };
         
-        // Check for missing elements
-        const missingElements = Object.entries(elements).filter(([name, el]) => !el).map(([name]) => name);
+        // Optional elements (won't cause error if missing)
+        const optionalElements = {
+            'staffPasswordHint': document.getElementById('staffPasswordHint')
+        };
+        
+        // Combine all elements
+        const elements = { ...requiredElements, ...optionalElements };
+        
+        // Check for missing required elements only
+        const missingElements = Object.entries(requiredElements).filter(([name, el]) => !el).map(([name]) => name);
         if (missingElements.length > 0) {
-            console.error('Missing form elements:', missingElements);
-            throw new Error(`Missing form elements: ${missingElements.join(', ')}`);
+            console.error('Missing required form elements:', missingElements);
+            throw new Error(`Missing required form elements: ${missingElements.join(', ')}`);
         }
         
         // Populate form fields
@@ -3755,7 +3762,9 @@ async function editStaff(id) {
         elements.staffActive.checked = staff.active !== 0;
         elements.staffPassword.value = '';
         elements.staffPassword.required = false;
-        elements.staffPasswordHint.textContent = t('staff.passwordHint.edit');
+        if (elements.staffPasswordHint) {
+            elements.staffPasswordHint.textContent = t('staff.passwordHint.edit');
+        }
         elements.staffActiveGroup.style.display = 'block';
         
         elements.staffFormTitle.textContent = t('staff.edit');
