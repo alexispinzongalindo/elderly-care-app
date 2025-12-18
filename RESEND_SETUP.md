@@ -17,19 +17,28 @@ Render's free tier **blocks all SMTP connections**. Resend uses HTTP API, which 
 4. Copy the API key (starts with `re_`)
 
 ### 3. Set Up Your "From" Email
-**Option A: Use Resend's Test Domain (Easiest - for testing)**
-- Resend provides: `onboarding@resend.dev`
-- You can use this for testing immediately
-- **Note**: This only works for sending, replies go nowhere
 
-**Option B: Use Your Own Domain (Recommended - for production)**
+⚠️ **IMPORTANT**: Resend's test domain (`onboarding@resend.dev`) **only allows sending to your own verified email address** (the one you signed up with). To send to other recipients (like staff emails or emergency contacts), you **MUST** verify your own domain.
+
+**Option A: Use Resend's Test Domain (Testing only - LIMITED)**
+- Resend provides: `onboarding@resend.dev`
+- ⚠️ **LIMITATION**: Can only send to YOUR account email (e.g., `alexis_pinzon@yahoo.com`)
+- ❌ **CANNOT** send to other addresses like `apinzon@elderlycare.tech`
+- Use only for testing if you update recipient emails to your own
+
+**Option B: Verify Your Own Domain (REQUIRED for production) ✅**
 1. Go to https://resend.com/domains
 2. Click "Add Domain"
-3. Add your domain (e.g., `elderlycare.tech`)
+3. Add your domain: `elderlycare.tech`
 4. Follow DNS setup instructions:
-   - Add the TXT records they provide to your domain's DNS
-   - Wait for verification (usually 5-10 minutes)
-5. Once verified, you can send from any email on that domain (e.g., `notifications@elderlycare.tech`)
+   - Add the **TXT records** they provide to your domain's DNS (for verification)
+   - Add the **MX records** (for receiving replies)
+   - Add the **DKIM records** (for email authentication)
+   - **Where to add**: Your domain registrar's DNS settings (e.g., Cloudflare, Namecheap, GoDaddy)
+5. Wait for verification (usually 5 minutes to 1 hour, sometimes up to 48 hours)
+6. Once verified, you can send from any email on that domain (e.g., `notifications@elderlycare.tech`)
+
+**Current Issue**: You're using `onboarding@resend.dev` which blocks sending to `apinzon@elderlycare.tech`. You need to verify `elderlycare.tech` and change `RESEND_FROM_EMAIL` to `notifications@elderlycare.tech` (or similar).
 
 ### 4. Configure in Render
 1. Go to your Render service dashboard
@@ -58,9 +67,19 @@ The code will automatically use Resend if `RESEND_API_KEY` is set!
    - Or error messages if something's wrong
 
 ## Troubleshooting
+
+### Error: "You can only send testing emails to your own email address"
+**Cause**: Using `onboarding@resend.dev` (test domain) which only allows sending to your account email.
+
+**Solution**: 
+1. Verify your domain (`elderlycare.tech`) in Resend (see Option B above)
+2. Update `RESEND_FROM_EMAIL` in Render to use your verified domain: `notifications@elderlycare.tech`
+3. Redeploy your app
+
+### Other Common Issues
 - **"Resend API key not configured"**: Check `RESEND_API_KEY` is set in Render
 - **"RESEND_FROM_EMAIL not configured"**: Set `RESEND_FROM_EMAIL` in Render
-- **"Domain not verified"**: Wait for DNS propagation or use `onboarding@resend.dev` for testing
+- **"Domain not verified"**: Wait for DNS propagation (check DNS records are correct)
 
 ## Free Tier Limits
 - **100 emails per day** (free tier)
