@@ -1956,16 +1956,29 @@ def incidents():
                 incident_type_for_email = data.get('incident_type', 'Unknown')
                 severity_for_email = data.get('severity', 'minor')
                 try:
+                    print(f"🔍 [Background] Email thread started for incident")
+                    print(f"   EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE}")
+                    
+                    # Check email configuration
+                    import os
+                    bg_sender_email = os.getenv('SENDER_EMAIL', '')
+                    bg_sender_password = os.getenv('SENDER_PASSWORD', '')
+                    print(f"   SENDER_EMAIL: {'SET (' + bg_sender_email + ')' if bg_sender_email else 'NOT SET'}")
+                    print(f"   SENDER_PASSWORD: {'SET' if bg_sender_password else 'NOT SET'}")
+                    
+                    if not EMAIL_SERVICE_AVAILABLE:
+                        print(f"⚠️ [Background] Email service not available (module import failed)")
+                        return
+                    
+                    if not bg_sender_email or not bg_sender_password:
+                        print(f"⚠️ [Background] Email service not configured (missing environment variables)")
+                        return
+                    
                     raw_severity = severity_for_email
                     severity_value = raw_severity.lower() if raw_severity else ''
                     print(f"🔍 [Background] Incident severity check:")
                     print(f"   Raw severity: '{raw_severity}'")
                     print(f"   Normalized severity: '{severity_value}'")
-                    print(f"   EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE}")
-                    
-                    if not EMAIL_SERVICE_AVAILABLE:
-                        print(f"⚠️ [Background] Email service not available")
-                        return
                     
                     if severity_value not in ['major', 'critical']:
                         print(f"ℹ️ [Background] Severity '{severity_value}' does not qualify for email alert")
@@ -2039,24 +2052,38 @@ def incidents():
                     
                     # Send email to all recipients (staff + emergency contact)
                     emails_sent = 0
+                    email_errors = []
                     for recipient_email in all_recipients:
                         print(f"📤 [Background] Sending incident alert to {recipient_email}...")
-                        if send_incident_alert(
-                            resident_name=resident_name,
-                            incident_type=incident_type_for_email,
-                            severity=severity_for_email.title(),
-                            staff_email=recipient_email,
-                            language=language_for_email
-                        ):
-                            emails_sent += 1
-                            print(f"✅ [Background] Email sent successfully to {recipient_email}")
-                        else:
-                            print(f"❌ [Background] Failed to send email to {recipient_email}")
+                        try:
+                            email_result = send_incident_alert(
+                                resident_name=resident_name,
+                                incident_type=incident_type_for_email,
+                                severity=severity_for_email.title(),
+                                staff_email=recipient_email,
+                                language=language_for_email
+                            )
+                            if email_result:
+                                emails_sent += 1
+                                print(f"✅ [Background] Email sent successfully to {recipient_email}")
+                            else:
+                                error_msg = f"Email function returned False for {recipient_email}"
+                                email_errors.append(error_msg)
+                                print(f"❌ [Background] {error_msg}")
+                        except Exception as email_exception:
+                            error_msg = f"Exception sending email to {recipient_email}: {str(email_exception)}"
+                            email_errors.append(error_msg)
+                            print(f"❌ [Background] {error_msg}")
+                            import traceback
+                            traceback.print_exc()
                     
                     if emails_sent > 0:
                         print(f"✅ [Background] Sent {emails_sent}/{len(all_recipients)} incident alert email(s) for {resident_name}")
                     else:
-                        print(f"⚠️ [Background] Failed to send incident alert emails. Check email configuration.")
+                        print(f"⚠️ [Background] Failed to send incident alert emails.")
+                        print(f"   Attempted to send to: {all_recipients}")
+                        print(f"   Errors: {email_errors}")
+                        print(f"   Check Render environment variables: SENDER_EMAIL and SENDER_PASSWORD")
                 except Exception as bg_error:
                     print(f"❌ [Background] Error in email sending thread: {bg_error}")
                     import traceback

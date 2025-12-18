@@ -3897,9 +3897,13 @@ async function showIncidentForm() {
         }
         
         console.log('✅ Incident form element found, showing it...');
-        formElement.style.display = 'block';
-        formElement.style.visibility = 'visible';
-        formElement.style.opacity = '1';
+        // Force form to be visible with !important overrides
+        formElement.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; margin-top: 2rem !important;';
+        console.log('✅ Form display forced with cssText');
+        console.log('✅ Form computed display:', window.getComputedStyle(formElement).display);
+        console.log('✅ Form computed visibility:', window.getComputedStyle(formElement).visibility);
+        console.log('✅ Form offsetHeight:', formElement.offsetHeight);
+        console.log('✅ Form offsetWidth:', formElement.offsetWidth);
         
         // Reset form
         const formTitle = document.getElementById('incidentFormTitle');

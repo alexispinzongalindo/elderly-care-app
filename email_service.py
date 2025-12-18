@@ -55,8 +55,8 @@ def send_email(to_email, subject, html_body, text_body=None):
         part2 = MIMEText(html_body, 'html')
         msg.attach(part2)
         
-        # Send email
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        # Send email with timeout to prevent hanging
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)  # 10 second timeout
         server.starttls()
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
         server.send_message(msg)
@@ -65,8 +65,23 @@ def send_email(to_email, subject, html_body, text_body=None):
         print(f"✅ Email sent successfully to {to_email}")
         return True
         
+    except smtplib.SMTPAuthenticationError as e:
+        error_msg = f"SMTP Authentication Error: {str(e)}. Check SENDER_EMAIL and SENDER_PASSWORD."
+        print(f"❌ {error_msg}")
+        return False
+    except smtplib.SMTPConnectError as e:
+        error_msg = f"SMTP Connection Error: {str(e)}. Cannot connect to {SMTP_SERVER}:{SMTP_PORT}."
+        print(f"❌ {error_msg}")
+        return False
+    except smtplib.SMTPException as e:
+        error_msg = f"SMTP Error: {str(e)}"
+        print(f"❌ {error_msg}")
+        return False
     except Exception as e:
-        print(f"❌ Error sending email to {to_email}: {str(e)}")
+        error_msg = f"Unexpected error sending email to {to_email}: {type(e).__name__}: {str(e)}"
+        print(f"❌ {error_msg}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def send_medication_alert(resident_name, medication_name, scheduled_time, staff_email, language='en'):
