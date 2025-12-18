@@ -109,7 +109,7 @@ try:
     cursor.execute('''
         SELECT i.id, i.resident_id, i.incident_type, i.severity, i.created_at,
                r.first_name, r.last_name
-        FROM incidents i
+        FROM incident_reports i
         LEFT JOIN residents r ON i.resident_id = r.id
         ORDER BY i.created_at DESC
         LIMIT 5
