@@ -17,6 +17,17 @@ try:
         send_custom_alert
     )
     EMAIL_SERVICE_AVAILABLE = True
+    # Check email configuration on startup
+    sender_email = os.getenv('SENDER_EMAIL', '')
+    sender_password = os.getenv('SENDER_PASSWORD', '')
+    if not sender_email or not sender_password:
+        print("⚠️ WARNING: Email service available but not configured!")
+        print(f"   SENDER_EMAIL: {'SET' if sender_email else 'NOT SET'}")
+        print(f"   SENDER_PASSWORD: {'SET' if sender_password else 'NOT SET'}")
+        print("   Email notifications will NOT work until environment variables are set.")
+    else:
+        print(f"✅ Email service configured and ready")
+        print(f"   Sender: {sender_email}")
 except ImportError:
     EMAIL_SERVICE_AVAILABLE = False
     print("⚠️ Email service not available. Email notifications will be disabled.")
