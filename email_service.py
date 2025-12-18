@@ -11,7 +11,8 @@ import os
 
 # Email configuration - Use environment variables or set directly
 SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
-SMTP_PORT = int(os.getenv('SMTP_PORT', 587))
+SMTP_PORT = int(os.getenv('SMTP_PORT', 0))  # 0 means auto-detect: try 465 first, then 587
+USE_SSL = os.getenv('USE_SSL', '').lower() == 'true'  # Force SSL mode
 SENDER_EMAIL = os.getenv('SENDER_EMAIL', '')  # Your Gmail address
 SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', '')  # Gmail App Password
 
@@ -55,22 +56,59 @@ def send_email(to_email, subject, html_body, text_body=None):
         part2 = MIMEText(html_body, 'html')
         msg.attach(part2)
         
-        # Send email with timeout to prevent hanging
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)  # 10 second timeout
-        server.starttls()
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
-        server.send_message(msg)
-        server.quit()
+        # Try to send email - use SSL (port 465) first, then STARTTLS (port 587)
+        # Render often blocks port 587, so we try 465 first
+        port_to_try = SMTP_PORT if SMTP_PORT > 0 else 465
+        use_ssl_for_this_attempt = USE_SSL if SMTP_PORT > 0 else True
         
-        print(f"✅ Email sent successfully to {to_email}")
-        return True
+        try:
+            if use_ssl_for_this_attempt:
+                # Use SSL (port 465) - sometimes works better on Render
+                print(f"📧 Attempting to send email via {SMTP_SERVER}:{port_to_try} using SSL...")
+                server = smtplib.SMTP_SSL(SMTP_SERVER, port_to_try, timeout=10)
+            else:
+                # Use STARTTLS (port 587)
+                print(f"📧 Attempting to send email via {SMTP_SERVER}:{port_to_try} using STARTTLS...")
+                server = smtplib.SMTP(SMTP_SERVER, port_to_try, timeout=10)
+                server.starttls()
+            
+            server.login(SENDER_EMAIL, SENDER_PASSWORD)
+            server.send_message(msg)
+            server.quit()
+            
+            print(f"✅ Email sent successfully to {to_email}")
+            return True
+        except (OSError, ConnectionError) as conn_error:
+            # If SSL/port 465 failed and we haven't tried port 587 yet, try that
+            if port_to_try == 465 and SMTP_PORT == 0 and '101' in str(conn_error):
+                print(f"⚠️ Port 465 (SSL) failed with network error, trying port 587 (STARTTLS)...")
+                try:
+                    server = smtplib.SMTP(SMTP_SERVER, 587, timeout=10)
+                    server.starttls()
+                    server.login(SENDER_EMAIL, SENDER_PASSWORD)
+                    server.send_message(msg)
+                    server.quit()
+                    print(f"✅ Email sent successfully to {to_email} via port 587")
+                    return True
+                except Exception as retry_error:
+                    print(f"❌ Port 587 also failed: {str(retry_error)}")
+                    raise conn_error  # Raise original error
+            else:
+                raise  # Re-raise if we've already tried both or have a specific port configured
         
     except smtplib.SMTPAuthenticationError as e:
         error_msg = f"SMTP Authentication Error: {str(e)}. Check SENDER_EMAIL and SENDER_PASSWORD."
         print(f"❌ {error_msg}")
         return False
     except smtplib.SMTPConnectError as e:
-        error_msg = f"SMTP Connection Error: {str(e)}. Cannot connect to {SMTP_SERVER}:{SMTP_PORT}."
+        error_msg = f"SMTP Connection Error: {str(e)}. Cannot connect to {SMTP_SERVER}."
+        print(f"❌ {error_msg}")
+        return False
+    except (OSError, ConnectionError) as e:
+        error_msg = f"Network Error: {str(e)}"
+        if '101' in str(e) or 'Network is unreachable' in str(e):
+            error_msg += f"\n   ⚠️ Render blocks outbound SMTP connections on free tier."
+            error_msg += f"\n   Solutions: 1) Use Resend/SendGrid API (HTTP-based), 2) Upgrade Render plan, 3) Use different hosting"
         print(f"❌ {error_msg}")
         return False
     except smtplib.SMTPException as e:
