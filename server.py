@@ -1927,8 +1927,23 @@ def incidents():
                             all_recipients.append(emergency_contact_email)
                             print(f"📧 Will also notify emergency contact: {emergency_contact_email}")
                         
+                        # Fallback: If no recipients found, try to get ANY staff email as last resort
                         if not all_recipients:
-                            print(f"⚠️ No email addresses found to send incident alert for {resident_name}")
+                            print(f"⚠️ No email addresses found in admin/manager/creator or emergency contact")
+                            cursor.execute('''
+                                SELECT email FROM staff 
+                                WHERE email IS NOT NULL 
+                                AND email != '' 
+                                AND active = 1
+                                LIMIT 1
+                            ''')
+                            fallback_staff = cursor.fetchone()
+                            if fallback_staff and fallback_staff['email']:
+                                all_recipients.append(fallback_staff['email'])
+                                print(f"⚠️ Using fallback staff email: {fallback_staff['email']}")
+                        
+                        if not all_recipients:
+                            print(f"❌ No email addresses found to send incident alert for {resident_name}")
                             print("   Add email addresses to staff records (admin/manager roles) or resident emergency contact")
                         else:
                             print(f"📬 Preparing to send emails to {len(all_recipients)} recipient(s): {all_recipients}")
