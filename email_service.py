@@ -1,6 +1,6 @@
 """
 Email Notification Service for Elder Care Management
-Uses FREE Gmail SMTP - $0/month forever
+Supports Resend API (HTTP-based, works on Render) and Gmail SMTP (for local dev)
 """
 
 import smtplib
@@ -8,17 +8,99 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 import os
+import json
+import urllib.request
+import urllib.parse
+import urllib.error
 
 # Email configuration - Use environment variables or set directly
+# Resend API (RECOMMENDED - works on Render free tier via HTTP)
+RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
+RESEND_FROM_EMAIL = os.getenv('RESEND_FROM_EMAIL', '')  # Your verified domain email (e.g., notifications@yourdomain.com)
+
+# Gmail SMTP (fallback for local development)
 SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
 SMTP_PORT = int(os.getenv('SMTP_PORT', 0))  # 0 means auto-detect: try 465 first, then 587
 USE_SSL = os.getenv('USE_SSL', '').lower() == 'true'  # Force SSL mode
 SENDER_EMAIL = os.getenv('SENDER_EMAIL', '')  # Your Gmail address
 SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', '')  # Gmail App Password
 
-def send_email(to_email, subject, html_body, text_body=None):
+# Use Resend if API key is set, otherwise use SMTP
+USE_RESEND = bool(RESEND_API_KEY)
+
+def send_email_via_resend(to_email, subject, html_body, text_body=None):
     """
-    Send email using Gmail SMTP (FREE)
+    Send email using Resend API (HTTP-based, works on Render)
+    
+    Args:
+        to_email: Recipient email address
+        subject: Email subject
+        html_body: HTML email body
+        text_body: Plain text email body (optional)
+    
+    Returns:
+        bool: True if email sent successfully, False otherwise
+    """
+    if not RESEND_API_KEY:
+        print("❌ Resend API key not configured")
+        return False
+    
+    if not RESEND_FROM_EMAIL:
+        print("❌ RESEND_FROM_EMAIL not configured. Set it in environment variables.")
+        return False
+    
+    if not to_email:
+        print(f"⚠️ No recipient email provided")
+        return False
+    
+    try:
+        url = "https://api.resend.com/emails"
+        data = {
+            "from": RESEND_FROM_EMAIL,
+            "to": [to_email],
+            "subject": subject,
+            "html": html_body
+        }
+        
+        if text_body:
+            data["text"] = text_body
+        
+        json_data = json.dumps(data).encode('utf-8')
+        
+        req = urllib.request.Request(url, data=json_data, method='POST')
+        req.add_header('Authorization', f'Bearer {RESEND_API_KEY}')
+        req.add_header('Content-Type', 'application/json')
+        
+        print(f"📧 Sending email via Resend API to {to_email}...")
+        with urllib.request.urlopen(req, timeout=10) as response:
+            response_data = json.loads(response.read().decode('utf-8'))
+            if response.getcode() == 200:
+                print(f"✅ Email sent successfully via Resend to {to_email}")
+                print(f"   Resend ID: {response_data.get('id', 'N/A')}")
+                return True
+            else:
+                print(f"❌ Resend API returned status {response.getcode()}: {response_data}")
+                return False
+                
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8')
+        print(f"❌ Resend API HTTP Error {e.code}: {error_body}")
+        try:
+            error_data = json.loads(error_body)
+            print(f"   Error details: {error_data}")
+        except:
+            pass
+        return False
+    except Exception as e:
+        print(f"❌ Error sending email via Resend: {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+def send_email_via_smtp(to_email, subject, html_body, text_body=None):
+    """
+    Send email using SMTP (Gmail, etc.) - for local development
+    Works on local machines but may be blocked on Render free tier
     
     Args:
         to_email: Recipient email address
@@ -30,11 +112,10 @@ def send_email(to_email, subject, html_body, text_body=None):
         bool: True if email sent successfully, False otherwise
     """
     if not SENDER_EMAIL or not SENDER_PASSWORD:
-        error_msg = "⚠️ Email not configured. Set SENDER_EMAIL and SENDER_PASSWORD environment variables."
+        error_msg = "⚠️ SMTP not configured. Set SENDER_EMAIL and SENDER_PASSWORD environment variables."
         print(error_msg)
         print(f"   SENDER_EMAIL: {'SET' if SENDER_EMAIL else 'NOT SET'}")
         print(f"   SENDER_PASSWORD: {'SET' if SENDER_PASSWORD else 'NOT SET'}")
-        print("   See EMAIL_SETUP.md for instructions")
         return False
     
     if not to_email:
@@ -121,6 +202,30 @@ def send_email(to_email, subject, html_body, text_body=None):
         import traceback
         traceback.print_exc()
         return False
+
+def send_email(to_email, subject, html_body, text_body=None):
+    """
+    Send email - automatically chooses Resend API (if configured) or SMTP (fallback)
+    
+    Args:
+        to_email: Recipient email address
+        subject: Email subject
+        html_body: HTML email body
+        text_body: Plain text email body (optional)
+    
+    Returns:
+        bool: True if email sent successfully, False otherwise
+    """
+    # Prefer Resend API (works on Render), fallback to SMTP for local dev
+    if USE_RESEND:
+        result = send_email_via_resend(to_email, subject, html_body, text_body)
+        if result:
+            return True
+        # If Resend fails, fall back to SMTP (but log the attempt)
+        print("⚠️ Resend failed, attempting SMTP fallback...")
+    
+    # Use SMTP (may not work on Render free tier)
+    return send_email_via_smtp(to_email, subject, html_body, text_body)
 
 def send_medication_alert(resident_name, medication_name, scheduled_time, staff_email, language='en'):
     """
