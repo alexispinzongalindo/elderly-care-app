@@ -1839,25 +1839,37 @@ def incidents():
     
     elif request.method == 'POST':
         data = request.json
+        print(f"\n{'='*60}")
+        print(f"📝 INCIDENT CREATION REQUEST RECEIVED")
+        print(f"{'='*60}")
+        print(f"📋 Received data: {data}")
         
         # Validate required fields
         if not data.get('resident_id'):
+            print(f"❌ Validation failed: Missing resident_id")
             conn.close()
             return jsonify({'error': 'Resident ID is required / Se requiere ID de residente'}), 400
         if not data.get('incident_date'):
+            print(f"❌ Validation failed: Missing incident_date")
             conn.close()
             return jsonify({'error': 'Incident date is required / Se requiere fecha del incidente'}), 400
         if not data.get('incident_type'):
+            print(f"❌ Validation failed: Missing incident_type")
             conn.close()
             return jsonify({'error': 'Incident type is required / Se requiere tipo de incidente'}), 400
         if not data.get('description'):
+            print(f"❌ Validation failed: Missing description")
             conn.close()
             return jsonify({'error': 'Description is required / Se requiere descripción'}), 400
+        
+        print(f"✅ All required fields validated")
         
         try:
             # Use provided staff_id or fallback to current staff
             staff_id = data.get('staff_id') or request.current_staff['id']
+            print(f"👤 Using staff_id: {staff_id}")
             
+            print(f"💾 Attempting to INSERT incident into database...")
             cursor.execute('''
                 INSERT INTO incident_reports (
                     resident_id, incident_date, incident_type, location, description,
@@ -1882,8 +1894,21 @@ def incidents():
                 data.get('residents_involved') or '',
                 int(staff_id)
             ))
+            print(f"✅ INSERT statement executed")
+            
+            print(f"💾 Committing transaction...")
             conn.commit()
             incident_id = cursor.lastrowid
+            print(f"✅ Transaction committed successfully! Incident ID: {incident_id}")
+            
+            # Verify the incident was saved
+            cursor.execute('SELECT * FROM incident_reports WHERE id = ?', (incident_id,))
+            verify_incident = cursor.fetchone()
+            if verify_incident:
+                print(f"✅ VERIFIED: Incident {incident_id} exists in database")
+                print(f"   Description: {verify_incident['description'][:50]}...")
+            else:
+                print(f"❌ CRITICAL: Incident {incident_id} NOT FOUND after commit!")
             
             # Create notification for incident
             try:
@@ -1902,8 +1927,13 @@ def incidents():
                 print(f'Warning: Could not create notification: {notif_error}')
             
             # Send email alert for major/critical severity incidents
-            severity_value = data.get('severity', '').lower() if data.get('severity') else ''
-            print(f"🔍 Incident severity check: '{data.get('severity')}' -> '{severity_value}' (EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE})")
+            raw_severity = data.get('severity', '')
+            severity_value = raw_severity.lower() if raw_severity else ''
+            print(f"🔍 Incident severity check:")
+            print(f"   Raw severity from request: '{raw_severity}' (type: {type(raw_severity)})")
+            print(f"   Normalized severity: '{severity_value}'")
+            print(f"   EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE}")
+            print(f"   Will send email? {EMAIL_SERVICE_AVAILABLE and severity_value in ['major', 'critical']}")
             
             if EMAIL_SERVICE_AVAILABLE and severity_value in ['major', 'critical']:
                 print(f"✅ Severity '{severity_value}' qualifies for email alert")
@@ -1994,13 +2024,24 @@ def incidents():
                 else:
                     print(f"ℹ️ Severity '{severity_value}' does not qualify for email alert (must be 'major' or 'critical')")
             
+            print(f"📤 Sending success response with incident_id: {incident_id}")
             conn.close()
+            print(f"✅ Connection closed. Returning success response.")
+            print(f"{'='*60}\n")
             return jsonify({'id': incident_id, 'message': 'Incident report created successfully'}), 201
         except sqlite3.IntegrityError as e:
+            print(f"\n❌ INTEGRITY ERROR: {e}")
+            import traceback
+            traceback.print_exc()
             conn.close()
+            print(f"{'='*60}\n")
             return jsonify({'error': f'Database error: {str(e)}'}), 400
         except Exception as e:
+            print(f"\n❌ EXCEPTION: {e}")
+            import traceback
+            traceback.print_exc()
             conn.close()
+            print(f"{'='*60}\n")
             return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 @app.route('/api/incidents/<int:id>', methods=['GET', 'PUT', 'DELETE'])
