@@ -81,6 +81,28 @@ const translations = {
         'common.next': 'Next',
         'common.yes': 'Yes',
         'common.no': 'No',
+        'common.clear': 'Clear',
+        'common.darkMode': 'Dark Mode',
+        'common.print': 'Print',
+        'common.keyboardShortcuts': 'Keyboard Shortcuts',
+        'common.selectStaff': 'Select Staff',
+        'common.selectResidents': 'Select Residents',
+        'common.selectBill': 'Select bill',
+        'common.noItems': 'No items',
+        'common.noResidents': 'No residents added yet.',
+        'common.noMedications': 'No medications added yet.',
+        'common.noAppointments': 'No appointments scheduled.',
+        'common.noVitalSigns': 'No vital signs recorded yet.',
+        'common.noBills': 'No bills created yet.',
+        'common.noPayments': 'No payments recorded yet.',
+        'common.noStaff': 'No staff members found.',
+        'common.noCareNotes': 'No care notes found.',
+        'common.noIncidents': 'No incidents found.',
+        'common.noNotifications': 'No notifications',
+        'common.loading': 'Loading...',
+        'common.errorLoading': 'Error loading',
+        'common.tapToTakePhoto': 'Tap to take photo',
+        'common.cameraAutoOpen': 'Camera will open automatically',
         
         // Login
         'login.title': 'Elder Care Management',
@@ -99,6 +121,7 @@ const translations = {
         'resident.addNew': 'Add New Resident',
         
         // Resident Form
+        'resident.title': 'Residents Management',
         'resident.add': 'Add New Resident',
         'resident.edit': 'Edit Resident',
         'resident.firstName': 'First Name',
@@ -141,6 +164,8 @@ const translations = {
         'month.december': 'December',
         
         // Medications
+        'medication.title': 'Medication Management',
+        'medication.addNew': 'Add New Medication',
         'medication.add': 'Add Medication',
         'medication.edit': 'Edit Medication',
         'medication.name': 'Medication Name',
@@ -150,21 +175,53 @@ const translations = {
         'medication.endDate': 'End Date',
         'medication.instructions': 'Instructions',
         'medication.save': 'Save Medication',
+        'medication.frequency.onceDaily': 'Once daily',
+        'medication.frequency.twiceDaily': 'Twice daily',
+        'medication.frequency.threeTimesDaily': 'Three times daily',
+        'medication.frequency.every4Hours': 'Every 4 hours',
+        'medication.frequency.every6Hours': 'Every 6 hours',
+        'medication.frequency.every8Hours': 'Every 8 hours',
+        'medication.frequency.atIntervals': 'At intervals',
+        'medication.frequency.asNeeded': 'As needed',
+        'medication.noEndDate': 'No end date (Ongoing)',
+        'medication.ongoing': 'Ongoing',
+        'medication.scheduledTimes': 'Scheduled Times',
+        'medication.markTaken': 'Mark Taken',
+        'medication.taken': 'Taken',
+        
+        // Calendar
+        'calendar.title': 'Activity Calendar',
+        'calendar.previous': '← Previous',
+        'calendar.next': 'Next →',
+        'calendar.today': 'Today',
+        'calendar.search': 'Search Activities',
+        'calendar.searchPlaceholder': 'Search by name, doctor, medication...',
         
         // Appointments
+        'appointment.title': 'Appointment Tracking',
         'appointment.add': 'Add Appointment',
         'appointment.edit': 'Edit Appointment',
+        'appointment.addNew': 'Add New Appointment',
         'appointment.date': 'Date',
         'appointment.time': 'Time',
         'appointment.type': 'Type',
-        'appointment.provider': 'Provider',
+        'appointment.provider': 'Doctor/Provider',
+        'appointment.facility': 'Facility',
+        'appointment.purpose': 'Purpose',
         'appointment.location': 'Location',
         'appointment.notes': 'Notes',
         'appointment.save': 'Save Appointment',
         
         // Billing
+        'billing.title': 'Billing & Payments',
         'billing.add': 'Add New Bill',
         'billing.edit': 'Edit Bill',
+        'billing.create': 'Create Bill',
+        'billing.accountBalance': 'Account Balance',
+        'billing.totalBilled': 'Total Billed',
+        'billing.totalPaid': 'Total Paid',
+        'billing.balance': 'Balance',
+        'billing.pending': 'Pending',
         'billing.date': 'Billing Date',
         'billing.amount': 'Amount',
         'billing.description': 'Description',
@@ -174,10 +231,15 @@ const translations = {
         'billing.status.pending': 'Pending',
         'billing.status.paid': 'Paid',
         'billing.status.overdue': 'Overdue',
+        'payment.add': 'Record Payment',
+        'payment.edit': 'Edit Payment',
         
         // Vital Signs
-        'vitals.add': 'Add Vital Signs',
+        'vitals.title': 'Vital Signs Tracker',
+        'vitals.add': 'Record Vital Signs',
         'vitals.edit': 'Edit Vital Signs',
+        'vitals.history': 'Vital Signs History',
+        'vitals.dateTime': 'Date & Time',
         'vitals.date': 'Date',
         'vitals.time': 'Time',
         'vitals.bloodPressure': 'Blood Pressure',
@@ -189,6 +251,7 @@ const translations = {
         'vitals.save': 'Save Vital Signs',
         
         // Care Notes
+        'carenote.title': 'Care Notes',
         'carenote.add': 'Add Care Note',
         'carenote.edit': 'Edit Care Note',
         'carenote.date': 'Date',
@@ -198,8 +261,10 @@ const translations = {
         'carenote.save': 'Save Care Note',
         
         // Incidents
+        'incident.title': 'Incident Reports',
         'incident.add': 'Report Incident',
         'incident.edit': 'Edit Incident',
+        'incident.editReport': 'Edit Incident Report',
         'incident.date': 'Date',
         'incident.time': 'Time',
         'incident.type': 'Type',
@@ -209,6 +274,7 @@ const translations = {
         'incident.save': 'Save Incident',
         
         // Staff
+        'staff.title': 'Staff Management',
         'staff.add': 'Add New Staff Member',
         'staff.edit': 'Edit Staff Member',
         'staff.username': 'Username',
@@ -217,7 +283,16 @@ const translations = {
         'staff.email': 'Email',
         'staff.phone': 'Phone',
         'staff.password': 'Password',
+        'staff.password.placeholder': 'Enter new password',
         'staff.save': 'Save Staff',
+        'staff.passwordHint.new': '(Required for new staff)',
+        'staff.passwordHint.edit': '(Leave blank to keep current)',
+        'staff.active': 'Active',
+        'staff.role.caregiver': 'Caregiver',
+        'staff.role.nurse': 'Nurse',
+        'staff.role.admin': 'Administrator',
+        'staff.role.doctor': 'Doctor',
+        'staff.role.therapist': 'Therapist',
     },
     es: {
         // Navigation
@@ -277,6 +352,28 @@ const translations = {
         'common.next': 'Siguiente',
         'common.yes': 'Sí',
         'common.no': 'No',
+        'common.clear': 'Limpiar',
+        'common.darkMode': 'Modo Oscuro',
+        'common.print': 'Imprimir',
+        'common.keyboardShortcuts': 'Atajos de Teclado',
+        'common.selectStaff': 'Seleccionar Personal',
+        'common.selectResidents': 'Seleccionar Residentes',
+        'common.selectBill': 'Seleccionar factura',
+        'common.noItems': 'Sin elementos',
+        'common.noResidents': 'No hay residentes agregados aún.',
+        'common.noMedications': 'No hay medicamentos agregados aún.',
+        'common.noAppointments': 'No hay citas programadas.',
+        'common.noVitalSigns': 'No hay signos vitales registrados aún.',
+        'common.noBills': 'No hay facturas creadas aún.',
+        'common.noPayments': 'No hay pagos registrados aún.',
+        'common.noStaff': 'No se encontró personal.',
+        'common.noCareNotes': 'No se encontraron notas de cuidado.',
+        'common.noIncidents': 'No se encontraron incidentes.',
+        'common.noNotifications': 'Sin notificaciones',
+        'common.loading': 'Cargando...',
+        'common.errorLoading': 'Error al cargar',
+        'common.tapToTakePhoto': 'Toca para tomar foto',
+        'common.cameraAutoOpen': 'La cámara se abrirá automáticamente',
         
         // Login
         'login.title': 'Gestión de Cuidado de Ancianos',
@@ -295,6 +392,7 @@ const translations = {
         'resident.addNew': 'Agregar Nuevo Residente',
         
         // Resident Form
+        'resident.title': 'Gestión de Residentes',
         'resident.add': 'Agregar Nuevo Residente',
         'resident.edit': 'Editar Residente',
         'resident.firstName': 'Nombre',
@@ -337,6 +435,8 @@ const translations = {
         'month.december': 'Diciembre',
         
         // Medications
+        'medication.title': 'Gestión de Medicamentos',
+        'medication.addNew': 'Agregar Nuevo Medicamento',
         'medication.add': 'Agregar Medicamento',
         'medication.edit': 'Editar Medicamento',
         'medication.name': 'Nombre del Medicamento',
@@ -349,21 +449,53 @@ const translations = {
         'medication.times': 'Hora(s)',
         'medication.timesHint': 'Ingrese horas separadas por comas',
         'medication.hoursBetween': 'Horas Entre Dosis',
+        'medication.frequency.onceDaily': 'Una vez al día',
+        'medication.frequency.twiceDaily': 'Dos veces al día',
+        'medication.frequency.threeTimesDaily': 'Tres veces al día',
+        'medication.frequency.every4Hours': 'Cada 4 horas',
+        'medication.frequency.every6Hours': 'Cada 6 horas',
+        'medication.frequency.every8Hours': 'Cada 8 horas',
+        'medication.frequency.atIntervals': 'A intervalos',
+        'medication.frequency.asNeeded': 'Según sea necesario',
+        'medication.noEndDate': 'Sin fecha de fin (Continuo)',
+        'medication.ongoing': 'Continuo',
+        'medication.scheduledTimes': 'Horarios',
+        'medication.markTaken': 'Marcar Tomado',
+        'medication.taken': 'Tomado',
+        
+        // Calendar
+        'calendar.title': 'Calendario de Actividades',
+        'calendar.previous': '← Anterior',
+        'calendar.next': 'Siguiente →',
+        'calendar.today': 'Hoy',
+        'calendar.search': 'Buscar Actividades',
+        'calendar.searchPlaceholder': 'Buscar por nombre, doctor, medicamento...',
         
         // Appointments
+        'appointment.title': 'Seguimiento de Citas',
         'appointment.add': 'Agregar Cita',
         'appointment.edit': 'Editar Cita',
+        'appointment.addNew': 'Agregar Nueva Cita',
         'appointment.date': 'Fecha',
         'appointment.time': 'Hora',
         'appointment.type': 'Tipo',
-        'appointment.provider': 'Proveedor',
+        'appointment.provider': 'Doctor/Proveedor',
+        'appointment.facility': 'Instalación',
+        'appointment.purpose': 'Propósito',
         'appointment.location': 'Ubicación',
         'appointment.notes': 'Notas',
         'appointment.save': 'Guardar Cita',
         
         // Billing
+        'billing.title': 'Facturación y Pagos',
         'billing.add': 'Agregar Nueva Factura',
         'billing.edit': 'Editar Factura',
+        'billing.create': 'Crear Factura',
+        'billing.accountBalance': 'Saldo de Cuenta',
+        'billing.totalBilled': 'Total Facturado',
+        'billing.totalPaid': 'Total Pagado',
+        'billing.balance': 'Saldo',
+        'billing.pending': 'Pendiente',
         'billing.date': 'Fecha de Factura',
         'billing.amount': 'Monto',
         'billing.description': 'Descripción',
@@ -373,10 +505,15 @@ const translations = {
         'billing.status.pending': 'Pendiente',
         'billing.status.paid': 'Pagado',
         'billing.status.overdue': 'Vencido',
+        'payment.add': 'Registrar Pago',
+        'payment.edit': 'Editar Pago',
         
         // Vital Signs
-        'vitals.add': 'Agregar Signos Vitales',
+        'vitals.title': 'Registro de Signos Vitales',
+        'vitals.add': 'Registrar Signos Vitales',
         'vitals.edit': 'Editar Signos Vitales',
+        'vitals.history': 'Historial de Signos Vitales',
+        'vitals.dateTime': 'Fecha y Hora',
         'vitals.date': 'Fecha',
         'vitals.time': 'Hora',
         'vitals.bloodPressure': 'Presión Arterial',
@@ -388,6 +525,7 @@ const translations = {
         'vitals.save': 'Guardar Signos Vitales',
         
         // Care Notes
+        'carenote.title': 'Notas de Cuidado',
         'carenote.add': 'Agregar Nota de Cuidado',
         'carenote.edit': 'Editar Nota de Cuidado',
         'carenote.date': 'Fecha',
@@ -397,8 +535,10 @@ const translations = {
         'carenote.save': 'Guardar Nota de Cuidado',
         
         // Incidents
+        'incident.title': 'Reportes de Incidentes',
         'incident.add': 'Reportar Incidente',
         'incident.edit': 'Editar Incidente',
+        'incident.editReport': 'Editar Reporte de Incidente',
         'incident.date': 'Fecha',
         'incident.time': 'Hora',
         'incident.type': 'Tipo',
@@ -408,6 +548,7 @@ const translations = {
         'incident.save': 'Guardar Incidente',
         
         // Staff
+        'staff.title': 'Gestión de Personal',
         'staff.add': 'Agregar Nuevo Personal',
         'staff.edit': 'Editar Personal',
         'staff.username': 'Usuario',
@@ -416,7 +557,16 @@ const translations = {
         'staff.email': 'Correo Electrónico',
         'staff.phone': 'Teléfono',
         'staff.password': 'Contraseña',
+        'staff.password.placeholder': 'Ingrese nueva contraseña',
         'staff.save': 'Guardar Personal',
+        'staff.passwordHint.new': '(Requerido para nuevo personal)',
+        'staff.passwordHint.edit': '(Dejar en blanco para mantener actual)',
+        'staff.active': 'Activo',
+        'staff.role.caregiver': 'Cuidador',
+        'staff.role.nurse': 'Enfermero(a)',
+        'staff.role.admin': 'Administrador',
+        'staff.role.doctor': 'Médico',
+        'staff.role.therapist': 'Terapeuta',
     }
 };
 
@@ -665,14 +815,14 @@ function updateTranslations() {
     frequencySelects.forEach(select => {
         Array.from(select.options).forEach(option => {
             const freqMap = {
-                'Once daily': currentLanguage === 'es' ? 'Una vez al día' : 'Once daily',
-                'Twice daily': currentLanguage === 'es' ? 'Dos veces al día' : 'Twice daily',
-                'Three times daily': currentLanguage === 'es' ? 'Tres veces al día' : 'Three times daily',
-                'Every 4 hours': currentLanguage === 'es' ? 'Cada 4 horas' : 'Every 4 hours',
-                'Every 6 hours': currentLanguage === 'es' ? 'Cada 6 horas' : 'Every 6 hours',
-                'Every 8 hours': currentLanguage === 'es' ? 'Cada 8 horas' : 'Every 8 hours',
-                'At intervals': currentLanguage === 'es' ? 'A intervalos' : 'At intervals',
-                'As needed': currentLanguage === 'es' ? 'Según sea necesario' : 'As needed'
+                'Once daily': t('medication.frequency.onceDaily'),
+                'Twice daily': t('medication.frequency.twiceDaily'),
+                'Three times daily': t('medication.frequency.threeTimesDaily'),
+                'Every 4 hours': t('medication.frequency.every4Hours'),
+                'Every 6 hours': t('medication.frequency.every6Hours'),
+                'Every 8 hours': t('medication.frequency.every8Hours'),
+                'At intervals': t('medication.frequency.atIntervals'),
+                'As needed': t('medication.frequency.asNeeded')
             };
             if (freqMap[option.value]) {
                 option.textContent = freqMap[option.value];
@@ -1112,12 +1262,12 @@ function showAddResidentForm() {
         // Reset form titles only when adding new
         const formTitleModal = document.querySelector('#addResidentForm h3');
         if (formTitleModal) {
-            formTitleModal.textContent = 'Add New Resident / Agregar Nuevo Residente';
+            formTitleModal.textContent = t('resident.add');
         }
         
         const formTitlePage = document.querySelector('#addResidentFormPage h3');
         if (formTitlePage) {
-            formTitlePage.textContent = 'Add New Resident / Agregar Nuevo Residente';
+            formTitlePage.textContent = t('resident.add');
         }
         
         // Reset forms only when adding new
@@ -2797,6 +2947,9 @@ function showPage(pageName) {
     
     // Replace dual-language text with single language after page is shown
     replaceDualLanguageText();
+    
+    // Update all translatable elements (data-translate attributes)
+    updateTranslations();
 }
 
 function showMessage(message, type = 'success') {
@@ -3262,14 +3415,14 @@ async function loadResidents() {
             // Select button
             const selectBtn = document.createElement('button');
             selectBtn.className = 'btn btn-primary btn-sm';
-            selectBtn.textContent = 'Select / Seleccionar';
+            selectBtn.textContent = t('common.select');
             selectBtn.onclick = () => selectResidentById(resident.id);
             actionsDiv.appendChild(selectBtn);
             
             // Edit button - CREATE IT EXPLICITLY
             const editBtn = document.createElement('button');
             editBtn.className = 'btn btn-success btn-sm';
-            editBtn.textContent = 'Edit / Editar';
+            editBtn.textContent = t('common.edit');
             editBtn.setAttribute('type', 'button');
             editBtn.setAttribute('data-resident-id', resident.id);
             editBtn.style.cssText = 'background-color: #28a745 !important; color: white !important; border: 2px solid #28a745 !important; padding: 0.5rem 1rem !important; cursor: pointer !important; display: inline-block !important; visibility: visible !important; opacity: 1 !important; width: auto !important; height: auto !important; min-width: 100px !important; margin: 0 !important;';
@@ -3284,7 +3437,7 @@ async function loadResidents() {
             // Delete button
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'btn btn-danger btn-sm';
-            deleteBtn.textContent = 'Delete / Eliminar';
+            deleteBtn.textContent = t('common.delete');
             deleteBtn.onclick = () => deleteResident(resident.id);
             actionsDiv.appendChild(deleteBtn);
             
@@ -3414,12 +3567,12 @@ async function editResident(id) {
         // Update form titles
         const formTitlePage = document.querySelector('#addResidentFormPage h3');
         if (formTitlePage) {
-            formTitlePage.textContent = 'Edit Resident / Editar Residente';
+            formTitlePage.textContent = t('resident.edit');
         }
         
         const formTitleModal = document.querySelector('#addResidentForm h3');
         if (formTitleModal) {
-            formTitleModal.textContent = 'Edit Resident / Editar Residente';
+            formTitleModal.textContent = t('resident.edit');
         }
         
         // Final verification that editingResidentId is still set
@@ -3468,9 +3621,9 @@ let editingStaffId = null;
 function showAddStaffForm() {
     editingStaffId = null;
     document.getElementById('addStaffForm').style.display = 'block';
-    document.getElementById('staffFormTitle').textContent = 'Add New Staff Member / Agregar Nuevo Personal';
+    document.getElementById('staffFormTitle').textContent = t('staff.add');
     document.getElementById('staffPassword').required = true;
-    document.getElementById('staffPasswordHint').textContent = '(Required for new staff / Requerido para nuevo personal)';
+    document.getElementById('staffPasswordHint').textContent = t('staff.passwordHint.new');
     document.getElementById('staffActiveGroup').style.display = 'none';
     document.getElementById('newStaffForm').reset();
     // Process dual-language text for form header
@@ -3570,10 +3723,10 @@ async function editStaff(id) {
         document.getElementById('staffActive').checked = staff.active !== 0;
         document.getElementById('staffPassword').value = '';
         document.getElementById('staffPassword').required = false;
-        document.getElementById('staffPasswordHint').textContent = '(Leave blank to keep current / Dejar en blanco para mantener actual)';
+        document.getElementById('staffPasswordHint').textContent = t('staff.passwordHint.edit');
         document.getElementById('staffActiveGroup').style.display = 'block';
         
-        document.getElementById('staffFormTitle').textContent = 'Edit Staff Member / Editar Personal';
+        document.getElementById('staffFormTitle').textContent = t('staff.edit');
         replaceDualLanguageText();
         document.getElementById('addStaffForm').style.display = 'block';
         document.getElementById('addStaffForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -3710,7 +3863,7 @@ async function showIncidentForm() {
         // Reset form
         const formTitle = document.getElementById('incidentFormTitle');
         if (formTitle) {
-            formTitle.textContent = 'Report Incident / Reportar Incidente';
+            formTitle.textContent = t('incident.add');
             replaceDualLanguageText();
         }
         
@@ -4390,7 +4543,7 @@ async function editIncident(id) {
         document.getElementById('familyNotificationDateGroup').style.display = incident.family_notified ? 'block' : 'none';
         document.getElementById('followUpNotesGroup').style.display = incident.follow_up_required ? 'block' : 'none';
         
-        document.getElementById('incidentFormTitle').textContent = 'Edit Incident Report / Editar Reporte de Incidente';
+        document.getElementById('incidentFormTitle').textContent = t('incident.editReport');
         replaceDualLanguageText();
         document.getElementById('incidentForm').style.display = 'block';
         document.getElementById('incidentForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -4526,7 +4679,7 @@ let editingCareNoteId = null;
 function showCareNoteForm() {
     editingCareNoteId = null;
     document.getElementById('careNoteForm').style.display = 'block';
-    document.getElementById('careNoteFormTitle').textContent = 'Add Care Note / Agregar Nota de Cuidado';
+    document.getElementById('careNoteFormTitle').textContent = t('carenote.add');
     replaceDualLanguageText();
     const form = document.getElementById('newCareNoteForm');
     if (form) form.reset();
@@ -4614,7 +4767,7 @@ async function editCareNote(id) {
         document.getElementById('activities').value = note.activities || '';
         document.getElementById('generalNotes').value = note.general_notes || '';
         
-        document.getElementById('careNoteFormTitle').textContent = 'Edit Care Note / Editar Nota de Cuidado';
+        document.getElementById('careNoteFormTitle').textContent = t('carenote.edit');
         replaceDualLanguageText();
         document.getElementById('careNoteForm').style.display = 'block';
         document.getElementById('careNoteForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -5126,7 +5279,10 @@ function showMedicationForm() {
     document.getElementById('hoursIntervalGroup').style.display = 'none';
     document.getElementById('medTimesGroup').style.display = 'block';
     // Update form title
-    document.querySelector('#medicationForm h3').textContent = 'Add Medication / Agregar Medicamento';
+    const formTitle = document.querySelector('#medicationForm h3');
+    if (formTitle) {
+        formTitle.textContent = t('medication.add');
+    }
     replaceDualLanguageText();
 }
 
@@ -5202,7 +5358,10 @@ async function editMedication(id) {
         }
         
         // Update form title
-        document.querySelector('#medicationForm h3').textContent = 'Edit Medication / Editar Medicamento';
+        const formTitle = document.querySelector('#medicationForm h3');
+        if (formTitle) {
+            formTitle.textContent = t('medication.edit');
+        }
         replaceDualLanguageText();
         
         // Scroll to form
@@ -5347,7 +5506,7 @@ async function loadMedications() {
                         <button class="btn btn-sm ${status === 'taken' ? 'btn-secondary' : 'btn-success'}" 
                                 onclick="logMedication(${med.id}, '${time}')"
                                 ${status === 'taken' ? 'disabled' : ''}>
-                            ${status === 'taken' ? '✓ Taken / Tomado' : 'Mark Taken / Marcar Tomado'}
+                            ${status === 'taken' ? '✓ ' + t('medication.taken') : t('medication.markTaken')}
                         </button>
                     </div>
                 `;
@@ -5358,23 +5517,26 @@ async function loadMedications() {
                     <div>
                         <div class="item-title">${med.name}</div>
                         <div class="item-details">
-                            <p><strong>Dosage / Dosis:</strong> ${med.dosage}</p>
-                            <p><strong>Frequency / Frecuencia:</strong> ${med.frequency}</p>
+                            <p><strong>${t('medication.dosage')}:</strong> ${med.dosage}</p>
+                            <p><strong>${t('medication.frequency')}:</strong> ${med.frequency}</p>
                         </div>
                     </div>
                     <div class="item-actions">
-                        <button class="btn btn-primary btn-sm" onclick="editMedication(${med.id})">Edit / Editar</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteMedication(${med.id})">Delete / Eliminar</button>
+                        <button class="btn btn-primary btn-sm" onclick="editMedication(${med.id})" data-translate="common.edit">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMedication(${med.id})" data-translate="common.delete">Delete</button>
                     </div>
                 </div>
                 <div style="margin-top: 1rem;">
-                    <strong>Scheduled Times / Horarios:</strong><br>
+                    <strong>${t('medication.scheduledTimes')}:</strong><br>
                     ${timesHTML}
                 </div>
             `;
             
             listContainer.appendChild(card);
         }
+        
+        // Process any remaining dual-language text in dynamically generated content
+        replaceDualLanguageText();
     } catch (error) {
         console.error('Error loading medications:', error);
         showMessage('Error loading medications / Error al cargar medicamentos', 'error');
@@ -5435,7 +5597,7 @@ function showAppointmentForm() {
     setDateToDropdowns(today.toISOString().split('T')[0], 'apptYear', 'apptMonth', 'apptDay');
     document.getElementById('apptTime').value = '';
     // Update form title
-    document.querySelector('#appointmentForm h3').textContent = 'Add Appointment / Agregar Cita';
+    document.querySelector('#appointmentForm h3').textContent = t('appointment.add');
     replaceDualLanguageText();
 }
 
@@ -5487,7 +5649,7 @@ async function editAppointment(id) {
         document.getElementById('apptNotes').value = appt.notes || '';
         
         // Update form title
-        document.querySelector('#appointmentForm h3').textContent = 'Edit Appointment / Editar Cita';
+        document.querySelector('#appointmentForm h3').textContent = t('appointment.edit');
         replaceDualLanguageText();
         
         // Scroll to form
@@ -5683,7 +5845,7 @@ function showVitalSignsForm() {
     // Update form title
     const formTitle = document.querySelector('#vitalSignsForm h3');
     if (formTitle) {
-        formTitle.textContent = 'Record Vital Signs / Registrar Signos Vitales';
+        formTitle.textContent = t('vitals.add');
         replaceDualLanguageText();
     }
 }
@@ -5756,7 +5918,7 @@ async function editVitalSign(id) {
         // Update form title
         const formTitle = document.querySelector('#vitalSignsForm h3');
         if (formTitle) {
-            formTitle.textContent = 'Edit Vital Signs / Editar Signos Vitales';
+            formTitle.textContent = t('vitals.edit');
             replaceDualLanguageText();
         }
         
@@ -5984,7 +6146,7 @@ function showBillForm() {
     // Update form title
     const billFormTitle = document.getElementById('billFormTitle') || document.querySelector('#billForm h3');
     if (billFormTitle) {
-        billFormTitle.textContent = 'Add New Bill / Agregar Nueva Factura';
+        billFormTitle.textContent = t('billing.add');
         replaceDualLanguageText();
     } else {
         console.error('❌ billFormTitle element not found!');
@@ -6023,7 +6185,7 @@ async function editBill(id) {
         // Update form title
         const billFormTitle = document.getElementById('billFormTitle') || document.querySelector('#billForm h3');
         if (billFormTitle) {
-            billFormTitle.textContent = 'Edit Bill / Editar Factura';
+            billFormTitle.textContent = t('billing.edit');
             replaceDualLanguageText();
         } else {
             console.error('❌ billFormTitle element not found!');
@@ -6276,7 +6438,7 @@ function showPaymentForm() {
     setDateToDropdowns(today, 'paymentYear', 'paymentMonth', 'paymentDay');
     loadBilling(); // Load bills for dropdown
     // Update form title
-    document.querySelector('#paymentForm h3').textContent = 'Record Payment / Registrar Pago';
+    document.querySelector('#paymentForm h3').textContent = t('payment.add');
     replaceDualLanguageText();
 }
 
@@ -6301,7 +6463,7 @@ async function editPayment(id) {
         }
         
         // Update form title
-        document.querySelector('#paymentForm h3').textContent = 'Edit Payment / Editar Pago';
+        document.querySelector('#paymentForm h3').textContent = t('payment.edit');
         replaceDualLanguageText();
         
         // Scroll to form

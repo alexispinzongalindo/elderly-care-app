@@ -198,9 +198,9 @@
                             <span class="nav-title-text">Elder Care Tracker</span>
                         </h1>
                         <div class="quick-actions-nav" style="display: none;">
-                            <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeToggle" title="Dark Mode / Modo Oscuro">🌙</button>
-                            <button class="btn-icon" onclick="printCurrentPage()" title="Print / Imprimir">🖨️</button>
-                            <button class="btn-icon" onclick="showKeyboardShortcuts()" title="Keyboard Shortcuts / Atajos de Teclado">⌨️</button>
+                            <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeToggle" data-translate-title="common.darkMode" title="Dark Mode">🌙</button>
+                            <button class="btn-icon" onclick="printCurrentPage()" data-translate-title="common.print" title="Print">🖨️</button>
+                            <button class="btn-icon" onclick="showKeyboardShortcuts()" data-translate-title="common.keyboardShortcuts" title="Keyboard Shortcuts">⌨️</button>
                         </div>
                     </div>
                     
@@ -372,8 +372,8 @@
 
             <!-- Residents Page -->
             <div id="residents" class="page">
-                <h2>Residents Management / Gestión de Residentes</h2>
-                <button class="btn btn-primary" onclick="showAddResidentForm()">+ Add New Resident / Agregar Nuevo Residente</button>
+                <h2 data-translate="resident.title">Residents Management</h2>
+                <button class="btn btn-primary" onclick="showAddResidentForm()" data-translate="resident.addNew">+ Add New Resident</button>
                 
                 <!-- Add/Edit Resident Form (for Residents page) -->
                 <div id="addResidentFormPage" class="form-card" style="display: none; margin-top: 2rem;">
@@ -443,8 +443,8 @@
                                     <input type="file" id="newPhotoInputPage" accept="image/*" capture="environment" onchange="handleResidentPhotoUploadPage(event)" style="display: none;">
                                     <label for="newPhotoInputPage" class="photo-upload-label">
                                         <span class="photo-upload-icon">📷</span>
-                                        <span class="photo-upload-text">Tap to take photo / Toca para tomar foto</span>
-                                        <span class="photo-upload-hint">Camera will open automatically / La cámara se abrirá automáticamente</span>
+                                        <span class="photo-upload-text" data-translate="common.tapToTakePhoto">Tap to take photo</span>
+                                        <span class="photo-upload-hint" data-translate="common.cameraAutoOpen">Camera will open automatically</span>
                                     </label>
                                 </div>
                             </div>
@@ -469,8 +469,8 @@
                                 <input type="tel" id="newEmergencyPhonePage">
                             </div>
                             <div class="form-group">
-                                <label for="newEmergencyRelationPage">Relation / Relación</label>
-                                <input type="text" id="newEmergencyRelationPage" placeholder="e.g., Son, Daughter / Hijo, Hija">
+                                <label for="newEmergencyRelationPage" data-translate="resident.emergencyRelation">Relation</label>
+                                <input type="text" id="newEmergencyRelationPage" data-translate-placeholder="resident.relation.placeholder" placeholder="e.g., Son, Daughter">
                             </div>
                         </div>
                         <div class="form-group">
@@ -490,8 +490,8 @@
                             <textarea id="newDietaryRestrictionsPage" rows="2"></textarea>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-success">Save Resident / Guardar Residente</button>
-                            <button type="button" class="btn btn-secondary" onclick="hideAddResidentForm()">Cancel / Cancelar</button>
+                            <button type="submit" class="btn btn-success" data-translate="resident.save">Save Resident</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideAddResidentForm()" data-translate="common.cancel">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -501,12 +501,12 @@
 
             <!-- Staff Page -->
             <div id="staff" class="page">
-                <h2>Staff Management / Gestión de Personal</h2>
-                <button class="btn btn-primary" onclick="showAddStaffForm()">+ Add New Staff / Agregar Nuevo Personal</button>
+                <h2 data-translate="staff.title">Staff Management</h2>
+                <button class="btn btn-primary" onclick="showAddStaffForm()" data-translate="staff.addNew">+ Add New Staff</button>
                 
                 <!-- Add/Edit Staff Form -->
                 <div id="addStaffForm" class="form-card" style="display: none; margin-top: 2rem;">
-                    <h3 id="staffFormTitle">Add New Staff Member / Agregar Nuevo Personal</h3>
+                    <h3 id="staffFormTitle" data-translate="staff.add">Add New Staff Member</h3>
                     <form id="newStaffForm" onsubmit="saveStaff(event)">
                         <div class="form-row">
                             <div class="form-group">
@@ -514,7 +514,7 @@
                                 <input type="text" id="staffFullName" required>
                             </div>
                             <div class="form-group">
-                                <label for="staffUsername">Username / Nombre de Usuario *</label>
+                                <label for="staffUsername" data-translate="staff.username">Username *</label>
                                 <input type="text" id="staffUsername" required>
                             </div>
                         </div>
@@ -532,27 +532,27 @@
                             <div class="form-group">
                                 <label data-translate="staff.role">Role *</label>
                                 <select id="staffRole" required>
-                                    <option value="caregiver">Caregiver / Cuidador</option>
-                                    <option value="nurse">Nurse / Enfermero(a)</option>
-                                    <option value="admin">Administrator / Administrador</option>
-                                    <option value="doctor">Doctor / Médico</option>
-                                    <option value="therapist">Therapist / Terapeuta</option>
+                                    <option value="caregiver" data-translate="staff.role.caregiver">Caregiver</option>
+                                    <option value="nurse" data-translate="staff.role.nurse">Nurse</option>
+                                    <option value="admin" data-translate="staff.role.admin">Administrator</option>
+                                    <option value="doctor" data-translate="staff.role.doctor">Doctor</option>
+                                    <option value="therapist" data-translate="staff.role.therapist">Therapist</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="staffPassword">Password / Contraseña <span id="staffPasswordHint">(Leave blank to keep current)</span></label>
-                                <input type="password" id="staffPassword" placeholder="Enter new password / Ingrese nueva contraseña">
+                                <label for="staffPassword" data-translate="staff.password">Password <span id="staffPasswordHint">(Leave blank to keep current)</span></label>
+                                <input type="password" id="staffPassword" data-translate-placeholder="staff.password.placeholder" placeholder="Enter new password">
                             </div>
                         </div>
                         <div class="form-group" id="staffActiveGroup">
                             <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
                                 <input type="checkbox" id="staffActive" checked>
-                                <span>Active / Activo</span>
+                                <span data-translate="staff.active">Active</span>
                             </label>
                         </div>
                         <div class="button-group">
                             <button type="submit" class="btn btn-success" data-translate="staff.save">Save Staff</button>
-                            <button type="button" class="btn btn-secondary" onclick="hideAddStaffForm()">Cancel / Cancelar</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideAddStaffForm()" data-translate="common.cancel">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -562,8 +562,8 @@
 
             <!-- Medications Page -->
             <div id="medications" class="page">
-                <h2>Medication Management / Gestión de Medicamentos</h2>
-                <button class="btn btn-primary" onclick="showMedicationForm()">+ Add New Medication / Agregar Medicamento</button>
+                <h2 data-translate="medication.title">Medication Management</h2>
+                <button class="btn btn-primary" onclick="showMedicationForm()" data-translate="medication.addNew">+ Add New Medication</button>
                 
                 <div id="medicationForm" class="form-card" style="display: none;">
                     <h3 data-translate="medication.add">Add Medication</h3>
@@ -579,14 +579,14 @@
                         <div class="form-group">
                             <label for="medFrequency" data-translate="medication.frequency">Frequency *</label>
                             <select id="medFrequency" required onchange="handleFrequencyChange()">
-                                <option value="Once daily">Once daily</option>
-                                <option value="Twice daily">Twice daily</option>
-                                <option value="Three times daily">Three times daily</option>
-                                <option value="Every 4 hours">Every 4 hours</option>
-                                <option value="Every 6 hours">Every 6 hours</option>
-                                <option value="Every 8 hours">Every 8 hours</option>
-                                <option value="At intervals">At intervals</option>
-                                <option value="As needed">As needed</option>
+                                <option value="Once daily" data-translate="medication.frequency.onceDaily">Once daily</option>
+                                <option value="Twice daily" data-translate="medication.frequency.twiceDaily">Twice daily</option>
+                                <option value="Three times daily" data-translate="medication.frequency.threeTimesDaily">Three times daily</option>
+                                <option value="Every 4 hours" data-translate="medication.frequency.every4Hours">Every 4 hours</option>
+                                <option value="Every 6 hours" data-translate="medication.frequency.every6Hours">Every 6 hours</option>
+                                <option value="Every 8 hours" data-translate="medication.frequency.every8Hours">Every 8 hours</option>
+                                <option value="At intervals" data-translate="medication.frequency.atIntervals">At intervals</option>
+                                <option value="As needed" data-translate="medication.frequency.asNeeded">As needed</option>
                             </select>
                         </div>
                         <div id="hoursIntervalGroup" class="form-group" style="display: none;">
@@ -649,7 +649,7 @@
                             <div class="form-group" style="margin-bottom: 0.75rem;">
                                 <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
                                     <input type="checkbox" id="medNoEndDate" onchange="handleNoEndDateChange()">
-                                    <span>No end date / Sin fecha de fin (Ongoing / Continuo)</span>
+                                    <span data-translate="medication.noEndDate">No end date (Ongoing)</span>
                                 </label>
                             </div>
                             <div id="medEndDateGroup" class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
@@ -686,8 +686,8 @@
                             </div>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-success">Save / Guardar</button>
-                            <button type="button" class="btn btn-secondary" onclick="hideMedicationForm()">Cancel / Cancelar</button>
+                            <button type="submit" class="btn btn-success" data-translate="common.save">Save</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideMedicationForm()" data-translate="common.cancel">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -697,8 +697,8 @@
 
             <!-- Appointments Page -->
             <div id="appointments" class="page">
-                <h2>Appointment Tracking / Seguimiento de Citas</h2>
-                <button class="btn btn-primary" onclick="showAppointmentForm()">+ Add New Appointment / Agregar Nueva Cita</button>
+                <h2 data-translate="appointment.title">Appointment Tracking</h2>
+                <button class="btn btn-primary" onclick="showAppointmentForm()" data-translate="appointment.addNew">+ Add New Appointment</button>
                 
                 <div id="appointmentForm" class="form-card" style="display: none;">
                     <h3 data-translate="appointment.add">Add Appointment</h3>
@@ -740,15 +740,15 @@
                             <input type="time" id="apptTime" required>
                         </div>
                         <div class="form-group">
-                            <label for="apptDoctor">Doctor/Provider / Doctor/Proveedor *</label>
+                            <label for="apptDoctor" data-translate="appointment.provider">Doctor/Provider *</label>
                             <input type="text" id="apptDoctor" required>
                         </div>
                         <div class="form-group">
-                            <label for="apptFacility">Facility / Instalación</label>
+                            <label for="apptFacility" data-translate="appointment.facility">Facility</label>
                             <input type="text" id="apptFacility">
                         </div>
                         <div class="form-group">
-                            <label for="apptPurpose">Purpose / Propósito</label>
+                            <label for="apptPurpose" data-translate="appointment.purpose">Purpose</label>
                             <input type="text" id="apptPurpose">
                         </div>
                         <div class="form-group">
@@ -756,8 +756,8 @@
                             <textarea id="apptNotes" rows="3"></textarea>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-success">Save / Guardar</button>
-                            <button type="button" class="btn btn-secondary" onclick="hideAppointmentForm()">Cancel / Cancelar</button>
+                            <button type="submit" class="btn btn-success" data-translate="appointment.save">Save</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideAppointmentForm()" data-translate="common.cancel">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -767,13 +767,13 @@
 
             <!-- Vital Signs Page -->
             <div id="vitalsigns" class="page">
-                <h2>Vital Signs Tracker / Registro de Signos Vitales</h2>
+                <h2 data-translate="vitals.title">Vital Signs Tracker</h2>
                 
                 <div class="form-card">
-                    <h3>Record Vital Signs / Registrar Signos Vitales</h3>
+                    <h3 data-translate="vitals.add">Record Vital Signs</h3>
                     <form id="vitalSignsForm" onsubmit="saveVitalSign(event)">
                         <div class="form-group">
-                            <label>Date & Time / Fecha y Hora *</label>
+                            <label data-translate="vitals.dateTime">Date & Time *</label>
                             <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                                 <div class="form-group" style="margin: 0;">
                                     <select id="vsYear" class="form-control" required>
@@ -860,21 +860,21 @@
                         </div>
                         
                         <div class="button-group">
-                            <button type="submit" class="btn btn-success">💾 Save Vital Signs / Guardar Signos Vitales</button>
-                            <button type="button" class="btn btn-secondary" onclick="clearVitalSignsForm()">Clear / Limpiar</button>
+                            <button type="submit" class="btn btn-success" data-translate="vitals.save">💾 Save Vital Signs</button>
+                            <button type="button" class="btn btn-secondary" onclick="clearVitalSignsForm()" data-translate="common.clear">Clear</button>
                         </div>
                     </form>
                 </div>
                 
                 <div style="margin-top: 2rem;">
-                    <h3>Vital Signs History / Historial de Signos Vitales</h3>
+                    <h3 data-translate="vitals.history">Vital Signs History</h3>
                     <div id="vitalSignsList" class="item-list"></div>
                 </div>
             </div>
 
             <!-- Calendar Page -->
             <div id="calendar" class="page">
-                <h2>Activity Calendar / Calendario de Actividades</h2>
+                <h2 data-translate="calendar.title">Activity Calendar</h2>
                 
                 <div class="form-card">
                     <div class="calendar-controls" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
@@ -901,15 +901,15 @@
                             </select>
                         </div>
                         <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
-                            <button class="btn btn-secondary" onclick="changeCalendarMonth(-1)">← Previous / Anterior</button>
-                            <button class="btn btn-secondary" onclick="changeCalendarMonth(1)">Next / Siguiente →</button>
-                            <button class="btn btn-primary" onclick="goToToday()">Today / Hoy</button>
+                            <button class="btn btn-secondary" onclick="changeCalendarMonth(-1)" data-translate="calendar.previous">← Previous</button>
+                            <button class="btn btn-secondary" onclick="changeCalendarMonth(1)" data-translate="calendar.next">Next →</button>
+                            <button class="btn btn-primary" onclick="goToToday()" data-translate="calendar.today">Today</button>
                         </div>
                     </div>
                     
                     <div class="form-group" style="margin-bottom: 1rem;">
-                        <label for="calendarSearch" style="font-size: 0.9rem; margin-bottom: 0.25rem;">Search Activities / Buscar Actividades</label>
-                        <input type="text" id="calendarSearch" class="form-control" placeholder="Search by name, doctor, medication... / Buscar por nombre, doctor, medicamento..." style="padding: 0.5rem;">
+                        <label for="calendarSearch" style="font-size: 0.9rem; margin-bottom: 0.25rem;" data-translate="calendar.search">Search Activities</label>
+                        <input type="text" id="calendarSearch" class="form-control" data-translate-placeholder="calendar.searchPlaceholder" placeholder="Search by name, doctor, medication..." style="padding: 0.5rem;">
                     </div>
                 </div>
                 
@@ -918,26 +918,26 @@
 
             <!-- Billing Page -->
             <div id="billing" class="page">
-                <h2>Billing & Payments / Facturación y Pagos</h2>
+                <h2 data-translate="billing.title">Billing & Payments</h2>
                 
                 <!-- Account Balance Summary -->
                 <div id="accountBalanceCard" class="form-card" style="display: none;">
-                    <h3>Account Balance / Saldo de Cuenta</h3>
+                    <h3 data-translate="billing.accountBalance">Account Balance</h3>
                     <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 1rem;">
                         <div class="stat-card">
-                            <h4>Total Billed / Total Facturado</h4>
+                            <h4 data-translate="billing.totalBilled">Total Billed</h4>
                             <p class="stat-number" id="totalBilled">$0.00</p>
                         </div>
                         <div class="stat-card">
-                            <h4>Total Paid / Total Pagado</h4>
+                            <h4 data-translate="billing.totalPaid">Total Paid</h4>
                             <p class="stat-number" style="color: var(--success-green);" id="totalPaid">$0.00</p>
                         </div>
                         <div class="stat-card">
-                            <h4>Balance / Saldo</h4>
+                            <h4 data-translate="billing.balance">Balance</h4>
                             <p class="stat-number" id="currentBalance">$0.00</p>
                         </div>
                         <div class="stat-card">
-                            <h4>Pending / Pendiente</h4>
+                            <h4 data-translate="billing.pending">Pending</h4>
                             <p class="stat-number" style="color: var(--warning-color);" id="pendingAmount">$0.00</p>
                         </div>
                     </div>
@@ -945,11 +945,11 @@
 
                 <!-- Add Bill Form -->
                 <div class="form-card">
-                    <h3>Create Bill / Crear Factura</h3>
-                    <button class="btn btn-primary" onclick="showBillForm()">+ Add New Bill / Agregar Nueva Factura</button>
+                    <h3 data-translate="billing.create">Create Bill</h3>
+                    <button class="btn btn-primary" onclick="showBillForm()" data-translate="billing.add">+ Add New Bill</button>
                     
                     <div id="billForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
-                        <h3 id="billFormTitle">Add New Bill / Agregar Nueva Factura</h3>
+                        <h3 id="billFormTitle" data-translate="billing.add">Add New Bill</h3>
                         <form id="newBillForm" onsubmit="saveBill(event)">
                             <div class="form-group">
                                 <label data-translate="billing.date">Billing Date *</label>
