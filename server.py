@@ -7,6 +7,7 @@ import secrets
 from datetime import datetime, timedelta
 from functools import wraps
 import os
+import sys
 import threading
 
 # Import email service
@@ -1956,8 +1957,9 @@ def incidents():
                 incident_type_for_email = data.get('incident_type', 'Unknown')
                 severity_for_email = data.get('severity', 'minor')
                 try:
-                    print(f"🔍 [Background] Email thread started for incident")
-                    print(f"   EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE}")
+                    print(f"🔍 [Background] Email thread started for incident", flush=True)
+                    print(f"   Incident data: resident_id={resident_id_for_email}, severity='{severity_for_email}', type='{incident_type_for_email}'", flush=True)
+                    print(f"   EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE}", flush=True)
                     
                     # Check email configuration (Resend OR SMTP)
                     import os
@@ -1966,13 +1968,13 @@ def incidents():
                     bg_sender_email = os.getenv('SENDER_EMAIL', '')
                     bg_sender_password = os.getenv('SENDER_PASSWORD', '')
                     
-                    print(f"   RESEND_API_KEY: {'SET' if bg_resend_api_key else 'NOT SET'}")
-                    print(f"   RESEND_FROM_EMAIL: {'SET (' + bg_resend_from_email + ')' if bg_resend_from_email else 'NOT SET'}")
-                    print(f"   SENDER_EMAIL: {'SET (' + bg_sender_email + ')' if bg_sender_email else 'NOT SET'}")
-                    print(f"   SENDER_PASSWORD: {'SET' if bg_sender_password else 'NOT SET'}")
+                    print(f"   RESEND_API_KEY: {'SET (starts with re_)' if bg_resend_api_key else 'NOT SET'}", flush=True)
+                    print(f"   RESEND_FROM_EMAIL: {'SET (' + bg_resend_from_email + ')' if bg_resend_from_email else 'NOT SET'}", flush=True)
+                    print(f"   SENDER_EMAIL: {'SET (' + bg_sender_email + ')' if bg_sender_email else 'NOT SET'}", flush=True)
+                    print(f"   SENDER_PASSWORD: {'SET' if bg_sender_password else 'NOT SET'}", flush=True)
                     
                     if not EMAIL_SERVICE_AVAILABLE:
-                        print(f"⚠️ [Background] Email service not available (module import failed)")
+                        print(f"⚠️ [Background] Email service not available (module import failed)", flush=True)
                         return
                     
                     # Check if either Resend OR SMTP is configured
@@ -1980,27 +1982,27 @@ def incidents():
                     has_smtp = bool(bg_sender_email and bg_sender_password)
                     
                     if not has_resend and not has_smtp:
-                        print(f"⚠️ [Background] Email service not configured:")
-                        print(f"   Resend: {'✓' if has_resend else '✗'} (needs RESEND_API_KEY + RESEND_FROM_EMAIL)")
-                        print(f"   SMTP: {'✓' if has_smtp else '✗'} (needs SENDER_EMAIL + SENDER_PASSWORD)")
+                        print(f"⚠️ [Background] Email service not configured:", flush=True)
+                        print(f"   Resend: {'✓' if has_resend else '✗'} (needs RESEND_API_KEY + RESEND_FROM_EMAIL)", flush=True)
+                        print(f"   SMTP: {'✓' if has_smtp else '✗'} (needs SENDER_EMAIL + SENDER_PASSWORD)", flush=True)
                         return
                     
                     if has_resend:
-                        print(f"✅ [Background] Using Resend API for email sending")
+                        print(f"✅ [Background] Using Resend API for email sending", flush=True)
                     else:
-                        print(f"✅ [Background] Using SMTP for email sending (Resend not configured)")
+                        print(f"✅ [Background] Using SMTP for email sending (Resend not configured)", flush=True)
                     
                     raw_severity = severity_for_email
                     severity_value = raw_severity.lower() if raw_severity else ''
-                    print(f"🔍 [Background] Incident severity check:")
-                    print(f"   Raw severity: '{raw_severity}'")
-                    print(f"   Normalized severity: '{severity_value}'")
+                    print(f"🔍 [Background] Incident severity check:", flush=True)
+                    print(f"   Raw severity: '{raw_severity}'", flush=True)
+                    print(f"   Normalized severity: '{severity_value}'", flush=True)
                     
                     if severity_value not in ['major', 'critical']:
-                        print(f"ℹ️ [Background] Severity '{severity_value}' does not qualify for email alert")
+                        print(f"ℹ️ [Background] Severity '{severity_value}' does not qualify for email alert (needs 'major' or 'critical')", flush=True)
                         return
                     
-                    print(f"✅ [Background] Severity '{severity_value}' qualifies for email alert")
+                    print(f"✅ [Background] Severity '{severity_value}' qualifies for email alert", flush=True)
                     
                     # Create new database connection in background thread
                     bg_conn = get_db()
@@ -2010,12 +2012,12 @@ def incidents():
                     bg_cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (resident_id_for_email,))
                     resident = bg_cursor.fetchone()
                     if not resident:
-                        print(f"⚠️ [Background] Resident not found (resident_id: {resident_id_for_email})")
+                        print(f"⚠️ [Background] Resident not found (resident_id: {resident_id_for_email})", flush=True)
                         bg_conn.close()
                         return
                     
                     resident_name = f"{resident['first_name']} {resident['last_name']}"
-                    print(f"📋 [Background] Resident: {resident_name}")
+                    print(f"📋 [Background] Resident: {resident_name}", flush=True)
                     
                     # Get staff emails for notification (managers, admins, or assigned staff)
                     bg_cursor.execute('''
@@ -2026,23 +2028,23 @@ def incidents():
                         AND active = 1
                     ''', (staff_id_for_email,))
                     staff_emails = [row['email'] for row in bg_cursor.fetchall()]
-                    print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}")
+                    print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}", flush=True)
                     
                     # Get emergency contact email for the resident
                     bg_cursor.execute('SELECT emergency_contact_email FROM residents WHERE id = ?', (resident_id_for_email,))
                     emergency_contact = bg_cursor.fetchone()
                     emergency_contact_email = emergency_contact['emergency_contact_email'] if emergency_contact and emergency_contact['emergency_contact_email'] else None
-                    print(f"📞 [Background] Emergency contact email: {emergency_contact_email if emergency_contact_email else 'None'}")
+                    print(f"📞 [Background] Emergency contact email: {emergency_contact_email if emergency_contact_email else 'None'}", flush=True)
                     
                     # Combine all recipient emails
                     all_recipients = list(staff_emails)
                     if emergency_contact_email:
                         all_recipients.append(emergency_contact_email)
-                        print(f"📧 [Background] Will also notify emergency contact: {emergency_contact_email}")
+                        print(f"📧 [Background] Will also notify emergency contact: {emergency_contact_email}", flush=True)
                     
                     # Fallback: If no recipients found, try to get ANY staff email as last resort
                     if not all_recipients:
-                        print(f"⚠️ [Background] No email addresses found, trying fallback...")
+                        print(f"⚠️ [Background] No email addresses found, trying fallback...", flush=True)
                         bg_cursor.execute('''
                             SELECT email FROM staff 
                             WHERE email IS NOT NULL 
@@ -2053,24 +2055,24 @@ def incidents():
                         fallback_staff = bg_cursor.fetchone()
                         if fallback_staff and fallback_staff['email']:
                             all_recipients.append(fallback_staff['email'])
-                            print(f"⚠️ [Background] Using fallback staff email: {fallback_staff['email']}")
+                            print(f"⚠️ [Background] Using fallback staff email: {fallback_staff['email']}", flush=True)
                     
                     bg_conn.close()  # Close connection before sending emails
                     
                     if not all_recipients:
-                        print(f"❌ [Background] No email addresses found to send incident alert for {resident_name}")
+                        print(f"❌ [Background] No email addresses found to send incident alert for {resident_name}", flush=True)
                         return
                     
                     # Default to English for language (we can't access request.current_staff in background thread)
                     language_for_email = 'en'
                     
-                    print(f"📬 [Background] Preparing to send emails to {len(all_recipients)} recipient(s): {all_recipients}")
+                    print(f"📬 [Background] Preparing to send emails to {len(all_recipients)} recipient(s): {all_recipients}", flush=True)
                     
                     # Send email to all recipients (staff + emergency contact)
                     emails_sent = 0
                     email_errors = []
                     for recipient_email in all_recipients:
-                        print(f"📤 [Background] Sending incident alert to {recipient_email}...")
+                        print(f"📤 [Background] Sending incident alert to {recipient_email}...", flush=True)
                         try:
                             email_result = send_incident_alert(
                                 resident_name=resident_name,
@@ -2081,37 +2083,42 @@ def incidents():
                             )
                             if email_result:
                                 emails_sent += 1
-                                print(f"✅ [Background] Email sent successfully to {recipient_email}")
+                                print(f"✅ [Background] Email sent successfully to {recipient_email}", flush=True)
                             else:
                                 error_msg = f"Email function returned False for {recipient_email}"
                                 email_errors.append(error_msg)
-                                print(f"❌ [Background] {error_msg}")
+                                print(f"❌ [Background] {error_msg}", flush=True)
                         except Exception as email_exception:
                             error_msg = f"Exception sending email to {recipient_email}: {str(email_exception)}"
                             email_errors.append(error_msg)
-                            print(f"❌ [Background] {error_msg}")
+                            print(f"❌ [Background] {error_msg}", flush=True)
                             import traceback
                             traceback.print_exc()
+                            sys.stdout.flush()
                     
                     if emails_sent > 0:
-                        print(f"✅ [Background] Sent {emails_sent}/{len(all_recipients)} incident alert email(s) for {resident_name}")
+                        print(f"✅ [Background] Sent {emails_sent}/{len(all_recipients)} incident alert email(s) for {resident_name}", flush=True)
                     else:
-                        print(f"⚠️ [Background] Failed to send incident alert emails.")
-                        print(f"   Attempted to send to: {all_recipients}")
-                        print(f"   Errors: {email_errors}")
-                        print(f"   Check Render environment variables: SENDER_EMAIL and SENDER_PASSWORD")
+                        print(f"⚠️ [Background] Failed to send incident alert emails.", flush=True)
+                        print(f"   Attempted to send to: {all_recipients}", flush=True)
+                        print(f"   Errors: {email_errors}", flush=True)
+                        print(f"   Check Render environment variables: RESEND_API_KEY + RESEND_FROM_EMAIL (or SENDER_EMAIL + SENDER_PASSWORD)", flush=True)
                 except Exception as bg_error:
-                    print(f"❌ [Background] Error in email sending thread: {bg_error}")
+                    print(f"❌ [Background] Error in email sending thread: {bg_error}", flush=True)
                     import traceback
                     traceback.print_exc()
+                    sys.stdout.flush()
             
             # Start email thread (don't wait for it - happens in background)
             try:
+                print(f"🚀 Starting email background thread...", flush=True)
                 email_thread = threading.Thread(target=send_emails_background, daemon=True)
                 email_thread.start()
-                print(f"🚀 Email thread started in background (non-blocking)")
+                print(f"✅ Email thread started in background (non-blocking, thread ID: {email_thread.ident})", flush=True)
             except Exception as thread_error:
-                print(f"⚠️ Failed to start email thread (non-critical): {thread_error}")
+                print(f"⚠️ Failed to start email thread (non-critical): {thread_error}", flush=True)
+                import traceback
+                traceback.print_exc()
                 # Don't fail the request if thread creation fails
             
             # Return response IMMEDIATELY - this happens regardless of email thread
