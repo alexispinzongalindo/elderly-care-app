@@ -1935,6 +1935,7 @@ def incidents():
             print(f"   EMAIL_SERVICE_AVAILABLE: {EMAIL_SERVICE_AVAILABLE}")
             print(f"   Will send email? {EMAIL_SERVICE_AVAILABLE and severity_value in ['major', 'critical']}")
             
+            email_status = None
             if EMAIL_SERVICE_AVAILABLE and severity_value in ['major', 'critical']:
                 print(f"✅ Severity '{severity_value}' qualifies for email alert")
                 try:
@@ -1986,6 +1987,7 @@ def incidents():
                         if not all_recipients:
                             print(f"❌ No email addresses found to send incident alert for {resident_name}")
                             print("   Add email addresses to staff records (admin/manager roles) or resident emergency contact")
+                            email_status = "No email recipients found"
                         else:
                             print(f"📬 Preparing to send emails to {len(all_recipients)} recipient(s): {all_recipients}")
                             # Get language preference (default to 'en')
@@ -2010,25 +2012,34 @@ def incidents():
                             
                             if emails_sent > 0:
                                 print(f"✅ Sent {emails_sent}/{len(all_recipients)} incident alert email(s) for {resident_name} (staff + emergency contact)")
+                                email_status = f"Email sent to {emails_sent} recipient(s)"
                             else:
                                 print(f"⚠️ Failed to send incident alert emails. Check email configuration.")
+                                email_status = "Email sending failed - check server logs"
                     else:
                         print(f"⚠️ Resident not found for incident email alert (resident_id: {data.get('resident_id')})")
+                        email_status = "Resident not found for email"
                 except Exception as email_error:
                     print(f'❌ Error sending incident email: {email_error}')
                     import traceback
                     traceback.print_exc()
+                    email_status = f"Email error: {str(email_error)}"
             else:
                 if not EMAIL_SERVICE_AVAILABLE:
                     print(f"⚠️ Email service not available (EMAIL_SERVICE_AVAILABLE=False)")
+                    email_status = "Email service not configured"
                 else:
                     print(f"ℹ️ Severity '{severity_value}' does not qualify for email alert (must be 'major' or 'critical')")
+                    email_status = f"Email not sent - severity '{severity_value}' is not 'major' or 'critical'"
             
             print(f"📤 Sending success response with incident_id: {incident_id}")
             conn.close()
             print(f"✅ Connection closed. Returning success response.")
             print(f"{'='*60}\n")
-            return jsonify({'id': incident_id, 'message': 'Incident report created successfully'}), 201
+            response_data = {'id': incident_id, 'message': 'Incident report created successfully'}
+            if email_status:
+                response_data['email_status'] = email_status
+            return jsonify(response_data), 201
         except sqlite3.IntegrityError as e:
             print(f"\n❌ INTEGRITY ERROR: {e}")
             import traceback

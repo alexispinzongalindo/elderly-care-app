@@ -4645,6 +4645,7 @@ async function saveIncident(event) {
     }
     
     console.log('📤 Sending incident data:', incidentData);
+    console.log('🔍 Severity being sent:', severity, '(should be "major" or "critical" for email)');
     
     try {
         const url = editingIncidentId ? `/api/incidents/${editingIncidentId}` : '/api/incidents';
@@ -4669,11 +4670,13 @@ async function saveIncident(event) {
         if (response.ok) {
             const result = await response.json();
             console.log('✅ Success:', result);
-            showMessage(
-                editingIncidentId ? 'Incident updated successfully / Incidente actualizado exitosamente' : 
-                'Incident reported successfully / Incidente reportado exitosamente',
-                'success'
-            );
+            let message = editingIncidentId ? 'Incident updated successfully / Incidente actualizado exitosamente' : 
+                'Incident reported successfully / Incidente reportado exitosamente';
+            if (result.email_status) {
+                console.log('📧 Email status:', result.email_status);
+                message += `\n📧 ${result.email_status}`;
+            }
+            showMessage(message, result.email_status && result.email_status.includes('sent') ? 'success' : 'info');
             hideIncidentForm();
             loadIncidents();
         } else {
