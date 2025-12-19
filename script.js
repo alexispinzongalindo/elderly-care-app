@@ -2216,12 +2216,22 @@ function showPage(pageName) {
             targetPage.style.setProperty('position', 'relative', 'important');
             targetPage.style.setProperty('z-index', '10', 'important');
         }
+        // For carenotes page, ensure it stays visible
+        if (pageName === 'carenotes') {
+            targetPage.style.setProperty('position', 'relative', 'important');
+            targetPage.style.setProperty('z-index', '10', 'important');
+            targetPage.style.setProperty('min-height', '400px', 'important');
+            targetPage.style.setProperty('width', '100%', 'important');
+            targetPage.style.setProperty('padding', '2rem', 'important');
+        }
         targetPage.style.setProperty('visibility', 'visible', 'important');
         targetPage.style.setProperty('opacity', '1', 'important');
         targetPage.style.setProperty('position', 'relative', 'important');
         targetPage.style.removeProperty('left'); // Remove left: -9999px if it was set
         targetPage.style.removeProperty('right'); // Remove any right positioning
-        targetPage.style.setProperty('z-index', '1', 'important');
+        if (pageName !== 'financial' && pageName !== 'carenotes') {
+            targetPage.style.setProperty('z-index', '1', 'important');
+        }
         
         // SPECIAL HANDLING FOR FINANCIAL PAGE - Force dimensions immediately
         if (pageName === 'financial') {
@@ -2747,7 +2757,17 @@ function showPage(pageName) {
             
             // Force carenotes page to be visible using cssText for maximum control
             carenotesPage.classList.add('active');
-            carenotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important;';
+            carenotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important;';
+            
+            // DOUBLE-CHECK: Force it again after a micro-delay to override any timing issues
+            setTimeout(() => {
+                carenotesPage.style.setProperty('display', 'block', 'important');
+                carenotesPage.style.setProperty('visibility', 'visible', 'important');
+                carenotesPage.style.setProperty('opacity', '1', 'important');
+                carenotesPage.style.setProperty('min-height', '400px', 'important');
+                carenotesPage.style.setProperty('width', '100%', 'important');
+                console.log('✅ Care notes page re-forced visible after timeout');
+            }, 50);
             
             // Ensure all child elements are visible
             Array.from(carenotesPage.children).forEach((child) => {

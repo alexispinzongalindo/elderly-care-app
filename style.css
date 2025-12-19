@@ -407,12 +407,18 @@ body {
 /* CRITICAL: Force care notes page to show when active */
 #carenotes.page.active,
 #carenotes.active,
+#carenotes.page,
 #carenotes {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
     position: relative !important;
-    z-index: 1 !important;
+    z-index: 10 !important;
+    min-height: 400px !important;
+    width: 100% !important;
+    padding: 2rem !important;
+    overflow: visible !important;
+    background: var(--light-gray) !important;
 }
 
 /* CRITICAL: Force financial page to show when active */
