@@ -2140,6 +2140,20 @@ function showPage(pageName) {
     
     const targetPage = document.getElementById(pageName);
     if (targetPage) {
+        // CRITICAL: For carenotes, apply styles IMMEDIATELY before anything else
+        if (pageName === 'carenotes') {
+            console.log('🔴🔴🔴 IMMEDIATE CARE NOTES FIX 🔴🔴🔴');
+            targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important;';
+            targetPage.classList.add('active');
+            // Force all children visible immediately
+            Array.from(targetPage.children).forEach((child) => {
+                if (child.tagName === 'SCRIPT') return;
+                if (child.id === 'careNoteForm' && child.style.display === 'none') return;
+                child.style.setProperty('display', child.tagName === 'BUTTON' ? 'inline-block' : 'block', 'important');
+                child.style.setProperty('visibility', 'visible', 'important');
+                child.style.setProperty('opacity', '1', 'important');
+            });
+        }
         targetPage.classList.add('active');
         
         // CRITICAL: For financial page, scroll to top immediately
