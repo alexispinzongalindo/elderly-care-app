@@ -780,11 +780,11 @@ def resident_detail(id):
             data.get('photo_path'),
             id
         )
-        
+
         print(f"💾 About to UPDATE resident ID {id} with carrier_value: {repr(carrier_value)}", flush=True)
-        
+
         cursor.execute('''
-            UPDATE residents 
+            UPDATE residents
             SET first_name = ?, last_name = ?, date_of_birth = ?, room_number = ?,
                 bed_number = ?, gender = ?, emergency_contact_name = ?,
                 emergency_contact_phone = ?, emergency_contact_carrier = ?, emergency_contact_relation = ?,
@@ -793,15 +793,15 @@ def resident_detail(id):
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         ''', update_values)
-        
+
         print(f"✅ UPDATE executed. Rows affected: {cursor.rowcount}", flush=True)
         conn.commit()
-        
+
         # Verify the carrier was saved
         cursor.execute('SELECT emergency_contact_carrier FROM residents WHERE id = ?', (id,))
         saved_carrier = cursor.fetchone()
         print(f"🔍 VERIFICATION: Carrier value now in database: {repr(saved_carrier[0]) if saved_carrier else 'NOT FOUND'}", flush=True)
-        
+
         conn.close()
         return jsonify({'message': 'Resident updated successfully'})
 

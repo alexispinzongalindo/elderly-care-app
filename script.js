@@ -1617,20 +1617,30 @@ async function saveNewResident(event) {
     const notesEl = usePageForm ? document.getElementById('newNotesPage') : document.getElementById('newNotes');
 
     // Get carrier value and log it for debugging (carrierEl already declared above at line 1551)
-    const carrierValue = carrierEl ? carrierEl.value : '';
-
+    // IMPORTANT: Get the raw value first, then normalize
+    let carrierValue = null;
+    if (carrierEl) {
+        carrierValue = carrierEl.value; // Get raw value (could be empty string)
+        // Normalize: empty string becomes null, but preserve actual values like 'claro'
+        if (carrierValue === '') {
+            carrierValue = null;
+        }
+    }
+    
     // VERY VISIBLE LOGGING - CARRIER FIELD
     console.log('═══════════════════════════════════════════════════════');
     console.log('🚨🚨🚨 CARRIER FIELD DEBUGGING 🚨🚨🚨');
     console.log('═══════════════════════════════════════════════════════');
     console.log('🔍 usePageForm:', usePageForm);
-    console.log('🔍 Carrier element ID:', usePageForm ? 'newEmergencyCarrierPage' : 'newEmergencyCarrier');
-    console.log('🔍 Carrier element found:', carrierEl ? 'YES' : 'NO - ELEMENT NOT FOUND!');
+    console.log('🔍 Carrier element ID searched:', usePageForm ? 'newEmergencyCarrierPage' : 'newEmergencyCarrier');
+    console.log('🔍 Carrier element found:', carrierEl ? 'YES ✅' : 'NO ❌ - ELEMENT NOT FOUND!');
     if (carrierEl) {
-        console.log('🔍 Carrier element value:', carrierEl.value);
-        console.log('🔍 Carrier element selected option:', carrierEl.options[carrierEl.selectedIndex]?.text);
+        console.log('🔍 Raw carrier element value:', JSON.stringify(carrierEl.value));
+        console.log('🔍 Carrier element selectedIndex:', carrierEl.selectedIndex);
+        console.log('🔍 Carrier element selected option text:', carrierEl.options[carrierEl.selectedIndex]?.text);
+        console.log('🔍 Carrier element options:', Array.from(carrierEl.options).map(opt => ({value: opt.value, text: opt.text})));
     }
-    console.log('🔍 CARRIER VALUE TO SAVE:', carrierValue || 'EMPTY/NULL');
+    console.log('🔍 FINAL CARRIER VALUE TO SAVE:', JSON.stringify(carrierValue));
     console.log('═══════════════════════════════════════════════════════');
 
     const resident = {
@@ -1642,7 +1652,7 @@ async function saveNewResident(event) {
         bed_number: bedEl ? bedEl.value : '',
         emergency_contact_name: emergencyEl ? emergencyEl.value : '',
         emergency_contact_phone: phoneEl ? phoneEl.value : '',
-        emergency_contact_carrier: carrierValue || null,  // Use null instead of empty string
+        emergency_contact_carrier: carrierValue,  // Already normalized (null if empty, actual value otherwise)
         emergency_contact_relation: relationEl ? relationEl.value : '',
         emergency_contact_email: emailEl ? emailEl.value : '',
         insurance_provider: insuranceProviderEl ? insuranceProviderEl.value : null,
