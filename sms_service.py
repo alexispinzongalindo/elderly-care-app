@@ -33,6 +33,7 @@ CARRIER_GATEWAYS = {
     'virgin': '@vmobl.com',
     'metro': '@mymetropcs.com',
     'metropcs': '@mymetropcs.com',
+    'claro': '@vtexto.com',  # Claro Puerto Rico
 }
 
 # Default carrier if not specified (Verizon is common in PR)
