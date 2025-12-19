@@ -1777,14 +1777,17 @@
             console.log('🔍 User Agent:', navigator.userAgent);
             console.log('✅ Console is working!');
             
-            // Check if script.js loads
+            // Check if script.js loads - only log actual script/resource errors
             window.addEventListener('error', function(e) {
-                console.error('%c❌❌❌ SCRIPT LOAD ERROR ❌❌❌', 'background: red; color: white; font-size: 16px; padding: 10px;');
-                console.error('File:', e.filename);
-                console.error('Message:', e.message);
-                console.error('Line:', e.lineno);
-                console.error('Column:', e.colno);
-                console.error('Error object:', e.error);
+                // Only log errors related to scripts or if error has meaningful properties
+                if (e.filename && e.filename.includes('.js')) {
+                    console.error('%c❌❌❌ SCRIPT LOAD ERROR ❌❌❌', 'background: red; color: white; font-size: 16px; padding: 10px;');
+                    if (e.filename) console.error('File:', e.filename);
+                    if (e.message) console.error('Message:', e.message);
+                    if (e.lineno) console.error('Line:', e.lineno);
+                    if (e.colno) console.error('Column:', e.colno);
+                    if (e.error) console.error('Error object:', e.error);
+                }
             }, true);
             
             // Verify script loaded after a delay
