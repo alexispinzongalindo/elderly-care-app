@@ -2619,13 +2619,6 @@ def incidents():
                             print(f"✅ [Background] Sent {sms_sent} SMS alert(s)", flush=True)
                     else:
                         print(f"ℹ️ [Background] SMS service not available, skipping SMS notifications", flush=True)
-                        except Exception as email_exception:
-                            error_msg = f"Exception sending email to {recipient_email}: {str(email_exception)}"
-                            email_errors.append(error_msg)
-                            print(f"❌ [Background] {error_msg}", flush=True)
-                            import traceback
-                            traceback.print_exc()
-                            sys.stdout.flush()
                     
                     if emails_sent > 0:
                         print(f"✅ [Background] Sent {emails_sent}/{len(all_recipients)} incident alert email(s) for {resident_name}", flush=True)
