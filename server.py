@@ -2539,6 +2539,12 @@ def incidents():
                                 error_msg = f"Email function returned False for {recipient_email}"
                                 email_errors.append(error_msg)
                                 print(f"❌ [Background] {error_msg}", flush=True)
+                        except Exception as email_exception:
+                            error_msg = f"Exception sending email to {recipient_email}: {str(email_exception)}"
+                            email_errors.append(error_msg)
+                            print(f"❌ [Background] {error_msg}", flush=True)
+                            import traceback
+                            traceback.print_exc(file=sys.stdout)
                     
                     # Send SMS notifications (FREE via email-to-SMS gateway)
                     sms_sent = 0
