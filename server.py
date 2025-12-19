@@ -879,16 +879,23 @@ def log_medication(id):
                 print(f"💊 [Background] Medication: {medication_name} for {resident_name}", flush=True)
                 print(f"   Scheduled time: {scheduled_time}", flush=True)
                 
-                # Get staff emails for notification (managers, admins, or assigned staff)
+                # Get staff emails and phone numbers for notification (managers, admins, or assigned staff)
                 bg_cursor.execute('''
-                    SELECT email FROM staff 
+                    SELECT email, phone, preferred_language FROM staff 
                     WHERE (role IN ('admin', 'manager') OR id = ?) 
-                    AND email IS NOT NULL 
-                    AND email != '' 
                     AND active = 1
                 ''', (staff_id,))
-                staff_emails = [row['email'] for row in bg_cursor.fetchall()]
+                staff_records = bg_cursor.fetchall()
+                staff_emails = [row['email'] for row in staff_records if row['email']]
+                staff_phones = [(row['phone'], row['preferred_language'] or 'en') for row in staff_records if row['phone']]
                 print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}", flush=True)
+                print(f"📱 [Background] Found {len(staff_phones)} staff phone(s) for SMS", flush=True)
+                
+                # Get emergency contact phone for the resident
+                bg_cursor.execute('SELECT emergency_contact_phone FROM residents WHERE id = ?', (resident_id_for_email,))
+                emergency_contact_row = bg_cursor.fetchone()
+                emergency_contact_phone = emergency_contact_row['emergency_contact_phone'] if emergency_contact_row and emergency_contact_row['emergency_contact_phone'] else None
+                print(f"📱 [Background] Emergency contact phone: {emergency_contact_phone if emergency_contact_phone else 'None'}", flush=True)
                 
                 # Fallback: If no recipients found, try to get ANY staff email
                 if not staff_emails:
@@ -944,10 +951,68 @@ def log_medication(id):
                         traceback.print_exc(file=sys.stdout)
                 
                 if emails_sent > 0:
-                    print(f"✅ [Background] Sent {emails_sent}/{len(staff_emails)} medication missed alert(s) for {resident_name}", flush=True)
+                    print(f"✅ [Background] Sent {emails_sent}/{len(staff_emails)} medication missed alert email(s) for {resident_name}", flush=True)
                 else:
                     print(f"⚠️ [Background] Failed to send medication missed alert emails.", flush=True)
                     print(f"   Errors: {email_errors}", flush=True)
+                
+                # Send SMS notifications (FREE via email-to-SMS gateway)
+                sms_sent = 0
+                sms_errors = []
+                if SMS_SERVICE_AVAILABLE:
+                    print(f"📱 [Background] Preparing to send SMS alerts to {len(staff_phones)} staff phone(s) and emergency contact", flush=True)
+                    
+                    # Send SMS to staff
+                    for phone, language in staff_phones:
+                        if phone:
+                            try:
+                                sms_result = send_medication_alert_sms(
+                                    resident_name=resident_name,
+                                    medication_name=medication_name,
+                                    scheduled_time=scheduled_time,
+                                    phone=phone,
+                                    carrier=None,  # Will use default carrier (Verizon)
+                                    language=language or 'en'
+                                )
+                                if sms_result:
+                                    sms_sent += 1
+                                    print(f"✅ [Background] SMS sent successfully to {phone}", flush=True)
+                                else:
+                                    error_msg = f"SMS function returned False for {phone}"
+                                    sms_errors.append(error_msg)
+                                    print(f"❌ [Background] {error_msg}", flush=True)
+                            except Exception as sms_exception:
+                                error_msg = f"Exception sending SMS to {phone}: {str(sms_exception)}"
+                                sms_errors.append(error_msg)
+                                print(f"❌ [Background] {error_msg}", flush=True)
+                    
+                    # Send SMS to emergency contact
+                    if emergency_contact_phone:
+                        try:
+                            sms_result = send_medication_alert_sms(
+                                resident_name=resident_name,
+                                medication_name=medication_name,
+                                scheduled_time=scheduled_time,
+                                phone=emergency_contact_phone,
+                                carrier=None,  # Will use default carrier (Verizon)
+                                language='en'  # Default to English for emergency contacts
+                            )
+                            if sms_result:
+                                sms_sent += 1
+                                print(f"✅ [Background] SMS sent successfully to emergency contact: {emergency_contact_phone}", flush=True)
+                            else:
+                                error_msg = f"SMS function returned False for emergency contact {emergency_contact_phone}"
+                                sms_errors.append(error_msg)
+                                print(f"❌ [Background] {error_msg}", flush=True)
+                        except Exception as sms_exception:
+                            error_msg = f"Exception sending SMS to emergency contact {emergency_contact_phone}: {str(sms_exception)}"
+                            sms_errors.append(error_msg)
+                            print(f"❌ [Background] {error_msg}", flush=True)
+                    
+                    if sms_sent > 0:
+                        print(f"✅ [Background] Sent {sms_sent} medication alert SMS(s)", flush=True)
+                else:
+                    print(f"ℹ️ [Background] SMS service not available, skipping SMS notifications", flush=True)
             except Exception as bg_error:
                 print(f"❌ [Background] Error in medication alert thread: {bg_error}", flush=True)
                 import traceback
