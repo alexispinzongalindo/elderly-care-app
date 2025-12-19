@@ -21,6 +21,25 @@ let editingPaymentId = null;
 let currentLanguage = 'en'; // Default to English
 let currentUser = null;
 
+// Phone number formatting function - formats as (XXX) XXX-XXXX
+function formatPhoneNumber(phone) {
+    if (!phone) return phone;
+    
+    // Remove all non-digits
+    const digits = phone.replace(/\D/g, '');
+    
+    // Remove leading 1 if present (US country code)
+    const cleaned = digits.startsWith('1') && digits.length === 11 ? digits.substring(1) : digits;
+    
+    // Format as (XXX) XXX-XXXX if 10 digits
+    if (cleaned.length === 10) {
+        return `(${cleaned.substring(0, 3)}) ${cleaned.substring(3, 6)}-${cleaned.substring(6, 10)}`;
+    }
+    
+    // Return original if can't format
+    return phone;
+}
+
 // Translation dictionary
 const translations = {
     en: {
@@ -3557,7 +3576,8 @@ async function loadResidents() {
             }
             if (resident.emergency_contact_name) {
                 const p = document.createElement('p');
-                p.innerHTML = `<strong>Emergency Contact / Contacto de Emergencia:</strong> ${resident.emergency_contact_name} (${resident.emergency_contact_phone || ''})`;
+                const formattedPhone = resident.emergency_contact_phone_formatted || formatPhoneNumber(resident.emergency_contact_phone) || '';
+                p.innerHTML = `<strong>Emergency Contact / Contacto de Emergencia:</strong> ${resident.emergency_contact_name}${formattedPhone ? ` (${formattedPhone})` : ''}`;
                 details.appendChild(p);
             }
             if (resident.medical_conditions) {
@@ -3852,7 +3872,7 @@ async function loadStaff() {
                         <p><strong>Username / Usuario:</strong> ${staff.username || 'N/A'}</p>
                         <p><strong>Role / Rol:</strong> ${roleLabel}</p>
                         <p><strong>Email:</strong> ${staff.email || 'N/A'}</p>
-                        <p><strong>Phone / Teléfono:</strong> ${staff.phone || 'N/A'}</p>
+                        <p><strong>Phone / Teléfono:</strong> ${staff.phone_formatted || formatPhoneNumber(staff.phone) || 'N/A'}</p>
                         <p><strong>Created / Creado:</strong> ${createdDate}</p>
                     </div>
                     <div class="item-actions">

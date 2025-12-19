@@ -10,6 +10,7 @@ import os
 import sys
 import threading
 import time
+import re
 
 # Import email service
 try:
@@ -85,9 +86,21 @@ def init_db():
     except sqlite3.OperationalError:
         pass  # Column already exists
     
+    # Add phone_carrier column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE staff ADD COLUMN phone_carrier TEXT')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+    
     # Add emergency_contact_email column if it doesn't exist (migration)
     try:
         cursor.execute('ALTER TABLE residents ADD COLUMN emergency_contact_email TEXT')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+    
+    # Add emergency_contact_carrier column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE residents ADD COLUMN emergency_contact_carrier TEXT')
     except sqlite3.OperationalError:
         pass  # Column already exists
     
@@ -427,6 +440,28 @@ def verify_password(password, password_hash):
 def generate_session_token():
     return secrets.token_urlsafe(32)
 
+def format_phone_number(phone):
+    """
+    Format phone number as (XXX) XXX-XXXX for display
+    Returns the formatted string or original if invalid
+    """
+    if not phone:
+        return phone
+    
+    # Remove all non-digits
+    digits = re.sub(r'\D', '', str(phone))
+    
+    # Remove leading 1 if present (US country code)
+    if digits.startswith('1') and len(digits) == 11:
+        digits = digits[1:]
+    
+    # Format as (XXX) XXX-XXXX if 10 digits
+    if len(digits) == 10:
+        return f"({digits[0:3]}) {digits[3:6]}-{digits[6:10]}"
+    
+    # Return original if can't format
+    return phone
+
 def get_current_staff(request):
     """Get current logged-in staff from session token"""
     session_token = request.headers.get('Authorization')
@@ -610,7 +645,13 @@ def residents():
         query += ' ORDER BY last_name, first_name'
         
         cursor.execute(query)
-        residents_list = [dict(row) for row in cursor.fetchall()]
+        residents_list = []
+        for row in cursor.fetchall():
+            resident_dict = dict(row)
+            # Format emergency contact phone number for display
+            if resident_dict.get('emergency_contact_phone'):
+                resident_dict['emergency_contact_phone_formatted'] = format_phone_number(resident_dict['emergency_contact_phone'])
+            residents_list.append(resident_dict)
         conn.close()
         return jsonify(residents_list)
     
@@ -683,8 +724,12 @@ def resident_detail(id):
         if not resident:
             conn.close()
             return jsonify({'error': 'Resident not found'}), 404
+        resident_dict = dict(resident)
+        # Format emergency contact phone number for display
+        if resident_dict.get('emergency_contact_phone'):
+            resident_dict['emergency_contact_phone_formatted'] = format_phone_number(resident_dict['emergency_contact_phone'])
         conn.close()
-        return jsonify(dict(resident))
+        return jsonify(resident_dict)
     
     elif request.method == 'PUT':
         data = request.json
@@ -692,7 +737,7 @@ def resident_detail(id):
             UPDATE residents 
             SET first_name = ?, last_name = ?, date_of_birth = ?, room_number = ?,
                 bed_number = ?, gender = ?, emergency_contact_name = ?,
-                emergency_contact_phone = ?, emergency_contact_relation = ?,
+                emergency_contact_phone = ?, emergency_contact_carrier = ?, emergency_contact_relation = ?,
                 emergency_contact_email = ?, insurance_provider = ?, insurance_number = ?, medical_conditions = ?,
                 allergies = ?, dietary_restrictions = ?, notes = ?, photo_path = ?,
                 updated_at = CURRENT_TIMESTAMP
@@ -706,6 +751,7 @@ def resident_detail(id):
             data.get('gender'),
             data.get('emergency_contact_name'),
             data.get('emergency_contact_phone'),
+            data.get('emergency_contact_carrier'),  # Carrier for SMS
             data.get('emergency_contact_relation'),
             data.get('emergency_contact_email'),
             data.get('insurance_provider'),
@@ -879,21 +925,28 @@ def log_medication(id):
                 
                 # Get staff emails and phone numbers for notification (managers, admins, or assigned staff)
                 bg_cursor.execute('''
-                    SELECT email, phone, preferred_language FROM staff 
+                    SELECT email, phone, phone_carrier, preferred_language FROM staff 
                     WHERE (role IN ('admin', 'manager') OR id = ?) 
                     AND active = 1
                 ''', (staff_id,))
                 staff_records = bg_cursor.fetchall()
                 staff_emails = [row['email'] for row in staff_records if row['email']]
-                staff_phones = [(row['phone'], row['preferred_language'] or 'en') for row in staff_records if row['phone']]
+                # Filter phones: exclude NULL, empty strings, and whitespace-only strings
+                staff_phones = [(row['phone'], row['phone_carrier'], row['preferred_language'] or 'en') for row in staff_records 
+                               if row['phone'] and row['phone'].strip()]
                 print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}", flush=True)
-                print(f"📱 [Background] Found {len(staff_phones)} staff phone(s) for SMS", flush=True)
+                print(f"📱 [Background] Found {len(staff_phones)} staff phone(s) for SMS: {[p[0] for p in staff_phones]}", flush=True)
                 
                 # Get emergency contact phone for the resident
-                bg_cursor.execute('SELECT emergency_contact_phone FROM residents WHERE id = ?', (resident_id_for_email,))
+                bg_cursor.execute('SELECT emergency_contact_phone, emergency_contact_carrier FROM residents WHERE id = ?', (resident_id_for_email,))
                 emergency_contact_row = bg_cursor.fetchone()
-                emergency_contact_phone = emergency_contact_row['emergency_contact_phone'] if emergency_contact_row and emergency_contact_row['emergency_contact_phone'] else None
-                print(f"📱 [Background] Emergency contact phone: {emergency_contact_phone if emergency_contact_phone else 'None'}", flush=True)
+                emergency_contact_phone = None
+                emergency_contact_carrier = None
+                if emergency_contact_row and emergency_contact_row['emergency_contact_phone']:
+                    phone_str = emergency_contact_row['emergency_contact_phone'].strip() if emergency_contact_row['emergency_contact_phone'] else None
+                    emergency_contact_phone = phone_str if phone_str else None
+                    emergency_contact_carrier = emergency_contact_row['emergency_contact_carrier'] if emergency_contact_row['emergency_contact_carrier'] else None
+                print(f"📱 [Background] Emergency contact phone: {emergency_contact_phone if emergency_contact_phone else 'None'} (carrier: {emergency_contact_carrier or 'default'})", flush=True)
                 
                 # Fallback: If no recipients found, try to get ANY staff email
                 if not staff_emails:
@@ -959,9 +1012,15 @@ def log_medication(id):
                 sms_errors = []
                 if SMS_SERVICE_AVAILABLE:
                     print(f"📱 [Background] Preparing to send SMS alerts to {len(staff_phones)} staff phone(s) and emergency contact", flush=True)
+                    if len(staff_phones) > 0:
+                        print(f"   Staff phones: {[p[0] for p in staff_phones]}", flush=True)
+                    if emergency_contact_phone:
+                        print(f"   Emergency contact phone: {emergency_contact_phone}", flush=True)
+                    else:
+                        print(f"   ⚠️ No emergency contact phone found for resident {resident_id_for_email}", flush=True)
                     
                     # Send SMS to staff
-                    for phone, language in staff_phones:
+                    for phone, carrier, language in staff_phones:
                         if phone:
                             try:
                                 sms_result = send_medication_alert_sms(
@@ -969,7 +1028,7 @@ def log_medication(id):
                                     medication_name=medication_name,
                                     scheduled_time=scheduled_time,
                                     phone=phone,
-                                    carrier=None,  # Will use default carrier (Verizon)
+                                    carrier=carrier,  # Use carrier from database
                                     language=language or 'en'
                                 )
                                 if sms_result:
@@ -992,7 +1051,7 @@ def log_medication(id):
                                 medication_name=medication_name,
                                 scheduled_time=scheduled_time,
                                 phone=emergency_contact_phone,
-                                carrier=None,  # Will use default carrier (Verizon)
+                                carrier=emergency_contact_carrier,  # Use carrier from database
                                 language='en'  # Default to English for emergency contacts
                             )
                             if sms_result:
@@ -1312,23 +1371,35 @@ def vital_signs():
                         bg_conn_sms = get_db()
                         bg_cursor_sms = bg_conn_sms.cursor()
                         bg_cursor_sms.execute('''
-                            SELECT phone, preferred_language FROM staff 
+                            SELECT phone, phone_carrier, preferred_language FROM staff 
                             WHERE (role IN ('admin', 'manager') OR id = ?) 
                             AND phone IS NOT NULL 
                             AND phone != '' 
                             AND active = 1
                         ''', (staff_id,))
-                        staff_phones = [(row['phone'], row['preferred_language'] or 'en') for row in bg_cursor_sms.fetchall()]
-                        bg_cursor_sms.execute('SELECT emergency_contact_phone FROM residents WHERE id = ?', (resident_id,))
+                        staff_phone_records = bg_cursor_sms.fetchall()
+                        staff_phones = [(row['phone'].strip(), row['phone_carrier'], row['preferred_language'] or 'en') for row in staff_phone_records if row['phone'] and row['phone'].strip()]
+                        bg_cursor_sms.execute('SELECT emergency_contact_phone, emergency_contact_carrier FROM residents WHERE id = ?', (resident_id,))
                         emergency_contact_row = bg_cursor_sms.fetchone()
-                        emergency_contact_phone = emergency_contact_row['emergency_contact_phone'] if emergency_contact_row and emergency_contact_row['emergency_contact_phone'] else None
+                        emergency_contact_phone = None
+                        emergency_contact_carrier = None
+                        if emergency_contact_row and emergency_contact_row['emergency_contact_phone']:
+                            phone_str = emergency_contact_row['emergency_contact_phone'].strip() if emergency_contact_row['emergency_contact_phone'] else None
+                            emergency_contact_phone = phone_str if phone_str else None
+                            emergency_contact_carrier = emergency_contact_row['emergency_contact_carrier'] if emergency_contact_row['emergency_contact_carrier'] else None
                         bg_conn_sms.close()
                         
                         print(f"📱 [Background] Preparing to send SMS alerts to {len(staff_phones)} staff phone(s) and emergency contact", flush=True)
+                        if len(staff_phones) > 0:
+                            print(f"   Staff phones: {[p[0] for p in staff_phones]}", flush=True)
+                        if emergency_contact_phone:
+                            print(f"   Emergency contact phone: {emergency_contact_phone}", flush=True)
+                        else:
+                            print(f"   ⚠️ No emergency contact phone found for resident {resident_id}", flush=True)
                         
                         # Send SMS to staff for each critical alert
                         for vital_type, value, threshold in critical_alerts:
-                            for phone, language in staff_phones:
+                            for phone, carrier, language in staff_phones:
                                 if phone:
                                     try:
                                         sms_result = send_vital_signs_alert_sms(
@@ -1337,7 +1408,7 @@ def vital_signs():
                                             value=value,
                                             threshold=threshold,
                                             phone=phone,
-                                            carrier=None,  # Will use default carrier (Verizon)
+                                            carrier=carrier,  # Use carrier from database
                                             language=language or 'en'
                                         )
                                         if sms_result:
@@ -1361,7 +1432,7 @@ def vital_signs():
                                         value=value,
                                         threshold=threshold,
                                         phone=emergency_contact_phone,
-                                        carrier=None,  # Will use default carrier (Verizon)
+                                        carrier=emergency_contact_carrier,  # Use carrier from database
                                         language='en'  # Default to English for emergency contacts
                                     )
                                     if sms_result:
@@ -2169,8 +2240,14 @@ def staff():
             return jsonify({'error': 'Authentication required'}), 401
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute('SELECT id, username, full_name, role, email, phone, active, created_at FROM staff ORDER BY full_name')
-        staff_list = [dict(row) for row in cursor.fetchall()]
+        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at FROM staff ORDER BY full_name')
+        staff_list = []
+        for row in cursor.fetchall():
+            staff_dict = dict(row)
+            # Format phone number for display
+            if staff_dict.get('phone'):
+                staff_dict['phone_formatted'] = format_phone_number(staff_dict['phone'])
+            staff_list.append(staff_dict)
         conn.close()
         return jsonify(staff_list)
     
@@ -2186,15 +2263,16 @@ def staff():
         data = request.json
         password_hash = hash_password(data.get('password', 'password123'))
         cursor.execute('''
-            INSERT INTO staff (username, password_hash, full_name, role, email, phone)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO staff (username, password_hash, full_name, role, email, phone, phone_carrier)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (
             data.get('username'),
             password_hash,
             data.get('full_name'),
             data.get('role', 'caregiver'),
             data.get('email'),
-            data.get('phone')
+            data.get('phone'),
+            data.get('phone_carrier')  # Carrier for SMS (e.g., 'verizon', 'att', 't-mobile')
         ))
         conn.commit()
         staff_id = cursor.lastrowid
@@ -2208,12 +2286,16 @@ def staff_detail(id):
     cursor = conn.cursor()
     
     if request.method == 'GET':
-        cursor.execute('SELECT id, username, full_name, role, email, phone, active, created_at FROM staff WHERE id = ?', (id,))
+        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at FROM staff WHERE id = ?', (id,))
         staff = cursor.fetchone()
         conn.close()
         if not staff:
             return jsonify({'error': 'Staff member not found'}), 404
-        return jsonify(dict(staff))
+        staff_dict = dict(staff)
+        # Format phone number for display
+        if staff_dict.get('phone'):
+            staff_dict['phone_formatted'] = format_phone_number(staff_dict['phone'])
+        return jsonify(staff_dict)
     
     elif request.method == 'PUT':
         data = request.json
@@ -2238,7 +2320,7 @@ def staff_detail(id):
         else:
             cursor.execute('''
                 UPDATE staff 
-                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, active = ?
+                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, phone_carrier = ?, active = ?
                 WHERE id = ?
             ''', (
                 data.get('username'),
@@ -2246,6 +2328,7 @@ def staff_detail(id):
                 data.get('role', 'caregiver'),
                 data.get('email'),
                 data.get('phone'),
+                data.get('phone_carrier'),  # Carrier for SMS
                 data.get('active', True),
                 id
         ))
@@ -2480,15 +2563,17 @@ def incidents():
                     
                     # Get staff emails and phone numbers for notification (managers, admins, or assigned staff)
                     bg_cursor.execute('''
-                        SELECT email, phone, preferred_language FROM staff 
+                        SELECT email, phone, phone_carrier, preferred_language FROM staff 
                         WHERE (role IN ('admin', 'manager') OR id = ?) 
                         AND active = 1
                     ''', (staff_id_for_email,))
                     staff_records = bg_cursor.fetchall()
                     staff_emails = [row['email'] for row in staff_records if row['email']]
-                    staff_phones = [(row['phone'], row['preferred_language'] or 'en') for row in staff_records if row['phone']]
+                    # Filter phones: exclude NULL, empty strings, and whitespace-only strings
+                    staff_phones = [(row['phone'], row['phone_carrier'], row['preferred_language'] or 'en') for row in staff_records 
+                                   if row['phone'] and row['phone'].strip()]
                     print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}", flush=True)
-                    print(f"📱 [Background] Found {len(staff_phones)} staff phone(s) for SMS", flush=True)
+                    print(f"📱 [Background] Found {len(staff_phones)} staff phone(s) for SMS: {[p[0] for p in staff_phones]}", flush=True)
                     
                     # Get emergency contact email and phone for the resident
                     bg_cursor.execute('SELECT emergency_contact_email, emergency_contact_phone FROM residents WHERE id = ?', (resident_id_for_email,))
@@ -2566,30 +2651,42 @@ def incidents():
                     sms_sent = 0
                     sms_errors = []
                     if SMS_SERVICE_AVAILABLE:
-                        # Get staff phones (re-fetch from database)
+                        # Get staff phones (re-fetch from database with strict filtering)
                         bg_conn_sms = get_db()
                         bg_cursor_sms = bg_conn_sms.cursor()
                         bg_cursor_sms.execute('''
-                            SELECT phone, preferred_language FROM staff 
+                            SELECT phone, phone_carrier, preferred_language FROM staff 
                             WHERE (role IN ('admin', 'manager') OR id = ?) 
                             AND phone IS NOT NULL 
                             AND phone != '' 
                             AND active = 1
                         ''', (staff_id_for_email,))
-                        staff_phones = [(row['phone'], row['preferred_language'] or 'en') for row in bg_cursor_sms.fetchall()]
-                        bg_cursor_sms.execute('SELECT emergency_contact_phone FROM residents WHERE id = ?', (resident_id_for_email,))
+                        staff_phone_records = bg_cursor_sms.fetchall()
+                        staff_phones = [(row['phone'].strip(), row['phone_carrier'], row['preferred_language'] or 'en') for row in staff_phone_records if row['phone'] and row['phone'].strip()]
+                        bg_cursor_sms.execute('SELECT emergency_contact_phone, emergency_contact_carrier FROM residents WHERE id = ?', (resident_id_for_email,))
                         emergency_contact_row = bg_cursor_sms.fetchone()
-                        emergency_contact_phone = emergency_contact_row['emergency_contact_phone'] if emergency_contact_row and emergency_contact_row['emergency_contact_phone'] else None
+                        emergency_contact_phone = None
+                        emergency_contact_carrier = None
+                        if emergency_contact_row and emergency_contact_row['emergency_contact_phone']:
+                            phone_str = emergency_contact_row['emergency_contact_phone'].strip() if emergency_contact_row['emergency_contact_phone'] else None
+                            emergency_contact_phone = phone_str if phone_str else None
+                            emergency_contact_carrier = emergency_contact_row['emergency_contact_carrier'] if emergency_contact_row['emergency_contact_carrier'] else None
                         bg_conn_sms.close()
                         
                         print(f"📱 [Background] Preparing to send SMS alerts to {len(staff_phones)} staff phone(s) and emergency contact", flush=True)
+                        if len(staff_phones) > 0:
+                            print(f"   Staff phones: {[p[0] for p in staff_phones]}", flush=True)
+                        if emergency_contact_phone:
+                            print(f"   Emergency contact phone: {emergency_contact_phone}", flush=True)
+                        else:
+                            print(f"   ⚠️ No emergency contact phone found for resident {resident_id_for_email}", flush=True)
                         
                         # Add delay before SMS (to respect rate limit after emails)
                         # We've already sent emails, so wait 600ms before starting SMS
                         time.sleep(0.6)
                         
                         # Send SMS to staff
-                        for i, (phone, language) in enumerate(staff_phones):
+                        for i, (phone, carrier, language) in enumerate(staff_phones):
                             if phone:
                                 # Add 600ms delay between SMS requests (except first one)
                                 if i > 0:
@@ -2600,7 +2697,7 @@ def incidents():
                                         incident_type=incident_type_for_email,
                                         severity=severity_for_email.title(),
                                         phone=phone,
-                                        carrier=None,  # Will use default carrier (Verizon)
+                                        carrier=carrier,  # Use carrier from database
                                         language=language or 'en'
                                     )
                                     if sms_result:
@@ -2628,7 +2725,7 @@ def incidents():
                                         incident_type=incident_type_for_email,
                                         severity=severity_for_email.title(),
                                         phone=emergency_contact_phone,
-                                        carrier=None,  # Will use default carrier (Verizon)
+                                        carrier=emergency_contact_carrier,  # Use carrier from database
                                         language='en'  # Default to English for emergency contacts
                                     )
                                     if sms_result:

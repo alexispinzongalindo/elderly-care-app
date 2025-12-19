@@ -130,13 +130,15 @@ def send_sms(phone, message, carrier=None, language='en'):
     html_body = f"<html><body><p>{message.replace(chr(10), '<br>')}</p></body></html>"
     
     # Send via email service (which uses Resend or SMTP)
-    print(f"📱 Sending SMS to {phone} via {sms_email}...")
+    carrier_info = f" (carrier: {carrier or DEFAULT_CARRIER})" if carrier else f" (default carrier: {DEFAULT_CARRIER})"
+    print(f"📱 Sending SMS to {phone}{carrier_info} via {sms_email}...")
     result = send_email(sms_email, subject, html_body, text_body)
     
     if result:
-        print(f"✅ SMS sent successfully to {phone}")
+        print(f"✅ SMS sent successfully to {phone} via {sms_email}")
+        print(f"   💡 If SMS not received, verify phone uses {carrier or DEFAULT_CARRIER} carrier or specify correct carrier")
     else:
-        print(f"❌ Failed to send SMS to {phone}")
+        print(f"❌ Failed to send SMS to {phone} via {sms_email}")
     
     return result
 
