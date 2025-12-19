@@ -24,18 +24,18 @@ let currentUser = null;
 // Phone number formatting function - formats as (XXX) XXX-XXXX
 function formatPhoneNumber(phone) {
     if (!phone) return phone;
-    
+
     // Remove all non-digits
     const digits = phone.replace(/\D/g, '');
-    
+
     // Remove leading 1 if present (US country code)
     const cleaned = digits.startsWith('1') && digits.length === 11 ? digits.substring(1) : digits;
-    
+
     // Format as (XXX) XXX-XXXX if 10 digits
     if (cleaned.length === 10) {
         return `(${cleaned.substring(0, 3)}) ${cleaned.substring(3, 6)}-${cleaned.substring(6, 10)}`;
     }
-    
+
     // Return original if can't format
     return phone;
 }
@@ -62,7 +62,7 @@ const translations = {
         'nav.group.records': 'Records & Reports',
         'nav.group.financial': 'Financial',
         'nav.group.system': 'System',
-        
+
         // Dashboard
         'dashboard.title': 'Dashboard',
         'dashboard.medications': 'Medications',
@@ -77,7 +77,7 @@ const translations = {
         'dashboard.balance': 'Balance',
         'dashboard.overdue': 'Overdue',
         'dashboard.quickAccess': 'Quick Access',
-        
+
         // Common
         'common.search': 'Search',
         'common.logout': 'Logout',
@@ -122,7 +122,7 @@ const translations = {
         'common.errorLoading': 'Error loading',
         'common.tapToTakePhoto': 'Tap to take photo',
         'common.cameraAutoOpen': 'Camera will open automatically',
-        
+
         // Login
         'login.title': 'Elder Care Management',
         'login.subtitle': 'Login',
@@ -132,13 +132,13 @@ const translations = {
         'login.placeholder.username': 'Enter username',
         'login.placeholder.password': 'Enter password',
         'login.hint': 'Default: admin / admin123',
-        
+
         // Resident Selector
         'resident.select': 'Select Resident',
         'resident.choose': 'Choose Resident',
         'resident.selectOption': 'Select a resident',
         'resident.addNew': 'Add New Resident',
-        
+
         // Resident Form
         'resident.title': 'Residents Management',
         'resident.add': 'Add New Resident',
@@ -167,7 +167,7 @@ const translations = {
         'resident.relation.placeholder': 'e.g., Son, Daughter',
         'resident.uploadPhoto': 'Upload Photo',
         'resident.removePhoto': 'Remove Photo',
-        
+
         // Months
         'month.january': 'January',
         'month.february': 'February',
@@ -181,7 +181,7 @@ const translations = {
         'month.october': 'October',
         'month.november': 'November',
         'month.december': 'December',
-        
+
         // Medications
         'medication.title': 'Medication Management',
         'medication.addNew': 'Add New Medication',
@@ -207,7 +207,7 @@ const translations = {
         'medication.scheduledTimes': 'Scheduled Times',
         'medication.markTaken': 'Mark Taken',
         'medication.taken': 'Taken',
-        
+
         // Calendar
         'calendar.title': 'Activity Calendar',
         'calendar.previous': '← Previous',
@@ -215,7 +215,7 @@ const translations = {
         'calendar.today': 'Today',
         'calendar.search': 'Search Activities',
         'calendar.searchPlaceholder': 'Search by name, doctor, medication...',
-        
+
         // Appointments
         'appointment.title': 'Appointment Tracking',
         'appointment.add': 'Add Appointment',
@@ -230,7 +230,7 @@ const translations = {
         'appointment.location': 'Location',
         'appointment.notes': 'Notes',
         'appointment.save': 'Save Appointment',
-        
+
         // Billing
         'billing.title': 'Billing & Payments',
         'billing.add': 'Add New Bill',
@@ -252,7 +252,7 @@ const translations = {
         'billing.status.overdue': 'Overdue',
         'payment.add': 'Record Payment',
         'payment.edit': 'Edit Payment',
-        
+
         // Vital Signs
         'vitals.title': 'Vital Signs Tracker',
         'vitals.add': 'Record Vital Signs',
@@ -268,7 +268,7 @@ const translations = {
         'vitals.weight': 'Weight',
         'vitals.notes': 'Notes',
         'vitals.save': 'Save Vital Signs',
-        
+
         // Care Notes
         'carenote.title': 'Care Notes',
         'carenote.add': 'Add Care Note',
@@ -278,7 +278,7 @@ const translations = {
         'carenote.category': 'Category',
         'carenote.note': 'Note',
         'carenote.save': 'Save Care Note',
-        
+
         // Incidents
         'incident.title': 'Incident Reports',
         'incident.add': 'Report Incident',
@@ -291,7 +291,7 @@ const translations = {
         'incident.severity': 'Severity',
         'incident.actionTaken': 'Action Taken',
         'incident.save': 'Save Incident',
-        
+
         // Staff
         'staff.title': 'Staff Management',
         'staff.add': 'Add New Staff Member',
@@ -333,7 +333,7 @@ const translations = {
         'nav.group.records': 'Registros y Reportes',
         'nav.group.financial': 'Financiero',
         'nav.group.system': 'Sistema',
-        
+
         // Dashboard
         'dashboard.title': 'Panel de Control',
         'dashboard.medications': 'Medicamentos',
@@ -348,7 +348,7 @@ const translations = {
         'dashboard.balance': 'Saldo',
         'dashboard.overdue': 'Vencido',
         'dashboard.quickAccess': 'Acceso Rápido',
-        
+
         // Common
         'common.search': 'Buscar',
         'common.logout': 'Cerrar Sesión',
@@ -393,7 +393,7 @@ const translations = {
         'common.errorLoading': 'Error al cargar',
         'common.tapToTakePhoto': 'Toca para tomar foto',
         'common.cameraAutoOpen': 'La cámara se abrirá automáticamente',
-        
+
         // Login
         'login.title': 'Gestión de Cuidado de Ancianos',
         'login.subtitle': 'Iniciar Sesión',
@@ -403,13 +403,13 @@ const translations = {
         'login.placeholder.username': 'Ingrese usuario',
         'login.placeholder.password': 'Ingrese contraseña',
         'login.hint': 'Por defecto: admin / admin123',
-        
+
         // Resident Selector
         'resident.select': 'Seleccionar Residente',
         'resident.choose': 'Elegir Residente',
         'resident.selectOption': 'Seleccione un residente',
         'resident.addNew': 'Agregar Nuevo Residente',
-        
+
         // Resident Form
         'resident.title': 'Gestión de Residentes',
         'resident.add': 'Agregar Nuevo Residente',
@@ -438,7 +438,7 @@ const translations = {
         'resident.relation.placeholder': 'ej., Hijo, Hija',
         'resident.uploadPhoto': 'Subir Foto',
         'resident.removePhoto': 'Eliminar Foto',
-        
+
         // Months
         'month.january': 'Enero',
         'month.february': 'Febrero',
@@ -452,7 +452,7 @@ const translations = {
         'month.october': 'Octubre',
         'month.november': 'Noviembre',
         'month.december': 'Diciembre',
-        
+
         // Medications
         'medication.title': 'Gestión de Medicamentos',
         'medication.addNew': 'Agregar Nuevo Medicamento',
@@ -481,7 +481,7 @@ const translations = {
         'medication.scheduledTimes': 'Horarios',
         'medication.markTaken': 'Marcar Tomado',
         'medication.taken': 'Tomado',
-        
+
         // Calendar
         'calendar.title': 'Calendario de Actividades',
         'calendar.previous': '← Anterior',
@@ -489,7 +489,7 @@ const translations = {
         'calendar.today': 'Hoy',
         'calendar.search': 'Buscar Actividades',
         'calendar.searchPlaceholder': 'Buscar por nombre, doctor, medicamento...',
-        
+
         // Appointments
         'appointment.title': 'Seguimiento de Citas',
         'appointment.add': 'Agregar Cita',
@@ -504,7 +504,7 @@ const translations = {
         'appointment.location': 'Ubicación',
         'appointment.notes': 'Notas',
         'appointment.save': 'Guardar Cita',
-        
+
         // Billing
         'billing.title': 'Facturación y Pagos',
         'billing.add': 'Agregar Nueva Factura',
@@ -526,7 +526,7 @@ const translations = {
         'billing.status.overdue': 'Vencido',
         'payment.add': 'Registrar Pago',
         'payment.edit': 'Editar Pago',
-        
+
         // Vital Signs
         'vitals.title': 'Registro de Signos Vitales',
         'vitals.add': 'Registrar Signos Vitales',
@@ -542,7 +542,7 @@ const translations = {
         'vitals.weight': 'Peso',
         'vitals.notes': 'Notas',
         'vitals.save': 'Guardar Signos Vitales',
-        
+
         // Care Notes
         'carenote.title': 'Notas de Cuidado',
         'carenote.add': 'Agregar Nota de Cuidado',
@@ -552,7 +552,7 @@ const translations = {
         'carenote.category': 'Categoría',
         'carenote.note': 'Nota',
         'carenote.save': 'Guardar Nota de Cuidado',
-        
+
         // Incidents
         'incident.title': 'Reportes de Incidentes',
         'incident.add': 'Reportar Incidente',
@@ -565,7 +565,7 @@ const translations = {
         'incident.severity': 'Severidad',
         'incident.actionTaken': 'Acción Tomada',
         'incident.save': 'Guardar Incidente',
-        
+
         // Staff
         'staff.title': 'Gestión de Personal',
         'staff.add': 'Agregar Nuevo Personal',
@@ -599,7 +599,7 @@ function t(key) {
 function replaceDualLanguageText() {
     // Pattern: "English / Spanish" -> extract only the needed language
     const dualLangPattern = /([^/]+)\s*\/\s*([^/]+)/g;
-    
+
     function replaceText(text) {
         if (!text || !text.includes(' / ')) return text;
         return text.replace(dualLangPattern, (match, englishPart, spanishPart) => {
@@ -608,7 +608,7 @@ function replaceDualLanguageText() {
             return currentLanguage === 'es' ? es : en;
         });
     }
-    
+
     // Process all text nodes directly
     const walker = document.createTreeWalker(
         document.body,
@@ -616,7 +616,7 @@ function replaceDualLanguageText() {
         null,
         false
     );
-    
+
     let textNode;
     while (textNode = walker.nextNode()) {
         // Skip text nodes inside script, style, and noscript tags
@@ -624,14 +624,14 @@ function replaceDualLanguageText() {
         if (parent && (parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE' || parent.tagName === 'NOSCRIPT')) {
             continue;
         }
-        
+
         // Skip if parent has data-translate (handled by updateTranslations)
-        if (parent && (parent.hasAttribute('data-translate') || 
-            parent.hasAttribute('data-translate-placeholder') || 
+        if (parent && (parent.hasAttribute('data-translate') ||
+            parent.hasAttribute('data-translate-placeholder') ||
             parent.hasAttribute('data-translate-title'))) {
             continue;
         }
-        
+
         const text = textNode.textContent;
         if (text && text.includes(' / ')) {
             const newText = replaceText(text);
@@ -640,30 +640,30 @@ function replaceDualLanguageText() {
             }
         }
     }
-    
+
     // Process element textContent for headings, buttons, labels, options, etc.
     // This handles cases where text might be in element.textContent but not in a direct text node
     // For headings and buttons, be more aggressive and process them directly
     const elementsToProcess = document.querySelectorAll('h1, h2, h3, h4, h5, h6, button, label, option, span, div, p, td, th, li, a');
     elementsToProcess.forEach(el => {
         // Skip elements with data-translate (handled by updateTranslations)
-        if (el.hasAttribute('data-translate') || 
-            el.hasAttribute('data-translate-placeholder') || 
+        if (el.hasAttribute('data-translate') ||
+            el.hasAttribute('data-translate-placeholder') ||
             el.hasAttribute('data-translate-title')) {
             return;
         }
-        
+
         // Skip script, style, noscript
         if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || el.tagName === 'NOSCRIPT') {
             return;
         }
-        
+
         // For headings and buttons, always process textContent directly if it contains dual-language pattern
         // For other elements, only process if they have simple text content (not nested elements)
-        const isHeadingOrButton = el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3' || 
-                                  el.tagName === 'H4' || el.tagName === 'H5' || el.tagName === 'H6' || 
+        const isHeadingOrButton = el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3' ||
+                                  el.tagName === 'H4' || el.tagName === 'H5' || el.tagName === 'H6' ||
                                   el.tagName === 'BUTTON';
-        
+
         if (el.textContent && el.textContent.includes(' / ')) {
             if (isHeadingOrButton) {
                 // For headings and buttons, always process textContent
@@ -673,11 +673,11 @@ function replaceDualLanguageText() {
                 }
             } else {
                 // For other elements, only process if it has simple text content
-                const hasOnlyTextNodes = Array.from(el.childNodes).every(node => 
-                    node.nodeType === Node.TEXT_NODE || 
+                const hasOnlyTextNodes = Array.from(el.childNodes).every(node =>
+                    node.nodeType === Node.TEXT_NODE ||
                     (node.nodeType === Node.ELEMENT_NODE && node.childNodes.length === 0)
                 );
-                
+
                 if (hasOnlyTextNodes) {
                     const newText = replaceText(el.textContent);
                     if (newText !== el.textContent) {
@@ -687,26 +687,26 @@ function replaceDualLanguageText() {
             }
         }
     });
-    
+
     // Process attributes (placeholder, title, value)
     document.querySelectorAll('[placeholder], [title], [value], option, button').forEach(el => {
         // Skip elements with data-translate attributes
-        if (el.hasAttribute('data-translate') || 
-            el.hasAttribute('data-translate-placeholder') || 
+        if (el.hasAttribute('data-translate') ||
+            el.hasAttribute('data-translate-placeholder') ||
             el.hasAttribute('data-translate-title')) {
             return;
         }
-        
+
         // Process placeholder
         if (el.placeholder && el.placeholder.includes(' / ')) {
             el.placeholder = replaceText(el.placeholder);
         }
-        
+
         // Process title
         if (el.title && el.title.includes(' / ')) {
             el.title = replaceText(el.title);
         }
-        
+
         // Process value (for input elements)
         if (el.value && el.value.includes(' / ')) {
             el.value = replaceText(el.value);
@@ -719,25 +719,25 @@ function setLanguage(lang) {
         console.error('Invalid language:', lang);
         return;
     }
-    
+
     currentLanguage = lang;
     document.documentElement.lang = lang;
-    
+
     // Save to localStorage
     localStorage.setItem('preferredLanguage', lang);
-    
+
     // Update language selector
     const langSelector = document.getElementById('languageSelector');
     if (langSelector) {
         langSelector.value = lang;
     }
-    
+
     // Replace all dual-language text with single language
     replaceDualLanguageText();
-    
+
     // Update all translatable elements
     updateTranslations();
-    
+
     // Update dashboard date to new language
     const dateEl = document.getElementById('dashboardDate');
     if (dateEl) {
@@ -746,7 +746,7 @@ function setLanguage(lang) {
         const locale = currentLanguage === 'es' ? 'es-PR' : 'en-US';
         dateEl.textContent = today.toLocaleDateString(locale, options);
     }
-    
+
     // Save to server if user is logged in
     if (currentUser && authToken) {
         fetch('/api/staff/language', {
@@ -774,25 +774,25 @@ function updateTranslations() {
             el.textContent = t(key);
         }
     });
-    
+
     // Update placeholders
     document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
         const key = el.getAttribute('data-translate-placeholder');
         el.placeholder = t(key);
     });
-    
+
     // Update titles
     document.querySelectorAll('[data-translate-title]').forEach(el => {
         const key = el.getAttribute('data-translate-title');
         el.title = t(key);
     });
-    
+
     // Update select options with data-translate-option
     document.querySelectorAll('[data-translate-option]').forEach(el => {
         const key = el.getAttribute('data-translate-option');
         el.textContent = t(key);
     });
-    
+
     // Update month options dynamically
     const monthSelects = document.querySelectorAll('select[id*="BirthMonth"], select[id*="birthMonth"]');
     monthSelects.forEach(select => {
@@ -812,7 +812,7 @@ function updateTranslations() {
             }
         });
     });
-    
+
     // Update gender options
     const genderSelects = document.querySelectorAll('select[id*="Gender"], select[id*="gender"]');
     genderSelects.forEach(select => {
@@ -828,7 +828,7 @@ function updateTranslations() {
             }
         });
     });
-    
+
     // Update frequency options in medication forms
     const frequencySelects = document.querySelectorAll('select[id*="Frequency"], select[id*="frequency"]');
     frequencySelects.forEach(select => {
@@ -848,7 +848,7 @@ function updateTranslations() {
             }
         });
     });
-    
+
     // Update billing status options
     const statusSelects = document.querySelectorAll('select[id*="Status"], select[id*="status"]');
     statusSelects.forEach(select => {
@@ -878,12 +878,12 @@ const originalFetch = window.fetch;
 window.fetch = function(url, options = {}) {
     const method = options.method || 'GET';
     const timestamp = new Date().toISOString();
-    
+
     // Disable cache for all API requests to ensure they show in Network tab
     if (url.startsWith('/api/')) {
         options.cache = 'no-store'; // Force network request, never use cache
         options.headers = options.headers || {};
-        
+
         // Add cache-control headers
         if (!options.headers['Cache-Control']) {
             options.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
@@ -891,7 +891,7 @@ window.fetch = function(url, options = {}) {
         if (!options.headers['Pragma']) {
             options.headers['Pragma'] = 'no-cache';
         }
-        
+
         // Log all API requests - MAKE IT IMPOSSIBLE TO MISS
         console.log(
             `%c🌐🌐🌐 NETWORK REQUEST 🌐🌐🌐\n` +
@@ -910,7 +910,7 @@ window.fetch = function(url, options = {}) {
             body: options.body,
             cache: options.cache
         });
-        
+
         // Also log to window for debugging
         if (!window.networkRequests) window.networkRequests = [];
         window.networkRequests.push({
@@ -920,25 +920,25 @@ window.fetch = function(url, options = {}) {
             status: 'pending'
         });
     }
-    
+
     // Add auth headers for API calls (except login)
     if (url.startsWith('/api/') && !url.includes('/auth/login')) {
         const authHeaders = getAuthHeaders();
         options.headers = { ...authHeaders, ...(options.headers || {}) };
-        
+
         // Debug: Log if token is missing
         if (!authToken && url.startsWith('/api/')) {
             console.warn('⚠️ WARNING: Making API request without auth token:', url);
         }
     }
-    
+
     // Make the request and log response
     const fetchPromise = originalFetch(url, options);
-    
+
     if (url.startsWith('/api/')) {
         fetchPromise.then(response => {
             const responseTimestamp = new Date().toISOString();
-            
+
             // Update network requests log
             if (window.networkRequests) {
                 const req = window.networkRequests.find(r => r.url === url && r.status === 'pending');
@@ -948,7 +948,7 @@ window.fetch = function(url, options = {}) {
                     req.completedAt = responseTimestamp;
                 }
             }
-            
+
             // Big, visible console log for response
             const statusColor = response.ok ? '#4CAF50' : '#f44336';
             console.log(
@@ -966,7 +966,7 @@ window.fetch = function(url, options = {}) {
                 statusText: response.statusText,
                 headers: Object.fromEntries(response.headers.entries())
             });
-            
+
             // Clone response to read body without consuming it
             response.clone().json().then(data => {
                 console.log(`%c📦 Response data:`, 'background: #FF9800; color: white; padding: 5px;', data);
@@ -976,7 +976,7 @@ window.fetch = function(url, options = {}) {
                     console.log(`%c📦 Response text:`, 'background: #FF9800; color: white; padding: 5px;', text.substring(0, 200));
                 }).catch(() => {});
             });
-            
+
             return response;
         }).catch(error => {
             const errorTimestamp = new Date().toISOString();
@@ -993,7 +993,7 @@ window.fetch = function(url, options = {}) {
             console.error('Full error:', error);
         });
     }
-    
+
     return fetchPromise;
 };
 
@@ -1015,7 +1015,7 @@ function checkAuth() {
         } else if (staffNavLink) {
             staffNavLink.style.display = 'none';
         }
-        
+
         // Show Financial Management nav link if user is admin
         const financialNavLink = document.getElementById('financialNavLink');
         if (financialNavLink) {
@@ -1029,7 +1029,7 @@ function checkAuth() {
         } else {
             console.error('❌ Financial Management nav link element not found!');
         }
-        
+
         if (!currentResidentId) {
             showResidentSelector();
         } else {
@@ -1063,34 +1063,34 @@ async function handleLogin(event) {
     event.preventDefault();
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
-    
+
     // Validate inputs
     if (!username || !password) {
         showMessage('Please enter both username and password / Por favor ingrese usuario y contraseña', 'error');
         return;
     }
-    
+
     console.log('🔐 Attempting login for username:', username);
-    
+
     try {
         console.log('🔐 Sending login request...');
         const response = await fetch('/api/auth/login', {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
             body: JSON.stringify({ username, password }),
             cache: 'no-store'
         });
-        
+
         console.log('📡 Login response status:', response.status, response.statusText);
         console.log('📡 Login response headers:', [...response.headers.entries()]);
-        
+
         // Get response text first to see what we're dealing with
         const responseText = await response.text();
         console.log('📡 Login response text:', responseText);
-        
+
         // Try to parse response
         let data;
         try {
@@ -1102,25 +1102,25 @@ async function handleLogin(event) {
             showMessage('Server error. Please try again / Error del servidor. Por favor intente de nuevo', 'error');
             return;
         }
-        
+
         if (response.ok) {
             if (!data.token || !data.staff) {
                 console.error('❌ Login response missing token or staff data:', data);
                 showMessage('Invalid server response / Respuesta del servidor inválida', 'error');
                 return;
             }
-            
+
             console.log('✅ Login successful!', data);
             authToken = data.token;
             currentStaff = data.staff;
             currentUser = data.staff; // Set for language system
             localStorage.setItem('authToken', authToken);
             localStorage.setItem('currentStaff', JSON.stringify(currentStaff));
-            
+
             // Load user's preferred language
             const userLanguage = currentStaff.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
             setLanguage(userLanguage);
-            
+
             document.getElementById('userName').textContent = currentStaff.full_name;
             const userRoleEl = document.getElementById('userRole');
             if (userRoleEl) {
@@ -1128,7 +1128,7 @@ async function handleLogin(event) {
                 userRoleEl.style.display = 'inline-block';
             }
             document.getElementById('userInfo').style.display = 'flex';
-            
+
             // Show Staff nav link if user is admin
             const staffNavLink = document.getElementById('staffNavLink');
             if (staffNavLink && currentStaff.role === 'admin') {
@@ -1136,7 +1136,7 @@ async function handleLogin(event) {
             } else if (staffNavLink) {
                 staffNavLink.style.display = 'none';
             }
-            
+
             // Show Financial Management nav link if user is admin
             const financialNavLink = document.getElementById('financialNavLink');
             if (financialNavLink) {
@@ -1150,7 +1150,7 @@ async function handleLogin(event) {
             } else {
                 console.error('❌ Financial Management nav link element not found!');
             }
-            
+
             hideLoginModal();
             showResidentSelector();
             showMessage('Login successful! / ¡Inicio de sesión exitoso!', 'success');
@@ -1159,7 +1159,7 @@ async function handleLogin(event) {
             const errorMsg = data.error || data.message || 'Login failed / Error de inicio de sesión';
             console.error('❌ Login failed:', response.status, errorMsg);
             showMessage(errorMsg, 'error');
-            
+
             // Clear password field on error
             document.getElementById('loginPassword').value = '';
         }
@@ -1175,18 +1175,18 @@ async function handleLogout() {
     } catch (error) {
         console.error('Logout error:', error);
     }
-    
+
     authToken = null;
     currentStaff = null;
     currentResidentId = null;
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentStaff');
     localStorage.removeItem('currentResidentId');
-    
+
     document.getElementById('userInfo').style.display = 'none';
     document.getElementById('currentResidentInfo').style.display = 'none';
     document.getElementById('mainApp').style.display = 'none';
-    
+
     showLoginModal();
     showMessage('Logged out successfully / Sesión cerrada exitosamente', 'success');
 }
@@ -1196,19 +1196,19 @@ async function loadResidentsForSelector() {
         const response = await fetch('/api/residents?active_only=true', {
             headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
             console.error('Residents selector API error:', response.status);
             return;
         }
-        
+
         const residents = await response.json();
-        
+
         const select = document.getElementById('residentSelect');
         if (!select) return;
-        
+
         select.innerHTML = '<option value="">-- Select a resident --</option>';
-        
+
         residents.forEach(resident => {
             const option = document.createElement('option');
             option.value = resident.id;
@@ -1224,17 +1224,17 @@ async function loadResidentsForSelector() {
 function selectResident() {
     const select = document.getElementById('residentSelect');
     const residentId = select.value;
-    
+
     if (!residentId) {
         showMessage('Please select a resident / Por favor seleccione un residente', 'error');
         return;
     }
-    
+
     currentResidentId = residentId;
     localStorage.setItem('currentResidentId', residentId);
-    
+
     loadCurrentResidentInfo(residentId);
-    
+
     hideResidentSelector();
     initApp();
     showMessage('Resident selected / Residente seleccionado', 'success');
@@ -1244,11 +1244,11 @@ async function loadCurrentResidentInfo(residentId) {
     try {
         const response = await fetch(`/api/residents/${residentId}`);
         const resident = await response.json();
-        
-        document.getElementById('currentResidentName').textContent = 
+
+        document.getElementById('currentResidentName').textContent =
             `${resident.first_name} ${resident.last_name}${resident.room_number ? ' - Room ' + resident.room_number : ''}`;
         document.getElementById('currentResidentInfo').style.display = 'block';
-        
+
         // Add photo to current resident info if available
         const currentResidentInfo = document.getElementById('currentResidentInfo');
         let photoElement = document.getElementById('currentResidentPhoto');
@@ -1274,53 +1274,53 @@ async function loadCurrentResidentInfo(residentId) {
 function showAddResidentForm(isNewResident = false) {
     console.log('%c📝 showAddResidentForm() CALLED!', 'background: #ff00ff; color: #fff; font-size: 16px; padding: 5px;');
     console.log('isNewResident parameter:', isNewResident);
-    
+
     // If explicitly adding a new resident, always clear editing state
     if (isNewResident) {
         console.log('🆕 Adding NEW resident - clearing all editing state');
         editingResidentId = null;
-        
+
         // Clear form data attributes
         const residentFormPage = document.getElementById('addResidentFormPage');
         const residentFormModal = document.getElementById('addResidentForm');
         if (residentFormPage) delete residentFormPage.dataset.editingId;
         if (residentFormModal) delete residentFormModal.dataset.editingId;
-        
+
         // Reset form titles
         const formTitleModal = document.querySelector('#addResidentForm h3');
         if (formTitleModal) {
             formTitleModal.textContent = t('resident.add');
         }
-        
+
         const formTitlePage = document.querySelector('#addResidentFormPage h3');
         if (formTitlePage) {
             formTitlePage.textContent = t('resident.add');
         }
-        
+
         // Reset forms
         resetResidentForm();
     } else {
         // Store the current editingResidentId to prevent it from being lost (when editing)
         const wasEditing = editingResidentId !== null && editingResidentId !== undefined;
         const savedEditingId = editingResidentId;
-        
+
         console.log('showAddResidentForm called. editingResidentId:', editingResidentId, 'wasEditing:', wasEditing);
-        
+
         // Only reset editingResidentId if it's not already set (i.e., when adding new, not editing)
         if (!wasEditing) {
             editingResidentId = null;
-            
+
             // Reset form titles only when adding new
             const formTitleModal = document.querySelector('#addResidentForm h3');
             if (formTitleModal) {
                 formTitleModal.textContent = t('resident.add');
             }
-            
+
             const formTitlePage = document.querySelector('#addResidentFormPage h3');
             if (formTitlePage) {
                 formTitlePage.textContent = t('resident.add');
             }
-            
+
             // Reset forms only when adding new
             resetResidentForm();
         } else {
@@ -1329,7 +1329,7 @@ function showAddResidentForm(isNewResident = false) {
             console.log('Preserving editingResidentId:', editingResidentId);
         }
     }
-    
+
     // Show form in modal (if in resident selector)
     const formModal = document.getElementById('addResidentForm');
     console.log('Form modal element:', formModal);
@@ -1339,7 +1339,7 @@ function showAddResidentForm(isNewResident = false) {
     } else {
         console.warn('⚠️ Modal form element not found!');
     }
-    
+
     // Show form on page (if on residents page)
     const formPage = document.getElementById('addResidentFormPage');
     console.log('Form page element:', formPage);
@@ -1349,7 +1349,7 @@ function showAddResidentForm(isNewResident = false) {
     } else {
         console.warn('⚠️ Page form element not found!');
     }
-    
+
     // Final safeguard - restore editingResidentId if it was lost (only if not adding new)
     if (!isNewResident) {
         const wasEditing = editingResidentId !== null && editingResidentId !== undefined;
@@ -1375,34 +1375,34 @@ function handleResidentPhotoUploadPage(event) {
 function handlePhotoUpload(event, previewId, previewImgId, placeholderId, inputId, dataVar) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     // Check if it's an image
     if (!file.type.startsWith('image/')) {
         showMessage('Please select an image file / Por favor seleccione un archivo de imagen', 'error');
         return;
     }
-    
+
     // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
         showMessage('Image too large. Max 5MB / Imagen muy grande. Máximo 5MB', 'error');
         return;
     }
-    
+
     const reader = new FileReader();
     reader.onload = function(e) {
         const photoData = e.target.result; // Base64 data URL
-        
+
         // Store in appropriate variable
         if (dataVar === 'residentPhotoData') {
             residentPhotoData = photoData;
         } else {
             residentPhotoDataPage = photoData;
         }
-        
+
         const preview = document.getElementById(previewId);
         const previewImg = document.getElementById(previewImgId);
         const placeholder = document.getElementById(placeholderId);
-        
+
         if (preview && previewImg && placeholder) {
             previewImg.src = photoData;
             preview.style.display = 'block';
@@ -1417,7 +1417,7 @@ function removeResidentPhoto() {
     const preview = document.getElementById('newPhotoPreview');
     const placeholder = document.getElementById('newPhotoUploadPlaceholder');
     const photoInput = document.getElementById('newPhotoInput');
-    
+
     if (preview) preview.style.display = 'none';
     if (placeholder) placeholder.style.display = 'block';
     if (photoInput) photoInput.value = '';
@@ -1428,7 +1428,7 @@ function removeResidentPhotoPage() {
     const preview = document.getElementById('newPhotoPreviewPage');
     const placeholder = document.getElementById('newPhotoUploadPlaceholderPage');
     const photoInput = document.getElementById('newPhotoInputPage');
-    
+
     if (preview) preview.style.display = 'none';
     if (placeholder) placeholder.style.display = 'block';
     if (photoInput) photoInput.value = '';
@@ -1438,23 +1438,23 @@ function resetResidentForm() {
     // Reset modal form
     const formModal = document.getElementById('newResidentForm');
     if (formModal) formModal.reset();
-    
+
     // Reset page form
     const formPage = document.getElementById('newResidentFormPage');
     if (formPage) formPage.reset();
-    
+
     // Reset date dropdowns
     ['newBirthYear', 'newBirthMonth', 'newBirthDay', 'newBirthYearPage', 'newBirthMonthPage', 'newBirthDayPage'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
     });
-    
+
     // Reset carrier fields
     ['newEmergencyCarrier', 'newEmergencyCarrierPage'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
     });
-    
+
     removeResidentPhoto();
     removeResidentPhotoPage();
 }
@@ -1465,13 +1465,13 @@ function hideAddResidentForm() {
         formModal.style.display = 'none';
         delete formModal.dataset.editingId; // Clear backup
     }
-    
+
     const formPage = document.getElementById('addResidentFormPage');
     if (formPage) {
         formPage.style.display = 'none';
         delete formPage.dataset.editingId; // Clear backup
     }
-    
+
     // Only reset editingResidentId if we're not in the middle of saving
     // (It will be reset after successful save)
     if (editingResidentId !== null && editingResidentId !== undefined) {
@@ -1487,18 +1487,18 @@ async function saveNewResident(event) {
     console.log('🔄 saveNewResident called!', event);
     event.preventDefault();
     console.log('✅ Event prevented, starting save process...');
-    
+
     // Determine which form was submitted
     const submittedForm = event.target;
     const isPageForm = submittedForm.id === 'newResidentFormPage';
     console.log('📝 Form submitted:', isPageForm ? 'PAGE FORM' : 'MODAL FORM', 'Form ID:', submittedForm.id);
-    
+
     // CRITICAL: Check if we're editing by looking at form title
     const formTitlePage = document.querySelector('#addResidentFormPage h3');
     const formTitleModal = document.querySelector('#addResidentForm h3');
-    const isEditMode = (formTitlePage && formTitlePage.textContent.includes('Edit')) || 
+    const isEditMode = (formTitlePage && formTitlePage.textContent.includes('Edit')) ||
                        (formTitleModal && formTitleModal.textContent.includes('Edit'));
-    
+
     // If form says "Edit" but editingResidentId is null, try to recover it from form data attribute
     if (isEditMode && (!editingResidentId || editingResidentId === null || editingResidentId === undefined)) {
         console.error('⚠️ CRITICAL: Form is in edit mode but editingResidentId is missing! Trying to recover...');
@@ -1514,31 +1514,31 @@ async function saveNewResident(event) {
             return;
         }
     }
-    
+
     console.log('=== SAVING RESIDENT ===');
     console.log('Form edit mode detected:', isEditMode);
     console.log('editingResidentId:', editingResidentId, typeof editingResidentId);
-    
+
     // Use the form that was actually submitted (from event.target)
     const usePageForm = isPageForm;
-    
+
     console.log('🔍 Using form:', usePageForm ? 'PAGE FORM' : 'MODAL FORM');
-    
+
     // Get values from the form that was submitted
     const firstNameModal = document.getElementById('newFirstName');
     const firstNamePage = document.getElementById('newFirstNamePage');
     const firstNameEl = usePageForm ? firstNamePage : firstNameModal;
-    
+
     console.log('🔍 FORM ELEMENT CHECK:');
     console.log('  Modal firstName element:', firstNameModal, 'Value:', firstNameModal?.value);
     console.log('  Page firstName element:', firstNamePage, 'Value:', firstNamePage?.value);
     console.log('  Using form:', usePageForm ? 'PAGE' : 'MODAL');
     console.log('  Selected firstName element:', firstNameEl, 'Value:', firstNameEl?.value);
-    
+
     const lastNameModal = document.getElementById('newLastName');
     const lastNamePage = document.getElementById('newLastNamePage');
     const lastNameEl = usePageForm ? lastNamePage : lastNameModal;
-    
+
     console.log('  Modal lastName element:', lastNameModal, 'Value:', lastNameModal?.value);
     console.log('  Page lastName element:', lastNamePage, 'Value:', lastNamePage?.value);
     console.log('  Selected lastName element:', lastNameEl, 'Value:', lastNameEl?.value);
@@ -1554,7 +1554,7 @@ async function saveNewResident(event) {
     const conditionsEl = usePageForm ? document.getElementById('newMedicalConditionsPage') : document.getElementById('newMedicalConditions');
     const allergiesEl = usePageForm ? document.getElementById('newAllergiesPage') : document.getElementById('newAllergies');
     const dietaryEl = usePageForm ? document.getElementById('newDietaryRestrictionsPage') : document.getElementById('newDietaryRestrictions');
-    
+
     // Get date from the form that was submitted
     let dateOfBirth = null;
     if (usePageForm) {
@@ -1572,27 +1572,27 @@ async function saveNewResident(event) {
             dateOfBirth = getDateFromDropdowns('newBirthYear', 'newBirthMonth', 'newBirthDay');
         }
     }
-    
+
     // Get photo from the form that was submitted
     const photoData = usePageForm ? residentPhotoDataPage : residentPhotoData;
-    
+
     // Validate required fields
     console.log('🔍 Validating fields...');
     console.log('First name element:', firstNameEl, 'Value:', firstNameEl?.value, 'Trimmed:', firstNameEl?.value?.trim());
     console.log('Last name element:', lastNameEl, 'Value:', lastNameEl?.value, 'Trimmed:', lastNameEl?.value?.trim());
-    
+
     // Log form visibility for debugging
     const modalForm = document.getElementById('addResidentForm');
     const pageForm = document.getElementById('addResidentFormPage');
     console.log('Modal form display:', modalForm?.style.display, 'Visible:', modalForm?.offsetParent !== null);
     console.log('Page form display:', pageForm?.style.display, 'Visible:', pageForm?.offsetParent !== null);
-    
+
     if (!firstNameEl) {
         console.error('❌ First name element NOT FOUND! Neither modal nor page element exists!');
         showMessage('First Name field not found. Please refresh the page. / Campo de nombre no encontrado. Por favor recargue la página.', 'error');
         return;
     }
-    
+
     if (!firstNameEl.value || !firstNameEl.value.trim()) {
         console.error('❌ First name is missing or empty!');
         console.error('   Element:', firstNameEl);
@@ -1602,20 +1602,20 @@ async function saveNewResident(event) {
         showMessage('First Name is required / El nombre es requerido', 'error');
         return;
     }
-    
+
     if (!lastNameEl || !lastNameEl.value.trim()) {
         console.error('❌ Last name is missing!');
         showMessage('Last Name is required / El apellido es requerido', 'error');
         return;
     }
-    
+
     console.log('✅ Validation passed!');
-    
+
     // Get insurance fields if they exist (these fields may not exist in the form)
     const insuranceProviderEl = usePageForm ? document.getElementById('newInsuranceProviderPage') : document.getElementById('newInsuranceProvider');
     const insuranceNumberEl = usePageForm ? document.getElementById('newInsuranceNumberPage') : document.getElementById('newInsuranceNumber');
     const notesEl = usePageForm ? document.getElementById('newNotesPage') : document.getElementById('newNotes');
-    
+
     // Get carrier value and log it for debugging
     const carrierEl = usePageForm ? document.getElementById('newEmergencyCarrierPage') : document.getElementById('newEmergencyCarrier');
     const carrierValue = carrierEl ? carrierEl.value : '';
@@ -1626,7 +1626,7 @@ async function saveNewResident(event) {
     console.log('🔍 Carrier element value:', carrierEl ? carrierEl.value : 'ELEMENT NOT FOUND!');
     console.log('🔍 Carrier value to save:', carrierValue || null);
     console.log('🔍🔍🔍 END CARRIER DEBUGGING 🔍🔍🔍');
-    
+
     const resident = {
         first_name: firstNameEl.value.trim(),
         last_name: lastNameEl.value.trim(),
@@ -1647,23 +1647,23 @@ async function saveNewResident(event) {
         notes: notesEl ? notesEl.value : null,
         photo_path: photoData || null
     };
-    
+
     console.log('📦 Resident data to save:', resident);
     console.log('📦 Carrier in resident object:', resident.emergency_contact_carrier);
     console.log('📦 Full resident JSON:', JSON.stringify(resident, null, 2));
     console.log('Date of birth:', dateOfBirth);
-    
+
     try {
         // Store editingResidentId in a local variable to prevent it from being lost
         const currentEditingId = editingResidentId;
         const isEditing = currentEditingId && currentEditingId !== null && currentEditingId !== undefined && currentEditingId !== 0;
-        
+
         console.log('=== SAVING RESIDENT ===');
         console.log('editingResidentId (global):', editingResidentId, typeof editingResidentId);
         console.log('currentEditingId (local):', currentEditingId, typeof currentEditingId);
         console.log('isEditing:', isEditing);
         console.log('Resident data being sent:', resident);
-        
+
         let response;
         if (isEditing) {
             // Update existing resident
@@ -1673,7 +1673,7 @@ async function saveNewResident(event) {
                 headers: getAuthHeaders(),
                 body: JSON.stringify(resident)
             });
-            
+
             console.log('Update response status:', response.status);
             console.log('Update response headers:', response.headers);
         } else {
@@ -1682,14 +1682,14 @@ async function saveNewResident(event) {
             console.log('POST URL:', '/api/residents');
             console.log('Headers:', getAuthHeaders());
             console.log('Resident data:', resident);
-            
+
             try {
                 response = await fetch('/api/residents', {
                     method: 'POST',
                     headers: getAuthHeaders(),
                     body: JSON.stringify(resident)
                 });
-                
+
                 console.log('✅ Create response received! Status:', response.status, response.statusText);
             } catch (fetchError) {
                 console.error('❌ Fetch error:', fetchError);
@@ -1697,19 +1697,19 @@ async function saveNewResident(event) {
                 return;
             }
         }
-        
+
         if (response.ok) {
             const result = await response.json().catch(() => ({}));
             console.log('✅ Save successful! Response:', result);
             console.log('Was editing:', isEditing, 'ID:', currentEditingId);
-            showMessage(isEditing 
-                ? 'Resident updated successfully! / ¡Residente actualizado exitosamente!' 
+            showMessage(isEditing
+                ? 'Resident updated successfully! / ¡Residente actualizado exitosamente!'
                 : 'Resident added successfully! / ¡Residente agregado exitosamente!', 'success');
-            
+
             // Clear editing state AFTER successful save
             editingResidentId = null;
             hideAddResidentForm();
-            
+
             loadResidentsForSelector();
             if (document.getElementById('residents').classList.contains('active')) {
                 loadResidents();
@@ -1721,7 +1721,7 @@ async function saveNewResident(event) {
                 const errorText = await response.text();
                 console.error('❌ Server error response:', response.status, response.statusText);
                 console.error('Error response text:', errorText);
-                
+
                 // Try to parse as JSON
                 try {
                     const errorData = JSON.parse(errorText);
@@ -1743,7 +1743,7 @@ async function saveNewResident(event) {
 
 function initApp() {
     console.log('🚀 Initializing app...');
-    
+
     // Test server connection
     fetch('/health')
         .then(response => response.json())
@@ -1754,7 +1754,7 @@ function initApp() {
             console.error('❌ Server health check failed:', error);
             showMessage('Warning: Cannot connect to server / Advertencia: No se puede conectar al servidor', 'error');
         });
-    
+
     document.getElementById('mainApp').style.display = 'block';
     initNavigation();
     loadDashboard();
@@ -1762,9 +1762,9 @@ function initApp() {
     setInterval(updateClock, 1000);
     initializeCalendarControls();
     initQuickWins();
-    
+
     console.log('✅ App initialized');
-    
+
     // Add resize handler to fix dashboard grid layout
     let resizeTimeout;
     window.addEventListener('resize', () => {
@@ -1795,14 +1795,14 @@ function initQuickWins() {
     const quickActions = document.querySelector('.quick-actions-nav');
     if (searchContainer) searchContainer.style.display = 'flex';
     if (quickActions) quickActions.style.display = 'flex';
-    
+
     // Initialize dark mode from localStorage
     const darkMode = localStorage.getItem('darkMode') === 'true';
     if (darkMode) {
         document.body.classList.add('dark-mode');
         updateDarkModeIcon(true);
     }
-    
+
     // Setup search
     const searchInput = document.getElementById('globalSearch');
     if (searchInput) {
@@ -1813,7 +1813,7 @@ function initQuickWins() {
             }
         });
     }
-    
+
     // Setup keyboard shortcuts
     document.addEventListener('keydown', handleKeyboardShortcuts);
 }
@@ -1825,16 +1825,16 @@ let searchTimeout = null;
 async function handleGlobalSearch(event) {
     const query = event.target.value.trim();
     const clearBtn = document.getElementById('clearSearchBtn');
-    
+
     if (clearBtn) {
         clearBtn.style.display = query ? 'block' : 'none';
     }
-    
+
     if (query.length < 2) {
         hideSearchResults();
         return;
     }
-    
+
     // Debounce search
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
@@ -1846,7 +1846,7 @@ async function performSearch(query) {
     try {
         searchResults = [];
         const lowerQuery = query.toLowerCase();
-        
+
         // Search residents
         try {
             const residentsRes = await fetch('/api/residents', { headers: getAuthHeaders() });
@@ -1871,7 +1871,7 @@ async function performSearch(query) {
                 });
             }
         } catch (e) { console.error('Error searching residents:', e); }
-        
+
         // Search medications
         if (currentResidentId) {
             try {
@@ -1895,7 +1895,7 @@ async function performSearch(query) {
                 }
             } catch (e) { console.error('Error searching medications:', e); }
         }
-        
+
         // Search appointments
         if (currentResidentId) {
             try {
@@ -1921,7 +1921,7 @@ async function performSearch(query) {
                 }
             } catch (e) { console.error('Error searching appointments:', e); }
         }
-        
+
         displaySearchResults();
     } catch (error) {
         console.error('Search error:', error);
@@ -1931,20 +1931,20 @@ async function performSearch(query) {
 function displaySearchResults() {
     const searchInput = document.getElementById('globalSearch');
     if (!searchInput) return;
-    
+
     // Remove existing results
     const existing = document.getElementById('searchResults');
     if (existing) existing.remove();
-    
+
     if (searchResults.length === 0) {
         return;
     }
-    
+
     // Create results container
     const resultsDiv = document.createElement('div');
     resultsDiv.id = 'searchResults';
     resultsDiv.className = 'search-results';
-    
+
     searchResults.forEach(result => {
         const item = document.createElement('div');
         item.className = 'search-result-item';
@@ -1956,7 +1956,7 @@ function displaySearchResults() {
         item.addEventListener('click', result.action);
         resultsDiv.appendChild(item);
     });
-    
+
     // Insert after search container
     const searchContainer = document.getElementById('searchContainer');
     if (searchContainer) {
@@ -2008,19 +2008,19 @@ function exportToPDF(title, content) {
         showMessage('PDF library not loaded. Please refresh the page. / Biblioteca PDF no cargada. Por favor recargue la página.', 'error');
         return;
     }
-    
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
+
     // Add title
     doc.setFontSize(18);
     doc.text(title, 14, 20);
-    
+
     // Add content (simple text for now)
     doc.setFontSize(10);
     const lines = doc.splitTextToSize(content, 180);
     doc.text(lines, 14, 30);
-    
+
     // Save
     doc.save(`${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
     showMessage('PDF exported successfully / PDF exportado exitosamente', 'success');
@@ -2037,14 +2037,14 @@ function handleKeyboardShortcuts(event) {
         }
         return;
     }
-    
+
     // Focus search with /
     if (event.key === '/') {
         event.preventDefault();
         const searchInput = document.getElementById('globalSearch');
         if (searchInput) searchInput.focus();
     }
-    
+
     // Close modals with Esc
     if (event.key === 'Escape') {
         const modals = document.querySelectorAll('.modal');
@@ -2055,19 +2055,19 @@ function handleKeyboardShortcuts(event) {
         });
         clearSearch();
     }
-    
+
     // Print with Ctrl/Cmd + P
     if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
         event.preventDefault();
         printCurrentPage();
     }
-    
+
     // Toggle dark mode with Ctrl/Cmd + D
     if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
         event.preventDefault();
         toggleDarkMode();
     }
-    
+
     // Number shortcuts for navigation
     if (!event.ctrlKey && !event.metaKey && !event.altKey) {
         const shortcuts = {
@@ -2079,7 +2079,7 @@ function handleKeyboardShortcuts(event) {
             '6': 'calendar',
             '7': 'billing'
         };
-        
+
         if (shortcuts[event.key]) {
             event.preventDefault();
             showPage(shortcuts[event.key]);
@@ -2093,7 +2093,7 @@ function handleKeyboardShortcuts(event) {
             });
         }
     }
-    
+
     // Show shortcuts help with ?
     if (event.key === '?' && !event.ctrlKey && !event.metaKey) {
         event.preventDefault();
@@ -2139,21 +2139,21 @@ function initNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
     const menuToggle = document.getElementById('menuToggle');
     const navMenu = document.getElementById('navMenu');
-    
+
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const page = link.dataset.page;
             showPage(page);
-            
+
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
-            
+
             // Close mobile menu when a link is clicked
             if (navMenu) navMenu.classList.remove('active');
         });
     });
-    
+
     // Add event listener to menu toggle button (backup to onclick)
     if (menuToggle && navMenu) {
         menuToggle.addEventListener('click', (e) => {
@@ -2169,15 +2169,15 @@ function showPage(pageName) {
     console.log('%c📄📄📄 showPage() CALLED with: ' + pageName + ' 📄📄📄', 'background: #FF6B6B; color: white; font-size: 18px; font-weight: bold; padding: 10px;');
     console.log('📄 Current URL:', window.location.href);
     console.log('📄 Timestamp:', new Date().toISOString());
-    
+
     if (!pageName) {
         console.error('❌ showPage called with no pageName!');
         return;
     }
-    
+
     const pages = document.querySelectorAll('.page');
     console.log('📄 Found', pages.length, 'pages in DOM');
-    
+
     // CRITICAL: Hide ALL pages first with inline styles to override any forced visibility
     pages.forEach(page => {
         if (page.id !== pageName) {
@@ -2196,7 +2196,7 @@ function showPage(pageName) {
             page.style.setProperty('z-index', '-1', 'important');
         }
     });
-    
+
     // CRITICAL: Ensure mainApp is visible first
     const mainApp = document.getElementById('mainApp');
     if (mainApp) {
@@ -2208,7 +2208,7 @@ function showPage(pageName) {
             mainApp.style.setProperty('opacity', '1', 'important');
         }
     }
-    
+
     const targetPage = document.getElementById(pageName);
     if (targetPage) {
         // CRITICAL: For carenotes, apply styles IMMEDIATELY before anything else
@@ -2226,7 +2226,7 @@ function showPage(pageName) {
             });
         }
         targetPage.classList.add('active');
-        
+
         // CRITICAL: For financial page, scroll to top immediately
         if (pageName === 'financial') {
             window.scrollTo({ top: 0, behavior: 'instant' });
@@ -2236,7 +2236,7 @@ function showPage(pageName) {
             targetPage.style.setProperty('margin-top', '0', 'important');
             targetPage.style.setProperty('padding-top', '2rem', 'important');
         }
-        
+
         // CRITICAL: Force ALL parent elements visible (same as incidents page fix)
         let currentElement = targetPage;
         let level = 0;
@@ -2245,14 +2245,14 @@ function showPage(pageName) {
             const display = computedStyle.display;
             const visibility = computedStyle.visibility;
             const opacity = computedStyle.opacity;
-            
+
             // Skip billing page if this page is inside it (shouldn't happen, but just in case)
             if (currentElement.id === 'billing' && pageName !== 'billing') {
                 currentElement = currentElement.parentElement;
                 level++;
                 continue;
             }
-            
+
             // Fix any parent with display:none (except intentionally hidden elements)
             if (display === 'none' && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm' && currentElement.id !== 'billForm' && currentElement.id !== 'paymentForm') {
                 currentElement.style.setProperty('display', 'block', 'important');
@@ -2261,14 +2261,14 @@ function showPage(pageName) {
                 currentElement.style.setProperty('position', 'relative', 'important');
                 currentElement.style.setProperty('z-index', '1', 'important');
             }
-            
+
             // Also fix if visibility is hidden or opacity is 0
             if ((visibility === 'hidden' || opacity === '0') && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm' && currentElement.id !== 'billForm' && currentElement.id !== 'paymentForm') {
                 currentElement.style.setProperty('visibility', 'visible', 'important');
                 currentElement.style.setProperty('opacity', '1', 'important');
                 currentElement.style.setProperty('display', 'block', 'important');
             }
-            
+
             // Stop at mainApp
             if (currentElement.id === 'mainApp') {
                 currentElement.style.setProperty('display', 'block', 'important');
@@ -2278,11 +2278,11 @@ function showPage(pageName) {
                 currentElement.style.setProperty('z-index', '1', 'important');
                 break;
             }
-            
+
             currentElement = currentElement.parentElement;
             level++;
         }
-        
+
         // Also ensure main.container is visible
         const mainContainer = targetPage.closest('main.container');
         if (mainContainer) {
@@ -2290,12 +2290,12 @@ function showPage(pageName) {
             mainContainer.style.setProperty('visibility', 'visible', 'important');
             mainContainer.style.setProperty('opacity', '1', 'important');
         }
-        
+
         // Only show the target page with !important
         targetPage.style.setProperty('display', 'block', 'important');
         targetPage.style.setProperty('visibility', 'visible', 'important');
         targetPage.style.setProperty('opacity', '1', 'important');
-        
+
         // For financial page, ensure it stays visible
         if (pageName === 'financial') {
             targetPage.style.setProperty('position', 'relative', 'important');
@@ -2317,7 +2317,7 @@ function showPage(pageName) {
         if (pageName !== 'financial' && pageName !== 'carenotes') {
             targetPage.style.setProperty('z-index', '1', 'important');
         }
-        
+
         // SPECIAL HANDLING FOR FINANCIAL PAGE - Force dimensions immediately
         if (pageName === 'financial') {
             targetPage.style.setProperty('min-height', '500px', 'important');
@@ -2326,7 +2326,7 @@ function showPage(pageName) {
             // Force all children visible immediately
             Array.from(targetPage.children).forEach((child) => {
                 if (child.tagName === 'SCRIPT') return;
-                const display = child.classList.contains('button-group') ? 'flex' : 
+                const display = child.classList.contains('button-group') ? 'flex' :
                               child.tagName === 'BUTTON' ? 'inline-block' : 'block';
                 child.style.setProperty('display', display, 'important');
                 child.style.setProperty('visibility', 'visible', 'important');
@@ -2342,7 +2342,7 @@ function showPage(pageName) {
                 }
             });
         }
-        
+
         // SPECIAL HANDLING FOR CARE NOTES PAGE - Force dimensions immediately
         if (pageName === 'carenotes') {
             targetPage.style.setProperty('min-height', '400px', 'important');
@@ -2355,7 +2355,7 @@ function showPage(pageName) {
                 if (child.id === 'careNoteForm' && child.style.display === 'none') {
                     return;
                 }
-                const display = child.tagName === 'BUTTON' ? 'inline-block' : 
+                const display = child.tagName === 'BUTTON' ? 'inline-block' :
                               child.classList.contains('item-list') ? 'block' : 'block';
                 child.style.setProperty('display', display, 'important');
                 child.style.setProperty('visibility', 'visible', 'important');
@@ -2367,7 +2367,7 @@ function showPage(pageName) {
                 }
             });
         }
-        
+
         // Force show ALL direct children
         Array.from(targetPage.children).forEach((child, index) => {
             // Skip forms that should be hidden initially
@@ -2391,7 +2391,7 @@ function showPage(pageName) {
             child.style.setProperty('position', 'relative', 'important');
             child.style.setProperty('z-index', '1', 'important');
         });
-        
+
         // Explicitly show all child elements of the target page
         const targetContainers = targetPage.querySelectorAll('h2, h3, button, [id$="List"], [class*="container"], [class*="form-card"], [class*="item-list"]');
         targetContainers.forEach(container => {
@@ -2401,8 +2401,8 @@ function showPage(pageName) {
                 return;
             }
             // Show everything else
-            container.style.setProperty('display', container.tagName === 'H2' || container.tagName === 'H3' ? 'block' : 
-                                       container.tagName === 'BUTTON' ? 'inline-block' : 
+            container.style.setProperty('display', container.tagName === 'H2' || container.tagName === 'H3' ? 'block' :
+                                       container.tagName === 'BUTTON' ? 'inline-block' :
                                        container.classList.contains('item-list') ? 'block' : 'block', 'important');
             container.style.setProperty('visibility', 'visible', 'important');
             container.style.setProperty('opacity', '1', 'important');
@@ -2411,7 +2411,7 @@ function showPage(pageName) {
         console.log('✅ Target page children count:', targetPage.children.length);
         console.log('✅ Target page offsetHeight:', targetPage.offsetHeight);
         console.log('✅ Target page offsetWidth:', targetPage.offsetWidth);
-        
+
         // Update nav links
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
@@ -2419,7 +2419,7 @@ function showPage(pageName) {
                 link.classList.add('active');
             }
         });
-        
+
         // Load page-specific data
         if (pageName === 'dashboard') {
             // Force grid layout immediately - run multiple times to ensure it sticks
@@ -2443,7 +2443,7 @@ function showPage(pageName) {
                     statsGrid.style.setProperty('width', '100%', 'important');
                     statsGrid.style.setProperty('max-width', '100%', 'important');
                     console.log('✅ [showPage] Applied grid:', columns);
-                    
+
                     // Force cards to not be full width
                     const cards = statsGrid.querySelectorAll('.stat-card');
                     cards.forEach(card => {
@@ -2454,13 +2454,13 @@ function showPage(pageName) {
                     console.warn('⚠️ [showPage] stats-grid not found');
                 }
             };
-            
+
             // Run immediately and after short delays to ensure it sticks
             forceGridLayout();
             setTimeout(forceGridLayout, 50);
             setTimeout(forceGridLayout, 200);
             setTimeout(forceGridLayout, 500);
-            
+
             loadDashboard();
         }
         else if (pageName === 'residents') loadResidents();
@@ -2475,7 +2475,7 @@ function showPage(pageName) {
         }
         else if (pageName === 'billing') {
             console.log('💰 Showing billing page');
-            
+
             // CRITICAL: Aggressively hide incidents page when showing billing
             const incidentsPage = document.getElementById('incidents');
             if (incidentsPage) {
@@ -2488,7 +2488,7 @@ function showPage(pageName) {
                 incidentsPage.style.setProperty('z-index', '-1', 'important');
                 console.log('✅ Incidents page forcefully hidden');
             }
-            
+
             // CRITICAL: Show billing page and restore its children
             const billingPage = document.getElementById('billing');
             if (billingPage) {
@@ -2500,7 +2500,7 @@ function showPage(pageName) {
                 billingPage.style.setProperty('z-index', '1', 'important');
                 billingPage.style.removeProperty('left'); // Remove left: -9999px if it was set
                 billingPage.style.removeProperty('right'); // Remove any right positioning
-                
+
                 // Force show all direct children of billing page
                 Array.from(billingPage.children).forEach((child, index) => {
                     // Only restore if it's not a form that should be hidden
@@ -2515,7 +2515,7 @@ function showPage(pageName) {
                     child.style.setProperty('visibility', 'visible', 'important');
                     child.style.setProperty('opacity', '1', 'important');
                 });
-                
+
                 // Also force show key billing containers
                 const billingList = document.getElementById('billsList');
                 const paymentsList = document.getElementById('paymentsList');
@@ -2527,10 +2527,10 @@ function showPage(pageName) {
                     paymentsList.style.setProperty('display', 'block', 'important');
                     paymentsList.style.setProperty('visibility', 'visible', 'important');
                 }
-                
+
                 console.log('✅ Billing page restored and shown');
             }
-            
+
             loadBilling();
             loadPayments();
             loadAccountBalance();
@@ -2541,7 +2541,7 @@ function showPage(pageName) {
         else if (pageName === 'incidents') {
             console.log('%c🚨🚨🚨 SHOWING INCIDENTS PAGE 🚨🚨🚨', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
             console.log('🚨 Running from: ' + window.location.hostname);
-            
+
             // CRITICAL: Get incidents page element FIRST
             const incidentsPageElement = document.getElementById('incidents');
             if (!incidentsPageElement) {
@@ -2553,7 +2553,7 @@ function showPage(pageName) {
             console.log('✅ Element ID:', incidentsPageElement.id);
             console.log('✅ Element classes:', incidentsPageElement.className);
             console.log('✅ Element parent:', incidentsPageElement.parentElement?.tagName, incidentsPageElement.parentElement?.id);
-            
+
             // CRITICAL: Aggressively hide billing page when showing incidents
             const billingPage = document.getElementById('billing');
             if (billingPage) {
@@ -2567,7 +2567,7 @@ function showPage(pageName) {
                 // DON'T hide children with !important - just hide the container
                 // This allows billing to be restored when shown again
                 console.log('✅ Billing page forcefully hidden');
-                
+
                 // CRITICAL: If incidents is inside billing, move it out!
                 if (incidentsPageElement.parentElement && incidentsPageElement.parentElement.id === 'billing') {
                     console.log('⚠️⚠️⚠️ CRITICAL: Incidents page is INSIDE billing page! Moving it out...');
@@ -2582,7 +2582,7 @@ function showPage(pageName) {
             } else {
                 console.log('⚠️ Billing page element not found (this is OK if it doesn\'t exist)');
             }
-            
+
             // CRITICAL: Explicitly show incidents page content IMMEDIATELY
             const incidentsPage = document.getElementById('incidents');
             if (!incidentsPage) {
@@ -2590,7 +2590,7 @@ function showPage(pageName) {
                 alert('ERROR: Incidents page element not found! Check console.');
                 return;
             }
-            
+
             console.log('✅ Incidents page element found');
             console.log('✅ Incidents page ID:', incidentsPage.id);
             console.log('✅ Incidents page classes:', incidentsPage.className);
@@ -2598,7 +2598,7 @@ function showPage(pageName) {
             console.log('✅ Incidents page parent:', incidentsPage.parentElement?.tagName, incidentsPage.parentElement?.id);
             console.log('✅ Incidents page parent display:', window.getComputedStyle(incidentsPage.parentElement).display);
             console.log('✅ Incidents page innerHTML length:', incidentsPage.innerHTML.length);
-            
+
             // CRITICAL: Ensure ALL parents are visible, starting from incidentsPage up to mainApp
             // BUT: Skip the billing page if incidents is inside it (we'll move incidents out first)
             let currentElement = incidentsPage;
@@ -2608,9 +2608,9 @@ function showPage(pageName) {
                 const display = computedStyle.display;
                 const visibility = computedStyle.visibility;
                 const opacity = computedStyle.opacity;
-                
+
                 console.log(`🔍 Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}): display=${display}, visibility=${visibility}, opacity=${opacity}`);
-                
+
                 // CRITICAL: If this is the billing page, DON'T make it visible - incidents should not be inside it!
                 if (currentElement.id === 'billing') {
                     console.log(`⚠️⚠️⚠️ SKIPPING billing page - incidents should NOT be inside billing!`);
@@ -2620,7 +2620,7 @@ function showPage(pageName) {
                     level++;
                     continue;
                 }
-                
+
                 // Fix any parent with display:none (except intentionally hidden elements)
                 if (display === 'none' && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm') {
                     console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - setting display to block with !important`);
@@ -2631,7 +2631,7 @@ function showPage(pageName) {
                     currentElement.style.setProperty('z-index', '1', 'important');
                     console.log(`✅ Fixed Parent ${level} - new display:`, window.getComputedStyle(currentElement).display);
                 }
-                
+
                 // Also fix if visibility is hidden or opacity is 0
                 if ((visibility === 'hidden' || opacity === '0') && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm') {
                     console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - visibility/opacity issue`);
@@ -2639,7 +2639,7 @@ function showPage(pageName) {
                     currentElement.style.setProperty('opacity', '1', 'important');
                     currentElement.style.setProperty('display', 'block', 'important');
                 }
-                
+
                 // Stop at mainApp
                 if (currentElement.id === 'mainApp') {
                     console.log(`🔧 CRITICAL: Found mainApp container - forcing visibility`);
@@ -2650,11 +2650,11 @@ function showPage(pageName) {
                     currentElement.style.setProperty('z-index', '1', 'important');
                     break;
                 }
-                
+
                 currentElement = currentElement.parentElement;
                 level++;
             }
-            
+
             // Also ensure main.container is visible
             const mainContainer = incidentsPage.closest('main.container');
             if (mainContainer) {
@@ -2663,12 +2663,12 @@ function showPage(pageName) {
                 mainContainer.style.setProperty('opacity', '1', 'important');
                 console.log('✅ main.container forced visible');
             }
-            
+
             // Force incidents page to be visible using cssText for maximum control
             incidentsPage.classList.add('active');
             incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
             console.log('✅ Incidents page forced visible with cssText');
-            
+
             // Verify it worked
             const computedStyle = window.getComputedStyle(incidentsPage);
             console.log('✅ After forcing - display:', computedStyle.display);
@@ -2676,7 +2676,7 @@ function showPage(pageName) {
             console.log('✅ After forcing - opacity:', computedStyle.opacity);
             console.log('✅ After forcing - offsetHeight:', incidentsPage.offsetHeight);
             console.log('✅ After forcing - offsetWidth:', incidentsPage.offsetWidth);
-            
+
             // Show ALL direct children of incidents page - USE CSS TEXT FOR MAXIMUM CONTROL
             Array.from(incidentsPage.children).forEach((child, index) => {
                 console.log(`✅ Child ${index}:`, child.tagName, child.id || child.className, 'textContent:', child.textContent?.substring(0, 50));
@@ -2686,35 +2686,35 @@ function showPage(pageName) {
                 const beforeHeight = child.offsetHeight;
                 const beforeWidth = child.offsetWidth;
                 console.log(`    Before: display=${beforeDisplay}, visibility=${beforeVisibility}, opacity=${beforeOpacity}, height=${beforeHeight}, width=${beforeWidth}`);
-                
+
                 // Don't hide the form if it's supposed to be hidden
                 if (child.id === 'incidentForm' && child.style.display === 'none') {
                     console.log('⚠️ Skipping incidentForm (should be hidden)');
                     return;
                 }
-                
+
                 // Use cssText to completely replace styles for maximum control
                 const displayValue = child.tagName === 'BUTTON' ? 'inline-block' : 'block';
                 child.style.cssText = `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important;`;
-                
+
                 const afterDisplay = window.getComputedStyle(child).display;
                 const afterVisibility = window.getComputedStyle(child).visibility;
                 const afterOpacity = window.getComputedStyle(child).opacity;
                 const afterHeight = child.offsetHeight;
                 const afterWidth = child.offsetWidth;
                 console.log(`    After: display=${afterDisplay}, visibility=${afterVisibility}, opacity=${afterOpacity}, height=${afterHeight}, width=${afterWidth}`);
-                
+
                 if (afterHeight === 0 && afterWidth === 0) {
                     console.error(`    ❌❌❌ CHILD ${index} HAS ZERO DIMENSIONS! ❌❌❌`);
                 }
             });
-            
+
             // Removed debug test element checking code
-            
+
             const incidentsH2 = incidentsPage.querySelector('h2');
             const incidentsButton = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
             const incidentsList = document.getElementById('incidentsList');
-            
+
             if (incidentsH2) {
                 incidentsH2.style.setProperty('display', 'block', 'important');
                 incidentsH2.style.setProperty('visibility', 'visible', 'important');
@@ -2725,7 +2725,7 @@ function showPage(pageName) {
             } else {
                 console.error('❌ Incidents H2 NOT FOUND!');
             }
-            
+
             if (incidentsButton) {
                 incidentsButton.style.setProperty('display', 'inline-block', 'important');
                 incidentsButton.style.setProperty('visibility', 'visible', 'important');
@@ -2736,7 +2736,7 @@ function showPage(pageName) {
             } else {
                 console.error('❌ Incidents button NOT FOUND!');
             }
-            
+
             if (incidentsList) {
                 incidentsList.style.setProperty('display', 'block', 'important');
                 incidentsList.style.setProperty('visibility', 'visible', 'important');
@@ -2747,7 +2747,7 @@ function showPage(pageName) {
             } else {
                 console.error('❌ Incidents list container NOT FOUND!');
             }
-            
+
             // Verify visibility with computed styles
             setTimeout(() => {
                 const computedDisplay = window.getComputedStyle(incidentsPage).display;
@@ -2761,25 +2761,25 @@ function showPage(pageName) {
                     console.error('❌❌❌ PAGE IS STILL HIDDEN DESPITE ALL EFFORTS! ❌❌❌');
                 }
             }, 100);
-            
+
             console.log('🔄 Loading incidents page data...');
             loadIncidents();
         }
         else if (pageName === 'carenotes') {
             console.log('%c📝📝📝 SHOWING CARE NOTES PAGE 📝📝📝', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
-            
+
             const carenotesPage = document.getElementById('carenotes');
             if (!carenotesPage) {
                 console.error('❌ Care notes page not found!');
                 return;
             }
-            
+
             console.log('✅ Care notes page element found in DOM');
             console.log('✅ Element ID:', carenotesPage.id);
             console.log('✅ Element classes:', carenotesPage.className);
             console.log('✅ Element parent:', carenotesPage.parentElement?.tagName, carenotesPage.parentElement?.id);
             console.log('✅ Element children count:', carenotesPage.children.length);
-            
+
             // CRITICAL: Ensure ALL parents are visible, starting from carenotesPage up to mainApp
             let currentElement = carenotesPage;
             let level = 0;
@@ -2788,16 +2788,16 @@ function showPage(pageName) {
                 const display = computedStyle.display;
                 const visibility = computedStyle.visibility;
                 const opacity = computedStyle.opacity;
-                
+
                 console.log(`🔍 Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}): display=${display}, visibility=${visibility}, opacity=${opacity}`);
-                
+
                 // Skip intentionally hidden elements
                 if (currentElement.id === 'loginModal' || currentElement.id === 'residentSelector' || currentElement.id === 'careNoteForm') {
                     currentElement = currentElement.parentElement;
                     level++;
                     continue;
                 }
-                
+
                 // Fix any parent with display:none
                 if (display === 'none') {
                     console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - setting display to block with !important`);
@@ -2807,7 +2807,7 @@ function showPage(pageName) {
                     currentElement.style.setProperty('position', 'relative', 'important');
                     currentElement.style.setProperty('z-index', '1', 'important');
                 }
-                
+
                 // Also fix if visibility is hidden or opacity is 0
                 if (visibility === 'hidden' || opacity === '0') {
                     console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - visibility/opacity issue`);
@@ -2815,7 +2815,7 @@ function showPage(pageName) {
                     currentElement.style.setProperty('opacity', '1', 'important');
                     currentElement.style.setProperty('display', 'block', 'important');
                 }
-                
+
                 // Stop at mainApp
                 if (currentElement.id === 'mainApp') {
                     console.log(`🔧 CRITICAL: Found mainApp container - forcing visibility`);
@@ -2826,11 +2826,11 @@ function showPage(pageName) {
                     currentElement.style.setProperty('z-index', '1', 'important');
                     break;
                 }
-                
+
                 currentElement = currentElement.parentElement;
                 level++;
             }
-            
+
             // Also ensure main.container is visible
             const mainContainer = carenotesPage.closest('main.container');
             if (mainContainer) {
@@ -2839,11 +2839,11 @@ function showPage(pageName) {
                 mainContainer.style.setProperty('opacity', '1', 'important');
                 console.log('✅ main.container forced visible');
             }
-            
+
             // Force carenotes page to be visible using cssText for maximum control
             carenotesPage.classList.add('active');
             carenotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important;';
-            
+
             // DOUBLE-CHECK: Force it again after a micro-delay to override any timing issues
             setTimeout(() => {
                 carenotesPage.style.setProperty('display', 'block', 'important');
@@ -2853,7 +2853,7 @@ function showPage(pageName) {
                 carenotesPage.style.setProperty('width', '100%', 'important');
                 console.log('✅ Care notes page re-forced visible after timeout');
             }, 50);
-            
+
             // Ensure all child elements are visible
             Array.from(carenotesPage.children).forEach((child) => {
                 if (child.tagName === 'SCRIPT') return;
@@ -2861,7 +2861,7 @@ function showPage(pageName) {
                 if (child.id === 'careNoteForm' && child.style.display === 'none') {
                     return;
                 }
-                const display = child.tagName === 'BUTTON' ? 'inline-block' : 
+                const display = child.tagName === 'BUTTON' ? 'inline-block' :
                               child.classList.contains('item-list') ? 'block' : 'block';
                 child.style.setProperty('display', display, 'important');
                 child.style.setProperty('visibility', 'visible', 'important');
@@ -2871,7 +2871,7 @@ function showPage(pageName) {
                     child.style.setProperty('margin-bottom', '1.5rem', 'important');
                 }
             });
-            
+
             // Ensure the careNotesList container exists and is visible
             const careNotesList = document.getElementById('careNotesList');
             if (careNotesList) {
@@ -2882,11 +2882,11 @@ function showPage(pageName) {
             } else {
                 console.error('❌ careNotesList container not found in DOM!');
             }
-            
+
             console.log('✅ Care notes page forced visible');
             console.log('✅ Care notes page offsetHeight:', carenotesPage.offsetHeight);
             console.log('✅ Care notes page offsetWidth:', carenotesPage.offsetWidth);
-            
+
             loadCareNotes();
         }
         else if (pageName === 'notifications') {
@@ -2897,17 +2897,17 @@ function showPage(pageName) {
         }
         else if (pageName === 'financial') {
             console.log('💰💰💰 FINANCIAL PAGE - COMPLETE REWRITE APPROACH 💰💰💰');
-            
+
             const financialPage = document.getElementById('financial');
             if (!financialPage) {
                 console.error('❌ Financial page not found!');
                 return;
             }
-            
+
             // COMPLETE REWRITE: Remove all inline styles and start fresh
             financialPage.removeAttribute('style');
             financialPage.className = 'page active';
-            
+
             // Check parent chain
             let parent = financialPage.parentElement;
             let level = 0;
@@ -2919,7 +2919,7 @@ function showPage(pageName) {
                     height: parent.offsetHeight,
                     width: parent.offsetWidth
                 });
-                
+
                 // Force parent visible if needed
                 if (parentStyle.display === 'none' || parent.offsetHeight === 0) {
                     parent.style.setProperty('display', 'block', 'important');
@@ -2927,11 +2927,11 @@ function showPage(pageName) {
                     parent.style.setProperty('min-height', '600px', 'important');
                     console.log(`⚠️ Fixed parent level ${level}`);
                 }
-                
+
                 parent = parent.parentElement;
                 level++;
             }
-            
+
             // Now set the financial page with ALL possible CSS properties
             financialPage.style.cssText = `
                 display: block !important;
@@ -2954,11 +2954,11 @@ function showPage(pageName) {
                 right: 0 !important;
                 bottom: auto !important;
             `;
-            
+
             // Force ALL children with explicit content - MORE AGGRESSIVE
             Array.from(financialPage.children).forEach((child, idx) => {
                 if (child.tagName === 'SCRIPT') return;
-                
+
                 let css = '';
                 if (child.tagName === 'H2') {
                     css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 50px !important; margin: 1rem 0 !important; padding: 0.5rem 0 !important; font-size: 2rem !important; font-weight: bold !important; color: #333 !important; background: transparent !important; position: relative !important; z-index: 100 !important;';
@@ -2971,7 +2971,7 @@ function showPage(pageName) {
                 } else {
                     css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 100px !important; position: relative !important; z-index: 100 !important;';
                 }
-                
+
                 child.style.cssText = css;
                 // Also set individual properties as backup
                 child.style.setProperty('display', child.tagName === 'H2' || child.classList.contains('button-group') ? (child.classList.contains('button-group') ? 'flex' : 'block') : 'block', 'important');
@@ -2979,9 +2979,9 @@ function showPage(pageName) {
                 child.style.setProperty('opacity', '1', 'important');
                 console.log(`✅ Child ${idx} (${child.tagName || child.className}) forced, height:`, child.offsetHeight, 'display:', window.getComputedStyle(child).display);
             });
-            
+
             // Removed debug test div code
-            
+
             // Verify ALL children are visible with detailed logging
             setTimeout(() => {
                 console.log('🔍🔍🔍 DETAILED CHILD VISIBILITY CHECK 🔍🔍🔍');
@@ -3002,7 +3002,7 @@ function showPage(pageName) {
                         position: computed.position,
                         zIndex: computed.zIndex
                     });
-                    
+
                     // If child has zero height but should be visible, force it again
                     if (child.offsetHeight === 0 && computed.display !== 'none') {
                         console.warn(`⚠️ Child ${idx} has zero height! Forcing again...`);
@@ -3011,7 +3011,7 @@ function showPage(pageName) {
                         child.style.setProperty('height', 'auto', 'important');
                     }
                 });
-                
+
                 const testDivCheck = document.getElementById('financialTestDiv');
                 if (testDivCheck) {
                     console.log('🔍 Test div check:', {
@@ -3028,41 +3028,41 @@ function showPage(pageName) {
                     console.error('❌ Test div not found after creation!');
                 }
             }, 100);
-            
+
             console.log('✅ Financial page completely rewritten, test div added');
             console.log('🔍 Financial page dimensions:', {
                 height: financialPage.offsetHeight,
                 width: financialPage.offsetWidth,
                 display: window.getComputedStyle(financialPage).display
             });
-            
+
             // CRITICAL: Show accounts tab IMMEDIATELY before initFinancialPage
             console.log('🔴 CRITICAL: Showing accounts tab IMMEDIATELY...');
             const accountsTab = document.getElementById('financialAccounts');
             if (accountsTab) {
                 accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important; position: relative !important;';
                 console.log('✅ Accounts tab forced visible immediately, height:', accountsTab.offsetHeight);
-                
+
                 // Force all children of accounts tab visible
                 Array.from(accountsTab.children).forEach((child) => {
                     child.style.setProperty('display', 'block', 'important');
                     child.style.setProperty('visibility', 'visible', 'important');
                     child.style.setProperty('opacity', '1', 'important');
                 });
-                
+
                 // AGGRESSIVE: Find and force form-card visible
                 const formCard = accountsTab.querySelector('.form-card');
                 if (formCard) {
                     formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important;';
                     console.log('✅✅✅ FORM-CARD FOUND AND FORCED VISIBLE IN showPage ✅✅✅');
-                    
+
                     // Find and force button visible
                     const button = formCard.querySelector('button');
                     if (button) {
                         button.style.setProperty('display', 'inline-block', 'important');
                         button.style.setProperty('visibility', 'visible', 'important');
                         button.style.setProperty('opacity', '1', 'important');
-                        
+
                         console.log('✅✅✅ BUTTON FOUND AND FORCED VISIBLE IN showPage ✅✅✅');
                         console.log('🔍 Button position:', button.getBoundingClientRect());
                     } else {
@@ -3072,7 +3072,7 @@ function showPage(pageName) {
                     console.error('❌❌❌ FORM-CARD NOT FOUND IN ACCOUNTS TAB!');
                 }
             }
-            
+
             // Hide other tabs
             ['financialTransactions', 'financialReconciliation', 'financialReceipts'].forEach(tabId => {
                 const tab = document.getElementById(tabId);
@@ -3080,7 +3080,7 @@ function showPage(pageName) {
                     tab.style.setProperty('display', 'none', 'important');
                 }
             });
-            
+
             // Update button styles
             const tabButtons = financialPage.querySelectorAll('.button-group button');
             tabButtons.forEach((btn, idx) => {
@@ -3092,18 +3092,18 @@ function showPage(pageName) {
                     btn.classList.add('btn-secondary');
                 }
             });
-            
+
             // ULTRA AGGRESSIVE FIX: Add test div and create button if missing
             setTimeout(() => {
-                
+
                 const accountsTab = document.getElementById('financialAccounts');
                 if (!accountsTab) {
                     console.error('❌❌❌ ACCOUNTS TAB NOT FOUND!');
                     return;
                 }
-                
+
                 accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; min-height: 500px !important;';
-                
+
                 // Try multiple selectors to find form-card
                 let formCard = accountsTab.querySelector('.form-card');
                 if (!formCard) {
@@ -3121,13 +3121,13 @@ function showPage(pageName) {
                     formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important;';
                     console.log('✅✅✅ FORM-CARD FOUND AND FORCED VISIBLE ✅✅✅');
                 }
-                
+
                 // Find or create button
                 let addButton = formCard.querySelector('button');
                 if (!addButton) {
                     addButton = document.querySelector('#financialAccounts button');
                 }
-                
+
                 if (!addButton) {
                     // CREATE BUTTON if it doesn't exist
                     addButton = document.createElement('button');
@@ -3137,21 +3137,21 @@ function showPage(pageName) {
                     formCard.appendChild(addButton);
                     console.log('✅✅✅ CREATED BUTTON BECAUSE IT WAS MISSING ✅✅✅');
                 }
-                
+
                 // Force button visible with normal styling
                 addButton.style.setProperty('display', 'inline-block', 'important');
                 addButton.style.setProperty('visibility', 'visible', 'important');
                 addButton.style.setProperty('opacity', '1', 'important');
                 console.log('✅✅✅ BUTTON FORCED VISIBLE WITH NORMAL STYLING ✅✅✅');
                 console.log('🔍 Button position:', addButton.getBoundingClientRect());
-                
+
                 const bankAccountsList = document.getElementById('bankAccountsList');
                 if (bankAccountsList) {
                     bankAccountsList.style.setProperty('display', 'block', 'important');
                     bankAccountsList.style.setProperty('visibility', 'visible', 'important');
                     bankAccountsList.style.setProperty('opacity', '1', 'important');
                     bankAccountsList.style.setProperty('min-height', '250px', 'important');
-                    
+
                     if (!bankAccountsList.innerHTML || bankAccountsList.innerHTML.trim() === '') {
                         bankAccountsList.innerHTML = '<div style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex !important; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd; visibility: visible !important; opacity: 1 !important; width: 100%; box-sizing: border-box;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
                     }
@@ -3162,10 +3162,10 @@ function showPage(pageName) {
     } else {
         console.error('❌ Page not found:', pageName);
     }
-    
+
     // Replace dual-language text with single language after page is shown
     replaceDualLanguageText();
-    
+
     // Update all translatable elements (data-translate attributes)
     updateTranslations();
 }
@@ -3174,7 +3174,7 @@ function showMessage(message, type = 'success') {
     const messageBox = document.getElementById('messageBox');
     messageBox.textContent = message;
     messageBox.className = `message-box ${type} show`;
-    
+
     setTimeout(() => {
         messageBox.classList.remove('show');
     }, 3000);
@@ -3203,7 +3203,7 @@ async function loadDashboard() {
             statsGrid.style.setProperty('width', '100%', 'important');
             statsGrid.style.setProperty('max-width', '100%', 'important');
             console.log('✅ Applied grid layout:', columns);
-            
+
             // Also force each stat-card to not be full width
             const statCards = statsGrid.querySelectorAll('.stat-card');
             statCards.forEach(card => {
@@ -3214,7 +3214,7 @@ async function loadDashboard() {
         } else {
             console.warn('⚠️ stats-grid element not found!');
         }
-        
+
         // Set dashboard date - only in selected language
         const dateEl = document.getElementById('dashboardDate');
         if (dateEl) {
@@ -3223,19 +3223,19 @@ async function loadDashboard() {
             const locale = currentLanguage === 'es' ? 'es-PR' : 'en-US';
             dateEl.textContent = today.toLocaleDateString(locale, options);
         }
-        
+
         // Check if user is authenticated
         if (!authToken) {
             console.error('No auth token available, redirecting to login');
             checkAuth();
             return;
         }
-        
-        const url = currentResidentId 
+
+        const url = currentResidentId
             ? `${API_URL}/dashboard?resident_id=${currentResidentId}`
             : `${API_URL}/dashboard`;
         const response = await fetch(url, { headers: getAuthHeaders() });
-        
+
         // Handle authentication errors
         if (response.status === 401) {
             console.error('Authentication failed - token expired or invalid');
@@ -3247,25 +3247,25 @@ async function loadDashboard() {
             checkAuth();
             return;
         }
-        
+
         if (!response.ok) {
             console.error('Dashboard API error:', response.status, response.statusText);
             throw new Error(`Dashboard API returned ${response.status}`);
         }
-        
+
         const data = await response.json();
         console.log('Dashboard data:', data);
-        
+
         // Get values with defaults
         const medsTaken = data.medications_taken_today ?? data.meds_taken_today ?? 0;
         const totalMeds = data.total_medications ?? data.total_meds ?? 0;
         const apptsToday = data.appointments_today ?? data.appts_today ?? 0;
-        
+
         // Update UI elements safely
         const medsStatEl = document.getElementById('medsTakenStat');
         if (medsStatEl) {
             medsStatEl.textContent = `${medsTaken}/${totalMeds}`;
-            
+
             // Show progress bar if there are medications
             const progressEl = document.getElementById('medsProgress');
             const progressBarEl = document.getElementById('medsProgressBar');
@@ -3277,12 +3277,12 @@ async function loadDashboard() {
                 progressEl.style.display = 'none';
             }
         }
-        
+
         const apptsEl = document.getElementById('apptsToday');
         if (apptsEl) {
             apptsEl.textContent = apptsToday;
         }
-        
+
         // Load total residents
         try {
             const residentsResponse = await fetch('/api/residents?active_only=true', { headers: getAuthHeaders() });
@@ -3296,7 +3296,7 @@ async function loadDashboard() {
         } catch (err) {
             console.error('Error loading residents count:', err);
         }
-        
+
         // Show billing summary if available
         if (data.billing_summary) {
             const billingCard = document.getElementById('billingCard');
@@ -3319,12 +3319,12 @@ async function loadDashboard() {
                 billingCard.style.display = 'none';
             }
         }
-        
+
         // Load widgets
         await loadUpcomingAppointments();
         await loadMedicationReminders();
         await loadRecentActivity();
-        
+
     } catch (error) {
         console.error('Error loading dashboard:', error);
         // Set default values on error
@@ -3339,17 +3339,17 @@ async function loadDashboard() {
 
 async function loadUpcomingAppointments() {
     try {
-        const url = currentResidentId 
+        const url = currentResidentId
             ? `${API_URL}/appointments?resident_id=${currentResidentId}`
             : `${API_URL}/appointments`;
         const response = await fetch(url, { headers: getAuthHeaders() });
-        
+
         if (!response.ok) return;
-        
+
         const appointments = await response.json();
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         // Filter upcoming appointments (today and future)
         const upcoming = appointments
             .filter(apt => {
@@ -3363,15 +3363,15 @@ async function loadUpcomingAppointments() {
                 return dateA - dateB;
             })
             .slice(0, 5); // Show only next 5
-        
+
         const listEl = document.getElementById('upcomingAppointmentsList');
         if (!listEl) return;
-        
+
         if (upcoming.length === 0) {
             listEl.innerHTML = '<p class="empty-state">No upcoming appointments / No hay citas próximas</p>';
             return;
         }
-        
+
         listEl.innerHTML = upcoming.map(apt => {
             const aptDate = new Date(apt.date);
             const isToday = aptDate.toDateString() === today.toDateString();
@@ -3395,27 +3395,27 @@ async function loadUpcomingAppointments() {
 
 async function loadMedicationReminders() {
     try {
-        const url = currentResidentId 
+        const url = currentResidentId
             ? `${API_URL}/medications?resident_id=${currentResidentId}`
             : `${API_URL}/medications`;
         const response = await fetch(url, { headers: getAuthHeaders() });
-        
+
         if (!response.ok) return;
-        
+
         const medications = await response.json();
         const activeMeds = medications.filter(m => m.active);
-        
+
         const listEl = document.getElementById('medicationRemindersList');
         if (!listEl) return;
-        
+
         if (activeMeds.length === 0) {
             listEl.innerHTML = '<p class="empty-state">No medications scheduled / No hay medicamentos programados</p>';
             return;
         }
-        
+
         // Show next 5 medications
         const nextMeds = activeMeds.slice(0, 5);
-        
+
         listEl.innerHTML = nextMeds.map(med => {
             const times = JSON.parse(med.time_slots || '[]');
             const nextTime = times.length > 0 ? times[0] : 'N/A';
@@ -3438,10 +3438,10 @@ async function loadRecentActivity() {
     try {
         // Load recent items from various sources
         const activities = [];
-        
+
         // Get recent vital signs
         try {
-            const vsUrl = currentResidentId 
+            const vsUrl = currentResidentId
                 ? `${API_URL}/vital-signs?resident_id=${currentResidentId}`
                 : `${API_URL}/vital-signs`;
             const vsResponse = await fetch(vsUrl, { headers: getAuthHeaders() });
@@ -3460,10 +3460,10 @@ async function loadRecentActivity() {
         } catch (err) {
             console.error('Error loading vital signs for activity:', err);
         }
-        
+
         // Get recent care notes
         try {
-            const notesUrl = currentResidentId 
+            const notesUrl = currentResidentId
                 ? `${API_URL}/care-notes?resident_id=${currentResidentId}`
                 : `${API_URL}/care-notes`;
             const notesResponse = await fetch(notesUrl, { headers: getAuthHeaders() });
@@ -3482,19 +3482,19 @@ async function loadRecentActivity() {
         } catch (err) {
             console.error('Error loading care notes for activity:', err);
         }
-        
+
         // Sort by time (most recent first) and take top 5
         activities.sort((a, b) => b.time - a.time);
         const recent = activities.slice(0, 5);
-        
+
         const listEl = document.getElementById('recentActivityList');
         if (!listEl) return;
-        
+
         if (recent.length === 0) {
             listEl.innerHTML = '<p class="empty-state">No recent activity / No hay actividad reciente</p>';
             return;
         }
-        
+
         listEl.innerHTML = recent.map(activity => {
             const timeAgo = getTimeAgo(activity.time);
             return `
@@ -3518,7 +3518,7 @@ function getTimeAgo(date) {
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-    
+
     if (minutes < 1) return 'Just now / Ahora mismo';
     if (minutes < 60) return `${minutes}m ago / hace ${minutes}m`;
     if (hours < 24) return `${hours}h ago / hace ${hours}h`;
@@ -3536,9 +3536,9 @@ async function loadResidents() {
             checkAuth();
             return;
         }
-        
+
         const response = await fetch('/api/residents?active_only=true', { headers: getAuthHeaders() });
-        
+
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Authentication failed - token expired');
@@ -3553,57 +3553,57 @@ async function loadResidents() {
             console.error('Error response:', errorText);
             throw new Error(`Residents API returned ${response.status}: ${errorText}`);
         }
-        
+
         const residents = await response.json();
         console.log('Loaded residents:', residents);
-        
+
         const listContainer = document.getElementById('residentsList');
         if (!listContainer) {
             console.error('residentsList element not found');
             return;
         }
-        
+
         listContainer.innerHTML = '';
-        
+
         if (!residents || residents.length === 0) {
             listContainer.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 2rem;">No residents added yet. / No hay residentes agregados aún.</p>';
             return;
         }
-        
+
         residents.forEach(resident => {
             const card = document.createElement('div');
             card.className = 'item-card';
-            
-            const photoHTML = resident.photo_path 
+
+            const photoHTML = resident.photo_path
                 ? `<div class="resident-photo-thumb"><img src="${resident.photo_path}" alt="${resident.first_name} ${resident.last_name}"></div>`
                 : '';
-            
+
             const residentName = `${resident.first_name || ''} ${resident.last_name || ''}`.trim() || 'Unnamed Resident / Residente Sin Nombre';
-            
+
             console.log('Creating resident card for:', residentName, 'ID:', resident.id);
-            
+
             // Create header structure
             const header = document.createElement('div');
             header.className = 'item-header';
-            
+
             const flexContainer = document.createElement('div');
             flexContainer.style.cssText = 'display: flex; gap: 1rem; align-items: flex-start;';
-            
+
             if (photoHTML) {
                 const photoDiv = document.createElement('div');
                 photoDiv.innerHTML = photoHTML;
                 flexContainer.appendChild(photoDiv.firstElementChild);
             }
-            
+
             const detailsContainer = document.createElement('div');
             detailsContainer.style.flex = '1';
-            
+
             const title = document.createElement('div');
             title.className = 'item-title';
             title.style.cssText = 'font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem; color: var(--text-color);';
             title.textContent = residentName;
             detailsContainer.appendChild(title);
-            
+
             const details = document.createElement('div');
             details.className = 'item-details';
             if (resident.room_number) {
@@ -3645,18 +3645,18 @@ async function loadResidents() {
             detailsContainer.appendChild(details);
             flexContainer.appendChild(detailsContainer);
             header.appendChild(flexContainer);
-            
+
             // Create action buttons using DOM methods
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'item-actions';
-            
+
             // Select button
             const selectBtn = document.createElement('button');
             selectBtn.className = 'btn btn-primary btn-sm';
             selectBtn.textContent = t('common.select');
             selectBtn.onclick = () => selectResidentById(resident.id);
             actionsDiv.appendChild(selectBtn);
-            
+
             // Edit button - CREATE IT EXPLICITLY
             const editBtn = document.createElement('button');
             editBtn.className = 'btn btn-success btn-sm';
@@ -3671,19 +3671,19 @@ async function loadResidents() {
                 editResident(resident.id);
             };
             actionsDiv.appendChild(editBtn);
-            
+
             // Delete button
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'btn btn-danger btn-sm';
             deleteBtn.textContent = t('common.delete');
             deleteBtn.onclick = () => deleteResident(resident.id);
             actionsDiv.appendChild(deleteBtn);
-            
+
             header.appendChild(actionsDiv);
             console.log('✅ Actions div appended to header. Actions div children:', actionsDiv.children.length);
             card.appendChild(header);
             console.log('✅ Card complete for resident:', resident.id, '. Checking for Edit button in DOM...');
-            
+
             listContainer.appendChild(card);
         });
     } catch (error) {
@@ -3707,22 +3707,22 @@ async function editResident(id) {
         const residentId = parseInt(id);
         console.log('=== EDITING RESIDENT ===');
         console.log('Resident ID:', residentId, typeof residentId);
-        
+
         // Set editing ID FIRST, before any other operations
         editingResidentId = residentId;
         console.log('Set editingResidentId to:', editingResidentId, typeof editingResidentId);
-        
+
         // Store ID on form elements as backup
         const residentFormPage = document.getElementById('addResidentFormPage');
         const residentFormModal = document.getElementById('addResidentForm');
         if (residentFormPage) residentFormPage.dataset.editingId = residentId;
         if (residentFormModal) residentFormModal.dataset.editingId = residentId;
-        
+
         // Show form BEFORE loading data to prevent any resets
         showAddResidentForm();
-        
+
         console.log('After showAddResidentForm, editingResidentId is:', editingResidentId, typeof editingResidentId);
-        
+
         // Verify it's still set, restore from form if needed
         if (editingResidentId !== residentId) {
             console.error('⚠️ WARNING: editingResidentId was reset! Restoring from form...');
@@ -3734,18 +3734,18 @@ async function editResident(id) {
                 editingResidentId = residentId;
             }
         }
-        
+
         const response = await fetch(`/api/residents/${id}`, {
             headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
             throw new Error(`Failed to load resident: ${response.status}`);
         }
-        
+
         const resident = await response.json();
         console.log('Loaded resident data:', resident);
-        
+
         // Populate form fields (try page form first, then modal form)
         const setValue = (pageId, modalId, value) => {
             const pageEl = document.getElementById(pageId);
@@ -3753,7 +3753,7 @@ async function editResident(id) {
             if (pageEl) pageEl.value = value || '';
             if (modalEl) modalEl.value = value || '';
         };
-        
+
         setValue('newFirstNamePage', 'newFirstName', resident.first_name);
         setValue('newLastNamePage', 'newLastName', resident.last_name);
         setValue('newGenderPage', 'newGender', resident.gender);
@@ -3767,18 +3767,18 @@ async function editResident(id) {
         setValue('newMedicalConditionsPage', 'newMedicalConditions', resident.medical_conditions);
         setValue('newAllergiesPage', 'newAllergies', resident.allergies);
         setValue('newDietaryRestrictionsPage', 'newDietaryRestrictions', resident.dietary_restrictions);
-        
+
         // Set date of birth
         if (resident.date_of_birth) {
             setDateToDropdowns(resident.date_of_birth, 'newBirthYearPage', 'newBirthMonthPage', 'newBirthDayPage');
             setDateToDropdowns(resident.date_of_birth, 'newBirthYear', 'newBirthMonth', 'newBirthDay');
         }
-        
+
         // Handle photo
         if (resident.photo_path) {
             residentPhotoData = resident.photo_path;
             residentPhotoDataPage = resident.photo_path;
-            
+
             // Update page form preview
             const previewPage = document.getElementById('newPhotoPreviewPage');
             const previewImgPage = document.getElementById('newPhotoPreviewImgPage');
@@ -3788,7 +3788,7 @@ async function editResident(id) {
                 previewPage.style.display = 'block';
                 placeholderPage.style.display = 'none';
             }
-            
+
             // Update modal form preview
             const preview = document.getElementById('newPhotoPreview');
             const previewImg = document.getElementById('newPhotoPreviewImg');
@@ -3802,25 +3802,25 @@ async function editResident(id) {
             removeResidentPhoto();
             removeResidentPhotoPage();
         }
-        
+
         // Update form titles
         const formTitlePage = document.querySelector('#addResidentFormPage h3');
         if (formTitlePage) {
             formTitlePage.textContent = t('resident.edit');
         }
-        
+
         const formTitleModal = document.querySelector('#addResidentForm h3');
         if (formTitleModal) {
             formTitleModal.textContent = t('resident.edit');
         }
-        
+
         // Final verification that editingResidentId is still set
         console.log('Final check - editingResidentId:', editingResidentId, typeof editingResidentId);
         if (editingResidentId !== residentId) {
             console.error('⚠️ CRITICAL: editingResidentId was lost! Restoring...');
             editingResidentId = residentId;
         }
-        
+
         // Scroll to form
         const scrollToForm = document.getElementById('addResidentFormPage');
         if (scrollToForm) {
@@ -3835,12 +3835,12 @@ async function editResident(id) {
 
 async function deleteResident(id) {
     if (!confirm('Are you sure you want to delete this resident? / ¿Está seguro de que desea eliminar este residente?')) return;
-    
+
     try {
         const response = await fetch(`/api/residents/${id}`, {
             method: 'DELETE'
         });
-        
+
         if (response.ok) {
             showMessage('Resident deleted successfully / Residente eliminado exitosamente', 'success');
             loadResidents();
@@ -3882,25 +3882,25 @@ async function loadStaff() {
         const response = await fetch('/api/staff', {
             headers: getAuthHeaders()
         });
-        
+
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
             handleLogout();
             return;
         }
-        
+
         if (!response.ok) {
             throw new Error(`Failed to load staff: ${response.status}`);
         }
-        
+
         const staffList = await response.json();
         const container = document.getElementById('staffList');
-        
+
         if (staffList.length === 0) {
             container.innerHTML = '<div class="empty-state">No staff members found. / No se encontró personal.</div>';
             return;
         }
-        
+
         container.innerHTML = staffList.map(staff => {
             const createdDate = staff.created_at ? new Date(staff.created_at).toLocaleDateString() : 'N/A';
             const roleLabels = {
@@ -3911,10 +3911,10 @@ async function loadStaff() {
                 'therapist': 'Therapist / Terapeuta'
             };
             const roleLabel = roleLabels[staff.role] || staff.role;
-            const activeBadge = staff.active ? 
-                '<span class="badge badge-success">Active / Activo</span>' : 
+            const activeBadge = staff.active ?
+                '<span class="badge badge-success">Active / Activo</span>' :
                 '<span class="badge badge-danger">Inactive / Inactivo</span>';
-            
+
             return `
                 <div class="item-card">
                     <div class="item-header">
@@ -3950,19 +3950,19 @@ async function editStaff(id) {
             // Wait a moment for page to render
             await new Promise(resolve => setTimeout(resolve, 100));
         }
-        
+
         editingStaffId = id;
         const response = await fetch(`/api/staff/${id}`, {
             headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Failed to load staff: ${response.status} ${response.statusText} - ${errorText}`);
         }
-        
+
         const staff = await response.json();
-        
+
         // Check if form elements exist before trying to populate them
         const requiredElements = {
             'staffFullName': document.getElementById('staffFullName'),
@@ -3976,22 +3976,22 @@ async function editStaff(id) {
             'staffFormTitle': document.getElementById('staffFormTitle'),
             'addStaffForm': document.getElementById('addStaffForm')
         };
-        
+
         // Optional elements (won't cause error if missing)
         const optionalElements = {
             'staffPasswordHint': document.getElementById('staffPasswordHint')
         };
-        
+
         // Combine all elements
         const elements = { ...requiredElements, ...optionalElements };
-        
+
         // Check for missing required elements only
         const missingElements = Object.entries(requiredElements).filter(([name, el]) => !el).map(([name]) => name);
         if (missingElements.length > 0) {
             console.error('Missing required form elements:', missingElements);
             throw new Error(`Missing required form elements: ${missingElements.join(', ')}`);
         }
-        
+
         // Populate form fields
         elements.staffFullName.value = staff.full_name || '';
         elements.staffUsername.value = staff.username || '';
@@ -4007,7 +4007,7 @@ async function editStaff(id) {
             elements.staffPasswordHint.textContent = t('staff.passwordHint.edit');
         }
         elements.staffActiveGroup.style.display = 'block';
-        
+
         elements.staffFormTitle.textContent = t('staff.edit');
         replaceDualLanguageText();
         elements.addStaffForm.style.display = 'block';
@@ -4020,7 +4020,7 @@ async function editStaff(id) {
 
 async function saveStaff(event) {
     event.preventDefault();
-    
+
     const staffData = {
         full_name: document.getElementById('staffFullName').value,
         username: document.getElementById('staffUsername').value,
@@ -4030,12 +4030,12 @@ async function saveStaff(event) {
         role: document.getElementById('staffRole').value,
         active: document.getElementById('staffActive').checked ? 1 : 0
     };
-    
+
     const password = document.getElementById('staffPassword').value;
     if (password) {
         staffData.password = password;
     }
-    
+
     try {
         let response;
         if (editingStaffId) {
@@ -4057,22 +4057,22 @@ async function saveStaff(event) {
                 body: JSON.stringify(staffData)
             });
         }
-        
+
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
             handleLogout();
             return;
         }
-        
+
         if (response.status === 403) {
             showMessage('Access denied. Admin role required. / Acceso denegado. Se requiere rol de administrador.', 'error');
             return;
         }
-        
+
         if (response.ok) {
             showMessage(
-                editingStaffId ? 
-                    'Staff member updated successfully / Personal actualizado exitosamente' : 
+                editingStaffId ?
+                    'Staff member updated successfully / Personal actualizado exitosamente' :
                     'Staff member added successfully / Personal agregado exitosamente',
                 'success'
             );
@@ -4090,24 +4090,24 @@ async function saveStaff(event) {
 
 async function deleteStaff(id) {
     if (!confirm('Are you sure you want to deactivate this staff member? / ¿Está seguro de que desea desactivar este miembro del personal?')) return;
-    
+
     try {
         const response = await fetch(`/api/staff/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        
+
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
             handleLogout();
             return;
         }
-        
+
         if (response.status === 403) {
             showMessage('Access denied. Admin role required. / Acceso denegado. Se requiere rol de administrador.', 'error');
             return;
         }
-        
+
         if (response.ok) {
             showMessage('Staff member deactivated successfully / Personal desactivado exitosamente', 'success');
             loadStaff();
@@ -4129,7 +4129,7 @@ async function showIncidentForm() {
     try {
         editingIncidentId = null;
         incidentPhotos = [];
-        
+
         // Show the form IMMEDIATELY - don't wait for anything
         const formElement = document.getElementById('incidentForm');
         if (!formElement) {
@@ -4137,7 +4137,7 @@ async function showIncidentForm() {
             showMessage('Error: Incident form not found. Please refresh the page. / Error: Formulario de incidente no encontrado. Por favor actualice la página.', 'error');
             return;
         }
-        
+
         console.log('✅ Incident form element found, showing it...');
         // Force form to be visible with !important overrides
         formElement.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; margin-top: 2rem !important;';
@@ -4146,21 +4146,21 @@ async function showIncidentForm() {
         console.log('✅ Form computed visibility:', window.getComputedStyle(formElement).visibility);
         console.log('✅ Form offsetHeight:', formElement.offsetHeight);
         console.log('✅ Form offsetWidth:', formElement.offsetWidth);
-        
+
         // Reset form
         const formTitle = document.getElementById('incidentFormTitle');
         if (formTitle) {
             formTitle.textContent = t('incident.add');
             replaceDualLanguageText();
         }
-        
+
         const newForm = document.getElementById('newIncidentForm');
         if (newForm) newForm.reset();
-        
+
         // Clear photo preview
         const photoPreview = document.getElementById('incidentPhotoPreview');
         if (photoPreview) photoPreview.innerHTML = '';
-        
+
         // Set default date to now
         const dateInput = document.getElementById('incidentDate');
         if (dateInput) {
@@ -4168,13 +4168,13 @@ async function showIncidentForm() {
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             dateInput.value = now.toISOString().slice(0, 16);
         }
-        
+
         const familyNotificationDateGroup = document.getElementById('familyNotificationDateGroup');
         if (familyNotificationDateGroup) familyNotificationDateGroup.style.display = 'none';
-        
+
         const followUpNotesGroup = document.getElementById('followUpNotesGroup');
         if (followUpNotesGroup) followUpNotesGroup.style.display = 'none';
-        
+
         // Setup checkbox handlers
         const familyNotified = document.getElementById('incidentFamilyNotified');
         const followUp = document.getElementById('incidentFollowUp');
@@ -4190,7 +4190,7 @@ async function showIncidentForm() {
                 if (group) group.style.display = this.checked ? 'block' : 'none';
             };
         }
-        
+
         // Load dropdowns (but don't block form display if they fail)
         try {
             await loadStaffForIncident();
@@ -4198,14 +4198,14 @@ async function showIncidentForm() {
             console.error('Error loading staff:', error);
             showMessage('Warning: Could not load staff list. / Advertencia: No se pudo cargar la lista de personal.', 'warning');
         }
-        
+
         try {
             await loadResidentsForIncident();
         } catch (error) {
             console.error('Error loading residents:', error);
             showMessage('Warning: Could not load residents list. / Advertencia: No se pudo cargar la lista de residentes.', 'warning');
         }
-        
+
         // Scroll to form
         formElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         console.log('✅ Incident form is now visible');
@@ -4218,10 +4218,10 @@ async function showIncidentForm() {
 async function loadStaffForIncident() {
     try {
         console.log('🔄 Loading staff for incident form...');
-        
+
         // Wait a bit to ensure form is in DOM
         await new Promise(resolve => setTimeout(resolve, 100));
-        
+
         const select = document.getElementById('incidentStaffId');
         if (!select) {
             console.error('❌ incidentStaffId select not found in DOM');
@@ -4234,9 +4234,9 @@ async function loadStaffForIncident() {
             }
             return;
         }
-        
+
         console.log('✅ Found incidentStaffId select element');
-        
+
         const response = await fetch('/api/staff', { headers: getAuthHeaders() });
         if (!response.ok) {
             const errorText = await response.text();
@@ -4244,22 +4244,22 @@ async function loadStaffForIncident() {
             select.innerHTML = '<option value="">-- Error loading staff --</option>';
             return;
         }
-        
+
         const staffList = await response.json();
         console.log('✅ Loaded staff (all):', staffList.length);
         console.log('   Staff list:', staffList.map(s => ({ id: s.id, name: s.full_name, active: s.active })));
-        
+
         // Filter to only active staff
         const activeStaff = staffList.filter(staff => staff.active === 1 || staff.active === true);
         console.log('✅ Active staff:', activeStaff.length);
         console.log('   Active staff list:', activeStaff.map(s => ({ id: s.id, name: s.full_name })));
-        
+
         select.innerHTML = '<option value="">-- Select Staff / Seleccionar Personal --</option>';
-        
+
         // Set current user as default
         const currentStaff = JSON.parse(localStorage.getItem('currentStaff') || '{}');
         console.log('   Current staff ID:', currentStaff.id);
-        
+
         if (activeStaff.length === 0) {
             console.warn('⚠️ No active staff found! Adding placeholder option.');
             const option = document.createElement('option');
@@ -4279,7 +4279,7 @@ async function loadStaffForIncident() {
                 select.appendChild(option);
             });
         }
-        
+
         console.log('✅ Staff dropdown populated with', activeStaff.length, 'active staff members');
         console.log('   Select element now has', select.options.length, 'options');
     } catch (error) {
@@ -4292,10 +4292,10 @@ async function loadStaffForIncident() {
 async function loadResidentsForIncident() {
     try {
         console.log('🔄 Loading residents for incident form...');
-        
+
         // Wait a bit to ensure form is in DOM
         await new Promise(resolve => setTimeout(resolve, 100));
-        
+
         const select = document.getElementById('incidentResidents');
         if (!select) {
             console.error('❌ incidentResidents select not found in DOM');
@@ -4308,9 +4308,9 @@ async function loadResidentsForIncident() {
             }
             return;
         }
-        
+
         console.log('✅ Found incidentResidents select element');
-        
+
         const response = await fetch('/api/residents?active_only=true', { headers: getAuthHeaders() });
         if (!response.ok) {
             const errorText = await response.text();
@@ -4318,18 +4318,18 @@ async function loadResidentsForIncident() {
             select.innerHTML = '<option value="">-- Error loading residents --</option>';
             return;
         }
-        
+
         const residents = await response.json();
         console.log('✅ Loaded residents (active only):', residents.length);
-        
+
         // Debug: Log each resident
         residents.forEach(r => {
             console.log(`  - Resident: ${r.first_name} ${r.last_name} (ID: ${r.id}, Active: ${r.active})`);
         });
-        
+
         // Clear existing options but keep the first placeholder
         select.innerHTML = '';
-        
+
         if (residents.length === 0) {
             console.warn('⚠️ No active residents found to populate dropdown');
             const option = document.createElement('option');
@@ -4363,23 +4363,23 @@ async function loadResidentsForIncident() {
 function handleIncidentPhotos(event) {
     const files = event.target.files;
     if (!files || files.length === 0) return;
-    
+
     incidentPhotos = [];
     const preview = document.getElementById('incidentPhotoPreview');
     if (!preview) return;
-    
+
     preview.innerHTML = '';
-    
+
     Array.from(files).forEach((file, index) => {
         if (!file.type.startsWith('image/')) {
             showMessage('Please select only image files / Por favor seleccione solo archivos de imagen', 'error');
             return;
         }
-        
+
         const reader = new FileReader();
         reader.onload = function(e) {
             incidentPhotos.push(e.target.result); // Store as base64
-            
+
             // Create preview
             const photoDiv = document.createElement('div');
             photoDiv.className = 'photo-preview-item';
@@ -4398,7 +4398,7 @@ function removeIncidentPhoto(index) {
     // Rebuild preview
     const preview = document.getElementById('incidentPhotoPreview');
     if (!preview) return;
-    
+
     preview.innerHTML = '';
     incidentPhotos.forEach((photo, idx) => {
         const photoDiv = document.createElement('div');
@@ -4409,7 +4409,7 @@ function removeIncidentPhoto(index) {
         `;
         preview.appendChild(photoDiv);
     });
-    
+
     // Reset file input
     document.getElementById('incidentPhotos').value = '';
 }
@@ -4430,7 +4430,7 @@ async function loadIncidents() {
             showMessage('Error: Incidents page not found / Error: Página de incidentes no encontrada', 'error');
             return;
         }
-        
+
         // ALWAYS ensure the page is visible and active - don't check, just force it
         incidentsPage.classList.add('active');
         incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important; overflow: visible !important;';
@@ -4445,21 +4445,21 @@ async function loadIncidents() {
         console.log('✅ Page has active class:', incidentsPage.classList.contains('active'));
         console.log('✅ Page innerHTML length:', incidentsPage.innerHTML.length);
         console.log('✅ Page children count:', incidentsPage.children.length);
-        
+
         console.log('✅ Page computed width:', window.getComputedStyle(incidentsPage).width);
-        
+
         // CRITICAL: Force show ALL direct children immediately
         const directChildren = Array.from(incidentsPage.children);
         console.log('🔍 Found', directChildren.length, 'direct children of incidents page');
         console.log('🔍 Children list:', directChildren.map(c => `${c.tagName}#${c.id || ''}.${c.className || ''}`).join(', '));
-        
+
         directChildren.forEach((child, index) => {
             console.log(`  Child ${index}:`, child.tagName, child.id || child.className);
             const beforeDisplay = window.getComputedStyle(child).display;
             const beforeVisibility = window.getComputedStyle(child).visibility;
             const beforeOpacity = window.getComputedStyle(child).opacity;
             console.log(`    Before: display=${beforeDisplay}, visibility=${beforeVisibility}, opacity=${beforeOpacity}`);
-            
+
             // Skip the form if it's supposed to be hidden
             if (child.id === 'incidentForm' && child.style.display === 'none') {
                 console.log(`  ⏭️ Skipping ${child.id} (form should be hidden)`);
@@ -4471,13 +4471,13 @@ async function loadIncidents() {
             child.style.setProperty('opacity', '1', 'important');
             child.style.setProperty('position', 'relative', 'important');
             child.style.setProperty('z-index', '1', 'important');
-            
+
             const afterDisplay = window.getComputedStyle(child).display;
             const afterVisibility = window.getComputedStyle(child).visibility;
             const afterOpacity = window.getComputedStyle(child).opacity;
             console.log(`    After: display=${afterDisplay}, visibility=${afterVisibility}, opacity=${afterOpacity}`);
             console.log(`  ✅ Forced child ${index} to be visible`);
-            
+
             // Also check if child has any hidden children
             const hiddenChildren = Array.from(child.querySelectorAll('*')).filter(c => {
                 const style = window.getComputedStyle(c);
@@ -4487,23 +4487,23 @@ async function loadIncidents() {
                 console.log(`  ⚠️ Child ${index} has ${hiddenChildren.length} hidden descendants`);
             }
         });
-        
+
         console.log('🔄 Loading incidents...');
-        
+
         // Verify key elements exist before loading
         const h2Before = incidentsPage.querySelector('h2');
         const buttonBefore = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
         console.log('🔍 Before loading incidents:');
         console.log('  H2 exists:', !!h2Before);
         console.log('  Button exists:', !!buttonBefore);
-        
+
         const container = document.getElementById('incidentsList');
         if (!container) {
             console.error('❌ incidentsList container not found');
             showMessage('Error: Page container not found / Error: Contenedor de página no encontrado', 'error');
             return;
         }
-        
+
         // Force container to be visible with !important
         container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; min-height: 200px !important; width: 100% !important; margin-top: 2rem !important; padding: 1rem !important; background: var(--white) !important; border-radius: 8px !important;';
         console.log('✅ Container forced visible with cssText');
@@ -4514,7 +4514,7 @@ async function loadIncidents() {
         console.log('✅ Container computed width:', window.getComputedStyle(container).width);
         console.log('✅ Container offsetHeight:', container.offsetHeight);
         console.log('✅ Container offsetWidth:', container.offsetWidth);
-        
+
         // FORCE the header to be visible with cssText
         const header = incidentsPage.querySelector('h2') || incidentsPage.querySelector('#incidentsH2');
         if (header) {
@@ -4530,7 +4530,7 @@ async function loadIncidents() {
             console.error('❌ Header not found!');
             console.error('Available h2 elements:', incidentsPage.querySelectorAll('h2'));
         }
-        
+
         // FORCE the button to be visible with cssText
         const reportButton = incidentsPage.querySelector('#incidentsButton') || incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
         if (reportButton) {
@@ -4549,8 +4549,8 @@ async function loadIncidents() {
             console.error('❌ Report Incident button not found!');
             console.error('Available buttons:', incidentsPage.querySelectorAll('button'));
         }
-        
-        
+
+
         // CRITICAL: Also check and fix the main.container parent
         const mainContainer = incidentsPage.closest('main.container');
         if (mainContainer) {
@@ -4566,22 +4566,22 @@ async function loadIncidents() {
                 mainContainer.style.setProperty('opacity', '1', 'important');
             }
         }
-        
+
         // Show loading state
         container.innerHTML = '<div class="empty-state">Loading incidents... / Cargando incidentes...</div>';
-        
+
         const url = currentResidentId ? `/api/incidents?resident_id=${currentResidentId}` : '/api/incidents';
         console.log('📡 Fetching incidents from:', url);
-        
+
         const response = await fetch(url, { headers: getAuthHeaders() });
         console.log('📥 Response status:', response.status);
-        
+
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
             handleLogout();
             return;
         }
-        
+
         if (!response.ok) {
             const errorText = await response.text();
             console.error('❌ Failed to load incidents:', response.status, errorText);
@@ -4589,13 +4589,13 @@ async function loadIncidents() {
             showMessage(`Error loading incidents / Error al cargar incidentes: ${response.status}`, 'error');
             return;
         }
-        
+
         const incidents = await response.json();
         console.log('✅ API Response received');
         console.log('✅ Incidents type:', Array.isArray(incidents) ? 'array' : typeof incidents);
         console.log('✅ Incidents length:', Array.isArray(incidents) ? incidents.length : 'N/A (not array)');
         console.log('✅ Incidents data:', incidents);
-        
+
         // Validate response is an array
         if (!Array.isArray(incidents)) {
             console.error('❌ API did not return an array! Response:', incidents);
@@ -4604,7 +4604,7 @@ async function loadIncidents() {
             showMessage('Error: Invalid data format from server / Error: Formato de datos inválido del servidor', 'error');
             return;
         }
-        
+
         if (incidents.length === 0) {
             // Create a highly visible empty state with aggressive inline styles
             const emptyStateDiv = document.createElement('div');
@@ -4630,11 +4630,11 @@ async function loadIncidents() {
                 <p style="margin-bottom: 1rem; font-size: 1.2rem; font-weight: bold; color: #333 !important;">📋 No incident reports found. / No se encontraron reportes de incidentes.</p>
                 <p style="font-size: 0.9rem; color: #666 !important;">Click the "+ Report Incident" button above to create your first incident report. / Haga clic en el botón "+ Reportar Incidente" arriba para crear su primer reporte de incidente.</p>
             `;
-            
+
             // Clear and append
             container.innerHTML = '';
             container.appendChild(emptyStateDiv);
-            
+
             // Force container visibility
             container.style.cssText = `
                 display: block !important;
@@ -4646,7 +4646,7 @@ async function loadIncidents() {
                 width: 100% !important;
                 margin-top: 2rem !important;
             `;
-            
+
             console.log('✅ Empty state message displayed');
             console.log('✅ Container innerHTML length:', container.innerHTML.length);
             console.log('✅ Container display:', window.getComputedStyle(container).display);
@@ -4655,7 +4655,7 @@ async function loadIncidents() {
             console.log('✅ Container z-index:', window.getComputedStyle(container).zIndex);
             console.log('✅ Empty state div display:', window.getComputedStyle(emptyStateDiv).display);
             console.log('✅ Empty state div visibility:', window.getComputedStyle(emptyStateDiv).visibility);
-            
+
             // Also check and fix parent elements
             let parent = container.parentElement;
             let level = 0;
@@ -4664,9 +4664,9 @@ async function loadIncidents() {
                 const display = computedStyle.display;
                 const visibility = computedStyle.visibility;
                 const opacity = computedStyle.opacity;
-                
+
                 console.log(`✅ Parent ${level} (${parent.tagName}): display=${display}, visibility=${visibility}, opacity=${opacity}`);
-                
+
                 // Fix any parent with display:none (except if it's intentionally hidden)
                 if (display === 'none' && parent.id !== 'loginModal' && parent.id !== 'residentSelector') {
                     console.log(`⚠️ Fixing Parent ${level} (${parent.tagName}) - setting display to block with !important`);
@@ -4677,7 +4677,7 @@ async function loadIncidents() {
                     parent.style.setProperty('z-index', '1', 'important');
                     console.log(`✅ Fixed Parent ${level} - new display:`, window.getComputedStyle(parent).display);
                 }
-                
+
                 // Also fix if visibility is hidden or opacity is 0
                 if ((visibility === 'hidden' || opacity === '0') && parent.id !== 'loginModal' && parent.id !== 'residentSelector' && parent.id !== 'incidentForm') {
                     console.log(`⚠️ Fixing Parent ${level} (${parent.tagName}) - visibility/opacity issue`);
@@ -4685,7 +4685,7 @@ async function loadIncidents() {
                     parent.style.setProperty('opacity', '1', 'important');
                     parent.style.setProperty('display', 'block', 'important');
                 }
-                
+
                 // CRITICAL: If this is the mainApp container, ALWAYS make it visible
                 if (parent.id === 'mainApp') {
                     console.log(`🔧 CRITICAL: Found mainApp container - forcing visibility`);
@@ -4695,14 +4695,14 @@ async function loadIncidents() {
                     parent.style.setProperty('position', 'relative', 'important');
                     parent.style.setProperty('z-index', '1', 'important');
                 }
-                
+
                 parent = parent.parentElement;
                 level++;
             }
-            
+
             return;
         }
-        
+
         // Render incidents
         const incidentsHTML = incidents.map(incident => {
             const date = new Date(incident.incident_date);
@@ -4718,7 +4718,7 @@ async function loadIncidents() {
                 'major': 'Major / Mayor',
                 'critical': 'Critical / Crítico'
             };
-            
+
             return `
                 <div class="item-card" style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important; border-radius: 8px !important;">
                     <div class="item-header">
@@ -4742,15 +4742,15 @@ async function loadIncidents() {
                 </div>
             `;
         }).join('');
-        
+
         container.innerHTML = incidentsHTML;
         console.log('✅ Rendered', incidents.length, 'incidents into container');
         console.log('✅ Container innerHTML length after render:', container.innerHTML.length);
         console.log('✅ Container has children:', container.children.length);
-        
+
         // CRITICAL: Force container visible AFTER rendering
         container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; min-height: 200px !important; width: 100% !important; margin-top: 2rem !important; padding: 1rem !important; background: var(--white) !important; border-radius: 8px !important;';
-        
+
         // Force all incident cards visible
         const incidentCards = container.querySelectorAll('.item-card');
         console.log('✅ Found', incidentCards.length, 'incident cards');
@@ -4758,7 +4758,7 @@ async function loadIncidents() {
             card.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important; border-radius: 8px !important; position: relative !important; z-index: 1 !important; width: 100% !important;';
             console.log(`✅ Forced card ${idx} visible - offsetHeight: ${card.offsetHeight}, offsetWidth: ${card.offsetWidth}`);
         });
-        
+
         console.log('✅ Container final display:', window.getComputedStyle(container).display);
         console.log('✅ Container final visibility:', window.getComputedStyle(container).visibility);
         console.log('✅ Container final opacity:', window.getComputedStyle(container).opacity);
@@ -4779,17 +4779,17 @@ async function editIncident(id) {
         editingIncidentId = id;
         const response = await fetch(`/api/incidents/${id}`, { headers: getAuthHeaders() });
         if (!response.ok) throw new Error(`Failed to load incident: ${response.status}`);
-        
+
         const incident = await response.json();
-        
+
         // Load dropdowns first
         await loadStaffForIncident();
         await loadResidentsForIncident();
-        
+
         // Format datetime for input
         const incidentDate = new Date(incident.incident_date);
         incidentDate.setMinutes(incidentDate.getMinutes() - incidentDate.getTimezoneOffset());
-        
+
         document.getElementById('incidentDate').value = incidentDate.toISOString().slice(0, 16);
         document.getElementById('incidentType').value = incident.incident_type || '';
         document.getElementById('incidentLocation').value = incident.location || '';
@@ -4800,18 +4800,18 @@ async function editIncident(id) {
         document.getElementById('incidentFamilyNotified').checked = incident.family_notified === 1;
         document.getElementById('incidentFollowUp').checked = incident.follow_up_required === 1;
         document.getElementById('followUpNotes').value = incident.follow_up_notes || '';
-        
+
         // Set staff
         if (incident.staff_id) {
             document.getElementById('incidentStaffId').value = incident.staff_id;
         }
-        
+
         // Set residents (handle multiple)
         const residentsSelect = document.getElementById('incidentResidents');
         if (residentsSelect) {
             // Clear selections
             Array.from(residentsSelect.options).forEach(opt => opt.selected = false);
-            
+
             // Try to parse residents_involved, fallback to single resident_id
             let residentsToSelect = [incident.resident_id];
             if (incident.residents_involved) {
@@ -4821,18 +4821,18 @@ async function editIncident(id) {
                     console.error('Error parsing residents_involved:', e);
                 }
             }
-            
+
             residentsToSelect.forEach(resId => {
                 const option = residentsSelect.querySelector(`option[value="${resId}"]`);
                 if (option) option.selected = true;
             });
         }
-        
+
         // Load photos
         incidentPhotos = [];
         const photoPreview = document.getElementById('incidentPhotoPreview');
         if (photoPreview) photoPreview.innerHTML = '';
-        
+
         if (incident.photos) {
             try {
                 const photos = JSON.parse(incident.photos);
@@ -4852,16 +4852,16 @@ async function editIncident(id) {
                 console.error('Error parsing photos:', e);
             }
         }
-        
+
         if (incident.family_notification_date) {
             const notifDate = new Date(incident.family_notification_date);
             notifDate.setMinutes(notifDate.getMinutes() - notifDate.getTimezoneOffset());
             document.getElementById('familyNotificationDate').value = notifDate.toISOString().slice(0, 16);
         }
-        
+
         document.getElementById('familyNotificationDateGroup').style.display = incident.family_notified ? 'block' : 'none';
         document.getElementById('followUpNotesGroup').style.display = incident.follow_up_required ? 'block' : 'none';
-        
+
         document.getElementById('incidentFormTitle').textContent = t('incident.editReport');
         replaceDualLanguageText();
         document.getElementById('incidentForm').style.display = 'block';
@@ -4879,7 +4879,7 @@ async function saveIncident(event) {
     console.log('💾💾💾 SAVE INCIDENT FUNCTION CALLED 💾💾💾');
     console.log('💾 Event:', event);
     console.log('💾 Saving incident...');
-    
+
     // Validate required fields
     const incidentDate = document.getElementById('incidentDate').value;
     const incidentType = document.getElementById('incidentType').value;
@@ -4888,20 +4888,20 @@ async function saveIncident(event) {
     const staffId = document.getElementById('incidentStaffId').value;
     const residentsSelect = document.getElementById('incidentResidents');
     const selectedResidents = Array.from(residentsSelect.selectedOptions).map(opt => opt.value).filter(v => v);
-    
+
     if (!incidentDate || !incidentType || !description || !severity || !staffId) {
         showMessage('Please fill in all required fields / Por favor complete todos los campos requeridos', 'error');
         return;
     }
-    
+
     if (selectedResidents.length === 0) {
         showMessage('Please select at least one resident / Por favor seleccione al menos un residente', 'error');
         return;
     }
-    
+
     // For now, save with first resident (we'll need to update backend to support multiple residents)
     const primaryResidentId = parseInt(selectedResidents[0]);
-    
+
     const incidentData = {
         resident_id: primaryResidentId,
         staff_id: parseInt(staffId),
@@ -4918,28 +4918,28 @@ async function saveIncident(event) {
         photos: JSON.stringify(incidentPhotos), // Store photos as JSON array of base64
         residents_involved: JSON.stringify(selectedResidents) // Store all involved residents
     };
-    
+
     if (incidentData.family_notified) {
         const notifDate = document.getElementById('familyNotificationDate').value;
         if (notifDate) {
             incidentData.family_notification_date = notifDate;
         }
     }
-    
+
     console.log('📤 Sending incident data:', incidentData);
     console.log('🔍 Severity being sent:', severity, '(should be "major" or "critical" for email)');
-    
+
     try {
         const url = editingIncidentId ? `/api/incidents/${editingIncidentId}` : '/api/incidents';
         const method = editingIncidentId ? 'PUT' : 'POST';
-        
+
         console.log(`🌐 ${method} ${url}`);
         console.log(`📤 Request body:`, incidentData);
-        
+
         // Create AbortController for timeout
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-        
+
         let response;
         try {
             response = await fetch(url, {
@@ -4958,20 +4958,20 @@ async function saveIncident(event) {
             }
             throw fetchError; // Re-throw other errors
         }
-        
+
         console.log('📥 Response status:', response.status);
         console.log('📥 Response headers:', [...response.headers.entries()]);
-        
+
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
             handleLogout();
             return;
         }
-        
+
         if (response.ok) {
             const result = await response.json();
             console.log('✅ Success:', result);
-            let message = editingIncidentId ? 'Incident updated successfully / Incidente actualizado exitosamente' : 
+            let message = editingIncidentId ? 'Incident updated successfully / Incidente actualizado exitosamente' :
                 'Incident reported successfully / Incidente reportado exitosamente';
             if (result.email_status) {
                 console.log('📧 Email status:', result.email_status);
@@ -4999,17 +4999,17 @@ async function saveIncident(event) {
 
 async function deleteIncident(id) {
     if (!confirm('Are you sure you want to delete this incident report? / ¿Está seguro de que desea eliminar este reporte?')) return;
-    
+
     console.log(`🗑️ Attempting to delete incident ${id}...`);
-    
+
     try {
         const response = await fetch(`/api/incidents/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        
+
         console.log(`📡 Delete response status: ${response.status}`);
-        
+
         if (response.ok) {
             const result = await response.json();
             console.log('✅ Delete successful:', result);
@@ -5070,10 +5070,10 @@ async function loadCareNotes() {
             checkAuth();
             return;
         }
-        
+
         const url = currentResidentId ? `/api/care-notes?resident_id=${currentResidentId}` : '/api/care-notes';
         const response = await fetch(url, { headers: getAuthHeaders() });
-        
+
         // Handle authentication errors
         if (response.status === 401) {
             console.error('Authentication failed - token expired or invalid');
@@ -5085,25 +5085,25 @@ async function loadCareNotes() {
             checkAuth();
             return;
         }
-        
+
         if (!response.ok) throw new Error(`Failed to load care notes: ${response.status}`);
-        
+
         const notes = await response.json();
         const container = document.getElementById('careNotesList');
         if (!container) {
             console.error('❌ careNotesList container not found!');
             return;
         }
-        
+
         // Ensure container is visible
         container.style.display = 'block';
         container.style.visibility = 'visible';
-        
+
         if (notes.length === 0) {
             container.innerHTML = '<div class="empty-state" style="padding: 2rem; text-align: center; color: #666;"><p>No care notes found. / No se encontraron notas de cuidado.</p><p style="margin-top: 1rem;">Click the "Add Care Note" button above to create your first care note.</p></div>';
             return;
         }
-        
+
         container.innerHTML = notes.map(note => {
             const date = new Date(note.note_date);
             const timeDisplay = note.note_time ? ` - ${note.note_time}` : '';
@@ -5148,9 +5148,9 @@ async function editCareNote(id) {
         editingCareNoteId = id;
         const response = await fetch(`/api/care-notes/${id}`, { headers: getAuthHeaders() });
         if (!response.ok) throw new Error(`Failed to load care note: ${response.status}`);
-        
+
         const note = await response.json();
-        
+
         document.getElementById('careNoteDate').value = note.note_date || '';
         document.getElementById('careNoteTime').value = note.note_time || '';
         document.getElementById('careNoteShift').value = note.shift || '';
@@ -5173,7 +5173,7 @@ async function editCareNote(id) {
         document.getElementById('behaviorNotes').value = note.behavior_notes || '';
         document.getElementById('activities').value = note.activities || '';
         document.getElementById('generalNotes').value = note.general_notes || '';
-        
+
         document.getElementById('careNoteFormTitle').textContent = t('carenote.edit');
         replaceDualLanguageText();
         document.getElementById('careNoteForm').style.display = 'block';
@@ -5186,7 +5186,7 @@ async function editCareNote(id) {
 
 async function saveCareNote(event) {
     event.preventDefault();
-    
+
     const careNoteData = {
         resident_id: currentResidentId,
         note_date: document.getElementById('careNoteDate').value,
@@ -5212,20 +5212,20 @@ async function saveCareNote(event) {
         activities: document.getElementById('activities').value,
         general_notes: document.getElementById('generalNotes').value
     };
-    
+
     try {
         const url = editingCareNoteId ? `/api/care-notes/${editingCareNoteId}` : '/api/care-notes';
         const method = editingCareNoteId ? 'PUT' : 'POST';
-        
+
         const response = await fetch(url, {
             method: method,
             headers: getAuthHeaders(),
             body: JSON.stringify(careNoteData)
         });
-        
+
         if (response.ok) {
             showMessage(
-                editingCareNoteId ? 'Care note updated successfully / Nota actualizada exitosamente' : 
+                editingCareNoteId ? 'Care note updated successfully / Nota actualizada exitosamente' :
                 'Care note created successfully / Nota creada exitosamente',
                 'success'
             );
@@ -5243,13 +5243,13 @@ async function saveCareNote(event) {
 
 async function deleteCareNote(id) {
     if (!confirm('Are you sure you want to delete this care note? / ¿Está seguro de que desea eliminar esta nota?')) return;
-    
+
     try {
         const response = await fetch(`/api/care-notes/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        
+
         if (response.ok) {
             showMessage('Care note deleted successfully / Nota eliminada exitosamente', 'success');
             loadCareNotes();
@@ -5269,9 +5269,9 @@ async function loadNotifications() {
     try {
         const url = currentResidentId ? `/api/notifications?resident_id=${currentResidentId}&unread_only=true` : '/api/notifications?unread_only=true';
         const response = await fetch(url, { headers: getAuthHeaders() });
-        
+
         if (!response.ok) return;
-        
+
         notificationsData = await response.json();
         updateNotificationBadge();
         updateNotificationsDropdown();
@@ -5296,12 +5296,12 @@ function updateNotificationBadge() {
 function updateNotificationsDropdown() {
     const list = document.getElementById('notificationsList');
     if (!list) return;
-    
+
     if (notificationsData.length === 0) {
         list.innerHTML = '<div class="empty-state" style="padding: 1rem; text-align: center; color: var(--dark-gray);">No notifications / Sin notificaciones</div>';
         return;
     }
-    
+
     list.innerHTML = notificationsData.slice(0, 10).map(notif => {
         const date = new Date(notif.created_at);
         const priorityClass = notif.priority || 'normal';
@@ -5336,12 +5336,12 @@ async function handleNotificationClick(id, actionUrl) {
             headers: getAuthHeaders()
         });
     } catch (e) { console.error('Error marking notification read:', e); }
-    
+
     // Navigate if action URL provided
     if (actionUrl) {
         showPage(actionUrl);
     }
-    
+
     // Reload notifications
     loadNotifications();
 }
@@ -5354,7 +5354,7 @@ async function markAllNotificationsRead() {
             headers: getAuthHeaders(),
             body: JSON.stringify({ resident_id: currentResidentId })
         });
-        
+
         if (response.ok) {
             showMessage('All notifications marked as read / Todas las notificaciones marcadas como leídas', 'success');
             loadNotifications();
@@ -5369,18 +5369,18 @@ async function loadNotificationsPage() {
     try {
         const url = currentResidentId ? `/api/notifications?resident_id=${currentResidentId}` : '/api/notifications';
         const response = await fetch(url, { headers: getAuthHeaders() });
-        
+
         if (!response.ok) throw new Error(`Failed to load notifications: ${response.status}`);
-        
+
         const notifications = await response.json();
         const container = document.getElementById('notificationsPageList');
         if (!container) return;
-        
+
         if (notifications.length === 0) {
             container.innerHTML = '<div class="empty-state">No notifications found. / No se encontraron notificaciones.</div>';
             return;
         }
-        
+
         container.innerHTML = notifications.map(notif => {
             const date = new Date(notif.created_at);
             const priorityClass = notif.priority || 'normal';
@@ -5415,7 +5415,7 @@ async function markNotificationRead(id) {
             method: 'PUT',
             headers: getAuthHeaders()
         });
-        
+
         if (response.ok) {
             loadNotifications();
             loadNotificationsPage();
@@ -5431,7 +5431,7 @@ async function loadReportsAnalytics() {
         // Load statistics
         const today = new Date().toISOString().split('T')[0];
         const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-        
+
         // Load incidents this month
         const incidentsRes = await fetch(`/api/incidents?resident_id=${currentResidentId || ''}`, { headers: getAuthHeaders() });
         if (incidentsRes.ok) {
@@ -5440,7 +5440,7 @@ async function loadReportsAnalytics() {
             const totalIncidents = document.getElementById('totalIncidents');
             if (totalIncidents) totalIncidents.textContent = thisMonth.length;
         }
-        
+
         // Load care notes this month
         const notesRes = await fetch(`/api/care-notes?resident_id=${currentResidentId || ''}`, { headers: getAuthHeaders() });
         if (notesRes.ok) {
@@ -5449,7 +5449,7 @@ async function loadReportsAnalytics() {
             const totalCareNotes = document.getElementById('totalCareNotes');
             if (totalCareNotes) totalCareNotes.textContent = thisMonth.length;
         }
-        
+
         // Load medications due today
         if (currentResidentId) {
             const medsRes = await fetch(`/api/medications?resident_id=${currentResidentId}`, { headers: getAuthHeaders() });
@@ -5459,7 +5459,7 @@ async function loadReportsAnalytics() {
                 if (medicationsDue) medicationsDue.textContent = meds.filter(m => m.active).length;
             }
         }
-        
+
         // Load appointments this week
         if (currentResidentId) {
             const appsRes = await fetch(`/api/appointments?resident_id=${currentResidentId}`, { headers: getAuthHeaders() });
@@ -5482,20 +5482,20 @@ async function loadReportsAnalytics() {
 
 async function generateReport(event) {
     event.preventDefault();
-    
+
     const reportType = document.getElementById('reportType').value;
     const dateFrom = document.getElementById('reportDateFrom').value;
     const dateTo = document.getElementById('reportDateTo').value;
-    
+
     if (!reportType) {
         showMessage('Please select a report type / Por favor seleccione un tipo de reporte', 'error');
         return;
     }
-    
+
     try {
         let data = [];
         let title = '';
-        
+
         // Collect data based on report type
         switch(reportType) {
             case 'incidents':
@@ -5549,32 +5549,32 @@ async function generateReport(event) {
                 title = 'Comprehensive Report / Reporte Integral';
                 break;
         }
-        
+
         // Generate PDF
         if (typeof window.jspdf === 'undefined') {
             showMessage('PDF library not loaded. Please refresh. / Biblioteca PDF no cargada. Por favor recargue.', 'error');
             return;
         }
-        
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
+
         // Add title
         doc.setFontSize(18);
         doc.text(title, 14, 20);
-        
+
         // Add date range if provided
         if (dateFrom || dateTo) {
             doc.setFontSize(10);
             doc.text(`Date Range: ${dateFrom || 'Start'} to ${dateTo || 'End'}`, 14, 30);
         }
-        
+
         // Add data (simplified - would format better in production)
         doc.setFontSize(10);
         let y = 40;
         doc.text(`Total Records: ${data.length}`, 14, y);
         y += 10;
-        
+
         // Add summary data
         if (data.length > 0 && data.length <= 50) {
             data.forEach((item, index) => {
@@ -5589,11 +5589,11 @@ async function generateReport(event) {
         } else if (data.length > 50) {
             doc.text('Too many records to display. Use CSV export for full data.', 14, y);
         }
-        
+
         // Save PDF
         doc.save(`${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
         showMessage('PDF generated successfully / PDF generado exitosamente', 'success');
-        
+
     } catch (error) {
         console.error('Error generating report:', error);
         showMessage('Error generating report / Error al generar reporte', 'error');
@@ -5613,7 +5613,7 @@ function selectHour(hours) {
     if (input) {
         input.value = hours;
     }
-    
+
     // Update quick select buttons
     const buttons = document.querySelectorAll('.hours-quick-btn');
     buttons.forEach(btn => {
@@ -5642,7 +5642,7 @@ function handleFrequencyChange() {
     const hoursIntervalGroup = document.getElementById('hoursIntervalGroup');
     const medTimesGroup = document.getElementById('medTimesGroup');
     const medTimesInput = document.getElementById('medTimes');
-    
+
     if (frequency === 'At intervals') {
         hoursIntervalGroup.style.display = 'block';
         medTimesGroup.style.display = 'none';
@@ -5659,7 +5659,7 @@ function handleFrequencyChange() {
 function handleNoEndDateChange() {
     const noEndDateCheckbox = document.getElementById('medNoEndDate');
     const endDateGroup = document.getElementById('medEndDateGroup');
-    
+
     if (noEndDateCheckbox.checked) {
         endDateGroup.style.display = 'none';
         // Clear end date fields
@@ -5708,9 +5708,9 @@ async function editMedication(id) {
             method: 'GET',
             headers: getAuthHeaders()
         });
-        
+
         console.log('Medication fetch response status:', response.status);
-        
+
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Authentication failed - token expired');
@@ -5735,32 +5735,32 @@ async function editMedication(id) {
             showMessage(`Error loading medication: ${errorText} / Error al cargar medicamento: ${errorText}`, 'error');
             return;
         }
-        
+
         const med = await response.json();
         console.log('Medication data loaded:', med);
-        
+
         editingMedicationId = id;
         document.getElementById('medicationForm').style.display = 'block';
         document.getElementById('medName').value = med.name;
         document.getElementById('medDosage').value = med.dosage;
         document.getElementById('medFrequency').value = med.frequency;
-        
+
         // Handle hours_interval
         if (med.hours_interval) {
             selectedHoursInterval = med.hours_interval;
             selectHour(med.hours_interval);
         }
-        
+
         // Trigger frequency change to show/hide appropriate fields
         handleFrequencyChange();
-        
+
         const times = JSON.parse(med.time_slots);
         document.getElementById('medTimes').value = times.join(', ');
-        
+
         if (med.start_date) {
             setDateTimeToDropdowns(med.start_date, 'medStartYear', 'medStartMonth', 'medStartDay', 'medStartTime');
         }
-        
+
         // Handle end date
         if (med.end_date) {
             setDateTimeToDropdowns(med.end_date, 'medEndYear', 'medEndMonth', 'medEndDay', 'medEndTime');
@@ -5771,14 +5771,14 @@ async function editMedication(id) {
             document.getElementById('medNoEndDate').checked = true;
             document.getElementById('medEndDateGroup').style.display = 'none';
         }
-        
+
         // Update form title
         const formTitle = document.querySelector('#medicationForm h3');
         if (formTitle) {
             formTitle.textContent = t('medication.edit');
         }
         replaceDualLanguageText();
-        
+
         // Scroll to form
         document.getElementById('medicationForm').scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
@@ -5797,24 +5797,24 @@ function hideMedicationForm() {
 
 async function saveMedication(event) {
     event.preventDefault();
-    
+
     if (!currentResidentId) {
         showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
         return;
     }
-    
+
     const name = document.getElementById('medName').value;
     const dosage = document.getElementById('medDosage').value;
     const frequency = document.getElementById('medFrequency').value;
     const timesStr = document.getElementById('medTimes').value;
     const time_slots = timesStr.split(',').map(t => t.trim());
     const start_date = getDateTimeFromDropdowns('medStartYear', 'medStartMonth', 'medStartDay', 'medStartTime') || null;
-    
+
     // Check if "No end date" is selected
     const noEndDate = document.getElementById('medNoEndDate').checked;
     const end_date = noEndDate ? null : (getDateTimeFromDropdowns('medEndYear', 'medEndMonth', 'medEndDay', 'medEndTime') || null);
-    
-    const medicationData = { 
+
+    const medicationData = {
         name,
         dosage,
         frequency,
@@ -5822,12 +5822,12 @@ async function saveMedication(event) {
         start_date,
         end_date
     };
-    
+
     // Add hours_interval if frequency is "At intervals"
     if (frequency === 'At intervals') {
         medicationData.hours_interval = selectedHoursInterval;
     }
-    
+
     try {
         let response;
         if (editingMedicationId) {
@@ -5846,10 +5846,10 @@ async function saveMedication(event) {
                 body: JSON.stringify(medicationData)
             });
         }
-        
+
         if (response.ok) {
-            showMessage(editingMedicationId 
-                ? 'Medication updated successfully! / ¡Medicamento actualizado exitosamente!' 
+            showMessage(editingMedicationId
+                ? 'Medication updated successfully! / ¡Medicamento actualizado exitosamente!'
                 : 'Medication added successfully! / ¡Medicamento agregado exitosamente!', 'success');
             hideMedicationForm();
             loadMedications();
@@ -5868,13 +5868,13 @@ async function saveMedication(event) {
 
 async function loadMedications() {
     try {
-        const url = currentResidentId 
+        const url = currentResidentId
             ? `${API_URL}/medications?resident_id=${currentResidentId}`
             : `${API_URL}/medications`;
         const response = await fetch(url, {
             headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Authentication failed - token expired');
@@ -5886,39 +5886,39 @@ async function loadMedications() {
             }
             throw new Error(`Failed to load medications: ${response.status}`);
         }
-        
+
         const medications = await response.json();
-        
+
         const listContainer = document.getElementById('medicationList');
         listContainer.innerHTML = '';
-        
+
         if (medications.length === 0) {
             listContainer.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 2rem;">No medications added yet. / No hay medicamentos agregados aún.</p>';
             return;
         }
-        
+
         for (const med of medications) {
             const times = JSON.parse(med.time_slots);
             const logsResponse = await fetch(`${API_URL}/medications/${med.id}/logs`, {
                 headers: getAuthHeaders()
             });
-            
+
             let logs = [];
             if (logsResponse.ok) {
                 logs = await logsResponse.json();
             }
-            
+
             const card = document.createElement('div');
             card.className = 'item-card';
-            
+
             let timesHTML = times.map(time => {
                 const logForTime = logs.find(log => log.scheduled_time === time && log.status === 'taken');
                 const status = logForTime ? 'taken' : 'pending';
-                
+
                 return `
                     <div style="display: inline-block; margin-right: 1rem; margin-bottom: 0.5rem;">
                         <span>${time}</span>
-                        <button class="btn btn-sm ${status === 'taken' ? 'btn-secondary' : 'btn-success'}" 
+                        <button class="btn btn-sm ${status === 'taken' ? 'btn-secondary' : 'btn-success'}"
                                 onclick="logMedication(${med.id}, '${time}')"
                                 ${status === 'taken' ? 'disabled' : ''}>
                             ${status === 'taken' ? '✓ ' + t('medication.taken') : t('medication.markTaken')}
@@ -5926,7 +5926,7 @@ async function loadMedications() {
                     </div>
                 `;
             }).join('');
-            
+
             card.innerHTML = `
                 <div class="item-header">
                     <div>
@@ -5946,10 +5946,10 @@ async function loadMedications() {
                     ${timesHTML}
                 </div>
             `;
-            
+
             listContainer.appendChild(card);
         }
-        
+
         // Process any remaining dual-language text in dynamically generated content
         replaceDualLanguageText();
     } catch (error) {
@@ -5965,7 +5965,7 @@ async function logMedication(medId, scheduledTime) {
             headers: getAuthHeaders(),
             body: JSON.stringify({ scheduled_time: scheduledTime, status: 'taken' })
         });
-        
+
         if (response.ok) {
             showMessage('Medication marked as taken! / ¡Medicamento marcado como tomado!', 'success');
             loadMedications();
@@ -5981,13 +5981,13 @@ async function logMedication(medId, scheduledTime) {
 
 async function deleteMedication(id) {
     if (!confirm('Are you sure you want to delete this medication? / ¿Está seguro de que desea eliminar este medicamento?')) return;
-    
+
     try {
         const response = await fetch(`${API_URL}/medications/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        
+
         if (response.ok) {
             showMessage('Medication deleted successfully! / ¡Medicamento eliminado exitosamente!', 'success');
             loadMedications();
@@ -6023,9 +6023,9 @@ async function editAppointment(id) {
             method: 'GET',
             headers: getAuthHeaders()
         });
-        
+
         console.log('Appointment fetch response status:', response.status);
-        
+
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Authentication failed - token expired');
@@ -6050,10 +6050,10 @@ async function editAppointment(id) {
             showMessage(`Error loading appointment: ${errorText} / Error al cargar cita: ${errorText}`, 'error');
             return;
         }
-        
+
         const appt = await response.json();
         console.log('Appointment data loaded:', appt);
-        
+
         editingAppointmentId = id;
         document.getElementById('appointmentForm').style.display = 'block';
         setDateToDropdowns(appt.date, 'apptYear', 'apptMonth', 'apptDay');
@@ -6062,11 +6062,11 @@ async function editAppointment(id) {
         document.getElementById('apptFacility').value = appt.facility || '';
         document.getElementById('apptPurpose').value = appt.purpose || '';
         document.getElementById('apptNotes').value = appt.notes || '';
-        
+
         // Update form title
         document.querySelector('#appointmentForm h3').textContent = t('appointment.edit');
         replaceDualLanguageText();
-        
+
         // Scroll to form
         document.getElementById('appointmentForm').scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
@@ -6083,12 +6083,12 @@ function hideAppointmentForm() {
 
 async function saveAppointment(event) {
     event.preventDefault();
-    
+
     if (!currentResidentId) {
         showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
         return;
     }
-    
+
     const appointment = {
         date: getDateFromDropdowns('apptYear', 'apptMonth', 'apptDay'),
         time: document.getElementById('apptTime').value,
@@ -6097,7 +6097,7 @@ async function saveAppointment(event) {
         purpose: document.getElementById('apptPurpose').value,
         notes: document.getElementById('apptNotes').value
     };
-    
+
     try {
         let response;
         if (editingAppointmentId) {
@@ -6116,10 +6116,10 @@ async function saveAppointment(event) {
                 body: JSON.stringify(appointment)
             });
         }
-        
+
         if (response.ok) {
-            showMessage(editingAppointmentId 
-                ? 'Appointment updated successfully! / ¡Cita actualizada exitosamente!' 
+            showMessage(editingAppointmentId
+                ? 'Appointment updated successfully! / ¡Cita actualizada exitosamente!'
                 : 'Appointment added successfully! / ¡Cita agregada exitosamente!', 'success');
             hideAppointmentForm();
             loadAppointments();
@@ -6138,13 +6138,13 @@ async function saveAppointment(event) {
 
 async function loadAppointments() {
     try {
-        const url = currentResidentId 
+        const url = currentResidentId
             ? `${API_URL}/appointments?resident_id=${currentResidentId}`
             : `${API_URL}/appointments`;
         const response = await fetch(url, {
             headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Authentication failed - token expired');
@@ -6156,30 +6156,30 @@ async function loadAppointments() {
             }
             throw new Error(`Failed to load appointments: ${response.status}`);
         }
-        
+
         const appointments = await response.json();
-        
+
         const listContainer = document.getElementById('appointmentList');
         listContainer.innerHTML = '';
-        
+
         if (appointments.length === 0) {
             listContainer.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 2rem;">No appointments scheduled. / No hay citas programadas.</p>';
             return;
         }
-        
+
         appointments.forEach(appt => {
             const apptDate = new Date(appt.date + 'T' + appt.time);
             const isCompleted = appt.completed;
             const isPast = apptDate < new Date();
-            
+
             let cardClass = 'item-card';
             if (isCompleted) cardClass += ' completed';
             else if (isPast) cardClass += ' missed';
             else cardClass += ' pending';
-            
+
             const card = document.createElement('div');
             card.className = cardClass;
-            
+
             card.innerHTML = `
                 <div class="item-header">
                     <div>
@@ -6200,7 +6200,7 @@ async function loadAppointments() {
                 </div>
                 ${isCompleted ? '<span class="badge badge-success">Completed / Completado</span>' : ''}
             `;
-            
+
             listContainer.appendChild(card);
         });
     } catch (error) {
@@ -6216,7 +6216,7 @@ async function markAppointmentComplete(id) {
             headers: getAuthHeaders(),
             body: JSON.stringify({ completed: 1 })
         });
-        
+
         if (response.ok) {
             showMessage('Appointment marked as completed! / ¡Cita marcada como completada!', 'success');
             loadAppointments();
@@ -6232,13 +6232,13 @@ async function markAppointmentComplete(id) {
 
 async function deleteAppointment(id) {
     if (!confirm('Are you sure you want to delete this appointment? / ¿Está seguro de que desea eliminar esta cita?')) return;
-    
+
     try {
         const response = await fetch(`${API_URL}/appointments/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        
+
         if (response.ok) {
             showMessage('Appointment deleted successfully! / ¡Cita eliminada exitosamente!', 'success');
             loadAppointments();
@@ -6287,9 +6287,9 @@ async function editVitalSign(id) {
             method: 'GET',
             headers: getAuthHeaders()
         });
-        
+
         console.log('Vital sign fetch response status:', response.status);
-        
+
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Authentication failed - token expired');
@@ -6314,13 +6314,13 @@ async function editVitalSign(id) {
             showMessage(`Error loading vital sign: ${errorText} / Error al cargar signo vital: ${errorText}`, 'error');
             return;
         }
-        
+
         const sign = await response.json();
         console.log('Vital sign data loaded:', sign);
-        
+
         editingVitalSignId = id;
         document.getElementById('vitalSignsForm').style.display = 'block';
-        
+
         setDateTimeToDropdowns(sign.recorded_at, 'vsYear', 'vsMonth', 'vsDay', 'vsTime');
         document.getElementById('vsSystolic').value = sign.systolic || '';
         document.getElementById('vsDiastolic').value = sign.diastolic || '';
@@ -6329,14 +6329,14 @@ async function editVitalSign(id) {
         document.getElementById('vsTemperature').value = sign.temperature || '';
         document.getElementById('vsHeartRate').value = sign.heart_rate || '';
         document.getElementById('vsNotes').value = sign.notes || '';
-        
+
         // Update form title
         const formTitle = document.querySelector('#vitalSignsForm h3');
         if (formTitle) {
             formTitle.textContent = t('vitals.edit');
             replaceDualLanguageText();
         }
-        
+
         // Scroll to form
         document.getElementById('vitalSignsForm').scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
@@ -6347,12 +6347,12 @@ async function editVitalSign(id) {
 
 async function saveVitalSign(event) {
     event.preventDefault();
-    
+
     if (!currentResidentId) {
         showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
         return;
     }
-    
+
     const data = {
         resident_id: currentResidentId,
         recorded_at: getDateTimeFromDropdowns('vsYear', 'vsMonth', 'vsDay', 'vsTime'),
@@ -6364,12 +6364,12 @@ async function saveVitalSign(event) {
         heart_rate: document.getElementById('vsHeartRate').value || null,
         notes: document.getElementById('vsNotes').value
     };
-    
+
     if (!data.systolic && !data.diastolic && !data.glucose && !data.weight && !data.temperature && !data.heart_rate) {
         showMessage('Please enter at least one vital sign measurement / Por favor ingrese al menos una medición de signo vital', 'error');
         return;
     }
-    
+
     try {
         let response;
         if (editingVitalSignId) {
@@ -6387,10 +6387,10 @@ async function saveVitalSign(event) {
                 body: JSON.stringify(data)
             });
         }
-        
+
         if (response.ok) {
-            showMessage(editingVitalSignId 
-                ? 'Vital signs updated successfully! / ¡Signos vitales actualizados exitosamente!' 
+            showMessage(editingVitalSignId
+                ? 'Vital signs updated successfully! / ¡Signos vitales actualizados exitosamente!'
                 : 'Vital signs recorded successfully! / ¡Signos vitales registrados exitosamente!', 'success');
             clearVitalSignsForm();
             loadVitalSigns();
@@ -6409,13 +6409,13 @@ async function saveVitalSign(event) {
 
 async function loadVitalSigns() {
     try {
-        const url = currentResidentId 
+        const url = currentResidentId
             ? `${API_URL}/vital-signs?resident_id=${currentResidentId}`
             : `${API_URL}/vital-signs`;
         const response = await fetch(url, {
             headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Authentication failed - token expired');
@@ -6427,9 +6427,9 @@ async function loadVitalSigns() {
             }
             throw new Error(`Failed to load vital signs: ${response.status}`);
         }
-        
+
         const signs = await response.json();
-        
+
         displayVitalSignsList(signs);
     } catch (error) {
         console.error('Error loading vital signs:', error);
@@ -6438,17 +6438,17 @@ async function loadVitalSigns() {
 
 function displayVitalSignsList(signs) {
     const container = document.getElementById('vitalSignsList');
-    
+
     if (signs.length === 0) {
         container.innerHTML = '<p class="empty-state">No vital signs recorded yet. / No hay signos vitales registrados aún.</p>';
         return;
     }
-    
+
     container.innerHTML = signs.map(sign => {
         const date = new Date(sign.recorded_at);
         const dateStr = date.toLocaleDateString();
         const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-        
+
         let measurements = [];
         if (sign.systolic && sign.diastolic) {
             measurements.push(`<span>🩸 BP: ${sign.systolic}/${sign.diastolic} mmHg</span>`);
@@ -6465,7 +6465,7 @@ function displayVitalSignsList(signs) {
         if (sign.weight) {
             measurements.push(`<span>⚖️ Weight: ${sign.weight} lbs</span>`);
         }
-        
+
         return `
             <div class="item-card">
                 <div class="item-header">
@@ -6488,13 +6488,13 @@ function displayVitalSignsList(signs) {
 
 async function deleteVitalSign(id) {
     if (!confirm('Are you sure you want to delete this vital sign record? / ¿Está seguro de que desea eliminar este registro?')) return;
-    
+
     try {
         const response = await fetch(`${API_URL}/vital-signs/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        
+
         if (response.ok) {
             showMessage('Vital sign deleted successfully / Signo vital eliminado exitosamente', 'success');
             loadVitalSigns();
@@ -6511,32 +6511,32 @@ async function loadAccountBalance() {
         document.getElementById('accountBalanceCard').style.display = 'none';
         return;
     }
-    
+
     try {
         const response = await fetch(`${API_URL}/billing/balance/${currentResidentId}`, { headers: getAuthHeaders() });
-        
+
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
             handleLogout();
             return;
         }
-        
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             console.error('Error loading account balance:', response.status, errorData);
             document.getElementById('accountBalanceCard').style.display = 'none';
             return;
         }
-        
+
         const balance = await response.json();
-        
+
         // Validate balance object
         if (!balance || typeof balance !== 'object' || balance.error) {
             console.error('Invalid balance data:', balance);
             document.getElementById('accountBalanceCard').style.display = 'none';
             return;
         }
-        
+
         document.getElementById('accountBalanceCard').style.display = 'block';
         document.getElementById('totalBilled').textContent = `$${(balance.total_billed || 0).toFixed(2)}`;
         document.getElementById('totalPaid').textContent = `$${(balance.total_paid || 0).toFixed(2)}`;
@@ -6571,32 +6571,32 @@ function showBillForm() {
 async function editBill(id) {
     try {
         const response = await fetch(`${API_URL}/billing/${id}`, { headers: getAuthHeaders() });
-        
+
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
             handleLogout();
             return;
         }
-        
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             console.error('Error loading bill:', response.status, errorData);
             showMessage('Error loading bill / Error al cargar factura', 'error');
             return;
         }
-        
+
         const bill = await response.json();
-        
+
         editingBillId = id;
         document.getElementById('billForm').style.display = 'block';
-        
+
         setDateToDropdowns(bill.billing_date, 'billYear', 'billMonth', 'billDay');
         setDateToDropdowns(bill.due_date, 'billDueYear', 'billDueMonth', 'billDueDay');
         document.getElementById('billAmount').value = bill.amount;
         document.getElementById('billCategory').value = bill.category || '';
         document.getElementById('billDescription').value = bill.description || '';
         document.getElementById('billNotes').value = bill.notes || '';
-        
+
         // Update form title
         const billFormTitle = document.getElementById('billFormTitle') || document.querySelector('#billForm h3');
         if (billFormTitle) {
@@ -6605,7 +6605,7 @@ async function editBill(id) {
         } else {
             console.error('❌ billFormTitle element not found!');
         }
-        
+
         // Scroll to form
         document.getElementById('billForm').scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
@@ -6622,12 +6622,12 @@ function hideBillForm() {
 
 async function saveBill(event) {
     event.preventDefault();
-    
+
     if (!currentResidentId) {
         showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
         return;
     }
-    
+
     const bill = {
         resident_id: currentResidentId,
         billing_date: getDateFromDropdowns('billYear', 'billMonth', 'billDay'),
@@ -6638,7 +6638,7 @@ async function saveBill(event) {
         status: 'pending',
         notes: document.getElementById('billNotes').value
     };
-    
+
     try {
         let response;
         if (editingBillId) {
@@ -6656,10 +6656,10 @@ async function saveBill(event) {
                 body: JSON.stringify(bill)
             });
         }
-        
+
         if (response.ok) {
-            showMessage(editingBillId 
-                ? 'Bill updated successfully! / ¡Factura actualizada exitosamente!' 
+            showMessage(editingBillId
+                ? 'Bill updated successfully! / ¡Factura actualizada exitosamente!'
                 : 'Bill created successfully! / ¡Factura creada exitosamente!', 'success');
             hideBillForm();
             loadBilling();
@@ -6679,11 +6679,11 @@ async function saveBill(event) {
 
 async function loadBilling() {
     try {
-        const url = currentResidentId 
+        const url = currentResidentId
             ? `${API_URL}/billing?resident_id=${currentResidentId}`
             : `${API_URL}/billing`;
         const response = await fetch(url, { headers: getAuthHeaders() });
-        
+
         if (!response.ok) {
             console.error('Error loading billing:', response.status, response.statusText);
             const listContainer = document.getElementById('billsList');
@@ -6692,9 +6692,9 @@ async function loadBilling() {
             }
             return;
         }
-        
+
         const bills = await response.json();
-        
+
         // CRITICAL: Check if bills is an array
         if (!Array.isArray(bills)) {
             console.error('Error: bills is not an array:', bills);
@@ -6704,33 +6704,33 @@ async function loadBilling() {
             }
             return;
         }
-        
+
         const listContainer = document.getElementById('billsList');
         if (!listContainer) {
             console.error('billsList container not found');
             return;
         }
-        
+
         listContainer.innerHTML = '';
-        
+
         if (bills.length === 0) {
             listContainer.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 2rem;">No bills created yet. / No hay facturas creadas aún.</p>';
             return;
         }
-        
+
         bills.forEach(bill => {
             const billDate = new Date(bill.billing_date);
             const dueDate = new Date(bill.due_date);
             const isOverdue = dueDate < new Date() && bill.status === 'pending';
-            
+
             let cardClass = 'item-card';
             if (bill.status === 'paid') cardClass += ' completed';
             else if (isOverdue) cardClass += ' missed';
             else cardClass += ' pending';
-            
+
             const card = document.createElement('div');
             card.className = cardClass;
-            
+
             card.innerHTML = `
                 <div class="item-header">
                     <div>
@@ -6750,10 +6750,10 @@ async function loadBilling() {
                     </div>
                 </div>
             `;
-            
+
             listContainer.appendChild(card);
         });
-        
+
         // Update payment form bill dropdown
         updatePaymentBillDropdown(bills.filter(b => b.status === 'pending'));
     } catch (error) {
@@ -6769,11 +6769,11 @@ async function updatePaymentBillDropdown(bills) {
         return;
     }
     select.innerHTML = '<option value="">-- Select bill -- / Seleccionar factura</option>';
-    
+
     // Load bills if not already loaded
     if (typeof bills === 'undefined' || !Array.isArray(bills)) {
         try {
-            const url = currentResidentId 
+            const url = currentResidentId
                 ? `${API_URL}/billing?resident_id=${currentResidentId}`
                 : `${API_URL}/billing`;
             const response = await fetch(url, { headers: getAuthHeaders() });
@@ -6792,7 +6792,7 @@ async function updatePaymentBillDropdown(bills) {
             return;
         }
     }
-    
+
     bills.forEach(bill => {
         const option = document.createElement('option');
         option.value = bill.id;
@@ -6808,7 +6808,7 @@ async function markBillPaid(id) {
             headers: getAuthHeaders(),
             body: JSON.stringify({ status: 'paid' })
         });
-        
+
         if (response.ok) {
             showMessage('Bill marked as paid! / ¡Factura marcada como pagada!', 'success');
             loadBilling();
@@ -6825,12 +6825,12 @@ async function markBillPaid(id) {
 
 async function deleteBill(id) {
     if (!confirm('Are you sure you want to delete this bill? / ¿Está seguro de que desea eliminar esta factura?')) return;
-    
+
     try {
         const response = await fetch(`${API_URL}/billing/${id}`, {
             method: 'DELETE'
         });
-        
+
         if (response.ok) {
             showMessage('Bill deleted successfully! / ¡Factura eliminada exitosamente!', 'success');
             loadBilling();
@@ -6861,26 +6861,26 @@ async function editPayment(id) {
     try {
         const response = await fetch(`${API_URL}/payments/${id}`);
         const payment = await response.json();
-        
+
         editingPaymentId = id;
         document.getElementById('paymentForm').style.display = 'block';
-        
+
         setDateToDropdowns(payment.payment_date, 'paymentYear', 'paymentMonth', 'paymentDay');
         document.getElementById('paymentAmount').value = payment.amount;
         document.getElementById('paymentMethod').value = payment.payment_method || 'Cash';
         document.getElementById('paymentReference').value = payment.reference_number || '';
         document.getElementById('paymentNotes').value = payment.notes || '';
-        
+
         // Load bills and set selected bill if linked
         await loadBilling();
         if (payment.billing_id) {
             document.getElementById('paymentBillId').value = payment.billing_id;
         }
-        
+
         // Update form title
         document.querySelector('#paymentForm h3').textContent = t('payment.edit');
         replaceDualLanguageText();
-        
+
         // Scroll to form
         document.getElementById('paymentForm').scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
@@ -6897,12 +6897,12 @@ function hidePaymentForm() {
 
 async function savePayment(event) {
     event.preventDefault();
-    
+
     if (!currentResidentId) {
         showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
         return;
     }
-    
+
     const payment = {
         resident_id: currentResidentId,
         billing_id: document.getElementById('paymentBillId').value || null,
@@ -6912,7 +6912,7 @@ async function savePayment(event) {
         reference_number: document.getElementById('paymentReference').value,
         notes: document.getElementById('paymentNotes').value
     };
-    
+
     try {
         let response;
         if (editingPaymentId) {
@@ -6930,10 +6930,10 @@ async function savePayment(event) {
                 body: JSON.stringify(payment)
             });
         }
-        
+
         if (response.ok) {
-            showMessage(editingPaymentId 
-                ? 'Payment updated successfully! / ¡Pago actualizado exitosamente!' 
+            showMessage(editingPaymentId
+                ? 'Payment updated successfully! / ¡Pago actualizado exitosamente!'
                 : 'Payment recorded successfully! / ¡Pago registrado exitosamente!', 'success');
             hidePaymentForm();
             loadPayments();
@@ -6954,17 +6954,17 @@ async function savePayment(event) {
 
 async function loadPayments() {
     try {
-        const url = currentResidentId 
+        const url = currentResidentId
             ? `${API_URL}/payments?resident_id=${currentResidentId}`
             : `${API_URL}/payments`;
         const response = await fetch(url, { headers: getAuthHeaders() });
-        
+
         if (response.status === 401) {
             showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
             handleLogout();
             return;
         }
-        
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             console.error('Error loading payments:', response.status, errorData);
@@ -6975,9 +6975,9 @@ async function loadPayments() {
             showMessage('Error loading payments / Error al cargar pagos', 'error');
             return;
         }
-        
+
         const payments = await response.json();
-        
+
         // Validate payments is an array
         if (!Array.isArray(payments)) {
             console.error('Error: payments is not an array:', payments);
@@ -6988,25 +6988,25 @@ async function loadPayments() {
             showMessage('Error loading payments / Error al cargar pagos', 'error');
             return;
         }
-        
+
         const listContainer = document.getElementById('paymentsList');
         if (!listContainer) {
             console.error('paymentsList container not found');
             return;
         }
         listContainer.innerHTML = '';
-        
+
         if (payments.length === 0) {
             listContainer.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 2rem;">No payments recorded yet. / No hay pagos registrados aún.</p>';
             return;
         }
-        
+
         payments.forEach(payment => {
             const paymentDate = new Date(payment.payment_date);
-            
+
             const card = document.createElement('div');
             card.className = 'item-card completed';
-            
+
             card.innerHTML = `
                 <div class="item-header">
                     <div>
@@ -7024,7 +7024,7 @@ async function loadPayments() {
                     </div>
                 </div>
             `;
-            
+
             listContainer.appendChild(card);
         });
     } catch (error) {
@@ -7035,12 +7035,12 @@ async function loadPayments() {
 
 async function deletePayment(id) {
     if (!confirm('Are you sure you want to delete this payment? / ¿Está seguro de que desea eliminar este pago?')) return;
-    
+
     try {
         const response = await fetch(`${API_URL}/payments/${id}`, {
             method: 'DELETE'
         });
-        
+
         if (response.ok) {
             showMessage('Payment deleted successfully! / ¡Pago eliminado exitosamente!', 'success');
             loadPayments();
@@ -7063,7 +7063,7 @@ let allCalendarActivities = [];
 function initializeCalendarControls() {
     const yearSelect = document.getElementById('calendarYear');
     const monthSelect = document.getElementById('calendarMonth');
-    
+
     // Populate year dropdown (current year ± 5 years)
     yearSelect.innerHTML = '';
     for (let year = currentCalendarYear - 5; year <= currentCalendarYear + 5; year++) {
@@ -7075,21 +7075,21 @@ function initializeCalendarControls() {
         }
         yearSelect.appendChild(option);
     }
-    
+
     // Set current month
     monthSelect.value = currentCalendarMonth;
-    
+
     // Add event listeners
     yearSelect.addEventListener('change', () => {
         currentCalendarYear = parseInt(yearSelect.value);
         loadCalendar();
     });
-    
+
     monthSelect.addEventListener('change', () => {
         currentCalendarMonth = parseInt(monthSelect.value);
         loadCalendar();
     });
-    
+
     const searchInput = document.getElementById('calendarSearch');
     if (searchInput) {
         searchInput.addEventListener('input', filterCalendarActivities);
@@ -7098,7 +7098,7 @@ function initializeCalendarControls() {
 
 function changeCalendarMonth(direction) {
     currentCalendarMonth += direction;
-    
+
     if (currentCalendarMonth < 0) {
         currentCalendarMonth = 11;
         currentCalendarYear--;
@@ -7106,10 +7106,10 @@ function changeCalendarMonth(direction) {
         currentCalendarMonth = 0;
         currentCalendarYear++;
     }
-    
+
     document.getElementById('calendarMonth').value = currentCalendarMonth;
     document.getElementById('calendarYear').value = currentCalendarYear;
-    
+
     // Update year dropdown if needed
     const yearSelect = document.getElementById('calendarYear');
     if (!yearSelect.querySelector(`option[value="${currentCalendarYear}"]`)) {
@@ -7121,7 +7121,7 @@ function changeCalendarMonth(direction) {
         yearSelect.appendChild(option);
         yearSelect.value = currentCalendarYear;
     }
-    
+
     loadCalendar();
 }
 
@@ -7129,28 +7129,28 @@ function goToToday() {
     const today = new Date();
     currentCalendarYear = today.getFullYear();
     currentCalendarMonth = today.getMonth();
-    
+
     document.getElementById('calendarYear').value = currentCalendarYear;
     document.getElementById('calendarMonth').value = currentCalendarMonth;
-    
+
     loadCalendar();
 }
 
 async function loadCalendar() {
     if (!document.getElementById('calendar')) return;
-    
+
     try {
         const year = currentCalendarYear.toString();
         const month = (currentCalendarMonth + 1).toString();
-        
+
         let url = `${API_URL}/calendar?year=${year}&month=${month}`;
         if (currentResidentId) {
             url += `&resident_id=${currentResidentId}`;
         }
-        
+
         const response = await fetch(url);
         allCalendarActivities = await response.json();
-        
+
         displayCalendar();
         initializeCalendarControls();
     } catch (error) {
@@ -7167,10 +7167,10 @@ function filterCalendarActivities() {
 function displayCalendar(searchTerm = '') {
     const container = document.getElementById('calendarDisplay');
     if (!container) return;
-    
+
     const year = currentCalendarYear;
     const month = currentCalendarMonth;
-    
+
     // Filter activities
     let activities = allCalendarActivities;
     if (searchTerm) {
@@ -7186,7 +7186,7 @@ function displayCalendar(searchTerm = '') {
             return searchableText.includes(searchTerm);
         });
     }
-    
+
     // Group activities by date
     const activitiesByDate = {};
     activities.forEach(activity => {
@@ -7197,22 +7197,22 @@ function displayCalendar(searchTerm = '') {
         }
         activitiesByDate[dateKey].push(activity);
     });
-    
+
     // Create calendar
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                        'July', 'August', 'September', 'October', 'November', 'December'];
     const monthNamesEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    
+
     container.innerHTML = `
         <div class="form-card">
             <h3 style="text-align: center; margin-bottom: 1rem;">
                 ${monthNames[month]} ${year} / ${monthNamesEs[month]} ${year}
             </h3>
             <div class="calendar-grid">
-                ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => 
+                ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day =>
                     `<div class="calendar-weekday">${day}</div>`
                 ).join('')}
                 ${Array(firstDay).fill(0).map(() => '<div class="calendar-day empty"></div>').join('')}
@@ -7222,7 +7222,7 @@ function displayCalendar(searchTerm = '') {
                     const dateKey = date.toISOString().split('T')[0];
                     const isToday = date.toDateString() === new Date().toDateString();
                     const dayActivities = activitiesByDate[dateKey] || [];
-                    
+
                     return `
                         <div class="calendar-day ${isToday ? 'today' : ''}">
                             <div class="day-number">${day}</div>
@@ -7232,7 +7232,7 @@ function displayCalendar(searchTerm = '') {
                                         let icon = '';
                                         let className = '';
                                         let title = '';
-                                        
+
                                         if (activity.type === 'medication') {
                                             icon = '💊';
                                             className = activity.status === 'taken' ? 'completed' : 'pending';
@@ -7246,7 +7246,7 @@ function displayCalendar(searchTerm = '') {
                                             className = 'completed';
                                             title = 'Vital Signs';
                                         }
-                                        
+
                                         return `<div class="activity-item ${className}" title="${title}">${icon} ${title.length > 15 ? title.substring(0, 15) + '...' : title}</div>`;
                                     }).join('')}
                                     ${dayActivities.length > 3 ? `<div class="activity-item">+${dayActivities.length - 3} more</div>` : ''}
@@ -7257,13 +7257,13 @@ function displayCalendar(searchTerm = '') {
                 }).join('')}
             </div>
         </div>
-        
+
         <div class="form-card" style="margin-top: 2rem;">
             <h3>Activities List / Lista de Actividades</h3>
             <div id="calendarActivitiesList" class="item-list"></div>
         </div>
     `;
-    
+
     // Display activities list
     displayCalendarActivitiesList(activities);
 }
@@ -7271,17 +7271,17 @@ function displayCalendar(searchTerm = '') {
 function displayCalendarActivitiesList(activities) {
     const container = document.getElementById('calendarActivitiesList');
     if (!container) return;
-    
+
     if (activities.length === 0) {
         container.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 2rem;">No activities found for this month. / No se encontraron actividades para este mes.</p>';
         return;
     }
-    
+
     container.innerHTML = activities.map(activity => {
         const date = new Date(activity.datetime);
         const dateStr = date.toLocaleDateString();
         const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-        
+
         let content = '';
         if (activity.type === 'medication') {
             content = `💊 ${activity.name} (${activity.dosage}) - ${activity.scheduled_time} - ${activity.status}`;
@@ -7290,7 +7290,7 @@ function displayCalendarActivitiesList(activities) {
         } else if (activity.type === 'vital_signs') {
             content = `🩺 Vital Signs recorded`;
         }
-        
+
         return `
             <div class="item-card">
                 <div class="item-header">
@@ -7310,10 +7310,10 @@ function displayCalendarActivitiesList(activities) {
 function populateYearDropdown(selectId, startYear = 1920, endYear = null) {
     const select = document.getElementById(selectId);
     if (!select) return;
-    
+
     const currentYear = new Date().getFullYear();
     const end = endYear || (currentYear + 10);
-    
+
     select.innerHTML = '<option value="">Year / Año</option>';
     for (let year = end; year >= startYear; year--) {
         const option = document.createElement('option');
@@ -7327,20 +7327,20 @@ function populateDayDropdown(daySelectId, monthSelectId, yearSelectId) {
     const daySelect = document.getElementById(daySelectId);
     const monthSelect = document.getElementById(monthSelectId);
     const yearSelect = document.getElementById(yearSelectId);
-    
+
     if (!daySelect || !monthSelect || !yearSelect) return;
-    
+
     const month = parseInt(monthSelect.value);
     const year = parseInt(yearSelect.value);
-    
+
     if (!month || !year) {
         daySelect.innerHTML = '<option value="">Day / Día</option>';
         return;
     }
-    
+
     const daysInMonth = new Date(year, month, 0).getDate();
     daySelect.innerHTML = '<option value="">Day / Día</option>';
-    
+
     for (let day = 1; day <= daysInMonth; day++) {
         const option = document.createElement('option');
         option.value = day.toString().padStart(2, '0');
@@ -7352,14 +7352,14 @@ function populateDayDropdown(daySelectId, monthSelectId, yearSelectId) {
 function setupDateDropdowns() {
     // Populate all year dropdowns
     const yearSelects = [
-        'medStartYear', 'medEndYear', 'apptYear', 'vsYear', 
+        'medStartYear', 'medEndYear', 'apptYear', 'vsYear',
         'billYear', 'billDueYear', 'paymentYear', 'newBirthYear', 'newBirthYearPage'
     ];
-    
+
     yearSelects.forEach(selectId => {
         populateYearDropdown(selectId);
     });
-    
+
     // Setup day dropdown updates when month/year changes
     const dateGroups = [
         { day: 'medStartDay', month: 'medStartMonth', year: 'medStartYear' },
@@ -7372,11 +7372,11 @@ function setupDateDropdowns() {
         { day: 'newBirthDay', month: 'newBirthMonth', year: 'newBirthYear' },
         { day: 'newBirthDayPage', month: 'newBirthMonthPage', year: 'newBirthYearPage' }
     ];
-    
+
     dateGroups.forEach(group => {
         const monthSelect = document.getElementById(group.month);
         const yearSelect = document.getElementById(group.year);
-        
+
         if (monthSelect) {
             monthSelect.addEventListener('change', () => populateDayDropdown(group.day, group.month, group.year));
         }
@@ -7390,19 +7390,19 @@ function getDateFromDropdowns(yearId, monthId, dayId) {
     const year = document.getElementById(yearId)?.value;
     const month = document.getElementById(monthId)?.value;
     const day = document.getElementById(dayId)?.value;
-    
+
     if (!year || !month || !day) return null;
-    
+
     return `${year}-${month}-${day}`;
 }
 
 function getDateTimeFromDropdowns(yearId, monthId, dayId, timeId) {
     const date = getDateFromDropdowns(yearId, monthId, dayId);
     const time = document.getElementById(timeId)?.value;
-    
+
     if (!date) return null;
     if (!time) return date;
-    
+
     return `${date}T${time}`;
 }
 
@@ -7417,18 +7417,18 @@ function setDateToDropdowns(dateString, yearId, monthId, dayId) {
         if (daySelect) daySelect.innerHTML = '<option value="">Day / Día</option>';
         return;
     }
-    
+
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return;
-    
+
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
-    
+
     const yearSelect = document.getElementById(yearId);
     const monthSelect = document.getElementById(monthId);
     const daySelect = document.getElementById(dayId);
-    
+
     if (yearSelect) {
         // Make sure year exists in dropdown
         if (!yearSelect.querySelector(`option[value="${year}"]`)) {
@@ -7451,10 +7451,10 @@ function setDateToDropdowns(dateString, yearId, monthId, dayId) {
 
 function setDateTimeToDropdowns(dateTimeString, yearId, monthId, dayId, timeId) {
     if (!dateTimeString) return;
-    
+
     const [datePart, timePart] = dateTimeString.split('T');
     setDateToDropdowns(datePart, yearId, monthId, dayId);
-    
+
     if (timePart && timeId) {
         const timeInput = document.getElementById(timeId);
         if (timeInput) {
@@ -7474,7 +7474,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setLanguage(savedLanguage); // Use setLanguage to ensure replaceDualLanguageText is called
         }
     }
-    
+
     checkAuth();
     if (authToken && currentStaff && currentResidentId) {
         initApp();
@@ -7520,18 +7520,18 @@ async function handleFinancialApiError(response, defaultMessage) {
 // Financial Tab Navigation
 function showFinancialTab(tab) {
     console.log('💰 Showing financial tab:', tab);
-    
+
     // Hide all tabs
     document.querySelectorAll('.financial-tab').forEach(t => {
         t.style.setProperty('display', 'none', 'important');
     });
-    
+
     // Update button styles
     document.querySelectorAll('#financial .button-group button').forEach(b => {
         b.classList.remove('btn-primary');
         b.classList.add('btn-secondary');
     });
-    
+
     // Show selected tab
     const tabElement = document.getElementById(`financial${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
     if (tabElement) {
@@ -7542,7 +7542,7 @@ function showFinancialTab(tab) {
         tabElement.style.setProperty('padding', '1rem', 'important');
         tabElement.style.setProperty('background', 'white', 'important');
         console.log('✅ Tab element shown:', tabElement.id);
-        
+
         // Force show all children of the tab
         Array.from(tabElement.children).forEach((child) => {
             const computedStyle = window.getComputedStyle(child);
@@ -7550,12 +7550,12 @@ function showFinancialTab(tab) {
             child.style.setProperty('display', 'block', 'important');
             child.style.setProperty('visibility', 'visible', 'important');
             child.style.setProperty('opacity', '1', 'important');
-            
+
             // Special handling for form-card and item-list
             if (child.classList.contains('form-card')) {
                 child.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 1.5rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 1000 !important; min-height: 100px !important; width: 100% !important; box-sizing: border-box !important;';
                 console.log('✅✅✅ FORM-CARD FORCED VISIBLE WITH CSS TEXT ✅✅✅');
-                
+
                 // Also ensure all children of form-card are visible (including the button and h3)
                 Array.from(child.children).forEach(grandChild => {
                     if (grandChild.tagName === 'BUTTON') {
@@ -7577,7 +7577,7 @@ function showFinancialTab(tab) {
                 child.style.setProperty('opacity', '1', 'important');
                 child.style.setProperty('margin-top', '2rem', 'important');
                 console.log('  ✅ bankAccountsList forced visible');
-                
+
                 // If empty, show empty state immediately
                 if (!child.innerHTML || child.innerHTML.trim() === '') {
                     child.innerHTML = '<div class="empty-state" style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex !important; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd; visibility: visible !important; opacity: 1 !important;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
@@ -7585,7 +7585,7 @@ function showFinancialTab(tab) {
                 }
             }
         });
-        
+
         // Double-check visibility after a short delay
         setTimeout(() => {
             const finalStyle = window.getComputedStyle(tabElement);
@@ -7599,7 +7599,7 @@ function showFinancialTab(tab) {
     } else {
         console.error('❌ Tab element not found:', `financial${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
     }
-    
+
     // Update button styles
     const buttonId = `tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`;
     const button = document.getElementById(buttonId);
@@ -7607,7 +7607,7 @@ function showFinancialTab(tab) {
         button.classList.remove('btn-secondary');
         button.classList.add('btn-primary');
     }
-    
+
     // Load data for the tab
     if (tab === 'accounts') {
         // Small delay to ensure DOM is ready
@@ -7631,10 +7631,10 @@ function showFinancialTab(tab) {
                 accountsTab.style.setProperty('overflow-x', 'visible', 'important');
                 accountsTab.style.setProperty('overflow-y', 'visible', 'important');
             }
-            
+
             // Scroll window to top to ensure content is visible (button was at y:1300, way below viewport)
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            
+
             // Also scroll to the form-card button specifically
             const formCard = document.querySelector('#financialAccounts .form-card');
             if (formCard) {
@@ -7648,7 +7648,7 @@ function showFinancialTab(tab) {
                     }, 200);
                 }
             }
-            
+
         loadBankAccounts();
         }, 100);
     } else if (tab === 'transactions') {
@@ -7669,7 +7669,7 @@ async function loadBankAccounts() {
             console.error('❌ Financial auth check failed');
             return;
         }
-        
+
         console.log('✅ Fetching bank accounts...');
         const response = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
         if (!response.ok) {
@@ -7680,7 +7680,7 @@ async function loadBankAccounts() {
         }
         const accounts = await response.json();
         console.log('✅ Bank accounts response:', accounts);
-        
+
         const listEl = document.getElementById('bankAccountsList');
         if (!listEl) {
             console.error('❌ bankAccountsList element not found!');
@@ -7703,14 +7703,14 @@ async function loadBankAccounts() {
             }
             return;
         }
-        
+
         console.log('✅ Found bankAccountsList element, updating content...');
         // Ensure the list element is visible
         listEl.style.setProperty('display', 'block', 'important');
         listEl.style.setProperty('visibility', 'visible', 'important');
         listEl.style.setProperty('opacity', '1', 'important');
         listEl.style.setProperty('min-height', '100px', 'important');
-        
+
         if (accounts.length === 0) {
             listEl.innerHTML = '<div class="empty-state" style="padding: 3rem !important; text-align: center !important; color: #333 !important; background: #f5f5f5 !important; border-radius: 8px !important; margin: 2rem 0 !important; min-height: 200px !important; height: auto !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; border: 2px dashed #999 !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; position: relative !important; z-index: 1000 !important;"><p style="font-size: 1.2rem !important; margin-bottom: 0.5rem !important; font-weight: 500 !important; color: #333 !important;">No bank accounts found.</p><p style="color: #666 !important; font-size: 0.95rem !important;">Click "Add Bank Account" above to create your first account.</p></div>';
             console.log('✅✅✅ Empty state message displayed with enhanced styling ✅✅✅');
@@ -7740,13 +7740,13 @@ async function loadBankAccounts() {
                 formCard.style.setProperty('background', 'white', 'important');
                 formCard.style.setProperty('padding', '1.5rem', 'important');
                 formCard.style.setProperty('margin-bottom', '1rem', 'important');
-                
+
                 // Also ensure the button inside is visible - SUPER VISIBLE FOR DEBUGGING
                 const addButton = formCard.querySelector('button');
                 if (addButton) {
                     // Make button SUPER visible with bright red background and yellow border
                     addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 99999 !important; background: #FF0000 !important; color: white !important; padding: 1rem 2rem !important; border: 5px solid #FFFF00 !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.2rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; min-height: 50px !important; box-shadow: 0 0 30px rgba(255,0,0,1) !important;';
-                    
+
                     // Force button to be positioned correctly (fix negative x position)
                     addButton.style.setProperty('position', 'relative', 'important');
                     addButton.style.setProperty('left', '0', 'important');
@@ -7754,7 +7754,7 @@ async function loadBankAccounts() {
                     addButton.style.setProperty('transform', 'none', 'important');
                     addButton.style.setProperty('margin-left', '0', 'important');
                     addButton.style.setProperty('margin-right', 'auto', 'important');
-                    
+
                     // Ensure ALL parent containers have overflow: visible
                     let parent = addButton.parentElement;
                     let level = 0;
@@ -7772,20 +7772,20 @@ async function loadBankAccounts() {
                         parent = parent.parentElement;
                         level++;
                     }
-                    
+
                     const rect = addButton.getBoundingClientRect();
                     console.log('✅✅✅ Add Bank Account button FORCED VISIBLE WITH NORMAL STYLING ✅✅✅');
                     console.log('🔍 Button text:', addButton.textContent);
                     console.log('🔍 Button computed display:', window.getComputedStyle(addButton).display);
                     console.log('🔍 Button position:', rect);
-                    
+
                     // Check if button is off-screen (horizontally OR vertically)
                     const isOffScreenX = rect.x < 0 || rect.x > window.innerWidth;
                     const isOffScreenY = rect.y < 0 || rect.y > window.innerHeight;
-                    
+
                     if (isOffScreenX || isOffScreenY) {
                         console.warn('⚠️ Button is off-screen! x:', rect.x, 'y:', rect.y, 'viewport height:', window.innerHeight);
-                        
+
                         // If button is below viewport, scroll to it
                         if (isOffScreenY && rect.y > window.innerHeight) {
                             console.log('📍 Button is below viewport - scrolling to it...');
@@ -7793,7 +7793,7 @@ async function loadBankAccounts() {
                             // Also try scrolling the window
                             window.scrollTo({ top: Math.max(0, rect.top + window.scrollY - 100), behavior: 'smooth' });
                         }
-                        
+
                         // Walk up the entire parent chain and fix ALL containers
                         let current = addButton.parentElement;
                         let level = 0;
@@ -7801,7 +7801,7 @@ async function loadBankAccounts() {
                             const computedStyle = window.getComputedStyle(current);
                             const hasTransform = computedStyle.transform && computedStyle.transform !== 'none';
                             const hasNegativeLeft = computedStyle.left && parseFloat(computedStyle.left) < 0;
-                            
+
                             if (hasTransform || hasNegativeLeft || current.id === 'financialAccounts' || current.classList.contains('form-card') || current.classList.contains('financial-tab')) {
                                 console.log(`🔧 Fixing parent level ${level}:`, current.tagName, current.className, current.id);
                                 current.style.setProperty('position', 'relative', 'important');
@@ -7817,27 +7817,27 @@ async function loadBankAccounts() {
                             current = current.parentElement;
                             level++;
                         }
-                        
+
                         // Force button to be visible by resetting all positioning
                         addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: static !important; left: auto !important; right: auto !important; transform: none !important; margin: 1rem 0 !important; width: auto !important;';
                         console.log('✅ Button position reset to static, all parents fixed');
-                        
+
                         // Re-check position after fix
                         setTimeout(() => {
                             const newRect = addButton.getBoundingClientRect();
                             console.log('🔍 Button position after fix:', newRect);
                             const isStillOffScreenX = newRect.x < 0 || newRect.x > window.innerWidth;
                             const isStillOffScreenY = newRect.y < 0 || newRect.y > window.innerHeight;
-                            
+
                             if (isStillOffScreenX || isStillOffScreenY) {
                                 console.error('❌ Button still off-screen after fix! x:', newRect.x, 'y:', newRect.y, 'viewport height:', window.innerHeight);
-                                
+
                                 // Try scrolling to the button first
                                 if (isStillOffScreenY) {
                                     console.log('📍 Attempting scroll to button...');
                                     addButton.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
                                     window.scrollTo({ top: Math.max(0, newRect.top + window.scrollY - 50), behavior: 'smooth' });
-                                    
+
                                     // After scroll, check again
                                     setTimeout(() => {
                                         const finalRect = addButton.getBoundingClientRect();
@@ -7858,7 +7858,7 @@ async function loadBankAccounts() {
                             }
                         }, 100);
                     }
-                    
+
                     // Also ensure parent form-card is positioned correctly
                     if (formCard) {
                         formCard.style.setProperty('position', 'relative', 'important');
@@ -7868,7 +7868,7 @@ async function loadBankAccounts() {
                         formCard.style.setProperty('width', '100%', 'important');
                         formCard.style.setProperty('max-width', '100%', 'important');
                     }
-                    
+
                     // Ensure accounts tab is positioned correctly
                     const accountsTab = listEl.closest('#financialAccounts');
                     if (accountsTab) {
@@ -7887,7 +7887,7 @@ async function loadBankAccounts() {
             }
             return;
         }
-        
+
         listEl.innerHTML = accounts.map(account => `
             <div class="item-card">
                 <div class="item-header">
@@ -7904,14 +7904,14 @@ async function loadBankAccounts() {
             </div>
         `).join('');
         console.log('✅ Bank accounts list rendered, count:', accounts.length);
-        
+
         // Ensure the Add Bank Account button is always visible, even when accounts exist
         const formCard = document.querySelector('#financialAccounts .form-card');
         if (formCard) {
             formCard.style.setProperty('display', 'block', 'important');
             formCard.style.setProperty('visibility', 'visible', 'important');
             formCard.style.setProperty('opacity', '1', 'important');
-            
+
             const addButton = formCard.querySelector('button[onclick*="showBankAccountForm"]');
             if (addButton) {
                 addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; margin: 1rem 0 !important;';
@@ -7939,14 +7939,14 @@ function hideBankAccountForm() {
     document.getElementById('bankAccountForm').style.display = 'none';
     editingBankAccountId = null;
     document.getElementById('newBankAccountForm').reset();
-    
+
     // Ensure the Add Bank Account button remains visible after hiding the form
     const formCard = document.querySelector('#financialAccounts .form-card');
     if (formCard) {
         formCard.style.setProperty('display', 'block', 'important');
         formCard.style.setProperty('visibility', 'visible', 'important');
         formCard.style.setProperty('opacity', '1', 'important');
-        
+
         const addButton = formCard.querySelector('button[onclick*="showBankAccountForm"]');
         if (addButton) {
             addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; margin: 1rem 0 !important;';
@@ -7962,7 +7962,7 @@ async function editBankAccount(id) {
         const response = await fetch(`/api/bank-accounts/${id}`, { headers: getAuthHeaders() });
         if (!response.ok) throw new Error('Failed to load bank account');
         const account = await response.json();
-        
+
         editingBankAccountId = id;
         document.getElementById('accountName').value = account.account_name;
         document.getElementById('bankName').value = account.bank_name;
@@ -7971,7 +7971,7 @@ async function editBankAccount(id) {
         document.getElementById('accountType').value = account.account_type;
         document.getElementById('openingBalance').value = account.opening_balance || 0;
         document.getElementById('accountNotes').value = account.notes || '';
-        
+
         showBankAccountForm();
     } catch (error) {
         console.error('Error loading bank account:', error);
@@ -7983,21 +7983,21 @@ async function deleteBankAccount(id) {
     if (!confirm('Are you sure you want to delete this bank account? / ¿Está seguro de que desea eliminar esta cuenta bancaria?')) {
         return;
     }
-    
+
     try {
         if (!checkFinancialAuth()) return;
-        
+
         const response = await fetch(`/api/bank-accounts/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
             const handled = await handleFinancialApiError(response, 'Failed to delete bank account');
             if (handled) return;
             throw new Error('Failed to delete bank account');
         }
-        
+
         showMessage('Bank account deleted successfully / Cuenta bancaria eliminada exitosamente', 'success');
         loadBankAccounts();
     } catch (error) {
@@ -8010,7 +8010,7 @@ async function saveBankAccount(event) {
     event.preventDefault();
     try {
         if (!checkFinancialAuth()) return;
-        
+
         const accountData = {
             account_name: document.getElementById('accountName').value,
             bank_name: document.getElementById('bankName').value,
@@ -8020,25 +8020,25 @@ async function saveBankAccount(event) {
             opening_balance: parseFloat(document.getElementById('openingBalance').value) || 0,
             notes: document.getElementById('accountNotes').value
         };
-        
-        const url = editingBankAccountId 
+
+        const url = editingBankAccountId
             ? `/api/bank-accounts/${editingBankAccountId}`
             : '/api/bank-accounts';
         const method = editingBankAccountId ? 'PUT' : 'POST';
-        
+
         const response = await fetch(url, {
             method: method,
             headers: getAuthHeaders(),
             body: JSON.stringify(accountData)
         });
-        
+
         if (!response.ok) {
             const handled = await handleFinancialApiError(response, 'Failed to save bank account');
             if (handled) return;
             throw new Error('Failed to save bank account');
         }
-        
-        showMessage(editingBankAccountId 
+
+        showMessage(editingBankAccountId
             ? 'Bank account updated successfully / Cuenta bancaria actualizada exitosamente'
             : 'Bank account saved successfully / Cuenta bancaria guardada exitosamente', 'success');
         editingBankAccountId = null;
@@ -8054,14 +8054,14 @@ async function saveBankAccount(event) {
 async function loadTransactions() {
     try {
         if (!checkFinancialAuth()) return;
-        
+
         const accountId = document.getElementById('filterTransactionAccount')?.value || '';
         const reconciled = document.getElementById('filterReconciled')?.value || '';
-        
+
         let url = '/api/transactions?';
         if (accountId) url += `bank_account_id=${accountId}&`;
         if (reconciled) url += `reconciled=${reconciled}`;
-        
+
         const response = await fetch(url, { headers: getAuthHeaders() });
         if (!response.ok) {
             const handled = await handleFinancialApiError(response, 'Failed to load transactions');
@@ -8071,20 +8071,20 @@ async function loadTransactions() {
         const transactions = await response.json();
         const listEl = document.getElementById('transactionsList');
         if (!listEl) return;
-        
+
         if (transactions.length === 0) {
             listEl.innerHTML = '<div class="empty-state">No transactions found.</div>';
             return;
         }
-        
+
         listEl.innerHTML = transactions.map(trans => `
             <div class="item-card ${trans.reconciled ? 'completed' : ''}">
                 <div class="item-header">
                     <div>
                         <h3 class="item-title">${trans.description}</h3>
                         <p class="item-details">
-                            ${trans.account_name} • ${trans.transaction_type} • 
-                            ${trans.transaction_date} • 
+                            ${trans.account_name} • ${trans.transaction_type} •
+                            ${trans.transaction_date} •
                             <strong style="color: ${trans.transaction_type === 'deposit' ? 'var(--success-green)' : 'var(--error-red)'}">
                                 ${trans.transaction_type === 'deposit' ? '+' : '-'}$${parseFloat(trans.amount).toFixed(2)}
                             </strong>
@@ -8108,7 +8108,7 @@ async function loadTransactions() {
 async function loadBankAccountsForSelect(selectId) {
     try {
         if (!checkFinancialAuth()) return;
-        
+
         const response = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
         if (!response.ok) {
             await handleFinancialApiError(response, 'Failed to load bank accounts');
@@ -8117,10 +8117,10 @@ async function loadBankAccountsForSelect(selectId) {
         const accounts = await response.json();
         const select = document.getElementById(selectId);
         if (!select) return;
-        
+
         select.innerHTML = '<option value="">Select Account / Seleccionar Cuenta</option>' +
             accounts.map(acc => `<option value="${acc.id}">${acc.account_name} (${acc.bank_name})</option>`).join('');
-        
+
         // Also populate filter selects
         if (selectId === 'transactionBankAccount') {
             const filterSelect = document.getElementById('filterTransactionAccount');
@@ -8159,7 +8159,7 @@ async function editTransaction(id) {
         const transactions = await response.json();
         const transaction = transactions.find(t => t.id === id);
         if (!transaction) throw new Error('Transaction not found');
-        
+
         editingTransactionId = id;
         document.getElementById('transactionBankAccount').value = transaction.bank_account_id;
         document.getElementById('transactionDate').value = transaction.transaction_date;
@@ -8170,7 +8170,7 @@ async function editTransaction(id) {
         document.getElementById('transactionPayee').value = transaction.payee || '';
         document.getElementById('transactionCategory').value = transaction.category || '';
         document.getElementById('transactionNotes').value = transaction.notes || '';
-        
+
         loadBankAccountsForSelect('transactionBankAccount');
         showTransactionForm();
     } catch (error) {
@@ -8183,21 +8183,21 @@ async function deleteTransaction(id) {
     if (!confirm('Are you sure you want to delete this transaction? / ¿Está seguro de que desea eliminar esta transacción?')) {
         return;
     }
-    
+
     try {
         if (!checkFinancialAuth()) return;
-        
+
         const response = await fetch(`/api/transactions/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
             const handled = await handleFinancialApiError(response, 'Failed to delete transaction');
             if (handled) return;
             throw new Error('Failed to delete transaction');
         }
-        
+
         showMessage('Transaction deleted successfully / Transacción eliminada exitosamente', 'success');
         loadTransactions();
         loadBankAccounts(); // Update account balances
@@ -8211,7 +8211,7 @@ async function saveTransaction(event) {
     event.preventDefault();
     try {
         if (!checkFinancialAuth()) return;
-        
+
         const transactionData = {
             bank_account_id: parseInt(document.getElementById('transactionBankAccount').value),
             transaction_date: document.getElementById('transactionDate').value,
@@ -8223,25 +8223,25 @@ async function saveTransaction(event) {
             category: document.getElementById('transactionCategory').value,
             notes: document.getElementById('transactionNotes').value
         };
-        
-        const url = editingTransactionId 
+
+        const url = editingTransactionId
             ? `/api/transactions/${editingTransactionId}`
             : '/api/transactions';
         const method = editingTransactionId ? 'PUT' : 'POST';
-        
+
         const response = await fetch(url, {
             method: method,
             headers: getAuthHeaders(),
             body: JSON.stringify(transactionData)
         });
-        
+
         if (!response.ok) {
             const handled = await handleFinancialApiError(response, 'Failed to save transaction');
             if (handled) return;
             throw new Error('Failed to save transaction');
         }
-        
-        showMessage(editingTransactionId 
+
+        showMessage(editingTransactionId
             ? 'Transaction updated successfully / Transacción actualizada exitosamente'
             : 'Transaction saved successfully / Transacción guardada exitosamente', 'success');
         editingTransactionId = null;
@@ -8258,10 +8258,10 @@ async function saveTransaction(event) {
 async function loadUnreconciledTransactions() {
     const accountId = document.getElementById('reconcileBankAccount').value;
     if (!accountId) return;
-    
+
     try {
         if (!checkFinancialAuth()) return;
-        
+
         // Load account balance
         const accountsResponse = await fetch('/api/bank-accounts', { headers: getAuthHeaders() });
         if (accountsResponse.ok) {
@@ -8273,7 +8273,7 @@ async function loadUnreconciledTransactions() {
         } else {
             await handleFinancialApiError(accountsResponse, 'Failed to load account balance');
         }
-        
+
         // Load unreconciled transactions
         const response = await fetch(`/api/transactions?bank_account_id=${accountId}&reconciled=false`, { headers: getAuthHeaders() });
         if (!response.ok) {
@@ -8283,12 +8283,12 @@ async function loadUnreconciledTransactions() {
         const transactions = await response.json();
         const container = document.getElementById('unreconciledTransactions');
         if (!container) return;
-        
+
         if (transactions.length === 0) {
             container.innerHTML = '<p>No unreconciled transactions found.</p>';
             return;
         }
-        
+
         container.innerHTML = transactions.map(trans => `
             <label style="display: flex; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--light-gray);">
                 <input type="checkbox" name="reconcile_trans" value="${trans.id}" style="margin-right: 1rem;">
@@ -8307,10 +8307,10 @@ async function reconcileAccount(event) {
     event.preventDefault();
     try {
         if (!checkFinancialAuth()) return;
-        
+
         const accountId = document.getElementById('reconcileBankAccount').value;
         const selectedTransactions = Array.from(document.querySelectorAll('input[name="reconcile_trans"]:checked')).map(cb => parseInt(cb.value));
-        
+
         const reconciliationData = {
             bank_account_id: parseInt(accountId),
             statement_date: document.getElementById('statementDate').value,
@@ -8318,19 +8318,19 @@ async function reconcileAccount(event) {
             transaction_ids: selectedTransactions,
             notes: document.getElementById('reconciliationNotes').value
         };
-        
+
         const response = await fetch('/api/reconciliation', {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(reconciliationData)
         });
-        
+
         if (!response.ok) {
             const handled = await handleFinancialApiError(response, 'Failed to reconcile account');
             if (handled) return;
             throw new Error('Failed to reconcile account');
         }
-        
+
         const result = await response.json();
         showMessage(`Reconciliation completed. Difference: $${result.difference.toFixed(2)} / Conciliación completada. Diferencia: $${result.difference.toFixed(2)}`, 'success');
         document.getElementById('reconciliationForm').reset();
@@ -8349,10 +8349,10 @@ async function searchReceipt() {
         showMessage('Please enter a receipt number or payment ID / Por favor ingrese un número de recibo o ID de pago', 'error');
         return;
     }
-    
+
     try {
         if (!checkFinancialAuth()) return;
-        
+
         // Try as payment ID first
         let paymentId = parseInt(search);
         if (isNaN(paymentId)) {
@@ -8366,19 +8366,19 @@ async function searchReceipt() {
                 await handleFinancialApiError(paymentsResponse, 'Failed to search payments');
             }
         }
-        
+
         if (!paymentId) {
             showMessage('Receipt not found / Recibo no encontrado', 'error');
             return;
         }
-        
+
         const response = await fetch(`/api/payments/${paymentId}/receipt`, { headers: getAuthHeaders() });
         if (!response.ok) {
             const handled = await handleFinancialApiError(response, 'Receipt not found');
             if (handled) return;
             throw new Error('Receipt not found');
         }
-        
+
         const receipt = await response.json();
         displayReceipt(receipt);
     } catch (error) {
@@ -8390,7 +8390,7 @@ async function searchReceipt() {
 function displayReceipt(receipt) {
     const container = document.getElementById('receiptDisplay');
     if (!container) return;
-    
+
     container.style.display = 'block';
     container.innerHTML = `
         <div style="text-align: center; border: 2px solid var(--primary-color); padding: 2rem; border-radius: 8px;">
@@ -8415,53 +8415,53 @@ function displayReceipt(receipt) {
 // Initialize financial page when shown
 function initFinancialPage() {
     console.log('💰💰💰 INITIALIZING FINANCIAL PAGE - AGGRESSIVE FIX 💰💰💰');
-    
+
     // Check authentication first
     if (!authToken || !currentStaff) {
         showMessage('Please log in to access this feature / Por favor inicie sesión para acceder a esta función', 'error');
         checkAuth();
         return;
     }
-    
+
     // Check if user is admin
     if (currentStaff.role !== 'admin') {
         showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
         showPage('dashboard');
         return;
     }
-    
+
     const financialPage = document.getElementById('financial');
     if (!financialPage) {
         console.error('❌ Financial page element not found!');
         return;
     }
-    
+
     // CRITICAL: Check if element is actually in the DOM
     if (!financialPage.parentElement) {
         console.error('❌❌❌ FINANCIAL PAGE HAS NO PARENT! ELEMENT NOT IN DOM! ❌❌❌');
         return;
     }
-    
+
     // Check if element is connected to the document
     if (!financialPage.isConnected) {
         console.error('❌❌❌ FINANCIAL PAGE NOT CONNECTED TO DOCUMENT! ❌❌❌');
         return;
     }
-    
+
     console.log('✅ Financial page is in DOM, parent:', financialPage.parentElement?.tagName, financialPage.parentElement?.className);
-    
+
     // AGGRESSIVE FIX - Same approach as incidents page
     console.log('🔴 Starting aggressive financial page fix...');
-    
+
     // Ensure main container is visible and has dimensions
     const mainContainer = financialPage.closest('main.container');
     if (mainContainer) {
         const containerHeight = mainContainer.offsetHeight;
         const containerWidth = mainContainer.offsetWidth;
         console.log('🔍 Main container dimensions:', { height: containerHeight, width: containerWidth });
-        
+
         mainContainer.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; min-height: 600px !important; width: 100% !important;';
-        
+
         // If container has zero dimensions, force it
         if (containerHeight === 0 || containerWidth === 0) {
             mainContainer.style.cssText += 'height: 600px !important; padding: 2rem !important;';
@@ -8469,7 +8469,7 @@ function initFinancialPage() {
         }
         console.log('✅ main.container forced visible');
     }
-    
+
     // Also check mainApp
     const mainApp = document.getElementById('mainApp');
     if (mainApp) {
@@ -8481,34 +8481,34 @@ function initFinancialPage() {
             console.log('⚠️ MainApp had zero dimensions - forced height');
         }
     }
-    
+
     // Force financial page visible with cssText (same as incidents)
     financialPage.classList.add('active');
     financialPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 500px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important;';
     console.log('✅ Financial page forced visible with cssText');
-    
+
     // Show ALL direct children using cssText
     Array.from(financialPage.children).forEach((child, index) => {
         console.log(`✅ Financial child ${index}:`, child.tagName, child.id || child.className);
-        
+
         if (child.tagName === 'SCRIPT') {
             return;
         }
-        
+
         let displayValue = 'block';
         if (child.tagName === 'BUTTON') {
             displayValue = 'inline-block';
         } else if (child.classList.contains('button-group')) {
             displayValue = 'flex';
         }
-        
+
         const beforeHeight = child.offsetHeight;
         const beforeWidth = child.offsetWidth;
         console.log(`    Before: height=${beforeHeight}, width=${beforeWidth}`);
-        
+
         // Use cssText to completely replace styles
         child.style.cssText = `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important;`;
-        
+
         // Add specific styles for specific elements
         if (child.tagName === 'H2') {
             child.style.cssText += 'margin-bottom: 1rem !important; font-size: 1.5rem !important; font-weight: bold !important; min-height: 30px !important;';
@@ -8519,86 +8519,86 @@ function initFinancialPage() {
         } else if (child.classList.contains('financial-tab')) {
             child.style.cssText += 'min-height: 300px !important;';
         }
-        
+
         const afterHeight = child.offsetHeight;
         const afterWidth = child.offsetWidth;
         console.log(`    After: height=${afterHeight}, width=${afterWidth}`);
-        
+
         if (afterHeight === 0 && afterWidth === 0) {
             console.error(`    ❌❌❌ CHILD ${index} STILL HAS ZERO DIMENSIONS! ❌❌❌`);
         }
     });
-    
+
     // Specifically target key elements
     const h2 = financialPage.querySelector('h2');
     const p = financialPage.querySelector('p');
     const buttonGroup = financialPage.querySelector('.button-group');
     const firstTab = financialPage.querySelector('.financial-tab');
-    
+
     if (h2) {
         h2.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; font-size: 1.5rem !important; font-weight: bold !important; min-height: 30px !important; height: auto !important;';
         console.log('✅ H2 forced visible, height:', h2.offsetHeight);
     }
-    
+
     if (p) {
         p.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 2rem !important; min-height: 20px !important; height: auto !important;';
         console.log('✅ P forced visible, height:', p.offsetHeight);
     }
-    
+
     if (buttonGroup) {
         buttonGroup.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 2rem !important; padding-bottom: 1rem !important; border-bottom: 2px solid var(--light-gray) !important; min-height: 50px !important; height: auto !important;';
         console.log('✅ Button group forced visible, height:', buttonGroup.offsetHeight);
     }
-    
+
     if (firstTab) {
         firstTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 300px !important; height: auto !important;';
         console.log('✅ First tab forced visible, height:', firstTab.offsetHeight);
     }
-    
+
     // CRITICAL FIX: Show the first tab (accounts) by default
     // All tabs are hidden by default, so we need to explicitly show one
     console.log('🔴 CRITICAL: Showing accounts tab by default...');
-    
+
     // Force ALL financial-tab divs to be visible with explicit content
     const allTabs = financialPage.querySelectorAll('.financial-tab');
     console.log('🔍 Found financial tabs:', allTabs.length);
     allTabs.forEach((tab, idx) => {
         const computedStyle = window.getComputedStyle(tab);
         console.log(`  Tab ${idx}:`, tab.id, 'display:', computedStyle.display, 'visibility:', computedStyle.visibility, 'height:', tab.offsetHeight);
-        
+
         // Force visible with explicit dimensions
         tab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important;';
-        
+
         // Force ALL children of each tab to be visible
         Array.from(tab.children).forEach((child) => {
             child.style.setProperty('display', 'block', 'important');
             child.style.setProperty('visibility', 'visible', 'important');
             child.style.setProperty('opacity', '1', 'important');
         });
-        
+
         console.log(`  After fix - Tab ${idx} height:`, tab.offsetHeight);
     });
-    
+
     // Now show only the accounts tab (this will hide the others)
     showFinancialTab('accounts');
-    
+
     // AGGRESSIVE: Directly ensure bankAccountsList shows empty state immediately
     setTimeout(() => {
         const bankAccountsList = document.getElementById('bankAccountsList');
         const accountsTab = document.getElementById('financialAccounts');
-        
+
         if (accountsTab) {
             accountsTab.style.setProperty('display', 'block', 'important');
             accountsTab.style.setProperty('visibility', 'visible', 'important');
             accountsTab.style.setProperty('opacity', '1', 'important');
         }
-        
+
         if (bankAccountsList) {
             bankAccountsList.style.setProperty('display', 'block', 'important');
             bankAccountsList.style.setProperty('visibility', 'visible', 'important');
             bankAccountsList.style.setProperty('opacity', '1', 'important');
             bankAccountsList.style.setProperty('min-height', '200px', 'important');
-            
+
             // If empty, show empty state immediately
             if (!bankAccountsList.innerHTML || bankAccountsList.innerHTML.trim() === '') {
                 bankAccountsList.innerHTML = '<div class="empty-state" style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
@@ -8608,7 +8608,7 @@ function initFinancialPage() {
             console.error('❌❌❌ bankAccountsList still not found after all fixes!');
         }
     }, 200);
-    
+
     // Double-check accounts tab is visible after showFinancialTab
     setTimeout(() => {
         const accountsTab = document.getElementById('financialAccounts');
@@ -8620,7 +8620,7 @@ function initFinancialPage() {
                 height: accountsTab.offsetHeight,
                 width: accountsTab.offsetWidth
             });
-            
+
             // If still hidden, force it
             if (finalStyle.display === 'none' || accountsTab.offsetHeight === 0) {
                 console.error('⚠️ Accounts tab still hidden - forcing visible!');
@@ -8628,23 +8628,23 @@ function initFinancialPage() {
             }
         }
     }, 300);
-    
+
     // Verify dimensions after a delay and force if still zero
     setTimeout(() => {
         const computedHeight = financialPage.offsetHeight;
         const computedWidth = financialPage.offsetWidth;
         console.log('🔍 Final financial page dimensions:', { height: computedHeight, width: computedWidth });
-        
+
         if (computedHeight === 0 || computedWidth === 0) {
             console.error('❌❌❌ FINANCIAL PAGE STILL HAS ZERO DIMENSIONS! Applying LAST RESORT FIX... ❌❌❌');
-            
+
             // LAST RESORT: Force absolute positioning and explicit dimensions
             financialPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; height: 600px !important; min-height: 600px !important; width: 100% !important; max-width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important; box-sizing: border-box !important;';
-            
+
             // Force ALL children to have explicit heights
             Array.from(financialPage.children).forEach((child) => {
                 if (child.tagName === 'SCRIPT') return;
-                
+
                 const childHeight = child.offsetHeight;
                 if (childHeight === 0) {
                     if (child.tagName === 'H2') {
@@ -8660,14 +8660,14 @@ function initFinancialPage() {
                     }
                 }
             });
-            
+
             // Check again after forcing
             setTimeout(() => {
                 const finalHeight = financialPage.offsetHeight;
                 const finalWidth = financialPage.offsetWidth;
                 const computedStyle = window.getComputedStyle(financialPage);
-                console.log('🔍 After last resort fix:', { 
-                    height: finalHeight, 
+                console.log('🔍 After last resort fix:', {
+                    height: finalHeight,
                     width: finalWidth,
                     display: computedStyle.display,
                     visibility: computedStyle.visibility,
@@ -8675,7 +8675,7 @@ function initFinancialPage() {
                     position: computedStyle.position,
                     zIndex: computedStyle.zIndex
                 });
-                
+
                 if (finalHeight > 0 && finalWidth > 0) {
                     console.log('✅✅✅ LAST RESORT FIX WORKED! ✅✅✅');
                 } else {
@@ -8689,7 +8689,7 @@ function initFinancialPage() {
                         top: computedStyle.top,
                         left: computedStyle.left
                     });
-                    
+
                     // FINAL ATTEMPT: Clone and replace the element
                     console.log('🔄 Attempting to clone and replace element...');
                     const clone = financialPage.cloneNode(true);
@@ -8702,7 +8702,7 @@ function initFinancialPage() {
             console.log('✅✅✅ FINANCIAL PAGE HAS DIMENSIONS! ✅✅✅');
         }
     }, 200);
-    
+
     // Show the accounts tab (this will also load bank accounts)
     showFinancialTab('accounts');
 }
