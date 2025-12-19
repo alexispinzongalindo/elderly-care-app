@@ -1702,6 +1702,23 @@ async function saveNewResident(event) {
     console.log('🔍 FINAL CARRIER VALUE TO SAVE:', JSON.stringify(carrierValue));
     console.log('═══════════════════════════════════════════════════════');
 
+    // FINAL CHECK: Re-read carrier value directly from element right before creating object
+    let finalCarrierValue = carrierValue;
+    if (carrierEl) {
+        const currentValue = carrierEl.value;
+        console.log('🔍 FINAL CHECK - Re-reading carrier from element:', currentValue);
+        console.log('🔍 FINAL CHECK - Element selectedIndex:', carrierEl.selectedIndex);
+        console.log('🔍 FINAL CHECK - Selected option:', carrierEl.options[carrierEl.selectedIndex]?.text || 'None');
+        if (currentValue !== carrierValue) {
+            console.warn('⚠️ Carrier value changed! Was:', carrierValue, 'Now:', currentValue);
+            finalCarrierValue = currentValue === '' ? null : currentValue;
+        } else {
+            finalCarrierValue = carrierValue;
+        }
+    } else {
+        console.error('❌ FINAL CHECK - carrierEl is NULL, cannot re-read value!');
+    }
+
     const resident = {
         first_name: firstNameEl.value.trim(),
         last_name: lastNameEl.value.trim(),
@@ -1711,8 +1728,8 @@ async function saveNewResident(event) {
         bed_number: bedEl ? bedEl.value : '',
         emergency_contact_name: emergencyEl ? emergencyEl.value : '',
         emergency_contact_phone: phoneEl ? phoneEl.value : '',
-        // CRITICAL: Always include carrier field (even if null) - don't let it be undefined
-        emergency_contact_carrier: carrierValue !== undefined ? carrierValue : null,  // Explicitly ensure it's never undefined
+        // CRITICAL: Use finalCarrierValue (re-read right before creating object)
+        emergency_contact_carrier: finalCarrierValue !== undefined ? finalCarrierValue : null,
         emergency_contact_relation: relationEl ? relationEl.value : '',
         emergency_contact_email: emailEl ? emailEl.value : '',
         insurance_provider: insuranceProviderEl ? insuranceProviderEl.value : null,
@@ -1727,6 +1744,7 @@ async function saveNewResident(event) {
     console.log('📦 Resident data to save:', resident);
     console.log('📦 Carrier in resident object:', resident.emergency_contact_carrier);
     console.log('📦 Full resident JSON:', JSON.stringify(resident, null, 2));
+    console.log('🔍 FINAL CHECK - emergency_contact_carrier in resident object:', resident.emergency_contact_carrier);
     console.log('Date of birth:', dateOfBirth);
 
     try {
