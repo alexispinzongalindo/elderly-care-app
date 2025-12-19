@@ -674,10 +674,10 @@ def residents():
             cursor.execute('''
                 INSERT INTO residents (
                     first_name, last_name, date_of_birth, room_number, bed_number,
-                    gender, emergency_contact_name, emergency_contact_phone,
+                    gender, emergency_contact_name, emergency_contact_phone, emergency_contact_carrier,
                     emergency_contact_relation, emergency_contact_email, insurance_provider, insurance_number,
                     medical_conditions, allergies, dietary_restrictions, notes, photo_path
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 data.get('first_name'),
                 data.get('last_name'),
@@ -687,6 +687,7 @@ def residents():
                 data.get('gender'),
                 data.get('emergency_contact_name'),
                 data.get('emergency_contact_phone'),
+                data.get('emergency_contact_carrier'),  # Carrier for SMS
                 data.get('emergency_contact_relation'),
                 data.get('emergency_contact_email'),
                 data.get('insurance_provider'),
@@ -946,7 +947,8 @@ def log_medication(id):
                     phone_str = emergency_contact_row['emergency_contact_phone'].strip() if emergency_contact_row['emergency_contact_phone'] else None
                     emergency_contact_phone = phone_str if phone_str else None
                     emergency_contact_carrier = emergency_contact_row['emergency_contact_carrier'] if emergency_contact_row['emergency_contact_carrier'] else None
-                print(f"📱 [Background] Emergency contact phone: {emergency_contact_phone if emergency_contact_phone else 'None'} (carrier: {emergency_contact_carrier or 'default'})", flush=True)
+                print(f"📱 [Background] Emergency contact phone: {emergency_contact_phone if emergency_contact_phone else 'None'}", flush=True)
+                print(f"📱 [Background] Emergency contact carrier from DB: '{emergency_contact_carrier}' (will use: {emergency_contact_carrier or 'default verizon'})", flush=True)
                 
                 # Fallback: If no recipients found, try to get ANY staff email
                 if not staff_emails:
