@@ -693,14 +693,25 @@ body:has(.nav-link[data-page="incidents"].active) #incidents {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    min-height: 100px !important;
+    min-height: 200px !important;
     width: 100% !important;
     position: relative !important;
     z-index: 1 !important;
     margin-top: 2rem !important;
-    padding: 1rem !important;
+    padding: 2rem !important;
     background: var(--white) !important;
     border-radius: 8px !important;
+}
+
+/* Force empty state to be visible */
+#carenotes .empty-state {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    padding: 2rem !important;
+    text-align: center !important;
+    color: var(--dark-gray) !important;
+    min-height: 150px !important;
 }
 
 h2 {
