@@ -60,7 +60,7 @@
             </div>
             <div class="button-group">
                 <button class="btn btn-primary" onclick="selectResident()" data-translate="common.continue">Continue</button>
-                <button class="btn btn-secondary" onclick="showAddResidentForm()" data-translate="resident.addNew">+ Add New Resident</button>
+                <button class="btn btn-secondary" onclick="showAddResidentForm(true)" data-translate="resident.addNew">+ Add New Resident</button>
             </div>
             
             <!-- Add Resident Form -->
@@ -154,12 +154,27 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label data-translate="resident.emergencyPhone">Emergency Contact Phone</label>
-                            <input type="tel" id="newEmergencyPhone">
+                            <input type="tel" id="newEmergencyPhone" placeholder="(787) 555-1234">
                         </div>
                         <div class="form-group">
-                            <label for="newEmergencyRelation" data-translate="resident.emergencyRelation">Relation</label>
-                            <input type="text" id="newEmergencyRelation" data-translate-placeholder="resident.relation.placeholder" placeholder="e.g., Son, Daughter">
+                            <label for="newEmergencyCarrier">Phone Carrier (for SMS)</label>
+                            <select id="newEmergencyCarrier" class="form-control">
+                                <option value="">-- Select Carrier --</option>
+                                <option value="verizon">Verizon</option>
+                                <option value="att">AT&T</option>
+                                <option value="t-mobile">T-Mobile</option>
+                                <option value="sprint">Sprint</option>
+                                <option value="us cellular">US Cellular</option>
+                                <option value="cricket">Cricket</option>
+                                <option value="boost">Boost Mobile</option>
+                                <option value="virgin">Virgin Mobile</option>
+                                <option value="metro">MetroPCS</option>
+                            </select>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newEmergencyRelation" data-translate="resident.emergencyRelation">Relation</label>
+                        <input type="text" id="newEmergencyRelation" data-translate-placeholder="resident.relation.placeholder" placeholder="e.g., Son, Daughter">
                     </div>
                     <div class="form-group">
                         <label data-translate="resident.emergencyEmail">Emergency Contact Email</label>
@@ -466,12 +481,27 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label data-translate="resident.emergencyPhone">Emergency Contact Phone</label>
-                                <input type="tel" id="newEmergencyPhonePage">
+                                <input type="tel" id="newEmergencyPhonePage" placeholder="(787) 555-1234">
                             </div>
                             <div class="form-group">
-                                <label for="newEmergencyRelationPage" data-translate="resident.emergencyRelation">Relation</label>
-                                <input type="text" id="newEmergencyRelationPage" data-translate-placeholder="resident.relation.placeholder" placeholder="e.g., Son, Daughter">
+                                <label for="newEmergencyCarrierPage">Phone Carrier (for SMS)</label>
+                                <select id="newEmergencyCarrierPage" class="form-control">
+                                    <option value="">-- Select Carrier --</option>
+                                    <option value="verizon">Verizon</option>
+                                    <option value="att">AT&T</option>
+                                    <option value="t-mobile">T-Mobile</option>
+                                    <option value="sprint">Sprint</option>
+                                    <option value="us cellular">US Cellular</option>
+                                    <option value="cricket">Cricket</option>
+                                    <option value="boost">Boost Mobile</option>
+                                    <option value="virgin">Virgin Mobile</option>
+                                    <option value="metro">MetroPCS</option>
+                                </select>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newEmergencyRelationPage" data-translate="resident.emergencyRelation">Relation</label>
+                            <input type="text" id="newEmergencyRelationPage" data-translate-placeholder="resident.relation.placeholder" placeholder="e.g., Son, Daughter">
                         </div>
                         <div class="form-group">
                             <label data-translate="resident.emergencyEmail">Emergency Contact Email</label>
@@ -525,8 +555,23 @@
                             </div>
                             <div class="form-group">
                                 <label data-translate="staff.phone">Phone</label>
-                                <input type="tel" id="staffPhone">
+                                <input type="tel" id="staffPhone" placeholder="(787) 555-1234">
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="staffPhoneCarrier">Phone Carrier (for SMS)</label>
+                            <select id="staffPhoneCarrier" class="form-control">
+                                <option value="">-- Select Carrier --</option>
+                                <option value="verizon">Verizon</option>
+                                <option value="att">AT&T</option>
+                                <option value="t-mobile">T-Mobile</option>
+                                <option value="sprint">Sprint</option>
+                                <option value="us cellular">US Cellular</option>
+                                <option value="cricket">Cricket</option>
+                                <option value="boost">Boost Mobile</option>
+                                <option value="virgin">Virgin Mobile</option>
+                                <option value="metro">MetroPCS</option>
+                            </select>
                         </div>
                         <div class="form-row">
                             <div class="form-group">

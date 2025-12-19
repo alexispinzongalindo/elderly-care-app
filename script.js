@@ -1271,20 +1271,22 @@ async function loadCurrentResidentInfo(residentId) {
     }
 }
 
-function showAddResidentForm() {
+function showAddResidentForm(isNewResident = false) {
     console.log('%c📝 showAddResidentForm() CALLED!', 'background: #ff00ff; color: #fff; font-size: 16px; padding: 5px;');
+    console.log('isNewResident parameter:', isNewResident);
     
-    // Store the current editingResidentId to prevent it from being lost
-    const wasEditing = editingResidentId !== null && editingResidentId !== undefined;
-    const savedEditingId = editingResidentId;
-    
-    console.log('showAddResidentForm called. editingResidentId:', editingResidentId, 'wasEditing:', wasEditing);
-    
-    // Only reset editingResidentId if it's not already set (i.e., when adding new, not editing)
-    if (!wasEditing) {
+    // If explicitly adding a new resident, always clear editing state
+    if (isNewResident) {
+        console.log('🆕 Adding NEW resident - clearing all editing state');
         editingResidentId = null;
         
-        // Reset form titles only when adding new
+        // Clear form data attributes
+        const residentFormPage = document.getElementById('addResidentFormPage');
+        const residentFormModal = document.getElementById('addResidentForm');
+        if (residentFormPage) delete residentFormPage.dataset.editingId;
+        if (residentFormModal) delete residentFormModal.dataset.editingId;
+        
+        // Reset form titles
         const formTitleModal = document.querySelector('#addResidentForm h3');
         if (formTitleModal) {
             formTitleModal.textContent = t('resident.add');
@@ -1295,12 +1297,37 @@ function showAddResidentForm() {
             formTitlePage.textContent = t('resident.add');
         }
         
-        // Reset forms only when adding new
+        // Reset forms
         resetResidentForm();
     } else {
-        // Restore editingResidentId if it was set (defensive programming)
-        editingResidentId = savedEditingId;
-        console.log('Preserving editingResidentId:', editingResidentId);
+        // Store the current editingResidentId to prevent it from being lost (when editing)
+        const wasEditing = editingResidentId !== null && editingResidentId !== undefined;
+        const savedEditingId = editingResidentId;
+        
+        console.log('showAddResidentForm called. editingResidentId:', editingResidentId, 'wasEditing:', wasEditing);
+        
+        // Only reset editingResidentId if it's not already set (i.e., when adding new, not editing)
+        if (!wasEditing) {
+            editingResidentId = null;
+            
+            // Reset form titles only when adding new
+            const formTitleModal = document.querySelector('#addResidentForm h3');
+            if (formTitleModal) {
+                formTitleModal.textContent = t('resident.add');
+            }
+            
+            const formTitlePage = document.querySelector('#addResidentFormPage h3');
+            if (formTitlePage) {
+                formTitlePage.textContent = t('resident.add');
+            }
+            
+            // Reset forms only when adding new
+            resetResidentForm();
+        } else {
+            // Restore editingResidentId if it was set (defensive programming)
+            editingResidentId = savedEditingId;
+            console.log('Preserving editingResidentId:', editingResidentId);
+        }
     }
     
     // Show form in modal (if in resident selector)
@@ -1323,10 +1350,14 @@ function showAddResidentForm() {
         console.warn('⚠️ Page form element not found!');
     }
     
-    // Final safeguard - restore editingResidentId if it was lost
-    if (wasEditing && editingResidentId !== savedEditingId) {
-        console.warn('⚠️ Restoring lost editingResidentId:', savedEditingId);
-        editingResidentId = savedEditingId;
+    // Final safeguard - restore editingResidentId if it was lost (only if not adding new)
+    if (!isNewResident) {
+        const wasEditing = editingResidentId !== null && editingResidentId !== undefined;
+        const savedEditingId = editingResidentId;
+        if (wasEditing && editingResidentId !== savedEditingId) {
+            console.warn('⚠️ Restoring lost editingResidentId:', savedEditingId);
+            editingResidentId = savedEditingId;
+        }
     }
 }
 
@@ -1414,6 +1445,12 @@ function resetResidentForm() {
     
     // Reset date dropdowns
     ['newBirthYear', 'newBirthMonth', 'newBirthDay', 'newBirthYearPage', 'newBirthMonthPage', 'newBirthDayPage'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    
+    // Reset carrier fields
+    ['newEmergencyCarrier', 'newEmergencyCarrierPage'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
     });
@@ -1511,6 +1548,7 @@ async function saveNewResident(event) {
     const bedEl = usePageForm ? document.getElementById('newBedNumberPage') : document.getElementById('newBedNumber');
     const emergencyEl = usePageForm ? document.getElementById('newEmergencyContactPage') : document.getElementById('newEmergencyContact');
     const phoneEl = usePageForm ? document.getElementById('newEmergencyPhonePage') : document.getElementById('newEmergencyPhone');
+    const carrierEl = usePageForm ? document.getElementById('newEmergencyCarrierPage') : document.getElementById('newEmergencyCarrier');
     const relationEl = usePageForm ? document.getElementById('newEmergencyRelationPage') : document.getElementById('newEmergencyRelation');
     const emailEl = usePageForm ? document.getElementById('newEmergencyEmailPage') : document.getElementById('newEmergencyEmail');
     const conditionsEl = usePageForm ? document.getElementById('newMedicalConditionsPage') : document.getElementById('newMedicalConditions');
@@ -1587,6 +1625,7 @@ async function saveNewResident(event) {
         bed_number: bedEl ? bedEl.value : '',
         emergency_contact_name: emergencyEl ? emergencyEl.value : '',
         emergency_contact_phone: phoneEl ? phoneEl.value : '',
+        emergency_contact_carrier: carrierEl ? carrierEl.value : '',
         emergency_contact_relation: relationEl ? relationEl.value : '',
         emergency_contact_email: emailEl ? emailEl.value : '',
         insurance_provider: insuranceProviderEl ? insuranceProviderEl.value : null,
@@ -3709,6 +3748,7 @@ async function editResident(id) {
         setValue('newBedNumberPage', 'newBedNumber', resident.bed_number);
         setValue('newEmergencyContactPage', 'newEmergencyContact', resident.emergency_contact_name);
         setValue('newEmergencyPhonePage', 'newEmergencyPhone', resident.emergency_contact_phone);
+        setValue('newEmergencyCarrierPage', 'newEmergencyCarrier', resident.emergency_contact_carrier);
         setValue('newEmergencyRelationPage', 'newEmergencyRelation', resident.emergency_contact_relation);
         setValue('newEmergencyEmailPage', 'newEmergencyEmail', resident.emergency_contact_email);
         setValue('newMedicalConditionsPage', 'newMedicalConditions', resident.medical_conditions);
@@ -3944,6 +3984,8 @@ async function editStaff(id) {
         elements.staffUsername.value = staff.username || '';
         elements.staffEmail.value = staff.email || '';
         elements.staffPhone.value = staff.phone || '';
+        const staffPhoneCarrierEl = document.getElementById('staffPhoneCarrier');
+        if (staffPhoneCarrierEl) staffPhoneCarrierEl.value = staff.phone_carrier || '';
         elements.staffRole.value = staff.role || 'caregiver';
         elements.staffActive.checked = staff.active !== 0;
         elements.staffPassword.value = '';
@@ -3971,6 +4013,7 @@ async function saveStaff(event) {
         username: document.getElementById('staffUsername').value,
         email: document.getElementById('staffEmail').value,
         phone: document.getElementById('staffPhone').value,
+        phone_carrier: document.getElementById('staffPhoneCarrier')?.value || '',
         role: document.getElementById('staffRole').value,
         active: document.getElementById('staffActive').checked ? 1 : 0
     };
