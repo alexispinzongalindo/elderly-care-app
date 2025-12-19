@@ -1616,8 +1616,7 @@ async function saveNewResident(event) {
     const insuranceNumberEl = usePageForm ? document.getElementById('newInsuranceNumberPage') : document.getElementById('newInsuranceNumber');
     const notesEl = usePageForm ? document.getElementById('newNotesPage') : document.getElementById('newNotes');
 
-    // Get carrier value and log it for debugging
-    const carrierEl = usePageForm ? document.getElementById('newEmergencyCarrierPage') : document.getElementById('newEmergencyCarrier');
+    // Get carrier value and log it for debugging (carrierEl already declared above at line 1551)
     const carrierValue = carrierEl ? carrierEl.value : '';
     console.log('🔍🔍🔍 CARRIER DEBUGGING 🔍🔍🔍');
     console.log('🔍 usePageForm:', usePageForm);
@@ -3761,12 +3760,12 @@ async function editResident(id) {
         setValue('newBedNumberPage', 'newBedNumber', resident.bed_number);
         setValue('newEmergencyContactPage', 'newEmergencyContact', resident.emergency_contact_name);
         setValue('newEmergencyPhonePage', 'newEmergencyPhone', resident.emergency_contact_phone);
-        
+
         // Log carrier value before setting
         console.log('🔍🔍🔍 LOADING CARRIER VALUE 🔍🔍🔍');
         console.log('🔍 Resident carrier value from API:', resident.emergency_contact_carrier);
         console.log('🔍 Carrier value type:', typeof resident.emergency_contact_carrier);
-        
+
         // Set carrier value with additional logging
         const carrierPageEl = document.getElementById('newEmergencyCarrierPage');
         const carrierModalEl = document.getElementById('newEmergencyCarrier');
@@ -3782,7 +3781,7 @@ async function editResident(id) {
             console.log('🔍 Modal carrier dropdown value after setting:', carrierModalEl.value);
         }
         console.log('🔍🔍🔍 END LOADING CARRIER VALUE 🔍🔍🔍');
-        
+
         setValue('newEmergencyRelationPage', 'newEmergencyRelation', resident.emergency_contact_relation);
         setValue('newEmergencyEmailPage', 'newEmergencyEmail', resident.emergency_contact_email);
         setValue('newMedicalConditionsPage', 'newMedicalConditions', resident.medical_conditions);
