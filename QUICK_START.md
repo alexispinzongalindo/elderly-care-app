@@ -83,10 +83,10 @@ const carrierValue = carrierEl ? carrierEl.value : '';
 
 ### After (ESLint catches it):
 ```javascript
-const carrierEl = usePageForm 
-  ? document.getElementById('newEmergencyCarrierPage') 
+const carrierEl = usePageForm
+  ? document.getElementById('newEmergencyCarrierPage')
   : document.getElementById('newEmergencyCarrier');
-  
+
 // ESLint warns: "carrierEl might be null"
 const carrierValue = carrierEl?.value ?? ''; // Better!
 ```
