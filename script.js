@@ -1549,19 +1549,55 @@ async function saveNewResident(event) {
     const emergencyEl = usePageForm ? document.getElementById('newEmergencyContactPage') : document.getElementById('newEmergencyContact');
     const phoneEl = usePageForm ? document.getElementById('newEmergencyPhonePage') : document.getElementById('newEmergencyPhone');
 
-    // Get carrier element - try both IDs as fallback
-    let carrierEl = usePageForm ? document.getElementById('newEmergencyCarrierPage') : document.getElementById('newEmergencyCarrier');
+    // Get carrier element - try multiple methods to find it
+    let carrierEl = null;
+    const primaryId = usePageForm ? 'newEmergencyCarrierPage' : 'newEmergencyCarrier';
+    const fallbackId = usePageForm ? 'newEmergencyCarrier' : 'newEmergencyCarrierPage';
+    
+    // Try getElementById first
+    carrierEl = document.getElementById(primaryId);
+    
+    // Fallback 1: Try the other form's ID
     if (!carrierEl) {
-        // Fallback: try the other form's element if primary not found
-        carrierEl = usePageForm ? document.getElementById('newEmergencyCarrier') : document.getElementById('newEmergencyCarrierPage');
+        carrierEl = document.getElementById(fallbackId);
         if (carrierEl) {
-            console.warn('⚠️ Carrier element found in fallback form (opposite form)');
+            console.warn('⚠️ Carrier element found using fallback ID:', fallbackId);
         }
     }
+    
+    // Fallback 2: Try querySelector with both IDs
     if (!carrierEl) {
-        console.error('❌ CRITICAL: Carrier element NOT FOUND in either form!');
-        console.error('   Searched for:', usePageForm ? 'newEmergencyCarrierPage' : 'newEmergencyCarrier');
-        console.error('   Fallback searched:', usePageForm ? 'newEmergencyCarrier' : 'newEmergencyCarrierPage');
+        carrierEl = document.querySelector(`#${primaryId}`);
+        if (carrierEl) {
+            console.warn('⚠️ Carrier element found using querySelector:', primaryId);
+        }
+    }
+    
+    // Fallback 3: Try querySelector with fallback ID
+    if (!carrierEl) {
+        carrierEl = document.querySelector(`#${fallbackId}`);
+        if (carrierEl) {
+            console.warn('⚠️ Carrier element found using querySelector fallback:', fallbackId);
+        }
+    }
+    
+    // Fallback 4: Try querySelector with just the select element and check if it's the right one
+    if (!carrierEl) {
+        const allSelects = document.querySelectorAll('select[id*="EmergencyCarrier"]');
+        console.log('🔍 Found select elements with "EmergencyCarrier" in ID:', allSelects.length);
+        if (allSelects.length > 0) {
+            carrierEl = allSelects[0]; // Use the first one found
+            console.warn('⚠️ Carrier element found using querySelector pattern:', carrierEl.id);
+        }
+    }
+    
+    // Final check - if still not found, log detailed error
+    if (!carrierEl) {
+        console.error('❌ CRITICAL: Carrier element NOT FOUND using any method!');
+        console.error('   Primary ID searched:', primaryId);
+        console.error('   Fallback ID searched:', fallbackId);
+        console.error('   All selects in document:', document.querySelectorAll('select').length);
+        console.error('   All elements with "Carrier" in ID:', Array.from(document.querySelectorAll('[id*="Carrier"]')).map(el => el.id));
     }
 
     const relationEl = usePageForm ? document.getElementById('newEmergencyRelationPage') : document.getElementById('newEmergencyRelation');
@@ -1634,7 +1670,7 @@ async function saveNewResident(event) {
     // Get carrier value and log it for debugging (carrierEl already declared above at line 1551)
     // IMPORTANT: Get the raw value first, then normalize
     let carrierValue = null;
-    
+
     // SIMPLE LOGGING - will show even with cached code
     console.log('🔍 SIMPLE CARRIER CHECK - carrierEl exists?', !!carrierEl);
     if (carrierEl) {
