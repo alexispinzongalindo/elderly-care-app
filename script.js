@@ -2538,13 +2538,6 @@ function showPage(pageName) {
                 console.log('✅ main.container forced visible');
             }
             
-            // CRITICAL: Check if test element exists in HTML
-            if (incidentsPage.innerHTML.includes('TEST')) {
-                console.log('✅ TEST element found in innerHTML');
-            } else {
-                console.error('❌ TEST element NOT found in innerHTML!');
-            }
-            
             // Force incidents page to be visible using cssText for maximum control
             incidentsPage.classList.add('active');
             incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
@@ -4111,23 +4104,6 @@ async function loadIncidents() {
         console.log('✅ Page innerHTML length:', incidentsPage.innerHTML.length);
         console.log('✅ Page children count:', incidentsPage.children.length);
         
-        // CRITICAL: Check if test element exists and is visible
-        const testElement = incidentsPage.querySelector('div[style*="TEST"]');
-        if (testElement) {
-            console.log('🔴 TEST ELEMENT EXISTS IN DOM!');
-            console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
-            console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
-            console.log('✅ Test element computed display:', window.getComputedStyle(testElement).display);
-            console.log('✅ Test element computed visibility:', window.getComputedStyle(testElement).visibility);
-            console.log('✅ Test element computed opacity:', window.getComputedStyle(testElement).opacity);
-            console.log('✅ Test element computed height:', window.getComputedStyle(testElement).height);
-            console.log('✅ Test element computed width:', window.getComputedStyle(testElement).width);
-            console.log('✅ Test element parent:', testElement.parentElement?.id);
-            console.log('✅ Test element parent display:', window.getComputedStyle(testElement.parentElement).display);
-        } else {
-            console.error('❌ TEST ELEMENT NOT FOUND IN DOM!');
-            console.error('Available children:', Array.from(incidentsPage.children).map(c => `${c.tagName}#${c.id || ''}.${c.className || ''}`));
-        }
         console.log('✅ Page computed width:', window.getComputedStyle(incidentsPage).width);
         
         // CRITICAL: Force show ALL direct children immediately
@@ -4172,18 +4148,12 @@ async function loadIncidents() {
         
         console.log('🔄 Loading incidents...');
         
-        // CRITICAL: Before loading, verify test element and other content still exist
-        const testElementBefore = incidentsPage.querySelector('div[style*="TEST"]');
+        // Verify key elements exist before loading
         const h2Before = incidentsPage.querySelector('h2');
         const buttonBefore = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
         console.log('🔍 Before loading incidents:');
-        console.log('  Test element exists:', !!testElementBefore);
         console.log('  H2 exists:', !!h2Before);
         console.log('  Button exists:', !!buttonBefore);
-        if (testElementBefore) {
-            console.log('  Test element offsetHeight:', testElementBefore.offsetHeight);
-            console.log('  Test element offsetWidth:', testElementBefore.offsetWidth);
-        }
         
         const container = document.getElementById('incidentsList');
         if (!container) {
@@ -4238,22 +4208,6 @@ async function loadIncidents() {
             console.error('Available buttons:', incidentsPage.querySelectorAll('button'));
         }
         
-        // CRITICAL: Force test element visible if it exists
-        // testElement was already declared at line 2630, reuse it here
-        if (testElement) {
-            // Removed debug red background styling
-            console.log('🔴 TEST ELEMENT FORCED VISIBLE!');
-            console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
-            console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
-            if (testElement.offsetHeight === 0 || testElement.offsetWidth === 0) {
-                console.error('❌❌❌ TEST ELEMENT HAS ZERO DIMENSIONS! ❌❌❌');
-            }
-        } else {
-            console.error('❌ TEST ELEMENT NOT FOUND IN DOM!');
-        }
-        
-        // Check for test element (already checked above at line 2596, removing duplicate)
-        // const testElement already declared above - removed duplicate declaration
         
         // CRITICAL: Also check and fix the main.container parent
         const mainContainer = incidentsPage.closest('main.container');
