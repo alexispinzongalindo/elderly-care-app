@@ -4142,42 +4142,73 @@ async function showIncidentForm() {
 async function loadStaffForIncident() {
     try {
         console.log('🔄 Loading staff for incident form...');
+        
+        // Wait a bit to ensure form is in DOM
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const select = document.getElementById('incidentStaffId');
+        if (!select) {
+            console.error('❌ incidentStaffId select not found in DOM');
+            console.error('   Trying to find form element...');
+            const form = document.getElementById('incidentForm');
+            console.error('   Form element exists:', !!form);
+            if (form) {
+                console.error('   Form display:', window.getComputedStyle(form).display);
+                console.error('   Form visibility:', window.getComputedStyle(form).visibility);
+            }
+            return;
+        }
+        
+        console.log('✅ Found incidentStaffId select element');
+        
         const response = await fetch('/api/staff', { headers: getAuthHeaders() });
         if (!response.ok) {
-            console.error('❌ Failed to load staff:', response.status);
+            const errorText = await response.text();
+            console.error('❌ Failed to load staff:', response.status, errorText);
+            select.innerHTML = '<option value="">-- Error loading staff --</option>';
             return;
         }
         
         const staffList = await response.json();
         console.log('✅ Loaded staff (all):', staffList.length);
+        console.log('   Staff list:', staffList.map(s => ({ id: s.id, name: s.full_name, active: s.active })));
         
         // Filter to only active staff
         const activeStaff = staffList.filter(staff => staff.active === 1 || staff.active === true);
         console.log('✅ Active staff:', activeStaff.length);
-        
-        const select = document.getElementById('incidentStaffId');
-        if (!select) {
-            console.error('❌ incidentStaffId select not found');
-            return;
-        }
+        console.log('   Active staff list:', activeStaff.map(s => ({ id: s.id, name: s.full_name })));
         
         select.innerHTML = '<option value="">-- Select Staff / Seleccionar Personal --</option>';
         
         // Set current user as default
         const currentStaff = JSON.parse(localStorage.getItem('currentStaff') || '{}');
+        console.log('   Current staff ID:', currentStaff.id);
         
-        activeStaff.forEach(staff => {
+        if (activeStaff.length === 0) {
+            console.warn('⚠️ No active staff found! Adding placeholder option.');
             const option = document.createElement('option');
-            option.value = staff.id;
-            option.textContent = `${staff.full_name} (${staff.role})`;
-            if (staff.id === currentStaff.id) {
-                option.selected = true;
-            }
+            option.value = '';
+            option.textContent = '-- No active staff available --';
+            option.disabled = true;
             select.appendChild(option);
-        });
+        } else {
+            activeStaff.forEach(staff => {
+                const option = document.createElement('option');
+                option.value = staff.id;
+                option.textContent = `${staff.full_name} (${staff.role})`;
+                if (staff.id === currentStaff.id) {
+                    option.selected = true;
+                    console.log('   Selected current staff:', staff.full_name);
+                }
+                select.appendChild(option);
+            });
+        }
+        
         console.log('✅ Staff dropdown populated with', activeStaff.length, 'active staff members');
+        console.log('   Select element now has', select.options.length, 'options');
     } catch (error) {
         console.error('❌ Error loading staff for incident:', error);
+        console.error('   Error stack:', error.stack);
         throw error; // Re-throw so caller knows it failed
     }
 }
@@ -4185,9 +4216,30 @@ async function loadStaffForIncident() {
 async function loadResidentsForIncident() {
     try {
         console.log('🔄 Loading residents for incident form...');
+        
+        // Wait a bit to ensure form is in DOM
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const select = document.getElementById('incidentResidents');
+        if (!select) {
+            console.error('❌ incidentResidents select not found in DOM');
+            console.error('   Trying to find form element...');
+            const form = document.getElementById('incidentForm');
+            console.error('   Form element exists:', !!form);
+            if (form) {
+                console.error('   Form display:', window.getComputedStyle(form).display);
+                console.error('   Form visibility:', window.getComputedStyle(form).visibility);
+            }
+            return;
+        }
+        
+        console.log('✅ Found incidentResidents select element');
+        
         const response = await fetch('/api/residents?active_only=true', { headers: getAuthHeaders() });
         if (!response.ok) {
-            console.error('❌ Failed to load residents:', response.status);
+            const errorText = await response.text();
+            console.error('❌ Failed to load residents:', response.status, errorText);
+            select.innerHTML = '<option value="">-- Error loading residents --</option>';
             return;
         }
         
@@ -4199,29 +4251,33 @@ async function loadResidentsForIncident() {
             console.log(`  - Resident: ${r.first_name} ${r.last_name} (ID: ${r.id}, Active: ${r.active})`);
         });
         
-        const select = document.getElementById('incidentResidents');
-        if (!select) {
-            console.error('❌ incidentResidents select not found');
-            return;
-        }
-        
-        select.innerHTML = '<option value="">-- Select Residents / Seleccionar Residentes --</option>';
+        // Clear existing options but keep the first placeholder
+        select.innerHTML = '';
         
         if (residents.length === 0) {
             console.warn('⚠️ No active residents found to populate dropdown');
-        }
-        
-        residents.forEach(resident => {
             const option = document.createElement('option');
-            option.value = resident.id;
-            option.textContent = `${resident.first_name} ${resident.last_name}${resident.room_number ? ' - Room ' + resident.room_number : ''}`;
-            // Pre-select current resident if available
-            if (currentResidentId && resident.id == currentResidentId) {
-                option.selected = true;
-            }
+            option.value = '';
+            option.textContent = '-- No active residents available --';
+            option.disabled = true;
             select.appendChild(option);
-        });
+        } else {
+            // Don't add placeholder for multi-select - users need to see all options
+            residents.forEach(resident => {
+                const option = document.createElement('option');
+                option.value = resident.id;
+                option.textContent = `${resident.first_name} ${resident.last_name}${resident.room_number ? ' - Room ' + resident.room_number : ''}`;
+                // Pre-select current resident if available
+                const currentResId = localStorage.getItem('currentResidentId');
+                if (currentResId && resident.id == currentResId) {
+                    option.selected = true;
+                    console.log('   Pre-selected current resident:', resident.first_name, resident.last_name);
+                }
+                select.appendChild(option);
+            });
+        }
         console.log('✅ Residents dropdown populated with', residents.length, 'active resident(s)');
+        console.log('   Select element now has', select.options.length, 'options');
     } catch (error) {
         console.error('❌ Error loading residents for incident:', error);
         throw error; // Re-throw so caller knows it failed
