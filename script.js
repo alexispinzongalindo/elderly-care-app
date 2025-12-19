@@ -4149,7 +4149,12 @@ async function loadStaffForIncident() {
         }
         
         const staffList = await response.json();
-        console.log('✅ Loaded staff:', staffList.length);
+        console.log('✅ Loaded staff (all):', staffList.length);
+        
+        // Filter to only active staff
+        const activeStaff = staffList.filter(staff => staff.active === 1 || staff.active === true);
+        console.log('✅ Active staff:', activeStaff.length);
+        
         const select = document.getElementById('incidentStaffId');
         if (!select) {
             console.error('❌ incidentStaffId select not found');
@@ -4161,7 +4166,7 @@ async function loadStaffForIncident() {
         // Set current user as default
         const currentStaff = JSON.parse(localStorage.getItem('currentStaff') || '{}');
         
-        staffList.forEach(staff => {
+        activeStaff.forEach(staff => {
             const option = document.createElement('option');
             option.value = staff.id;
             option.textContent = `${staff.full_name} (${staff.role})`;
@@ -4170,7 +4175,7 @@ async function loadStaffForIncident() {
             }
             select.appendChild(option);
         });
-        console.log('✅ Staff dropdown populated');
+        console.log('✅ Staff dropdown populated with', activeStaff.length, 'active staff members');
     } catch (error) {
         console.error('❌ Error loading staff for incident:', error);
         throw error; // Re-throw so caller knows it failed
@@ -4187,7 +4192,13 @@ async function loadResidentsForIncident() {
         }
         
         const residents = await response.json();
-        console.log('✅ Loaded residents:', residents.length);
+        console.log('✅ Loaded residents (active only):', residents.length);
+        
+        // Debug: Log each resident
+        residents.forEach(r => {
+            console.log(`  - Resident: ${r.first_name} ${r.last_name} (ID: ${r.id}, Active: ${r.active})`);
+        });
+        
         const select = document.getElementById('incidentResidents');
         if (!select) {
             console.error('❌ incidentResidents select not found');
@@ -4195,6 +4206,10 @@ async function loadResidentsForIncident() {
         }
         
         select.innerHTML = '<option value="">-- Select Residents / Seleccionar Residentes --</option>';
+        
+        if (residents.length === 0) {
+            console.warn('⚠️ No active residents found to populate dropdown');
+        }
         
         residents.forEach(resident => {
             const option = document.createElement('option');
@@ -4206,7 +4221,7 @@ async function loadResidentsForIncident() {
             }
             select.appendChild(option);
         });
-        console.log('✅ Residents dropdown populated');
+        console.log('✅ Residents dropdown populated with', residents.length, 'active resident(s)');
     } catch (error) {
         console.error('❌ Error loading residents for incident:', error);
         throw error; // Re-throw so caller knows it failed
