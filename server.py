@@ -2526,33 +2526,40 @@ def care_notes():
     cursor = conn.cursor()
     
     if request.method == 'GET':
-        resident_id = request.args.get('resident_id')
-        note_date = request.args.get('date')
-        
-        query = '''
-            SELECT cn.*, r.first_name || ' ' || r.last_name as resident_name,
-                   s.full_name as staff_name
-            FROM daily_care_notes cn
-            JOIN residents r ON cn.resident_id = r.id
-            JOIN staff s ON cn.staff_id = s.id
-            WHERE 1=1
-        '''
-        params = []
-        
-        if resident_id:
-            query += ' AND cn.resident_id = ?'
-            params.append(resident_id)
-        
-        if note_date:
-            query += ' AND cn.note_date = ?'
-            params.append(note_date)
-        
-        query += ' ORDER BY cn.note_date DESC, cn.created_at DESC'
-        
-        cursor.execute(query, params)
-        notes = [dict(row) for row in cursor.fetchall()]
-        conn.close()
-        return jsonify(notes)
+        try:
+            resident_id = request.args.get('resident_id')
+            note_date = request.args.get('date')
+            
+            query = '''
+                SELECT cn.*, r.first_name || ' ' || r.last_name as resident_name,
+                       s.full_name as staff_name
+                FROM daily_care_notes cn
+                JOIN residents r ON cn.resident_id = r.id
+                JOIN staff s ON cn.staff_id = s.id
+                WHERE 1=1
+            '''
+            params = []
+            
+            if resident_id:
+                query += ' AND cn.resident_id = ?'
+                params.append(resident_id)
+            
+            if note_date:
+                query += ' AND cn.note_date = ?'
+                params.append(note_date)
+            
+            query += ' ORDER BY cn.note_date DESC, cn.created_at DESC'
+            
+            cursor.execute(query, params)
+            notes = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            return jsonify(notes)
+        except Exception as e:
+            conn.close()
+            print(f"❌ Error loading care notes: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': f'Error loading care notes: {str(e)}'}), 500
     
     elif request.method == 'POST':
         data = request.json
@@ -2601,19 +2608,26 @@ def care_note_detail(id):
     cursor = conn.cursor()
     
     if request.method == 'GET':
-        cursor.execute('''
-            SELECT cn.*, r.first_name || ' ' || r.last_name as resident_name,
-                   s.full_name as staff_name
-            FROM daily_care_notes cn
-            JOIN residents r ON cn.resident_id = r.id
-            JOIN staff s ON cn.staff_id = s.id
-            WHERE cn.id = ?
-        ''', (id,))
-        note = cursor.fetchone()
-    conn.close()
-    if not note:
-        return jsonify({'error': 'Care note not found'}), 404
-        return jsonify(dict(note))
+        try:
+            cursor.execute('''
+                SELECT cn.*, r.first_name || ' ' || r.last_name as resident_name,
+                       s.full_name as staff_name
+                FROM daily_care_notes cn
+                JOIN residents r ON cn.resident_id = r.id
+                JOIN staff s ON cn.staff_id = s.id
+                WHERE cn.id = ?
+            ''', (id,))
+            note = cursor.fetchone()
+            conn.close()
+            if not note:
+                return jsonify({'error': 'Care note not found'}), 404
+            return jsonify(dict(note))
+        except Exception as e:
+            conn.close()
+            print(f"❌ Error loading care note {id}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': f'Error loading care note: {str(e)}'}), 500
     
     elif request.method == 'PUT':
         data = request.json

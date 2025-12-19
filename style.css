@@ -490,21 +490,13 @@ body {
     display: none !important;
 }
 
-/* Force test div to be visible */
+/* Force test div to be visible (removed red debug styling) */
 #financialTestDiv {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
     position: relative !important;
     z-index: 10000 !important;
-    height: 100px !important;
-    width: 100% !important;
-    background: red !important;
-    color: white !important;
-    padding: 20px !important;
-    margin: 20px 0 !important;
-    font-size: 20px !important;
-    font-weight: bold !important;
 }
 
 /* Force all financial tab content visible */

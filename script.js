@@ -2590,18 +2590,7 @@ function showPage(pageName) {
                 }
             });
             
-            // CRITICAL: Check for test element specifically
-            const testElement = incidentsPage.querySelector('div[style*="TEST"]');
-            if (testElement) {
-                console.log('🔴 TEST ELEMENT FOUND!');
-                console.log('✅ Test element display:', window.getComputedStyle(testElement).display);
-                console.log('✅ Test element visibility:', window.getComputedStyle(testElement).visibility);
-                console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
-                console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
-                console.log('✅ Test element parent:', testElement.parentElement?.id);
-            } else {
-                console.error('❌ TEST ELEMENT NOT FOUND!');
-            }
+            // Removed debug test element checking code
             
             const incidentsH2 = incidentsPage.querySelector('h2');
             const incidentsButton = incidentsPage.querySelector('button[onclick="showIncidentForm()"]');
@@ -2751,18 +2740,7 @@ function showPage(pageName) {
                 console.log(`✅ Child ${idx} (${child.tagName || child.className}) forced, height:`, child.offsetHeight, 'display:', window.getComputedStyle(child).display);
             });
             
-            // Add a test div at the BEGINNING to verify rendering works
-            const existingTestDiv = document.getElementById('financialTestDiv');
-            if (existingTestDiv) {
-                existingTestDiv.remove();
-            }
-            const testDiv = document.createElement('div');
-            testDiv.id = 'financialTestDiv';
-            testDiv.innerHTML = '<strong>🔴 TEST DIV: If you see this red box, rendering works! 🔴</strong>';
-            // Insert at the BEGINNING so we can see it immediately
-            financialPage.insertBefore(testDiv, financialPage.firstChild);
-            // Force it visible with maximum priority
-            testDiv.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: 100px !important; min-height: 100px !important; width: 100% !important; max-width: 100% !important; background: red !important; color: white !important; padding: 20px !important; margin: 20px 0 !important; font-size: 20px !important; font-weight: bold !important; z-index: 10000 !important; position: relative !important; box-sizing: border-box !important;';
+            // Removed debug test div code
             
             // Verify ALL children are visible with detailed logging
             setTimeout(() => {
@@ -2835,7 +2813,7 @@ function showPage(pageName) {
                 // AGGRESSIVE: Find and force form-card visible
                 const formCard = accountsTab.querySelector('.form-card');
                 if (formCard) {
-                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important; border: 3px solid red !important;';
+                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important;';
                     console.log('✅✅✅ FORM-CARD FOUND AND FORCED VISIBLE IN showPage ✅✅✅');
                     
                     // Find and force button visible
@@ -2895,12 +2873,12 @@ function showPage(pageName) {
                     // Create form-card if it doesn't exist
                     formCard = document.createElement('div');
                     formCard.className = 'form-card';
-                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; padding: 2rem !important; background: white !important; border: 5px solid red !important; margin-bottom: 1rem !important; min-height: 200px !important;';
+                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; margin-bottom: 1rem !important; min-height: 200px !important;';
                     formCard.innerHTML = '<h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Bank Accounts / Cuentas Bancarias</h3>';
                     accountsTab.insertBefore(formCard, accountsTab.firstChild);
                     console.log('✅✅✅ CREATED FORM-CARD BECAUSE IT WAS MISSING ✅✅✅');
                 } else {
-                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important; border: 5px solid red !important;';
+                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important;';
                     console.log('✅✅✅ FORM-CARD FOUND AND FORCED VISIBLE ✅✅✅');
                 }
                 
@@ -4263,7 +4241,7 @@ async function loadIncidents() {
         // CRITICAL: Force test element visible if it exists
         // testElement was already declared at line 2630, reuse it here
         if (testElement) {
-            testElement.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; background: red !important; color: white !important; padding: 1rem !important; margin: 1rem 0 !important; font-size: 1.2rem !important; font-weight: bold !important; position: relative !important; z-index: 9999 !important; width: 100% !important; height: auto !important;';
+            // Removed debug red background styling
             console.log('🔴 TEST ELEMENT FORCED VISIBLE!');
             console.log('✅ Test element offsetHeight:', testElement.offsetHeight);
             console.log('✅ Test element offsetWidth:', testElement.offsetWidth);
