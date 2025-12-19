@@ -904,7 +904,13 @@ window.fetch = function(url, options = {}) {
     
     // Add auth headers for API calls (except login)
     if (url.startsWith('/api/') && !url.includes('/auth/login')) {
-        options.headers = { ...getAuthHeaders(), ...(options.headers || {}) };
+        const authHeaders = getAuthHeaders();
+        options.headers = { ...authHeaders, ...(options.headers || {}) };
+        
+        // Debug: Log if token is missing
+        if (!authToken && url.startsWith('/api/')) {
+            console.warn('⚠️ WARNING: Making API request without auth token:', url);
+        }
     }
     
     // Make the request and log response
@@ -2977,10 +2983,29 @@ async function loadDashboard() {
             dateEl.textContent = today.toLocaleDateString(locale, options);
         }
         
+        // Check if user is authenticated
+        if (!authToken) {
+            console.error('No auth token available, redirecting to login');
+            checkAuth();
+            return;
+        }
+        
         const url = currentResidentId 
             ? `${API_URL}/dashboard?resident_id=${currentResidentId}`
             : `${API_URL}/dashboard`;
         const response = await fetch(url, { headers: getAuthHeaders() });
+        
+        // Handle authentication errors
+        if (response.status === 401) {
+            console.error('Authentication failed - token expired or invalid');
+            showMessage('Session expired. Please log in again / Sesión expirada. Por favor inicie sesión nuevamente', 'error');
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentStaff');
+            authToken = null;
+            currentStaff = null;
+            checkAuth();
+            return;
+        }
         
         if (!response.ok) {
             console.error('Dashboard API error:', response.status, response.statusText);
@@ -4722,8 +4747,27 @@ function hideCareNoteForm() {
 
 async function loadCareNotes() {
     try {
+        // Check if user is authenticated
+        if (!authToken) {
+            console.error('No auth token available, redirecting to login');
+            checkAuth();
+            return;
+        }
+        
         const url = currentResidentId ? `/api/care-notes?resident_id=${currentResidentId}` : '/api/care-notes';
         const response = await fetch(url, { headers: getAuthHeaders() });
+        
+        // Handle authentication errors
+        if (response.status === 401) {
+            console.error('Authentication failed - token expired or invalid');
+            showMessage('Session expired. Please log in again / Sesión expirada. Por favor inicie sesión nuevamente', 'error');
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentStaff');
+            authToken = null;
+            currentStaff = null;
+            checkAuth();
+            return;
+        }
         
         if (!response.ok) throw new Error(`Failed to load care notes: ${response.status}`);
         
