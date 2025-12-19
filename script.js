@@ -1616,6 +1616,12 @@ async function saveNewResident(event) {
     const insuranceNumberEl = usePageForm ? document.getElementById('newInsuranceNumberPage') : document.getElementById('newInsuranceNumber');
     const notesEl = usePageForm ? document.getElementById('newNotesPage') : document.getElementById('newNotes');
     
+    // Get carrier value and log it for debugging
+    const carrierValue = carrierEl ? carrierEl.value : '';
+    console.log('🔍 Carrier element:', carrierEl);
+    console.log('🔍 Carrier value:', carrierValue);
+    console.log('🔍 Carrier element found:', carrierEl !== null && carrierEl !== undefined);
+    
     const resident = {
         first_name: firstNameEl.value.trim(),
         last_name: lastNameEl.value.trim(),
@@ -1625,7 +1631,7 @@ async function saveNewResident(event) {
         bed_number: bedEl ? bedEl.value : '',
         emergency_contact_name: emergencyEl ? emergencyEl.value : '',
         emergency_contact_phone: phoneEl ? phoneEl.value : '',
-        emergency_contact_carrier: carrierEl ? carrierEl.value : '',
+        emergency_contact_carrier: carrierValue || null,  // Use null instead of empty string
         emergency_contact_relation: relationEl ? relationEl.value : '',
         emergency_contact_email: emailEl ? emailEl.value : '',
         insurance_provider: insuranceProviderEl ? insuranceProviderEl.value : null,
