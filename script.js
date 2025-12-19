@@ -1686,7 +1686,8 @@ async function saveNewResident(event) {
             console.log('🔄 UPDATING resident with ID:', currentEditingId);
             console.log('═══════════════════════════════════════════════════════');
             console.log('🚨🚨🚨 CARRIER IN REQUEST 🚨🚨🚨');
-            console.log('📤 emergency_contact_carrier:', resident.emergency_contact_carrier);
+            console.log('📤 emergency_contact_carrier:', JSON.stringify(resident.emergency_contact_carrier));
+            console.log('📤 emergency_contact_carrier type:', typeof resident.emergency_contact_carrier);
             console.log('📤 FULL JSON BEING SENT:');
             console.log(JSON.stringify(resident, null, 2));
             console.log('═══════════════════════════════════════════════════════');
