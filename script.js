@@ -2646,6 +2646,39 @@ function showPage(pageName) {
             loadIncidents();
         }
         else if (pageName === 'carenotes') {
+            const carenotesPage = document.getElementById('carenotes');
+            if (!carenotesPage) {
+                console.error('❌ Care notes page not found!');
+                return;
+            }
+            
+            // Force visibility - same approach as incidents page
+            carenotesPage.style.setProperty('display', 'block', 'important');
+            carenotesPage.style.setProperty('visibility', 'visible', 'important');
+            carenotesPage.style.setProperty('opacity', '1', 'important');
+            carenotesPage.style.setProperty('position', 'relative', 'important');
+            carenotesPage.style.setProperty('left', 'auto', 'important');
+            carenotesPage.style.setProperty('z-index', '1', 'important');
+            
+            // Ensure all child elements are visible
+            Array.from(carenotesPage.children).forEach((child) => {
+                if (child.tagName === 'SCRIPT') return;
+                const display = child.tagName === 'BUTTON' ? 'inline-block' : 
+                              child.classList.contains('item-list') ? 'block' : 'block';
+                child.style.setProperty('display', display, 'important');
+                child.style.setProperty('visibility', 'visible', 'important');
+                child.style.setProperty('opacity', '1', 'important');
+            });
+            
+            // Ensure the careNotesList container exists and is visible
+            const careNotesList = document.getElementById('careNotesList');
+            if (careNotesList) {
+                careNotesList.style.setProperty('display', 'block', 'important');
+                careNotesList.style.setProperty('visibility', 'visible', 'important');
+            } else {
+                console.error('❌ careNotesList container not found in DOM!');
+            }
+            
             loadCareNotes();
         }
         else if (pageName === 'notifications') {
@@ -4773,10 +4806,17 @@ async function loadCareNotes() {
         
         const notes = await response.json();
         const container = document.getElementById('careNotesList');
-        if (!container) return;
+        if (!container) {
+            console.error('❌ careNotesList container not found!');
+            return;
+        }
+        
+        // Ensure container is visible
+        container.style.display = 'block';
+        container.style.visibility = 'visible';
         
         if (notes.length === 0) {
-            container.innerHTML = '<div class="empty-state">No care notes found. / No se encontraron notas de cuidado.</div>';
+            container.innerHTML = '<div class="empty-state" style="padding: 2rem; text-align: center; color: #666;"><p>No care notes found. / No se encontraron notas de cuidado.</p><p style="margin-top: 1rem;">Click the "Add Care Note" button above to create your first care note.</p></div>';
             return;
         }
         
