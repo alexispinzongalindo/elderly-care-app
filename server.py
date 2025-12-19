@@ -3034,9 +3034,24 @@ def static_files(path):
         if path.startswith('api/'):
             return jsonify({'error': 'Not found'}), 404
         
+        # In production, prefer minified versions if they exist
+        # Check for .min.js, .min.css files first for faster loading
+        use_minified = os.getenv('USE_MINIFIED', 'true').lower() == 'true'
+        original_path = path
+        if use_minified:
+            # Check if minified version exists and use it instead
+            if path.endswith('.js') and not path.endswith('.min.js'):
+                min_path = path.replace('.js', '.min.js')
+                if os.path.exists(min_path):
+                    path = min_path
+            elif path.endswith('.css') and not path.endswith('.min.css'):
+                min_path = path.replace('.css', '.min.css')
+                if os.path.exists(min_path):
+                    path = min_path
+        
         response = send_from_directory('.', path)
         # Add aggressive cache control for JS and CSS files to prevent caching
-        if path.endswith('.js') or path.endswith('.css') or path.endswith('.html'):
+        if original_path.endswith('.js') or original_path.endswith('.css') or original_path.endswith('.html'):
             response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
             response.headers['Pragma'] = 'no-cache'
             response.headers['Expires'] = '0'

@@ -1,28 +1,31 @@
+# Minified files - we commit these for faster deployments
+# *.min.js
+# *.min.css
+# *.min.html
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
-elder_care.db
-
-# Environment
-.env
-.venv
-env/
-venv/
-ENV/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
@@ -30,9 +33,8 @@ Thumbs.db
 
 # Logs
 *.log
+server.log
 
-# Temporary files
-*.tmp
-*.temp
-
-
+# Environment variables
+.env
+.env.local
