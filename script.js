@@ -1617,10 +1617,15 @@ async function saveNewResident(event) {
     const notesEl = usePageForm ? document.getElementById('newNotesPage') : document.getElementById('newNotes');
     
     // Get carrier value and log it for debugging
+    const carrierEl = usePageForm ? document.getElementById('newEmergencyCarrierPage') : document.getElementById('newEmergencyCarrier');
     const carrierValue = carrierEl ? carrierEl.value : '';
-    console.log('🔍 Carrier element:', carrierEl);
-    console.log('🔍 Carrier value:', carrierValue);
-    console.log('🔍 Carrier element found:', carrierEl !== null && carrierEl !== undefined);
+    console.log('🔍🔍🔍 CARRIER DEBUGGING 🔍🔍🔍');
+    console.log('🔍 usePageForm:', usePageForm);
+    console.log('🔍 Carrier element ID searched:', usePageForm ? 'newEmergencyCarrierPage' : 'newEmergencyCarrier');
+    console.log('🔍 Carrier element found:', carrierEl);
+    console.log('🔍 Carrier element value:', carrierEl ? carrierEl.value : 'ELEMENT NOT FOUND!');
+    console.log('🔍 Carrier value to save:', carrierValue || null);
+    console.log('🔍🔍🔍 END CARRIER DEBUGGING 🔍🔍🔍');
     
     const resident = {
         first_name: firstNameEl.value.trim(),
@@ -1643,7 +1648,9 @@ async function saveNewResident(event) {
         photo_path: photoData || null
     };
     
-    console.log('Resident data to save:', resident);
+    console.log('📦 Resident data to save:', resident);
+    console.log('📦 Carrier in resident object:', resident.emergency_contact_carrier);
+    console.log('📦 Full resident JSON:', JSON.stringify(resident, null, 2));
     console.log('Date of birth:', dateOfBirth);
     
     try {
