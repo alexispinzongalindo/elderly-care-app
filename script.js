@@ -1626,7 +1626,7 @@ async function saveNewResident(event) {
             carrierValue = null;
         }
     }
-    
+
     // VERY VISIBLE LOGGING - CARRIER FIELD
     console.log('═══════════════════════════════════════════════════════');
     console.log('🚨🚨🚨 CARRIER FIELD DEBUGGING 🚨🚨🚨');
@@ -1652,7 +1652,8 @@ async function saveNewResident(event) {
         bed_number: bedEl ? bedEl.value : '',
         emergency_contact_name: emergencyEl ? emergencyEl.value : '',
         emergency_contact_phone: phoneEl ? phoneEl.value : '',
-        emergency_contact_carrier: carrierValue,  // Already normalized (null if empty, actual value otherwise)
+        // CRITICAL: Always include carrier field (even if null) - don't let it be undefined
+        emergency_contact_carrier: carrierValue !== undefined ? carrierValue : null,  // Explicitly ensure it's never undefined
         emergency_contact_relation: relationEl ? relationEl.value : '',
         emergency_contact_email: emailEl ? emailEl.value : '',
         insurance_provider: insuranceProviderEl ? insuranceProviderEl.value : null,
