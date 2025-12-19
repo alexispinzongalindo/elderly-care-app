@@ -1301,10 +1301,87 @@ def vital_signs():
                                 traceback.print_exc(file=sys.stdout)
                     
                     if emails_sent > 0:
-                        print(f"✅ [Background] Sent {emails_sent} vital signs alert(s) for {resident_name}", flush=True)
+                        print(f"✅ [Background] Sent {emails_sent} vital signs alert email(s) for {resident_name}", flush=True)
                     else:
                         print(f"⚠️ [Background] Failed to send vital signs alert emails.", flush=True)
                         print(f"   Errors: {email_errors}", flush=True)
+                    
+                    # Send SMS notifications for each critical alert (FREE via email-to-SMS gateway)
+                    sms_sent = 0
+                    sms_errors = []
+                    if SMS_SERVICE_AVAILABLE:
+                        # Re-fetch staff phones (connection was closed)
+                        bg_conn_sms = get_db()
+                        bg_cursor_sms = bg_conn_sms.cursor()
+                        bg_cursor_sms.execute('''
+                            SELECT phone, preferred_language FROM staff 
+                            WHERE (role IN ('admin', 'manager') OR id = ?) 
+                            AND phone IS NOT NULL 
+                            AND phone != '' 
+                            AND active = 1
+                        ''', (staff_id,))
+                        staff_phones = [(row['phone'], row['preferred_language'] or 'en') for row in bg_cursor_sms.fetchall()]
+                        bg_cursor_sms.execute('SELECT emergency_contact_phone FROM residents WHERE id = ?', (resident_id,))
+                        emergency_contact_row = bg_cursor_sms.fetchone()
+                        emergency_contact_phone = emergency_contact_row['emergency_contact_phone'] if emergency_contact_row and emergency_contact_row['emergency_contact_phone'] else None
+                        bg_conn_sms.close()
+                        
+                        print(f"📱 [Background] Preparing to send SMS alerts to {len(staff_phones)} staff phone(s) and emergency contact", flush=True)
+                        
+                        # Send SMS to staff for each critical alert
+                        for vital_type, value, threshold in critical_alerts:
+                            for phone, language in staff_phones:
+                                if phone:
+                                    try:
+                                        sms_result = send_vital_signs_alert_sms(
+                                            resident_name=resident_name,
+                                            vital_type=vital_type,
+                                            value=value,
+                                            threshold=threshold,
+                                            phone=phone,
+                                            carrier=None,  # Will use default carrier (Verizon)
+                                            language=language or 'en'
+                                        )
+                                        if sms_result:
+                                            sms_sent += 1
+                                            print(f"✅ [Background] SMS sent successfully to {phone} for {vital_type}", flush=True)
+                                        else:
+                                            error_msg = f"SMS function returned False for {phone}"
+                                            sms_errors.append(error_msg)
+                                            print(f"❌ [Background] {error_msg}", flush=True)
+                                    except Exception as sms_exception:
+                                        error_msg = f"Exception sending SMS to {phone}: {str(sms_exception)}"
+                                        sms_errors.append(error_msg)
+                                        print(f"❌ [Background] {error_msg}", flush=True)
+                            
+                            # Send SMS to emergency contact for each critical alert
+                            if emergency_contact_phone:
+                                try:
+                                    sms_result = send_vital_signs_alert_sms(
+                                        resident_name=resident_name,
+                                        vital_type=vital_type,
+                                        value=value,
+                                        threshold=threshold,
+                                        phone=emergency_contact_phone,
+                                        carrier=None,  # Will use default carrier (Verizon)
+                                        language='en'  # Default to English for emergency contacts
+                                    )
+                                    if sms_result:
+                                        sms_sent += 1
+                                        print(f"✅ [Background] SMS sent successfully to emergency contact: {emergency_contact_phone} for {vital_type}", flush=True)
+                                    else:
+                                        error_msg = f"SMS function returned False for emergency contact {emergency_contact_phone}"
+                                        sms_errors.append(error_msg)
+                                        print(f"❌ [Background] {error_msg}", flush=True)
+                                except Exception as sms_exception:
+                                    error_msg = f"Exception sending SMS to emergency contact {emergency_contact_phone}: {str(sms_exception)}"
+                                    sms_errors.append(error_msg)
+                                    print(f"❌ [Background] {error_msg}", flush=True)
+                        
+                        if sms_sent > 0:
+                            print(f"✅ [Background] Sent {sms_sent} vital signs alert SMS(s)", flush=True)
+                    else:
+                        print(f"ℹ️ [Background] SMS service not available, skipping SMS notifications", flush=True)
                 except Exception as bg_error:
                     print(f"❌ [Background] Error in vital signs alert thread: {bg_error}", flush=True)
                     import traceback
