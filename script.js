@@ -1769,6 +1769,24 @@ async function saveNewResident(event) {
             console.log('📤 FULL JSON BEING SENT:');
             console.log(JSON.stringify(resident, null, 2));
             console.log('═══════════════════════════════════════════════════════');
+            
+            // CRITICAL DEBUG: Check carrier element one more time RIGHT BEFORE sending
+            const lastChanceCarrierEl = document.getElementById('newEmergencyCarrierPage') || document.getElementById('newEmergencyCarrier');
+            if (lastChanceCarrierEl) {
+                const lastChanceValue = lastChanceCarrierEl.value;
+                console.log('🚨🚨🚨 LAST CHANCE CHECK BEFORE SEND 🚨🚨🚨');
+                console.log('📱 Carrier element found:', lastChanceCarrierEl.id);
+                console.log('📱 Carrier element value:', lastChanceValue);
+                console.log('📱 Current resident.emergency_contact_carrier:', resident.emergency_contact_carrier);
+                if (lastChanceValue && lastChanceValue !== resident.emergency_contact_carrier) {
+                    console.warn('⚠️⚠️⚠️ CARRIER VALUE MISMATCH! Updating resident object!');
+                    resident.emergency_contact_carrier = lastChanceValue === '' ? null : lastChanceValue;
+                    console.log('📱 Updated resident.emergency_contact_carrier to:', resident.emergency_contact_carrier);
+                }
+            } else {
+                console.error('❌❌❌ LAST CHANCE: Carrier element NOT FOUND!');
+            }
+            
             response = await fetch(`/api/residents/${currentEditingId}`, {
                 method: 'PUT',
                 headers: getAuthHeaders(),
