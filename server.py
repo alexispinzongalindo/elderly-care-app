@@ -19,6 +19,23 @@ try:
         send_custom_alert
     )
     EMAIL_SERVICE_AVAILABLE = True
+except ImportError:
+    EMAIL_SERVICE_AVAILABLE = False
+    print("⚠️ Email service not available. Email notifications will be disabled.")
+
+# Import SMS service (email-to-SMS gateway, FREE alternative to Twilio)
+try:
+    from sms_service import (
+        send_medication_alert_sms,
+        send_vital_signs_alert_sms,
+        send_incident_alert_sms,
+        send_custom_alert_sms
+    )
+    SMS_SERVICE_AVAILABLE = True
+    print("✅ SMS service available (email-to-SMS gateway)")
+except ImportError:
+    SMS_SERVICE_AVAILABLE = False
+    print("⚠️ SMS service not available. SMS notifications will be disabled.")
     # Check email configuration on startup
     sender_email = os.getenv('SENDER_EMAIL', '')
     sender_password = os.getenv('SENDER_PASSWORD', '')
@@ -2304,22 +2321,25 @@ def incidents():
                     resident_name = f"{resident['first_name']} {resident['last_name']}"
                     print(f"📋 [Background] Resident: {resident_name}", flush=True)
                     
-                    # Get staff emails for notification (managers, admins, or assigned staff)
+                    # Get staff emails and phone numbers for notification (managers, admins, or assigned staff)
                     bg_cursor.execute('''
-                        SELECT email FROM staff 
+                        SELECT email, phone, preferred_language FROM staff 
                         WHERE (role IN ('admin', 'manager') OR id = ?) 
-                        AND email IS NOT NULL 
-                        AND email != '' 
                         AND active = 1
                     ''', (staff_id_for_email,))
-                    staff_emails = [row['email'] for row in bg_cursor.fetchall()]
+                    staff_records = bg_cursor.fetchall()
+                    staff_emails = [row['email'] for row in staff_records if row['email']]
+                    staff_phones = [(row['phone'], row['preferred_language'] or 'en') for row in staff_records if row['phone']]
                     print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}", flush=True)
+                    print(f"📱 [Background] Found {len(staff_phones)} staff phone(s) for SMS", flush=True)
                     
-                    # Get emergency contact email for the resident
-                    bg_cursor.execute('SELECT emergency_contact_email FROM residents WHERE id = ?', (resident_id_for_email,))
+                    # Get emergency contact email and phone for the resident
+                    bg_cursor.execute('SELECT emergency_contact_email, emergency_contact_phone FROM residents WHERE id = ?', (resident_id_for_email,))
                     emergency_contact = bg_cursor.fetchone()
                     emergency_contact_email = emergency_contact['emergency_contact_email'] if emergency_contact and emergency_contact['emergency_contact_email'] else None
+                    emergency_contact_phone = emergency_contact['emergency_contact_phone'] if emergency_contact and emergency_contact['emergency_contact_phone'] else None
                     print(f"📞 [Background] Emergency contact email: {emergency_contact_email if emergency_contact_email else 'None'}", flush=True)
+                    print(f"📱 [Background] Emergency contact phone: {emergency_contact_phone if emergency_contact_phone else 'None'}", flush=True)
                     
                     # Combine all recipient emails
                     all_recipients = list(staff_emails)
@@ -2373,6 +2393,64 @@ def incidents():
                                 error_msg = f"Email function returned False for {recipient_email}"
                                 email_errors.append(error_msg)
                                 print(f"❌ [Background] {error_msg}", flush=True)
+                    
+                    # Send SMS notifications (FREE via email-to-SMS gateway)
+                    sms_sent = 0
+                    sms_errors = []
+                    if SMS_SERVICE_AVAILABLE:
+                        print(f"📱 [Background] Preparing to send SMS alerts to {len(staff_phones)} staff phone(s) and emergency contact", flush=True)
+                        
+                        # Send SMS to staff
+                        for phone, language in staff_phones:
+                            if phone:
+                                try:
+                                    sms_result = send_incident_alert_sms(
+                                        resident_name=resident_name,
+                                        incident_type=incident_type_for_email,
+                                        severity=severity_for_email.title(),
+                                        phone=phone,
+                                        carrier=None,  # Will use default carrier (Verizon)
+                                        language=language or 'en'
+                                    )
+                                    if sms_result:
+                                        sms_sent += 1
+                                        print(f"✅ [Background] SMS sent successfully to {phone}", flush=True)
+                                    else:
+                                        error_msg = f"SMS function returned False for {phone}"
+                                        sms_errors.append(error_msg)
+                                        print(f"❌ [Background] {error_msg}", flush=True)
+                                except Exception as sms_exception:
+                                    error_msg = f"Exception sending SMS to {phone}: {str(sms_exception)}"
+                                    sms_errors.append(error_msg)
+                                    print(f"❌ [Background] {error_msg}", flush=True)
+                        
+                        # Send SMS to emergency contact
+                        if emergency_contact_phone:
+                            try:
+                                sms_result = send_incident_alert_sms(
+                                    resident_name=resident_name,
+                                    incident_type=incident_type_for_email,
+                                    severity=severity_for_email.title(),
+                                    phone=emergency_contact_phone,
+                                    carrier=None,  # Will use default carrier (Verizon)
+                                    language='en'  # Default to English for emergency contacts
+                                )
+                                if sms_result:
+                                    sms_sent += 1
+                                    print(f"✅ [Background] SMS sent successfully to emergency contact: {emergency_contact_phone}", flush=True)
+                                else:
+                                    error_msg = f"SMS function returned False for emergency contact {emergency_contact_phone}"
+                                    sms_errors.append(error_msg)
+                                    print(f"❌ [Background] {error_msg}", flush=True)
+                            except Exception as sms_exception:
+                                error_msg = f"Exception sending SMS to emergency contact {emergency_contact_phone}: {str(sms_exception)}"
+                                sms_errors.append(error_msg)
+                                print(f"❌ [Background] {error_msg}", flush=True)
+                        
+                        if sms_sent > 0:
+                            print(f"✅ [Background] Sent {sms_sent} SMS alert(s)", flush=True)
+                    else:
+                        print(f"ℹ️ [Background] SMS service not available, skipping SMS notifications", flush=True)
                         except Exception as email_exception:
                             error_msg = f"Exception sending email to {recipient_email}: {str(email_exception)}"
                             email_errors.append(error_msg)
