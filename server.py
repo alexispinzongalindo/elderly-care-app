@@ -36,19 +36,45 @@ except ImportError:
     EMAIL_SERVICE_AVAILABLE = False
     print("⚠️ Email service not available. Email notifications will be disabled.")
 
-# Import SMS service (email-to-SMS gateway, FREE alternative to Twilio)
-try:
-    from sms_service import (
-        send_medication_alert_sms,
-        send_vital_signs_alert_sms,
-        send_incident_alert_sms,
-        send_custom_alert_sms
-    )
-    SMS_SERVICE_AVAILABLE = True
-    print("✅ SMS service available (email-to-SMS gateway)")
-except ImportError:
-    SMS_SERVICE_AVAILABLE = False
-    print("⚠️ SMS service not available. SMS notifications will be disabled.")
+# Import SMS service - supports both ClickSend API and email-to-SMS gateway
+# Priority: ClickSend (if configured) > email-to-SMS (free fallback)
+USE_CLICKSEND = os.getenv('CLICKSEND_API_KEY', '') and os.getenv('CLICKSEND_USERNAME', '')
+
+SMS_SERVICE_AVAILABLE = False
+send_medication_alert_sms = None
+send_vital_signs_alert_sms = None
+send_incident_alert_sms = None
+send_custom_alert_sms = None
+
+if USE_CLICKSEND:
+    # Try ClickSend first (more reliable, costs ~$0.0075/SMS)
+    try:
+        from clicksend_sms import (
+            send_medication_alert_sms,
+            send_vital_signs_alert_sms,
+            send_incident_alert_sms,
+            send_custom_alert_sms
+        )
+        SMS_SERVICE_AVAILABLE = True
+        print("✅ SMS service available via ClickSend API")
+    except ImportError:
+        print("⚠️ ClickSend configured but clicksend_sms.py not found. Falling back to email-to-SMS.")
+        USE_CLICKSEND = False
+
+if not USE_CLICKSEND:
+    # Fallback to email-to-SMS gateway (FREE alternative to Twilio)
+    try:
+        from sms_service import (
+            send_medication_alert_sms,
+            send_vital_signs_alert_sms,
+            send_incident_alert_sms,
+            send_custom_alert_sms
+        )
+        SMS_SERVICE_AVAILABLE = True
+        print("✅ SMS service available (email-to-SMS gateway - FREE)")
+    except ImportError:
+        SMS_SERVICE_AVAILABLE = False
+        print("⚠️ SMS service not available. SMS notifications will be disabled.")
 
 app = Flask(__name__, static_folder='.')
 CORS(app)

@@ -1769,7 +1769,7 @@ async function saveNewResident(event) {
             console.log('📤 FULL JSON BEING SENT:');
             console.log(JSON.stringify(resident, null, 2));
             console.log('═══════════════════════════════════════════════════════');
-            
+
             // CRITICAL DEBUG: Check carrier element one more time RIGHT BEFORE sending
             const lastChanceCarrierEl = document.getElementById('newEmergencyCarrierPage') || document.getElementById('newEmergencyCarrier');
             if (lastChanceCarrierEl) {
@@ -1786,7 +1786,7 @@ async function saveNewResident(event) {
             } else {
                 console.error('❌❌❌ LAST CHANCE: Carrier element NOT FOUND!');
             }
-            
+
             response = await fetch(`/api/residents/${currentEditingId}`, {
                 method: 'PUT',
                 headers: getAuthHeaders(),

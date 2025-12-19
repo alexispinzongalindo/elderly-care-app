@@ -10,17 +10,17 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Elder Care Management - Puerto Rico</title>
-    
+
     <!-- Favicon / App Icons -->
     <link rel="icon" type="image/png" href="attached_assets/generated_images/medical_cross_heart_logo.png">
     <link rel="shortcut icon" type="image/png" href="attached_assets/generated_images/medical_cross_heart_logo.png">
     <link rel="apple-touch-icon" href="attached_assets/generated_images/medical_cross_heart_logo.png">
     <!-- When you create favicon.ico, uncomment the line below and place favicon.ico in the root directory -->
     <!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    
+
     <link rel="stylesheet" href="style.css">
     <!-- jsPDF for PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -62,7 +62,7 @@
                 <button class="btn btn-primary" onclick="selectResident()" data-translate="common.continue">Continue</button>
                 <button class="btn btn-secondary" onclick="showAddResidentForm(true)" data-translate="resident.addNew">+ Add New Resident</button>
             </div>
-            
+
             <!-- Add Resident Form -->
             <div id="addResidentForm" class="form-card" style="display: none; margin-top: 2rem; background: var(--light-gray);">
                 <h3 data-translate="resident.add">Add New Resident</h3>
@@ -219,7 +219,7 @@
                             <button class="btn-icon" onclick="showKeyboardShortcuts()" data-translate-title="common.keyboardShortcuts" title="Keyboard Shortcuts">⌨️</button>
                         </div>
                     </div>
-                    
+
                     <!-- Center: Search and Resident Info -->
                     <div class="nav-center">
                         <div id="searchContainer" class="search-container" style="display: none;">
@@ -230,7 +230,7 @@
                             <strong id="currentResidentName">No resident selected</strong>
                         </div>
                     </div>
-                    
+
                     <!-- Right: Language Selector, Clock, Notifications, User Info -->
                     <div class="nav-right">
                         <select id="languageSelector" class="language-selector" onchange="setLanguage(this.value)" style="padding: 0.5rem; border: 1px solid var(--medium-gray); border-radius: 4px; background: var(--white); cursor: pointer; font-size: 0.9rem;">
@@ -266,7 +266,7 @@
                 <ul class="nav-menu" id="navMenu">
                     <!-- Main Navigation -->
                     <li><a href="#" class="nav-link active" data-page="dashboard"><span class="nav-icon">📊</span><span data-translate="nav.dashboard">Dashboard</span></a></li>
-                    
+
                     <!-- Care Management Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.care">Care Management</span></li>
                     <li><a href="#" class="nav-link" data-page="residents"><span class="nav-icon">👥</span><span data-translate="nav.residents">Residents</span></a></li>
@@ -274,18 +274,18 @@
                     <li><a href="#" class="nav-link" data-page="appointments"><span class="nav-icon">📅</span><span data-translate="nav.appointments">Appointments</span></a></li>
                     <li><a href="#" class="nav-link" data-page="vitalsigns"><span class="nav-icon">❤️</span><span data-translate="nav.vitalSigns">Vital Signs</span></a></li>
                     <li><a href="#" class="nav-link" data-page="carenotes"><span class="nav-icon">📝</span><span data-translate="nav.careNotes">Care Notes</span></a></li>
-                    
+
                     <!-- Records & Reports Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.records">Records & Reports</span></li>
                     <li><a href="#" class="nav-link" data-page="incidents" onclick="event.preventDefault(); console.log('🔴 INCIDENTS LINK CLICKED'); if(typeof showPage === 'function') { showPage('incidents'); } else { console.error('❌ showPage not defined!'); alert('Error: showPage function not found. Check console.'); } return false;"><span class="nav-icon">⚠️</span><span data-translate="nav.incidents">Incidents</span></a></li>
                     <li><a href="#" class="nav-link" data-page="calendar"><span class="nav-icon">📆</span><span data-translate="nav.calendar">Calendar</span></a></li>
                     <li><a href="#" class="nav-link" data-page="reports"><span class="nav-icon">📈</span><span data-translate="nav.reports">Reports</span></a></li>
-                    
+
                     <!-- Financial Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.financial">Financial</span></li>
                     <li><a href="#" class="nav-link" data-page="billing"><span class="nav-icon">💰</span><span data-translate="nav.billing">Billing</span></a></li>
                     <li><a href="#" class="nav-link" data-page="financial" id="financialNavLink" style="display: none;"><span class="nav-icon">💳</span><span data-translate="nav.financial">Financial Management</span></a></li>
-                    
+
                     <!-- System Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.system">System</span></li>
                     <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon">🔔</span><span data-translate="nav.notifications">Notifications</span></a></li>
@@ -300,7 +300,7 @@
             <div id="dashboard" class="page active">
                 <h2 data-translate="dashboard.title">Dashboard</h2>
                 <p id="dashboardDate" style="color: var(--dark-gray); margin-bottom: 2rem;"></p>
-                
+
                 <!-- Stats Grid with Cards Side by Side -->
                 <div class="stats-grid">
                     <div class="stat-card stat-card-medications">
@@ -347,7 +347,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Quick Access Actions -->
                 <div class="quick-actions-grid" style="margin-top: 2rem;">
                     <h3 style="grid-column: 1 / -1; margin-bottom: 1rem; color: var(--text-color);" data-translate="dashboard.quickAccess">Quick Access</h3>
@@ -390,7 +390,7 @@
             <div id="residents" class="page">
                 <h2 data-translate="resident.title">Residents Management</h2>
                 <button class="btn btn-primary" onclick="showAddResidentForm()" data-translate="resident.addNew">+ Add New Resident</button>
-                
+
                 <!-- Add/Edit Resident Form (for Residents page) -->
                 <div id="addResidentFormPage" class="form-card" style="display: none; margin-top: 2rem;">
                     <h3 data-translate="resident.add">Add New Resident</h3>
@@ -527,7 +527,7 @@
                         </div>
                     </form>
                 </div>
-                
+
                 <div id="residentsList" class="item-list"></div>
             </div>
 
@@ -535,7 +535,7 @@
             <div id="staff" class="page">
                 <h2 data-translate="staff.title">Staff Management</h2>
                 <button class="btn btn-primary" onclick="showAddStaffForm()" data-translate="staff.addNew">+ Add New Staff</button>
-                
+
                 <!-- Add/Edit Staff Form -->
                 <div id="addStaffForm" class="form-card" style="display: none; margin-top: 2rem;">
                     <h3 id="staffFormTitle" data-translate="staff.add">Add New Staff Member</h3>
@@ -604,7 +604,7 @@
                         </div>
                     </form>
                 </div>
-                
+
                 <div id="staffList" class="item-list"></div>
             </div>
 
@@ -612,7 +612,7 @@
             <div id="medications" class="page">
                 <h2 data-translate="medication.title">Medication Management</h2>
                 <button class="btn btn-primary" onclick="showMedicationForm()" data-translate="medication.addNew">+ Add New Medication</button>
-                
+
                 <div id="medicationForm" class="form-card" style="display: none;">
                     <h3 data-translate="medication.add">Add Medication</h3>
                     <form id="medForm" onsubmit="saveMedication(event)">
@@ -739,7 +739,7 @@
                         </div>
                     </form>
                 </div>
-                
+
                 <div id="medicationList" class="item-list"></div>
             </div>
 
@@ -747,7 +747,7 @@
             <div id="appointments" class="page">
                 <h2 data-translate="appointment.title">Appointment Tracking</h2>
                 <button class="btn btn-primary" onclick="showAppointmentForm()" data-translate="appointment.addNew">+ Add New Appointment</button>
-                
+
                 <div id="appointmentForm" class="form-card" style="display: none;">
                     <h3 data-translate="appointment.add">Add Appointment</h3>
                     <form id="apptForm" onsubmit="saveAppointment(event)">
@@ -809,14 +809,14 @@
                         </div>
                     </form>
                 </div>
-                
+
                 <div id="appointmentList" class="item-list"></div>
             </div>
 
             <!-- Vital Signs Page -->
             <div id="vitalsigns" class="page">
                 <h2 data-translate="vitals.title">Vital Signs Tracker</h2>
-                
+
                 <div class="form-card">
                     <h3 data-translate="vitals.add">Record Vital Signs</h3>
                     <form id="vitalSignsForm" onsubmit="saveVitalSign(event)">
@@ -855,7 +855,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-section">
                             <h4>🩸 Blood Pressure / Presión Arterial</h4>
                             <div class="form-row">
@@ -869,7 +869,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-section">
                             <h4>🩹 Blood Glucose / Glucosa en Sangre</h4>
                             <div class="form-group">
@@ -877,7 +877,7 @@
                                 <input type="number" id="vsGlucose" min="0" max="600" step="0.1" placeholder="100">
                             </div>
                         </div>
-                        
+
                         <div class="form-section">
                             <h4>🌡️ Temperature / Temperatura</h4>
                             <div class="form-group">
@@ -885,7 +885,7 @@
                                 <input type="number" id="vsTemperature" min="90" max="110" step="0.1" placeholder="98.6">
                             </div>
                         </div>
-                        
+
                         <div class="form-section">
                             <h4>❤️ Heart Rate / Frecuencia Cardíaca</h4>
                             <div class="form-group">
@@ -893,7 +893,7 @@
                                 <input type="number" id="vsHeartRate" min="30" max="200" placeholder="72">
                             </div>
                         </div>
-                        
+
                         <div class="form-section">
                             <h4>⚖️ Weight / Peso</h4>
                             <div class="form-group">
@@ -901,19 +901,19 @@
                                 <input type="number" id="vsWeight" min="0" max="1000" step="0.1" placeholder="150">
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label data-translate="appointment.notes">Notes</label>
                             <textarea id="vsNotes" rows="2" placeholder="Any observations..."></textarea>
                         </div>
-                        
+
                         <div class="button-group">
                             <button type="submit" class="btn btn-success" data-translate="vitals.save">💾 Save Vital Signs</button>
                             <button type="button" class="btn btn-secondary" onclick="clearVitalSignsForm()" data-translate="common.clear">Clear</button>
                         </div>
                     </form>
                 </div>
-                
+
                 <div style="margin-top: 2rem;">
                     <h3 data-translate="vitals.history">Vital Signs History</h3>
                     <div id="vitalSignsList" class="item-list"></div>
@@ -923,7 +923,7 @@
             <!-- Calendar Page -->
             <div id="calendar" class="page">
                 <h2 data-translate="calendar.title">Activity Calendar</h2>
-                
+
                 <div class="form-card">
                     <div class="calendar-controls" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
                         <div class="form-group" style="margin: 0; flex: 1; min-width: 120px;">
@@ -954,20 +954,20 @@
                             <button class="btn btn-primary" onclick="goToToday()" data-translate="calendar.today">Today</button>
                         </div>
                     </div>
-                    
+
                     <div class="form-group" style="margin-bottom: 1rem;">
                         <label for="calendarSearch" style="font-size: 0.9rem; margin-bottom: 0.25rem;" data-translate="calendar.search">Search Activities</label>
                         <input type="text" id="calendarSearch" class="form-control" data-translate-placeholder="calendar.searchPlaceholder" placeholder="Search by name, doctor, medication..." style="padding: 0.5rem;">
                     </div>
                 </div>
-                
+
                 <div id="calendarDisplay" class="calendar-container"></div>
             </div>
 
             <!-- Billing Page -->
             <div id="billing" class="page">
                 <h2 data-translate="billing.title">Billing & Payments</h2>
-                
+
                 <!-- Account Balance Summary -->
                 <div id="accountBalanceCard" class="form-card" style="display: none;">
                     <h3 data-translate="billing.accountBalance">Account Balance</h3>
@@ -995,7 +995,7 @@
                 <div class="form-card">
                     <h3 data-translate="billing.create">Create Bill</h3>
                     <button class="btn btn-primary" onclick="showBillForm()" data-translate="billing.add">+ Add New Bill</button>
-                    
+
                     <div id="billForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                         <h3 id="billFormTitle" data-translate="billing.add">Add New Bill</h3>
                         <form id="newBillForm" onsubmit="saveBill(event)">
@@ -1099,7 +1099,7 @@
                 <div class="form-card">
                     <h3>Record Payment / Registrar Pago</h3>
                     <button class="btn btn-primary" onclick="showPaymentForm()">+ Record Payment / Registrar Pago</button>
-                    
+
                     <div id="paymentForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                         <form id="newPaymentForm" onsubmit="savePayment(event)">
                             <div class="form-group">
@@ -1193,7 +1193,7 @@
             <div id="incidents" class="page" style="display: none;">
                 <h2 id="incidentsH2" style="display: block !important; visibility: visible !important; opacity: 1 !important; color: var(--text-color) !important; margin-bottom: 1.5rem !important; font-size: 1.8rem !important; font-weight: bold !important; position: relative !important; z-index: 1 !important; width: 100% !important; height: auto !important;">Incident Reports / Reportes de Incidentes</h2>
                 <button id="incidentsButton" class="btn btn-primary" onclick="showIncidentForm()" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1.5rem !important; padding: 0.75rem 1.5rem !important; font-size: 1rem !important; cursor: pointer !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important; background: var(--primary-color) !important; color: white !important; border: none !important;">+ Report Incident / Reportar Incidente</button>
-                
+
                 <!-- Incident Form -->
                 <div id="incidentForm" class="form-card" style="display: none; margin-top: 2rem;">
                     <h3 id="incidentFormTitle">Report Incident / Reportar Incidente</h3>
@@ -1206,7 +1206,7 @@
                                 <small class="form-hint">Timestamp when the incident occurred / Marca de tiempo cuando ocurrió el incidente</small>
                             </div>
                         </div>
-                        
+
                         <!-- Staff and Residents Section -->
                         <div class="form-row">
                             <div class="form-group">
@@ -1223,7 +1223,7 @@
                                 <small class="form-hint">Hold Ctrl/Cmd to select multiple / Mantenga Ctrl/Cmd para seleccionar múltiples</small>
                             </div>
                         </div>
-                        
+
                         <!-- Incident Type and Severity -->
                         <div class="form-row">
                             <div class="form-group">
@@ -1249,7 +1249,7 @@
                                 </select>
                             </div>
                         </div>
-                        
+
                         <!-- Location -->
                         <div class="form-row">
                             <div class="form-group">
@@ -1257,13 +1257,13 @@
                                 <input type="text" id="incidentLocation" placeholder="e.g., Room 101, Dining Hall">
                             </div>
                         </div>
-                        
+
                         <!-- Description Section -->
                         <div class="form-group">
                             <label for="incidentDescription">Description / Descripción del Incidente *</label>
                             <textarea id="incidentDescription" rows="6" required placeholder="Provide a detailed description of what happened, who was involved, and any immediate observations... / Proporcione una descripción detallada de lo que sucedió, quién estuvo involucrado y cualquier observación inmediata..."></textarea>
                         </div>
-                        
+
                         <!-- Photo Upload Section -->
                         <div class="form-group">
                             <label>Incident Photos / Fotos del Incidente</label>
@@ -1316,7 +1316,7 @@
                         </div>
                     </form>
                 </div>
-                
+
                 <div id="incidentsList" class="item-list" style="margin-top: 2rem !important; display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important; background: var(--white) !important; border-radius: 8px !important;"></div>
             </div>
 
@@ -1324,7 +1324,7 @@
             <div id="carenotes" class="page" style="display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important;">
                 <h2>Daily Care Notes / Notas Diarias de Cuidado</h2>
                 <button class="btn btn-primary" onclick="showCareNoteForm()">+ Add Care Note / Agregar Nota de Cuidado</button>
-                
+
                 <!-- Care Note Form -->
                 <div id="careNoteForm" class="form-card" style="display: none; margin-top: 2rem;">
                     <h3 id="careNoteFormTitle">Add Care Note / Agregar Nota de Cuidado</h3>
@@ -1479,7 +1479,7 @@
                         </div>
                     </form>
                 </div>
-                
+
                 <div id="careNotesList" class="item-list" style="margin-top: 2rem;"></div>
             </div>
 
@@ -1497,7 +1497,7 @@
             <div id="financial" class="page">
                 <h2>Financial Management / Gestión Financiera</h2>
                 <p style="color: var(--dark-gray); margin-bottom: 2rem;">Manage bank accounts, transactions, and reconciliation / Gestionar cuentas bancarias, transacciones y conciliación</p>
-                
+
                 <!-- Tabs Navigation -->
                 <div class="button-group" style="margin-bottom: 2rem; border-bottom: 2px solid var(--light-gray); padding-bottom: 1rem;">
                     <button class="btn btn-primary" onclick="showFinancialTab('accounts')" id="tabAccounts">Bank Accounts / Cuentas Bancarias</button>
@@ -1511,7 +1511,7 @@
                     <div class="form-card">
                         <h3>Bank Accounts / Cuentas Bancarias</h3>
                         <button class="btn btn-primary" onclick="showBankAccountForm()">+ Add Bank Account / Agregar Cuenta Bancaria</button>
-                        
+
                         <div id="bankAccountForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                             <form id="newBankAccountForm" onsubmit="saveBankAccount(event)">
                                 <div class="form-row">
@@ -1567,7 +1567,7 @@
                     <div class="form-card">
                         <h3>Transactions / Transacciones</h3>
                         <button class="btn btn-primary" onclick="showTransactionForm()">+ Add Transaction / Agregar Transacción</button>
-                        
+
                         <div id="transactionForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                             <form id="newTransactionForm" onsubmit="saveTransaction(event)">
                                 <div class="form-row">
@@ -1713,7 +1713,7 @@
             <!-- Reports Page -->
             <div id="reports" class="page">
                 <h2>Reports & Analytics / Reportes y Análisis</h2>
-                
+
                 <div class="stats-grid" style="margin-bottom: 2rem;">
                     <div class="stat-card">
                         <h3>Total Incidents / Total Incidentes</h3>
@@ -1773,7 +1773,7 @@
     </div>
 
     <div id="messageBox" class="message-box"></div>
-    
+
     <!-- Keyboard Shortcuts Modal -->
     <div id="shortcutsModal" class="modal" style="display: none;">
         <div class="form-card" style="max-width: 600px;">
@@ -1812,7 +1812,7 @@
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
@@ -1824,7 +1824,7 @@
             console.log('📍 Hostname:', window.location.hostname);
             console.log('🔍 User Agent:', navigator.userAgent);
             console.log('✅ Console is working!');
-            
+
             // Check if script.js loads - only log actual script/resource errors
             window.addEventListener('error', function(e) {
                 // Only log errors related to scripts or if error has meaningful properties
@@ -1837,7 +1837,7 @@
                     if (e.error) console.error('Error object:', e.error);
                 }
             }, true);
-            
+
             // Verify script loaded after a delay
             setTimeout(function() {
                 console.log('⏰ 2 second check - verifying script.js loaded...');
@@ -1876,7 +1876,7 @@
             }
         });
     </script>
-    
+
     <!-- Ensure financial page button is visible with normal styling -->
     <script>
         // Run when DOM is ready to ensure button visibility
@@ -1887,13 +1887,13 @@
                 if (fixedButton) {
                     fixedButton.remove();
                 }
-                
+
                 // Find and ensure the regular button is visible
                 setTimeout(() => {
                     const accountsTab = document.getElementById('financialAccounts');
                     const formCard = document.querySelector('#financialAccounts .form-card');
                     const regularButton = document.querySelector('#financialAccounts .form-card button');
-                    
+
                     if (regularButton) {
                         // Normal blue styling - ensure visibility
                         regularButton.style.setProperty('display', 'inline-block', 'important');
@@ -1901,7 +1901,7 @@
                         regularButton.style.setProperty('opacity', '1', 'important');
                         console.log('✅ Button visible with normal styling');
                     }
-                    
+
                     // Ensure form-card is visible
                     if (formCard) {
                         formCard.style.setProperty('display', 'block', 'important');
@@ -1910,14 +1910,14 @@
                     }
                 }, 100);
             }
-            
+
             // Run on load
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', ensureFinancialButtonVisible);
             } else {
                 ensureFinancialButtonVisible();
             }
-            
+
             // Run when navigating to financial page
             document.addEventListener('click', function(e) {
                 if (e.target.closest('.nav-link[data-page="financial"]')) {
@@ -1926,7 +1926,7 @@
             });
         })();
     </script>
-    
+
     <!-- Bootstrap JS Bundle (optional, for interactive components) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
