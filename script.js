@@ -1548,7 +1548,22 @@ async function saveNewResident(event) {
     const bedEl = usePageForm ? document.getElementById('newBedNumberPage') : document.getElementById('newBedNumber');
     const emergencyEl = usePageForm ? document.getElementById('newEmergencyContactPage') : document.getElementById('newEmergencyContact');
     const phoneEl = usePageForm ? document.getElementById('newEmergencyPhonePage') : document.getElementById('newEmergencyPhone');
-    const carrierEl = usePageForm ? document.getElementById('newEmergencyCarrierPage') : document.getElementById('newEmergencyCarrier');
+    
+    // Get carrier element - try both IDs as fallback
+    let carrierEl = usePageForm ? document.getElementById('newEmergencyCarrierPage') : document.getElementById('newEmergencyCarrier');
+    if (!carrierEl) {
+        // Fallback: try the other form's element if primary not found
+        carrierEl = usePageForm ? document.getElementById('newEmergencyCarrier') : document.getElementById('newEmergencyCarrierPage');
+        if (carrierEl) {
+            console.warn('⚠️ Carrier element found in fallback form (opposite form)');
+        }
+    }
+    if (!carrierEl) {
+        console.error('❌ CRITICAL: Carrier element NOT FOUND in either form!');
+        console.error('   Searched for:', usePageForm ? 'newEmergencyCarrierPage' : 'newEmergencyCarrier');
+        console.error('   Fallback searched:', usePageForm ? 'newEmergencyCarrier' : 'newEmergencyCarrierPage');
+    }
+    
     const relationEl = usePageForm ? document.getElementById('newEmergencyRelationPage') : document.getElementById('newEmergencyRelation');
     const emailEl = usePageForm ? document.getElementById('newEmergencyEmailPage') : document.getElementById('newEmergencyEmail');
     const conditionsEl = usePageForm ? document.getElementById('newMedicalConditionsPage') : document.getElementById('newMedicalConditions');
