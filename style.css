@@ -404,6 +404,17 @@ body {
     opacity: 1 !important;
 }
 
+/* CRITICAL: Force care notes page to show when active */
+#carenotes.page.active,
+#carenotes.active,
+#carenotes {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
 /* CRITICAL: Force financial page to show when active */
 #financial.page.active,
 #financial.active,
@@ -558,6 +569,24 @@ body {
     z-index: 1 !important;
 }
 
+/* CRITICAL: Force ALL children of care notes page to be visible */
+#carenotes.page.active > *,
+#carenotes.active > *,
+#carenotes > * {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* But keep the form hidden if it should be hidden */
+#carenotes.page.active > #careNoteForm[style*="display: none"],
+#carenotes.active > #careNoteForm[style*="display: none"],
+#carenotes > #careNoteForm[style*="display: none"] {
+    display: none !important;
+}
+
 /* But keep the form hidden if it should be hidden */
 #incidents.page.active > #incidentForm[style*="display: none"],
 #incidents.active > #incidentForm[style*="display: none"],
@@ -589,10 +618,39 @@ body:has(.nav-link[data-page="incidents"].active) #incidents {
     height: auto !important;
 }
 
+/* Force care notes page h2 to be visible */
+#carenotes.page.active h2,
+#carenotes.active h2,
+#carenotes h2 {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: var(--text-color) !important;
+    margin-bottom: 1.5rem !important;
+    font-size: 1.8rem !important;
+    font-weight: bold !important;
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    height: auto !important;
+}
+
 #incidents.page.active button.btn-primary,
 #incidents.active button.btn-primary,
 #incidents button.btn-primary,
 #incidents button[onclick="showIncidentForm()"] {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 1.5rem !important;
+    cursor: pointer !important;
+}
+
+/* Force care notes page button to be visible */
+#carenotes.page.active button.btn-primary,
+#carenotes.active button.btn-primary,
+#carenotes button.btn-primary,
+#carenotes button[onclick="showCareNoteForm()"] {
     display: inline-block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -613,6 +671,23 @@ body:has(.nav-link[data-page="incidents"].active) #incidents {
     visibility: visible !important;
     opacity: 1 !important;
     min-height: 200px !important;
+    width: 100% !important;
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: 2rem !important;
+    padding: 1rem !important;
+    background: var(--white) !important;
+    border-radius: 8px !important;
+}
+
+/* Force care notes list to be visible */
+#carenotes.page.active #careNotesList,
+#carenotes.active #careNotesList,
+#carenotes #careNotesList {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 100px !important;
     width: 100% !important;
     position: relative !important;
     z-index: 1 !important;
