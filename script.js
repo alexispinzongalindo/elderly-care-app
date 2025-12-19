@@ -3761,7 +3761,28 @@ async function editResident(id) {
         setValue('newBedNumberPage', 'newBedNumber', resident.bed_number);
         setValue('newEmergencyContactPage', 'newEmergencyContact', resident.emergency_contact_name);
         setValue('newEmergencyPhonePage', 'newEmergencyPhone', resident.emergency_contact_phone);
-        setValue('newEmergencyCarrierPage', 'newEmergencyCarrier', resident.emergency_contact_carrier);
+        
+        // Log carrier value before setting
+        console.log('🔍🔍🔍 LOADING CARRIER VALUE 🔍🔍🔍');
+        console.log('🔍 Resident carrier value from API:', resident.emergency_contact_carrier);
+        console.log('🔍 Carrier value type:', typeof resident.emergency_contact_carrier);
+        
+        // Set carrier value with additional logging
+        const carrierPageEl = document.getElementById('newEmergencyCarrierPage');
+        const carrierModalEl = document.getElementById('newEmergencyCarrier');
+        if (carrierPageEl) {
+            console.log('🔍 Setting page carrier dropdown to:', resident.emergency_contact_carrier || '');
+            carrierPageEl.value = resident.emergency_contact_carrier || '';
+            console.log('🔍 Page carrier dropdown value after setting:', carrierPageEl.value);
+            console.log('🔍 Page carrier dropdown options:', Array.from(carrierPageEl.options).map(opt => opt.value));
+        }
+        if (carrierModalEl) {
+            console.log('🔍 Setting modal carrier dropdown to:', resident.emergency_contact_carrier || '');
+            carrierModalEl.value = resident.emergency_contact_carrier || '';
+            console.log('🔍 Modal carrier dropdown value after setting:', carrierModalEl.value);
+        }
+        console.log('🔍🔍🔍 END LOADING CARRIER VALUE 🔍🔍🔍');
+        
         setValue('newEmergencyRelationPage', 'newEmergencyRelation', resident.emergency_contact_relation);
         setValue('newEmergencyEmailPage', 'newEmergencyEmail', resident.emergency_contact_email);
         setValue('newMedicalConditionsPage', 'newMedicalConditions', resident.medical_conditions);
