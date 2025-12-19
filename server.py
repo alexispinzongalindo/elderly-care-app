@@ -671,6 +671,12 @@ def residents():
                 conn.close()
                 return jsonify({'error': 'Last name is required / El apellido es requerido'}), 400
             
+            # Get carrier value and normalize empty strings to None
+            carrier_value = data.get('emergency_contact_carrier')
+            if carrier_value == '' or carrier_value is None:
+                carrier_value = None
+            print(f"📱 [INSERT] Emergency contact carrier value: '{carrier_value}' (type: {type(carrier_value).__name__})", flush=True)
+            
             cursor.execute('''
                 INSERT INTO residents (
                     first_name, last_name, date_of_birth, room_number, bed_number,
@@ -687,7 +693,7 @@ def residents():
                 data.get('gender'),
                 data.get('emergency_contact_name'),
                 data.get('emergency_contact_phone'),
-                data.get('emergency_contact_carrier'),  # Carrier for SMS
+                carrier_value,  # Carrier for SMS (None if empty)
                 data.get('emergency_contact_relation'),
                 data.get('emergency_contact_email'),
                 data.get('insurance_provider'),
@@ -734,6 +740,13 @@ def resident_detail(id):
     
     elif request.method == 'PUT':
         data = request.json
+        
+        # Get carrier value and normalize empty strings to None
+        carrier_value = data.get('emergency_contact_carrier')
+        if carrier_value == '' or carrier_value is None:
+            carrier_value = None
+        print(f"📱 [UPDATE] Emergency contact carrier value: '{carrier_value}' (type: {type(carrier_value).__name__}) for resident ID: {resident_id}", flush=True)
+        
         cursor.execute('''
             UPDATE residents 
             SET first_name = ?, last_name = ?, date_of_birth = ?, room_number = ?,
@@ -752,7 +765,7 @@ def resident_detail(id):
             data.get('gender'),
             data.get('emergency_contact_name'),
             data.get('emergency_contact_phone'),
-            data.get('emergency_contact_carrier'),  # Carrier for SMS
+            carrier_value,  # Carrier for SMS (None if empty)
             data.get('emergency_contact_relation'),
             data.get('emergency_contact_email'),
             data.get('insurance_provider'),
