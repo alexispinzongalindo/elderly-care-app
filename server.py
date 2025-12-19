@@ -9,6 +9,7 @@ from functools import wraps
 import os
 import sys
 import threading
+import time
 
 # Import email service
 try:
@@ -2497,11 +2498,13 @@ def incidents():
                     print(f"📞 [Background] Emergency contact email: {emergency_contact_email if emergency_contact_email else 'None'}", flush=True)
                     print(f"📱 [Background] Emergency contact phone: {emergency_contact_phone if emergency_contact_phone else 'None'}", flush=True)
                     
-                    # Combine all recipient emails
-                    all_recipients = list(staff_emails)
-                    if emergency_contact_email:
+                    # Combine all recipient emails (remove duplicates)
+                    all_recipients = list(set(staff_emails))  # Use set to remove duplicates
+                    if emergency_contact_email and emergency_contact_email not in all_recipients:
                         all_recipients.append(emergency_contact_email)
                         print(f"📧 [Background] Will also notify emergency contact: {emergency_contact_email}", flush=True)
+                    elif emergency_contact_email:
+                        print(f"ℹ️ [Background] Emergency contact email {emergency_contact_email} already in staff list, skipping duplicate", flush=True)
                     
                     # Fallback: If no recipients found, try to get ANY staff email as last resort
                     if not all_recipients:
@@ -2527,12 +2530,15 @@ def incidents():
                     # Default to English for language (we can't access request.current_staff in background thread)
                     language_for_email = 'en'
                     
-                    print(f"📬 [Background] Preparing to send emails to {len(all_recipients)} recipient(s): {all_recipients}", flush=True)
+                    print(f"📬 [Background] Preparing to send emails to {len(all_recipients)} unique recipient(s): {all_recipients}", flush=True)
                     
-                    # Send email to all recipients (staff + emergency contact)
+                    # Send email to all recipients (staff + emergency contact) with rate limiting
+                    # Resend API allows 2 requests per second, so add 600ms delay between requests
                     emails_sent = 0
                     email_errors = []
-                    for recipient_email in all_recipients:
+                    for i, recipient_email in enumerate(all_recipients):
+                        if i > 0:  # Wait 600ms between requests (except first one)
+                            time.sleep(0.6)  # 600ms delay = ~1.67 requests/second (under 2/sec limit)
                         print(f"📤 [Background] Sending incident alert to {recipient_email}...", flush=True)
                         try:
                             email_result = send_incident_alert(
@@ -2578,9 +2584,16 @@ def incidents():
                         
                         print(f"📱 [Background] Preparing to send SMS alerts to {len(staff_phones)} staff phone(s) and emergency contact", flush=True)
                         
+                        # Add delay before SMS (to respect rate limit after emails)
+                        # We've already sent emails, so wait 600ms before starting SMS
+                        time.sleep(0.6)
+                        
                         # Send SMS to staff
-                        for phone, language in staff_phones:
+                        for i, (phone, language) in enumerate(staff_phones):
                             if phone:
+                                # Add 600ms delay between SMS requests (except first one)
+                                if i > 0:
+                                    time.sleep(0.6)
                                 try:
                                     sms_result = send_incident_alert_sms(
                                         resident_name=resident_name,
@@ -2602,28 +2615,35 @@ def incidents():
                                     sms_errors.append(error_msg)
                                     print(f"❌ [Background] {error_msg}", flush=True)
                         
-                        # Send SMS to emergency contact
+                        # Send SMS to emergency contact (if not already sent to staff)
                         if emergency_contact_phone:
-                            try:
-                                sms_result = send_incident_alert_sms(
-                                    resident_name=resident_name,
-                                    incident_type=incident_type_for_email,
-                                    severity=severity_for_email.title(),
-                                    phone=emergency_contact_phone,
-                                    carrier=None,  # Will use default carrier (Verizon)
-                                    language='en'  # Default to English for emergency contacts
-                                )
-                                if sms_result:
-                                    sms_sent += 1
-                                    print(f"✅ [Background] SMS sent successfully to emergency contact: {emergency_contact_phone}", flush=True)
-                                else:
-                                    error_msg = f"SMS function returned False for emergency contact {emergency_contact_phone}"
+                            # Check if emergency contact phone is already in staff_phones
+                            emergency_phone_already_contacted = any(phone == emergency_contact_phone for phone, _ in staff_phones)
+                            if not emergency_phone_already_contacted:
+                                # Add delay before emergency contact SMS
+                                time.sleep(0.6)
+                                try:
+                                    sms_result = send_incident_alert_sms(
+                                        resident_name=resident_name,
+                                        incident_type=incident_type_for_email,
+                                        severity=severity_for_email.title(),
+                                        phone=emergency_contact_phone,
+                                        carrier=None,  # Will use default carrier (Verizon)
+                                        language='en'  # Default to English for emergency contacts
+                                    )
+                                    if sms_result:
+                                        sms_sent += 1
+                                        print(f"✅ [Background] SMS sent successfully to emergency contact: {emergency_contact_phone}", flush=True)
+                                    else:
+                                        error_msg = f"SMS function returned False for emergency contact {emergency_contact_phone}"
+                                        sms_errors.append(error_msg)
+                                        print(f"❌ [Background] {error_msg}", flush=True)
+                                except Exception as sms_exception:
+                                    error_msg = f"Exception sending SMS to emergency contact {emergency_contact_phone}: {str(sms_exception)}"
                                     sms_errors.append(error_msg)
                                     print(f"❌ [Background] {error_msg}", flush=True)
-                            except Exception as sms_exception:
-                                error_msg = f"Exception sending SMS to emergency contact {emergency_contact_phone}: {str(sms_exception)}"
-                                sms_errors.append(error_msg)
-                                print(f"❌ [Background] {error_msg}", flush=True)
+                            else:
+                                print(f"ℹ️ [Background] Emergency contact phone {emergency_contact_phone} already contacted as staff, skipping duplicate SMS", flush=True)
                         
                         if sms_sent > 0:
                             print(f"✅ [Background] Sent {sms_sent} SMS alert(s)", flush=True)
