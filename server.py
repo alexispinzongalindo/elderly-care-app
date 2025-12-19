@@ -745,7 +745,7 @@ def resident_detail(id):
         carrier_value = data.get('emergency_contact_carrier')
         if carrier_value == '' or carrier_value is None:
             carrier_value = None
-        print(f"📱 [UPDATE] Emergency contact carrier value: '{carrier_value}' (type: {type(carrier_value).__name__}) for resident ID: {resident_id}", flush=True)
+        print(f"📱 [UPDATE] Emergency contact carrier value: '{carrier_value}' (type: {type(carrier_value).__name__}) for resident ID: {id}", flush=True)
         
         cursor.execute('''
             UPDATE residents 
