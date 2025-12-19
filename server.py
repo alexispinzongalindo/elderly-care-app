@@ -1227,16 +1227,23 @@ def vital_signs():
                     resident_name = f"{resident['first_name']} {resident['last_name']}"
                     print(f"📋 [Background] Resident: {resident_name}", flush=True)
                     
-                    # Get staff emails for notification (managers, admins, or assigned staff)
+                    # Get staff emails and phone numbers for notification (managers, admins, or assigned staff)
                     bg_cursor.execute('''
-                        SELECT email FROM staff 
+                        SELECT email, phone, preferred_language FROM staff 
                         WHERE (role IN ('admin', 'manager') OR id = ?) 
-                        AND email IS NOT NULL 
-                        AND email != '' 
                         AND active = 1
                     ''', (staff_id,))
-                    staff_emails = [row['email'] for row in bg_cursor.fetchall()]
+                    staff_records = bg_cursor.fetchall()
+                    staff_emails = [row['email'] for row in staff_records if row['email']]
+                    staff_phones = [(row['phone'], row['preferred_language'] or 'en') for row in staff_records if row['phone']]
                     print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}", flush=True)
+                    print(f"📱 [Background] Found {len(staff_phones)} staff phone(s) for SMS", flush=True)
+                    
+                    # Get emergency contact phone for the resident
+                    bg_cursor.execute('SELECT emergency_contact_phone FROM residents WHERE id = ?', (resident_id,))
+                    emergency_contact_row = bg_cursor.fetchone()
+                    emergency_contact_phone = emergency_contact_row['emergency_contact_phone'] if emergency_contact_row and emergency_contact_row['emergency_contact_phone'] else None
+                    print(f"📱 [Background] Emergency contact phone: {emergency_contact_phone if emergency_contact_phone else 'None'}", flush=True)
                     
                     # Fallback: If no recipients found, try to get ANY staff email
                     if not staff_emails:
