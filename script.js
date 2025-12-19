@@ -4771,9 +4771,13 @@ function showCareNoteForm() {
     replaceDualLanguageText();
     const form = document.getElementById('newCareNoteForm');
     if (form) form.reset();
-    // Set default date to today
+    // Set default date and time to today/now
     const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const timeString = now.toTimeString().slice(0, 5); // HH:MM format
     document.getElementById('careNoteDate').value = today;
+    const timeField = document.getElementById('careNoteTime');
+    if (timeField) timeField.value = timeString;
     document.getElementById('careNoteForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -4802,16 +4806,23 @@ async function loadCareNotes() {
         
         container.innerHTML = notes.map(note => {
             const date = new Date(note.note_date);
+            const timeDisplay = note.note_time ? ` - ${note.note_time}` : '';
             return `
                 <div class="item-card">
                     <div class="item-header">
-                        <h3>${date.toLocaleDateString()} - ${note.resident_name || 'N/A'}</h3>
+                        <h3>${date.toLocaleDateString()}${timeDisplay} - ${note.resident_name || 'N/A'}</h3>
                         ${note.shift ? `<span class="badge badge-success">${note.shift}</span>` : ''}
                     </div>
                     <div class="item-details">
+                        ${note.appetite_rating ? `<p><strong>Appetite / Apetito:</strong> ${note.appetite_rating}</p>` : ''}
+                        ${note.fluid_intake ? `<p><strong>Fluid Intake / Ingesta de Líquidos:</strong> ${note.fluid_intake}</p>` : ''}
                         ${note.meal_breakfast ? `<p><strong>Breakfast / Desayuno:</strong> ${note.meal_breakfast}</p>` : ''}
                         ${note.meal_lunch ? `<p><strong>Lunch / Almuerzo:</strong> ${note.meal_lunch}</p>` : ''}
                         ${note.meal_dinner ? `<p><strong>Dinner / Cena:</strong> ${note.meal_dinner}</p>` : ''}
+                        ${note.toileting ? `<p><strong>Toileting / Uso de Baño:</strong> ${note.toileting}</p>` : ''}
+                        ${note.mobility ? `<p><strong>Mobility / Movilidad:</strong> ${note.mobility}</p>` : ''}
+                        ${note.pain_level ? `<p><strong>Pain Level / Nivel de Dolor:</strong> ${note.pain_level}${note.pain_location ? ` - ${note.pain_location}` : ''}</p>` : ''}
+                        ${note.skin_condition ? `<p><strong>Skin Condition / Condición de la Piel:</strong> ${note.skin_condition}</p>` : ''}
                         ${note.sleep_hours ? `<p><strong>Sleep / Sueño:</strong> ${note.sleep_hours} hours / horas</p>` : ''}
                         ${note.sleep_quality ? `<p><strong>Sleep Quality / Calidad:</strong> ${note.sleep_quality}</p>` : ''}
                         ${note.mood ? `<p><strong>Mood / Estado de Ánimo:</strong> ${note.mood}</p>` : ''}
@@ -4841,13 +4852,21 @@ async function editCareNote(id) {
         const note = await response.json();
         
         document.getElementById('careNoteDate').value = note.note_date || '';
+        document.getElementById('careNoteTime').value = note.note_time || '';
         document.getElementById('careNoteShift').value = note.shift || '';
+        document.getElementById('appetiteRating').value = note.appetite_rating || '';
+        document.getElementById('fluidIntake').value = note.fluid_intake || '';
         document.getElementById('mealBreakfast').value = note.meal_breakfast || '';
         document.getElementById('mealLunch').value = note.meal_lunch || '';
         document.getElementById('mealDinner').value = note.meal_dinner || '';
         document.getElementById('mealSnacks').value = note.meal_snacks || '';
         document.getElementById('bathing').value = note.bathing || '';
         document.getElementById('hygiene').value = note.hygiene || '';
+        document.getElementById('toileting').value = note.toileting || '';
+        document.getElementById('mobility').value = note.mobility || '';
+        document.getElementById('painLevel').value = note.pain_level || '';
+        document.getElementById('painLocation').value = note.pain_location || '';
+        document.getElementById('skinCondition').value = note.skin_condition || '';
         document.getElementById('sleepHours').value = note.sleep_hours || '';
         document.getElementById('sleepQuality').value = note.sleep_quality || '';
         document.getElementById('mood').value = note.mood || '';
@@ -4871,13 +4890,21 @@ async function saveCareNote(event) {
     const careNoteData = {
         resident_id: currentResidentId,
         note_date: document.getElementById('careNoteDate').value,
+        note_time: document.getElementById('careNoteTime').value || null,
         shift: document.getElementById('careNoteShift').value,
         meal_breakfast: document.getElementById('mealBreakfast').value,
         meal_lunch: document.getElementById('mealLunch').value,
         meal_dinner: document.getElementById('mealDinner').value,
         meal_snacks: document.getElementById('mealSnacks').value,
+        appetite_rating: document.getElementById('appetiteRating').value,
+        fluid_intake: document.getElementById('fluidIntake').value,
         bathing: document.getElementById('bathing').value,
         hygiene: document.getElementById('hygiene').value,
+        toileting: document.getElementById('toileting').value,
+        mobility: document.getElementById('mobility').value,
+        pain_level: document.getElementById('painLevel').value,
+        pain_location: document.getElementById('painLocation').value,
+        skin_condition: document.getElementById('skinCondition').value,
         sleep_hours: document.getElementById('sleepHours').value || null,
         sleep_quality: document.getElementById('sleepQuality').value,
         mood: document.getElementById('mood').value,

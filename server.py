@@ -327,13 +327,21 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             resident_id INTEGER NOT NULL,
             note_date DATE NOT NULL,
+            note_time TIME,
             shift TEXT,
             meal_breakfast TEXT,
             meal_lunch TEXT,
             meal_dinner TEXT,
             meal_snacks TEXT,
+            appetite_rating TEXT,
+            fluid_intake TEXT,
             bathing TEXT,
             hygiene TEXT,
+            toileting TEXT,
+            mobility TEXT,
+            pain_level TEXT,
+            pain_location TEXT,
+            skin_condition TEXT,
             sleep_hours REAL,
             sleep_quality TEXT,
             mood TEXT,
@@ -346,6 +354,23 @@ def init_db():
             FOREIGN KEY (staff_id) REFERENCES staff (id)
         )
     ''')
+    
+    # Add new columns to existing table if they don't exist (migration)
+    new_columns = [
+        ('note_time', 'TIME'),
+        ('appetite_rating', 'TEXT'),
+        ('fluid_intake', 'TEXT'),
+        ('toileting', 'TEXT'),
+        ('mobility', 'TEXT'),
+        ('pain_level', 'TEXT'),
+        ('pain_location', 'TEXT'),
+        ('skin_condition', 'TEXT')
+    ]
+    for col_name, col_type in new_columns:
+        try:
+            cursor.execute(f'ALTER TABLE daily_care_notes ADD COLUMN {col_name} {col_type}')
+        except sqlite3.OperationalError:
+            pass  # Column already exists
     
     # Notifications table
     cursor.execute('''
@@ -795,11 +820,127 @@ def log_medication(id):
     cursor = conn.cursor()
     data = request.json
     
+    medication_status = data.get('status', '').lower()
+    scheduled_time = data.get('scheduled_time', '')
+    staff_id = request.current_staff['id']
+    
     cursor.execute('''
         INSERT INTO medication_logs (medication_id, scheduled_time, status, staff_id)
         VALUES (?, ?, ?, ?)
-    ''', (id, data['scheduled_time'], data['status'], request.current_staff['id']))
+    ''', (id, scheduled_time, medication_status, staff_id))
     conn.commit()
+    log_id = cursor.lastrowid
+    
+    # If medication is marked as "missed", send email alert in background
+    if medication_status == 'missed' and EMAIL_SERVICE_AVAILABLE:
+        def send_medication_alert_background():
+            try:
+                print(f"💊 [Background] Medication alert thread started for medication_id={id}, status='missed'", flush=True)
+                
+                # Create new database connection in background thread
+                bg_conn = get_db()
+                bg_cursor = bg_conn.cursor()
+                
+                # Get medication details with resident information
+                bg_cursor.execute('''
+                    SELECT m.name, m.dosage, r.first_name, r.last_name, r.id as resident_id
+                    FROM medications m
+                    JOIN residents r ON m.resident_id = r.id
+                    WHERE m.id = ?
+                ''', (id,))
+                med_info = bg_cursor.fetchone()
+                
+                if not med_info:
+                    print(f"⚠️ [Background] Medication not found (medication_id: {id})", flush=True)
+                    bg_conn.close()
+                    return
+                
+                medication_name = med_info['name']
+                resident_name = f"{med_info['first_name']} {med_info['last_name']}"
+                resident_id_for_email = med_info['resident_id']
+                
+                print(f"💊 [Background] Medication: {medication_name} for {resident_name}", flush=True)
+                print(f"   Scheduled time: {scheduled_time}", flush=True)
+                
+                # Get staff emails for notification (managers, admins, or assigned staff)
+                bg_cursor.execute('''
+                    SELECT email FROM staff 
+                    WHERE (role IN ('admin', 'manager') OR id = ?) 
+                    AND email IS NOT NULL 
+                    AND email != '' 
+                    AND active = 1
+                ''', (staff_id,))
+                staff_emails = [row['email'] for row in bg_cursor.fetchall()]
+                print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}", flush=True)
+                
+                # Fallback: If no recipients found, try to get ANY staff email
+                if not staff_emails:
+                    print(f"⚠️ [Background] No staff emails found, trying fallback...", flush=True)
+                    bg_cursor.execute('''
+                        SELECT email FROM staff 
+                        WHERE email IS NOT NULL 
+                        AND email != '' 
+                        AND active = 1
+                        LIMIT 1
+                    ''')
+                    fallback_staff = bg_cursor.fetchone()
+                    if fallback_staff and fallback_staff['email']:
+                        staff_emails.append(fallback_staff['email'])
+                        print(f"⚠️ [Background] Using fallback staff email: {fallback_staff['email']}", flush=True)
+                
+                bg_conn.close()
+                
+                if not staff_emails:
+                    print(f"❌ [Background] No email addresses found to send medication alert for {resident_name}", flush=True)
+                    return
+                
+                # Default to English for language
+                language_for_email = 'en'
+                
+                print(f"📬 [Background] Preparing to send medication missed alerts to {len(staff_emails)} recipient(s)", flush=True)
+                
+                # Send email to all staff recipients
+                emails_sent = 0
+                email_errors = []
+                for recipient_email in staff_emails:
+                    print(f"📤 [Background] Sending medication missed alert to {recipient_email}...", flush=True)
+                    try:
+                        email_result = send_medication_alert(
+                            resident_name=resident_name,
+                            medication_name=medication_name,
+                            scheduled_time=scheduled_time,
+                            staff_email=recipient_email,
+                            language=language_for_email
+                        )
+                        if email_result:
+                            emails_sent += 1
+                            print(f"✅ [Background] Medication alert sent successfully to {recipient_email}", flush=True)
+                        else:
+                            error_msg = f"Email function returned False for {recipient_email}"
+                            email_errors.append(error_msg)
+                            print(f"❌ [Background] {error_msg}", flush=True)
+                    except Exception as email_exception:
+                        error_msg = f"Exception sending email to {recipient_email}: {str(email_exception)}"
+                        email_errors.append(error_msg)
+                        print(f"❌ [Background] {error_msg}", flush=True)
+                        import traceback
+                        traceback.print_exc(file=sys.stdout)
+                
+                if emails_sent > 0:
+                    print(f"✅ [Background] Sent {emails_sent}/{len(staff_emails)} medication missed alert(s) for {resident_name}", flush=True)
+                else:
+                    print(f"⚠️ [Background] Failed to send medication missed alert emails.", flush=True)
+                    print(f"   Errors: {email_errors}", flush=True)
+            except Exception as bg_error:
+                print(f"❌ [Background] Error in medication alert thread: {bg_error}", flush=True)
+                import traceback
+                traceback.print_exc(file=sys.stdout)
+        
+        # Start background thread for email sending
+        email_thread = threading.Thread(target=send_medication_alert_background, daemon=True)
+        email_thread.start()
+        print(f"💊 Medication missed alert thread started (non-blocking, thread ID: {email_thread.ident})", flush=True)
+    
     conn.close()
     return jsonify({'message': 'Medication logged successfully'}), 201
 
@@ -924,24 +1065,168 @@ def vital_signs():
     
     elif request.method == 'POST':
         data = request.json
+        resident_id = data.get('resident_id')
+        systolic = data.get('systolic')
+        diastolic = data.get('diastolic')
+        glucose = data.get('glucose')
+        temperature = data.get('temperature')
+        heart_rate = data.get('heart_rate')
+        staff_id = request.current_staff['id']
+        
         cursor.execute('''
             INSERT INTO vital_signs (resident_id, recorded_at, systolic, diastolic, glucose, weight, temperature, heart_rate, notes, staff_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            data.get('resident_id'),
+            resident_id,
             data.get('recorded_at'),
-            data.get('systolic'),
-            data.get('diastolic'),
-            data.get('glucose'),
+            systolic,
+            diastolic,
+            glucose,
             data.get('weight'),
-            data.get('temperature'),
-            data.get('heart_rate'),
+            temperature,
+            heart_rate,
             data.get('notes', ''),
-            request.current_staff['id']
+            staff_id
         ))
         conn.commit()
         sign_id = cursor.lastrowid
+        
+        # Check for critical values and send alerts in background
+        critical_alerts = []
+        if EMAIL_SERVICE_AVAILABLE:
+            # Check blood pressure (systolic ≥ 140 or diastolic ≥ 90)
+            if systolic and systolic >= 140:
+                critical_alerts.append(('Blood Pressure', f'Systolic: {systolic} mmHg', 'Systolic ≥ 140 mmHg'))
+            elif diastolic and diastolic >= 90:
+                critical_alerts.append(('Blood Pressure', f'Diastolic: {diastolic} mmHg', 'Diastolic ≥ 90 mmHg'))
+            
+            # Check glucose (low: < 70, high: > 180)
+            if glucose is not None:
+                if glucose < 70:
+                    critical_alerts.append(('Glucose', f'{glucose} mg/dL', '< 70 mg/dL (Low)'))
+                elif glucose > 180:
+                    critical_alerts.append(('Glucose', f'{glucose} mg/dL', '> 180 mg/dL (High)'))
+            
+            # Check heart rate (low: < 60, high: > 100)
+            if heart_rate is not None:
+                if heart_rate < 60:
+                    critical_alerts.append(('Heart Rate', f'{heart_rate} bpm', '< 60 bpm (Low)'))
+                elif heart_rate > 100:
+                    critical_alerts.append(('Heart Rate', f'{heart_rate} bpm', '> 100 bpm (High)'))
+            
+            # Check temperature (fever: > 100.4°F, hypothermia: < 95°F)
+            if temperature is not None:
+                if temperature > 100.4:
+                    critical_alerts.append(('Temperature', f'{temperature}°F', '> 100.4°F (Fever)'))
+                elif temperature < 95:
+                    critical_alerts.append(('Temperature', f'{temperature}°F', '< 95°F (Hypothermia)'))
+        
         conn.close()
+        
+        # If critical values detected, send email alerts in background
+        if critical_alerts and EMAIL_SERVICE_AVAILABLE:
+            def send_vital_signs_alerts_background():
+                try:
+                    print(f"🚨 [Background] Vital signs alert thread started for resident_id={resident_id}", flush=True)
+                    print(f"   Critical alerts detected: {len(critical_alerts)}", flush=True)
+                    
+                    # Create new database connection in background thread
+                    bg_conn = get_db()
+                    bg_cursor = bg_conn.cursor()
+                    
+                    # Get resident name
+                    bg_cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (resident_id,))
+                    resident = bg_cursor.fetchone()
+                    if not resident:
+                        print(f"⚠️ [Background] Resident not found (resident_id: {resident_id})", flush=True)
+                        bg_conn.close()
+                        return
+                    
+                    resident_name = f"{resident['first_name']} {resident['last_name']}"
+                    print(f"📋 [Background] Resident: {resident_name}", flush=True)
+                    
+                    # Get staff emails for notification (managers, admins, or assigned staff)
+                    bg_cursor.execute('''
+                        SELECT email FROM staff 
+                        WHERE (role IN ('admin', 'manager') OR id = ?) 
+                        AND email IS NOT NULL 
+                        AND email != '' 
+                        AND active = 1
+                    ''', (staff_id,))
+                    staff_emails = [row['email'] for row in bg_cursor.fetchall()]
+                    print(f"👥 [Background] Found {len(staff_emails)} staff email(s): {staff_emails}", flush=True)
+                    
+                    # Fallback: If no recipients found, try to get ANY staff email
+                    if not staff_emails:
+                        print(f"⚠️ [Background] No staff emails found, trying fallback...", flush=True)
+                        bg_cursor.execute('''
+                            SELECT email FROM staff 
+                            WHERE email IS NOT NULL 
+                            AND email != '' 
+                            AND active = 1
+                            LIMIT 1
+                        ''')
+                        fallback_staff = bg_cursor.fetchone()
+                        if fallback_staff and fallback_staff['email']:
+                            staff_emails.append(fallback_staff['email'])
+                            print(f"⚠️ [Background] Using fallback staff email: {fallback_staff['email']}", flush=True)
+                    
+                    bg_conn.close()
+                    
+                    if not staff_emails:
+                        print(f"❌ [Background] No email addresses found to send vital signs alerts for {resident_name}", flush=True)
+                        return
+                    
+                    # Default to English for language
+                    language_for_email = 'en'
+                    
+                    print(f"📬 [Background] Preparing to send {len(critical_alerts)} vital signs alert(s) to {len(staff_emails)} recipient(s)", flush=True)
+                    
+                    # Send email for each critical alert
+                    emails_sent = 0
+                    email_errors = []
+                    for vital_type, value, threshold in critical_alerts:
+                        for recipient_email in staff_emails:
+                            print(f"📤 [Background] Sending {vital_type} alert ({value}) to {recipient_email}...", flush=True)
+                            try:
+                                email_result = send_vital_signs_alert(
+                                    resident_name=resident_name,
+                                    vital_type=vital_type,
+                                    value=value,
+                                    threshold=threshold,
+                                    staff_email=recipient_email,
+                                    language=language_for_email
+                                )
+                                if email_result:
+                                    emails_sent += 1
+                                    print(f"✅ [Background] {vital_type} alert sent successfully to {recipient_email}", flush=True)
+                                else:
+                                    error_msg = f"Email function returned False for {recipient_email} ({vital_type})"
+                                    email_errors.append(error_msg)
+                                    print(f"❌ [Background] {error_msg}", flush=True)
+                            except Exception as email_exception:
+                                error_msg = f"Exception sending {vital_type} alert to {recipient_email}: {str(email_exception)}"
+                                email_errors.append(error_msg)
+                                print(f"❌ [Background] {error_msg}", flush=True)
+                                import traceback
+                                traceback.print_exc(file=sys.stdout)
+                    
+                    if emails_sent > 0:
+                        print(f"✅ [Background] Sent {emails_sent} vital signs alert(s) for {resident_name}", flush=True)
+                    else:
+                        print(f"⚠️ [Background] Failed to send vital signs alert emails.", flush=True)
+                        print(f"   Errors: {email_errors}", flush=True)
+                except Exception as bg_error:
+                    print(f"❌ [Background] Error in vital signs alert thread: {bg_error}", flush=True)
+                    import traceback
+                    traceback.print_exc(file=sys.stdout)
+            
+            # Start background thread for email sending
+            email_thread = threading.Thread(target=send_vital_signs_alerts_background, daemon=True)
+            email_thread.start()
+            print(f"🚨 Vital signs alert thread started (non-blocking, thread ID: {email_thread.ident})", flush=True)
+            print(f"   Critical values detected: {critical_alerts}", flush=True)
+        
         return jsonify({'id': sign_id, 'message': 'Vital signs recorded successfully'}), 201
 
 @app.route('/api/vital-signs/<int:sign_id>', methods=['GET', 'PUT', 'DELETE'])
@@ -2273,20 +2558,29 @@ def care_notes():
         data = request.json
         cursor.execute('''
             INSERT INTO daily_care_notes (
-                resident_id, note_date, shift, meal_breakfast, meal_lunch,
-                meal_dinner, meal_snacks, bathing, hygiene, sleep_hours,
-                sleep_quality, mood, behavior_notes, activities, general_notes, staff_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                resident_id, note_date, note_time, shift, meal_breakfast, meal_lunch,
+                meal_dinner, meal_snacks, appetite_rating, fluid_intake, bathing, hygiene,
+                toileting, mobility, pain_level, pain_location, skin_condition,
+                sleep_hours, sleep_quality, mood, behavior_notes, activities, general_notes, staff_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data.get('resident_id'),
             data.get('note_date'),
+            data.get('note_time'),
             data.get('shift'),
             data.get('meal_breakfast'),
             data.get('meal_lunch'),
             data.get('meal_dinner'),
             data.get('meal_snacks'),
+            data.get('appetite_rating'),
+            data.get('fluid_intake'),
             data.get('bathing'),
             data.get('hygiene'),
+            data.get('toileting'),
+            data.get('mobility'),
+            data.get('pain_level'),
+            data.get('pain_location'),
+            data.get('skin_condition'),
             data.get('sleep_hours'),
             data.get('sleep_quality'),
             data.get('mood'),
@@ -2325,20 +2619,29 @@ def care_note_detail(id):
         data = request.json
         cursor.execute('''
             UPDATE daily_care_notes 
-            SET note_date = ?, shift = ?, meal_breakfast = ?, meal_lunch = ?,
-                meal_dinner = ?, meal_snacks = ?, bathing = ?, hygiene = ?,
-                sleep_hours = ?, sleep_quality = ?, mood = ?, behavior_notes = ?,
-                activities = ?, general_notes = ?
+            SET note_date = ?, note_time = ?, shift = ?, meal_breakfast = ?, meal_lunch = ?,
+                meal_dinner = ?, meal_snacks = ?, appetite_rating = ?, fluid_intake = ?,
+                bathing = ?, hygiene = ?, toileting = ?, mobility = ?, pain_level = ?,
+                pain_location = ?, skin_condition = ?, sleep_hours = ?, sleep_quality = ?,
+                mood = ?, behavior_notes = ?, activities = ?, general_notes = ?
             WHERE id = ?
         ''', (
             data.get('note_date'),
+            data.get('note_time'),
             data.get('shift'),
             data.get('meal_breakfast'),
             data.get('meal_lunch'),
             data.get('meal_dinner'),
             data.get('meal_snacks'),
+            data.get('appetite_rating'),
+            data.get('fluid_intake'),
             data.get('bathing'),
             data.get('hygiene'),
+            data.get('toileting'),
+            data.get('mobility'),
+            data.get('pain_level'),
+            data.get('pain_location'),
+            data.get('skin_condition'),
             data.get('sleep_hours'),
             data.get('sleep_quality'),
             data.get('mood'),

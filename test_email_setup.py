@@ -36,7 +36,7 @@ print()
 # Check if email_service can be imported
 print("2. Email Service Module:")
 try:
-    from email_service import send_email, EMAIL_SERVICE_AVAILABLE
+    from email_service import send_email
     print("   ✅ email_service.py found and can be imported")
 except ImportError as e:
     print(f"   ❌ Cannot import email_service: {e}")
