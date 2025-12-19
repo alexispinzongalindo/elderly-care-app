@@ -2158,20 +2158,30 @@ def dashboard():
         'billing_summary': billing_summary
     })
 
-# Staff management (admin only)
+# Staff management (GET: any authenticated user, POST: admin only)
 @app.route('/api/staff', methods=['GET', 'POST'])
-@require_role('admin')
 def staff():
-    conn = get_db()
-    cursor = conn.cursor()
-    
+    # GET: Allow any authenticated user (needed for dropdowns in forms)
     if request.method == 'GET':
+        staff_member = get_current_staff(request)
+        if not staff_member:
+            return jsonify({'error': 'Authentication required'}), 401
+        conn = get_db()
+        cursor = conn.cursor()
         cursor.execute('SELECT id, username, full_name, role, email, phone, active, created_at FROM staff ORDER BY full_name')
         staff_list = [dict(row) for row in cursor.fetchall()]
         conn.close()
         return jsonify(staff_list)
     
+    # POST: Admin only
     elif request.method == 'POST':
+        staff_member = get_current_staff(request)
+        if not staff_member:
+            return jsonify({'error': 'Authentication required'}), 401
+        if staff_member['role'] != 'admin':
+            return jsonify({'error': 'Insufficient permissions'}), 403
+        conn = get_db()
+        cursor = conn.cursor()
         data = request.json
         password_hash = hash_password(data.get('password', 'password123'))
         cursor.execute('''
