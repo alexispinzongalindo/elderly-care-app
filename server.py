@@ -741,11 +741,22 @@ def resident_detail(id):
     elif request.method == 'PUT':
         data = request.json
         
+        # Very visible logging for carrier debugging
+        print("=" * 70, flush=True)
+        print("🚨🚨🚨 RESIDENT UPDATE REQUEST RECEIVED 🚨🚨🚨", flush=True)
+        print(f"Resident ID: {id}", flush=True)
+        print("=" * 70, flush=True)
+        
+        # Log ALL carrier-related fields
+        print(f"📱 Raw emergency_contact_carrier from request: {repr(data.get('emergency_contact_carrier'))}", flush=True)
+        print(f"📱 Type: {type(data.get('emergency_contact_carrier')).__name__}", flush=True)
+        
         # Get carrier value and normalize empty strings to None
         carrier_value = data.get('emergency_contact_carrier')
         if carrier_value == '' or carrier_value is None:
             carrier_value = None
-        print(f"📱 [UPDATE] Emergency contact carrier value: '{carrier_value}' (type: {type(carrier_value).__name__}) for resident ID: {id}", flush=True)
+        print(f"📱 Normalized carrier_value to save: {repr(carrier_value)}", flush=True)
+        print("=" * 70, flush=True)
         
         cursor.execute('''
             UPDATE residents 

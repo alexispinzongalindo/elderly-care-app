@@ -1618,7 +1618,7 @@ async function saveNewResident(event) {
 
     // Get carrier value and log it for debugging (carrierEl already declared above at line 1551)
     const carrierValue = carrierEl ? carrierEl.value : '';
-    
+
     // VERY VISIBLE LOGGING - CARRIER FIELD
     console.log('═══════════════════════════════════════════════════════');
     console.log('🚨🚨🚨 CARRIER FIELD DEBUGGING 🚨🚨🚨');
