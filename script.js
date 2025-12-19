@@ -1667,6 +1667,8 @@ async function saveNewResident(event) {
         if (isEditing) {
             // Update existing resident
             console.log('🔄 UPDATING resident with ID:', currentEditingId);
+            console.log('📤 CARRIER VALUE IN RESIDENT OBJECT:', resident.emergency_contact_carrier);
+            console.log('📤 FULL REQUEST BODY (JSON):', JSON.stringify(resident));
             response = await fetch(`/api/residents/${currentEditingId}`, {
                 method: 'PUT',
                 headers: getAuthHeaders(),
