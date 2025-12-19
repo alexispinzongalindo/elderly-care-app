@@ -1548,7 +1548,7 @@ async function saveNewResident(event) {
     const bedEl = usePageForm ? document.getElementById('newBedNumberPage') : document.getElementById('newBedNumber');
     const emergencyEl = usePageForm ? document.getElementById('newEmergencyContactPage') : document.getElementById('newEmergencyContact');
     const phoneEl = usePageForm ? document.getElementById('newEmergencyPhonePage') : document.getElementById('newEmergencyPhone');
-    
+
     // Get carrier element - try both IDs as fallback
     let carrierEl = usePageForm ? document.getElementById('newEmergencyCarrierPage') : document.getElementById('newEmergencyCarrier');
     if (!carrierEl) {
@@ -1563,7 +1563,7 @@ async function saveNewResident(event) {
         console.error('   Searched for:', usePageForm ? 'newEmergencyCarrierPage' : 'newEmergencyCarrier');
         console.error('   Fallback searched:', usePageForm ? 'newEmergencyCarrier' : 'newEmergencyCarrierPage');
     }
-    
+
     const relationEl = usePageForm ? document.getElementById('newEmergencyRelationPage') : document.getElementById('newEmergencyRelation');
     const emailEl = usePageForm ? document.getElementById('newEmergencyEmailPage') : document.getElementById('newEmergencyEmail');
     const conditionsEl = usePageForm ? document.getElementById('newMedicalConditionsPage') : document.getElementById('newMedicalConditions');
@@ -1634,12 +1634,20 @@ async function saveNewResident(event) {
     // Get carrier value and log it for debugging (carrierEl already declared above at line 1551)
     // IMPORTANT: Get the raw value first, then normalize
     let carrierValue = null;
+    
+    // SIMPLE LOGGING - will show even with cached code
+    console.log('🔍 SIMPLE CARRIER CHECK - carrierEl exists?', !!carrierEl);
     if (carrierEl) {
+        console.log('🔍 SIMPLE CARRIER CHECK - element.value:', carrierEl.value);
+        console.log('🔍 SIMPLE CARRIER CHECK - element.id:', carrierEl.id);
         carrierValue = carrierEl.value; // Get raw value (could be empty string)
         // Normalize: empty string becomes null, but preserve actual values like 'claro'
         if (carrierValue === '') {
             carrierValue = null;
         }
+        console.log('🔍 SIMPLE CARRIER CHECK - final carrierValue:', carrierValue);
+    } else {
+        console.error('❌ SIMPLE CARRIER CHECK - carrierEl is NULL! Element not found!');
     }
 
     // VERY VISIBLE LOGGING - CARRIER FIELD
