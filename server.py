@@ -2398,6 +2398,22 @@ def incidents():
                     sms_sent = 0
                     sms_errors = []
                     if SMS_SERVICE_AVAILABLE:
+                        # Get staff phones (re-fetch from database)
+                        bg_conn_sms = get_db()
+                        bg_cursor_sms = bg_conn_sms.cursor()
+                        bg_cursor_sms.execute('''
+                            SELECT phone, preferred_language FROM staff 
+                            WHERE (role IN ('admin', 'manager') OR id = ?) 
+                            AND phone IS NOT NULL 
+                            AND phone != '' 
+                            AND active = 1
+                        ''', (staff_id_for_email,))
+                        staff_phones = [(row['phone'], row['preferred_language'] or 'en') for row in bg_cursor_sms.fetchall()]
+                        bg_cursor_sms.execute('SELECT emergency_contact_phone FROM residents WHERE id = ?', (resident_id_for_email,))
+                        emergency_contact_row = bg_cursor_sms.fetchone()
+                        emergency_contact_phone = emergency_contact_row['emergency_contact_phone'] if emergency_contact_row and emergency_contact_row['emergency_contact_phone'] else None
+                        bg_conn_sms.close()
+                        
                         print(f"📱 [Background] Preparing to send SMS alerts to {len(staff_phones)} staff phone(s) and emergency contact", flush=True)
                         
                         # Send SMS to staff
