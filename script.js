@@ -1618,13 +1618,20 @@ async function saveNewResident(event) {
 
     // Get carrier value and log it for debugging (carrierEl already declared above at line 1551)
     const carrierValue = carrierEl ? carrierEl.value : '';
-    console.log('🔍🔍🔍 CARRIER DEBUGGING 🔍🔍🔍');
+    
+    // VERY VISIBLE LOGGING - CARRIER FIELD
+    console.log('═══════════════════════════════════════════════════════');
+    console.log('🚨🚨🚨 CARRIER FIELD DEBUGGING 🚨🚨🚨');
+    console.log('═══════════════════════════════════════════════════════');
     console.log('🔍 usePageForm:', usePageForm);
-    console.log('🔍 Carrier element ID searched:', usePageForm ? 'newEmergencyCarrierPage' : 'newEmergencyCarrier');
-    console.log('🔍 Carrier element found:', carrierEl);
-    console.log('🔍 Carrier element value:', carrierEl ? carrierEl.value : 'ELEMENT NOT FOUND!');
-    console.log('🔍 Carrier value to save:', carrierValue || null);
-    console.log('🔍🔍🔍 END CARRIER DEBUGGING 🔍🔍🔍');
+    console.log('🔍 Carrier element ID:', usePageForm ? 'newEmergencyCarrierPage' : 'newEmergencyCarrier');
+    console.log('🔍 Carrier element found:', carrierEl ? 'YES' : 'NO - ELEMENT NOT FOUND!');
+    if (carrierEl) {
+        console.log('🔍 Carrier element value:', carrierEl.value);
+        console.log('🔍 Carrier element selected option:', carrierEl.options[carrierEl.selectedIndex]?.text);
+    }
+    console.log('🔍 CARRIER VALUE TO SAVE:', carrierValue || 'EMPTY/NULL');
+    console.log('═══════════════════════════════════════════════════════');
 
     const resident = {
         first_name: firstNameEl.value.trim(),
@@ -1667,8 +1674,12 @@ async function saveNewResident(event) {
         if (isEditing) {
             // Update existing resident
             console.log('🔄 UPDATING resident with ID:', currentEditingId);
-            console.log('📤 CARRIER VALUE IN RESIDENT OBJECT:', resident.emergency_contact_carrier);
-            console.log('📤 FULL REQUEST BODY (JSON):', JSON.stringify(resident));
+            console.log('═══════════════════════════════════════════════════════');
+            console.log('🚨🚨🚨 CARRIER IN REQUEST 🚨🚨🚨');
+            console.log('📤 emergency_contact_carrier:', resident.emergency_contact_carrier);
+            console.log('📤 FULL JSON BEING SENT:');
+            console.log(JSON.stringify(resident, null, 2));
+            console.log('═══════════════════════════════════════════════════════');
             response = await fetch(`/api/residents/${currentEditingId}`, {
                 method: 'PUT',
                 headers: getAuthHeaders(),
