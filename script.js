@@ -2533,29 +2533,22 @@ function showPage(pageName) {
 
         // CRITICAL: Force carenotes page to be visible IMMEDIATELY (before any other logic)
         if (pageName === 'carenotes') {
-            console.log('🚨🚨🚨 CARENOTES PAGE DETECTED - FORCING VISIBILITY 🚨🚨🚨');
             const carenotesPage = document.getElementById('carenotes');
             if (carenotesPage) {
-                // Aggressively force visibility
+                // USE cssText to completely overwrite all styles - most aggressive approach
                 carenotesPage.classList.add('active');
-                carenotesPage.style.setProperty('display', 'block', 'important');
-                carenotesPage.style.setProperty('visibility', 'visible', 'important');
-                carenotesPage.style.setProperty('opacity', '1', 'important');
-                carenotesPage.style.setProperty('position', 'relative', 'important');
-                carenotesPage.style.setProperty('z-index', '10', 'important');
-                carenotesPage.style.setProperty('min-height', '400px', 'important');
-                carenotesPage.style.setProperty('width', '100%', 'important');
-                console.log('✅ Carenotes page visibility forced');
-            } else {
-                console.error('❌ Carenotes page element not found!');
-            }
-
-            // FALLBACK: Ensure loadCareNotes() is called
-            console.log('🔧 FALLBACK: Scheduling loadCareNotes() call');
-            setTimeout(() => {
-                console.log('🔧 FALLBACK: Executing loadCareNotes() now');
+                carenotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important;';
+                
+                // Also force the container to show immediately
+                const container = document.getElementById('careNotesList');
+                if (container) {
+                    container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
+                    container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading...</div>';
+                }
+                
+                // Call loadCareNotes() IMMEDIATELY - don't wait
                 loadCareNotes();
-            }, 100);
+            }
         }
 
         // Update nav links
@@ -5256,15 +5249,25 @@ async function loadCareNotes() {
     // GET CONTAINER IMMEDIATELY - make it visible right away
     const container = document.getElementById('careNotesList');
     if (!container) {
-        console.error('❌ careNotesList container not found!');
-        return;
+        // Try to create it if it doesn't exist
+        const carenotesPage = document.getElementById('carenotes');
+        if (carenotesPage) {
+            const newContainer = document.createElement('div');
+            newContainer.id = 'careNotesList';
+            newContainer.className = 'item-list';
+            newContainer.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important; margin-top: 2rem !important;';
+            carenotesPage.appendChild(newContainer);
+            container = newContainer;
+        } else {
+            return;
+        }
     }
 
-    // FORCE VISIBILITY IMMEDIATELY
+    // FORCE VISIBILITY IMMEDIATELY with cssText
     container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
-
+    
     // Show loading state immediately
-    container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading care notes...</div>';
+    container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666; background: white; border-radius: 8px;">Loading care notes...</div>';
 
     try {
         if (!authToken) {
