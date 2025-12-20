@@ -2531,12 +2531,31 @@ function showPage(pageName) {
         console.log('✅ Target page offsetHeight:', targetPage.offsetHeight);
         console.log('✅ Target page offsetWidth:', targetPage.offsetWidth);
 
-        // FALLBACK: Ensure loadCareNotes() is called for carenotes page
+        // CRITICAL: Force carenotes page to be visible IMMEDIATELY (before any other logic)
         if (pageName === 'carenotes') {
-            console.log('🔧 FALLBACK: Calling loadCareNotes() directly');
+            console.log('🚨🚨🚨 CARENOTES PAGE DETECTED - FORCING VISIBILITY 🚨🚨🚨');
+            const carenotesPage = document.getElementById('carenotes');
+            if (carenotesPage) {
+                // Aggressively force visibility
+                carenotesPage.classList.add('active');
+                carenotesPage.style.setProperty('display', 'block', 'important');
+                carenotesPage.style.setProperty('visibility', 'visible', 'important');
+                carenotesPage.style.setProperty('opacity', '1', 'important');
+                carenotesPage.style.setProperty('position', 'relative', 'important');
+                carenotesPage.style.setProperty('z-index', '10', 'important');
+                carenotesPage.style.setProperty('min-height', '400px', 'important');
+                carenotesPage.style.setProperty('width', '100%', 'important');
+                console.log('✅ Carenotes page visibility forced');
+            } else {
+                console.error('❌ Carenotes page element not found!');
+            }
+            
+            // FALLBACK: Ensure loadCareNotes() is called
+            console.log('🔧 FALLBACK: Scheduling loadCareNotes() call');
             setTimeout(() => {
+                console.log('🔧 FALLBACK: Executing loadCareNotes() now');
                 loadCareNotes();
-            }, 50);
+            }, 100);
         }
 
         // Update nav links
@@ -5288,11 +5307,21 @@ async function loadCareNotes() {
         }
 
         console.log('✅ careNotesList container found');
+        console.log('✅ Container before forcing - display:', window.getComputedStyle(container).display);
+        console.log('✅ Container before forcing - visibility:', window.getComputedStyle(container).visibility);
+        console.log('✅ Container before forcing - offsetHeight:', container.offsetHeight);
 
-        // Ensure container is visible
-        container.style.display = 'block';
-        container.style.visibility = 'visible';
-        container.style.minHeight = '200px';
+        // Aggressively ensure container is visible
+        container.style.setProperty('display', 'block', 'important');
+        container.style.setProperty('visibility', 'visible', 'important');
+        container.style.setProperty('opacity', '1', 'important');
+        container.style.setProperty('min-height', '200px', 'important');
+        container.style.setProperty('width', '100%', 'important');
+        container.style.setProperty('padding', '1rem', 'important');
+        
+        console.log('✅ Container after forcing - display:', window.getComputedStyle(container).display);
+        console.log('✅ Container after forcing - visibility:', window.getComputedStyle(container).visibility);
+        console.log('✅ Container after forcing - offsetHeight:', container.offsetHeight);
 
         if (!notes || notes.length === 0) {
             console.log('📝 No care notes found, showing empty state');
