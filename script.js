@@ -143,8 +143,9 @@ const translations = {
         'resident.title': 'Residents Management',
         'resident.add': 'Add New Resident',
         'resident.edit': 'Edit Resident',
-        'resident.firstName': 'First Name',
-        'resident.lastName': 'Last Name',
+        'resident.fullName': 'Full Name',
+        'resident.firstName': 'First Name', // Deprecated - kept for backwards compatibility
+        'resident.lastName': 'Last Name', // Deprecated - kept for backwards compatibility
         'resident.dateOfBirth': 'Date of Birth',
         'resident.gender': 'Gender',
         'resident.photo': 'Photo',
@@ -414,8 +415,9 @@ const translations = {
         'resident.title': 'Gestión de Residentes',
         'resident.add': 'Agregar Nuevo Residente',
         'resident.edit': 'Editar Residente',
-        'resident.firstName': 'Nombre',
-        'resident.lastName': 'Apellido',
+        'resident.fullName': 'Nombre Completo',
+        'resident.firstName': 'Nombre', // Deprecated - kept for backwards compatibility
+        'resident.lastName': 'Apellido', // Deprecated - kept for backwards compatibility
         'resident.dateOfBirth': 'Fecha de Nacimiento',
         'resident.gender': 'Género',
         'resident.photo': 'Foto',
@@ -1524,24 +1526,26 @@ async function saveNewResident(event) {
 
     console.log('🔍 Using form:', usePageForm ? 'PAGE FORM' : 'MODAL FORM');
 
-    // Get values from the form that was submitted
-    const firstNameModal = document.getElementById('newFirstName');
-    const firstNamePage = document.getElementById('newFirstNamePage');
-    const firstNameEl = usePageForm ? firstNamePage : firstNameModal;
+    // Get full name field and split it into first and last name
+    const fullNameModal = document.getElementById('newFullName');
+    const fullNamePage = document.getElementById('newFullNamePage');
+    const fullNameEl = usePageForm ? fullNamePage : fullNameModal;
 
     console.log('🔍 FORM ELEMENT CHECK:');
-    console.log('  Modal firstName element:', firstNameModal, 'Value:', firstNameModal?.value);
-    console.log('  Page firstName element:', firstNamePage, 'Value:', firstNamePage?.value);
+    console.log('  Modal fullName element:', fullNameModal, 'Value:', fullNameModal?.value);
+    console.log('  Page fullName element:', fullNamePage, 'Value:', fullNamePage?.value);
     console.log('  Using form:', usePageForm ? 'PAGE' : 'MODAL');
-    console.log('  Selected firstName element:', firstNameEl, 'Value:', firstNameEl?.value);
+    console.log('  Selected fullName element:', fullNameEl, 'Value:', fullNameEl?.value);
 
-    const lastNameModal = document.getElementById('newLastName');
-    const lastNamePage = document.getElementById('newLastNamePage');
-    const lastNameEl = usePageForm ? lastNamePage : lastNameModal;
-
-    console.log('  Modal lastName element:', lastNameModal, 'Value:', lastNameModal?.value);
-    console.log('  Page lastName element:', lastNamePage, 'Value:', lastNamePage?.value);
-    console.log('  Selected lastName element:', lastNameEl, 'Value:', lastNameEl?.value);
+    // Split full name into first and last name
+    let firstName = '';
+    let lastName = '';
+    if (fullNameEl && fullNameEl.value.trim()) {
+        const nameParts = fullNameEl.value.trim().split(/\s+/);
+        firstName = nameParts[0] || '';
+        lastName = nameParts.slice(1).join(' ') || '';
+    }
+    console.log('  Split name - First:', firstName, 'Last:', lastName);
     // Get other fields from the form that was submitted
     const genderEl = usePageForm ? document.getElementById('newGenderPage') : document.getElementById('newGender');
     const roomEl = usePageForm ? document.getElementById('newRoomNumberPage') : document.getElementById('newRoomNumber');
@@ -1720,8 +1724,8 @@ async function saveNewResident(event) {
     }
 
     const resident = {
-        first_name: firstNameEl.value.trim(),
-        last_name: lastNameEl.value.trim(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
         date_of_birth: dateOfBirth || null,
         gender: genderEl ? genderEl.value : '',
         room_number: roomEl ? roomEl.value : '',
@@ -2853,21 +2857,21 @@ function showPage(pageName) {
         }
         else if (pageName === 'carenotes') {
             console.log('%c📝📝📝 SHOWING CARE NOTES PAGE 📝📝📝', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
-            
+
             const careNotesPage = document.getElementById('carenotes');
             if (!careNotesPage) {
                 console.error('❌❌❌ CARE NOTES PAGE ELEMENT NOT FOUND IN DOM! ❌❌❌');
                 alert('ERROR: Care notes page element (#carenotes) not found in DOM!');
                 return;
             }
-            
+
             console.log('✅ Care notes page element found in DOM');
             console.log('✅ Element ID:', careNotesPage.id);
             console.log('✅ Element classes:', careNotesPage.className);
             console.log('✅ Element parent:', careNotesPage.parentElement?.tagName, careNotesPage.parentElement?.id);
             console.log('✅ Element children count:', careNotesPage.children.length);
             console.log('✅ Element innerHTML length:', careNotesPage.innerHTML.length);
-            
+
             // CRITICAL: Ensure ALL parents are visible, starting from careNotesPage up to mainApp
             let currentElement = careNotesPage;
             let level = 0;
@@ -2876,9 +2880,9 @@ function showPage(pageName) {
                 const display = computedStyle.display;
                 const visibility = computedStyle.visibility;
                 const opacity = computedStyle.opacity;
-                
+
                 console.log(`🔍 Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}): display=${display}, visibility=${visibility}, opacity=${opacity}, offsetHeight=${currentElement.offsetHeight}, offsetWidth=${currentElement.offsetWidth}`);
-                
+
                 // Fix any parent with display:none (except intentionally hidden elements)
                 if (display === 'none' && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector') {
                     console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - setting display to block with !important`);
@@ -2889,7 +2893,7 @@ function showPage(pageName) {
                     currentElement.style.setProperty('z-index', '1', 'important');
                     console.log(`✅ Fixed Parent ${level} - new display:`, window.getComputedStyle(currentElement).display);
                 }
-                
+
                 // Also fix if visibility is hidden or opacity is 0
                 if ((visibility === 'hidden' || opacity === '0') && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector') {
                     console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - visibility/opacity issue`);
@@ -2897,7 +2901,7 @@ function showPage(pageName) {
                     currentElement.style.setProperty('opacity', '1', 'important');
                     currentElement.style.setProperty('display', 'block', 'important');
                 }
-                
+
                 // Stop at mainApp
                 if (currentElement.id === 'mainApp') {
                     console.log(`🔧 CRITICAL: Found mainApp container - forcing visibility`);
@@ -2908,11 +2912,11 @@ function showPage(pageName) {
                     currentElement.style.setProperty('z-index', '1', 'important');
                     break;
                 }
-                
+
                 currentElement = currentElement.parentElement;
                 level++;
             }
-            
+
             // Also ensure main.container is visible
             const mainContainer = careNotesPage.closest('main.container');
             if (mainContainer) {
@@ -2921,12 +2925,12 @@ function showPage(pageName) {
                 mainContainer.style.setProperty('opacity', '1', 'important');
                 console.log('✅ main.container forced visible');
             }
-            
+
             // Force care notes page to be visible using cssText for maximum control
             careNotesPage.classList.add('active');
             careNotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
             console.log('✅ Care notes page forced visible with cssText');
-            
+
             // Verify it worked
             const computedStyle = window.getComputedStyle(careNotesPage);
             console.log('✅ After forcing - display:', computedStyle.display);
@@ -2934,7 +2938,7 @@ function showPage(pageName) {
             console.log('✅ After forcing - opacity:', computedStyle.opacity);
             console.log('✅ After forcing - offsetHeight:', careNotesPage.offsetHeight);
             console.log('✅ After forcing - offsetWidth:', careNotesPage.offsetWidth);
-            
+
             // Show ALL direct children of care notes page - USE CSS TEXT FOR MAXIMUM CONTROL
             Array.from(careNotesPage.children).forEach((child, index) => {
                 console.log(`✅ Child ${index}:`, child.tagName, child.id || child.className, 'textContent:', child.textContent?.substring(0, 50));
@@ -2944,34 +2948,34 @@ function showPage(pageName) {
                 const beforeHeight = child.offsetHeight;
                 const beforeWidth = child.offsetWidth;
                 console.log(`    Before: display=${beforeDisplay}, visibility=${beforeVisibility}, opacity=${beforeOpacity}, height=${beforeHeight}, width=${beforeWidth}`);
-                
+
                 // Don't hide forms if they're supposed to be hidden
                 if ((child.id === 'careNoteForm' || child.id === 'careNoteEditForm') && child.style.display === 'none') {
                     console.log(`⚠️ Skipping ${child.id} (should be hidden)`);
                     return;
                 }
-                
+
                 // Use cssText to completely replace styles for maximum control
                 const displayValue = child.tagName === 'BUTTON' ? 'inline-block' : 'block';
                 child.style.cssText = `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important;`;
-                
+
                 const afterDisplay = window.getComputedStyle(child).display;
                 const afterVisibility = window.getComputedStyle(child).visibility;
                 const afterOpacity = window.getComputedStyle(child).opacity;
                 const afterHeight = child.offsetHeight;
                 const afterWidth = child.offsetWidth;
                 console.log(`    After: display=${afterDisplay}, visibility=${afterVisibility}, opacity=${afterOpacity}, height=${afterHeight}, width=${afterWidth}`);
-                
+
                 if (afterHeight === 0 && afterWidth === 0) {
                     console.error(`    ❌❌❌ CHILD ${index} HAS ZERO DIMENSIONS! ❌❌❌`);
                 }
             });
-            
+
             // Force specific elements to be visible
             const careNotesH2 = careNotesPage.querySelector('h2');
             const careNotesButton = careNotesPage.querySelector('button[onclick="showCareNoteForm()"]');
             const careNotesList = document.getElementById('careNotesList');
-            
+
             if (careNotesH2) {
                 careNotesH2.style.setProperty('display', 'block', 'important');
                 careNotesH2.style.setProperty('visibility', 'visible', 'important');
@@ -2982,7 +2986,7 @@ function showPage(pageName) {
             } else {
                 console.error('❌ Care notes H2 NOT FOUND!');
             }
-            
+
             if (careNotesButton) {
                 careNotesButton.style.setProperty('display', 'inline-block', 'important');
                 careNotesButton.style.setProperty('visibility', 'visible', 'important');
@@ -2993,7 +2997,7 @@ function showPage(pageName) {
             } else {
                 console.error('❌ Care notes button NOT FOUND!');
             }
-            
+
             if (careNotesList) {
                 careNotesList.style.setProperty('display', 'block', 'important');
                 careNotesList.style.setProperty('visibility', 'visible', 'important');
@@ -3004,7 +3008,7 @@ function showPage(pageName) {
             } else {
                 console.error('❌ Care notes list container NOT FOUND!');
             }
-            
+
             // Verify visibility with computed styles
             setTimeout(() => {
                 const computedDisplay = window.getComputedStyle(careNotesPage).display;
@@ -3020,7 +3024,7 @@ function showPage(pageName) {
                     console.error('❌❌❌ PAGE IS STILL HIDDEN DESPITE ALL EFFORTS! ❌❌❌');
                 }
             }, 100);
-            
+
             console.log('🔄 Loading care notes page data...');
             loadCareNotes();
         }
@@ -3889,8 +3893,9 @@ async function editResident(id) {
             if (modalEl) modalEl.value = value || '';
         };
 
-        setValue('newFirstNamePage', 'newFirstName', resident.first_name);
-        setValue('newLastNamePage', 'newLastName', resident.last_name);
+        // Combine first and last name into full name
+        const fullName = `${resident.first_name || ''} ${resident.last_name || ''}`.trim();
+        setValue('newFullNamePage', 'newFullName', fullName);
         setValue('newGenderPage', 'newGender', resident.gender);
         setValue('newRoomNumberPage', 'newRoomNumber', resident.room_number);
         setValue('newBedNumberPage', 'newBedNumber', resident.bed_number);
