@@ -2508,6 +2508,18 @@ function showPage(pageName) {
             }
         });
 
+        // Ensure the user actually sees the page content (Safari can make it look "blank" at the top)
+        if (pageName === 'carenotes') {
+            setTimeout(() => {
+                try {
+                    targetPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } catch (e) {
+                    // Fallback
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                }
+            }, 0);
+        }
+
         // Load page-specific data
         if (pageName === 'dashboard') {
             // Force grid layout immediately - run multiple times to ensure it sticks
