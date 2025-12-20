@@ -2531,6 +2531,14 @@ function showPage(pageName) {
         console.log('✅ Target page offsetHeight:', targetPage.offsetHeight);
         console.log('✅ Target page offsetWidth:', targetPage.offsetWidth);
 
+        // FALLBACK: Ensure loadCareNotes() is called for carenotes page
+        if (pageName === 'carenotes') {
+            console.log('🔧 FALLBACK: Calling loadCareNotes() directly');
+            setTimeout(() => {
+                loadCareNotes();
+            }, 50);
+        }
+
         // Update nav links
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
@@ -2885,6 +2893,10 @@ function showPage(pageName) {
             loadIncidents();
         }
         else if (pageName === 'carenotes') {
+            console.log('🔍 REACHED CARENOTES ELSE-IF BLOCK');
+            console.log('🔍 pageName value:', pageName);
+            console.log('🔍 pageName type:', typeof pageName);
+            console.log('🔍 pageName === "carenotes":', pageName === 'carenotes');
             console.log('📝📝📝 CARENOTES BLOCK EXECUTING 📝📝📝');
             console.log('%c📝📝📝 SHOWING CARE NOTES PAGE 📝📝📝', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
 
