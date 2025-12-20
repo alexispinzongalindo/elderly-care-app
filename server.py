@@ -3213,6 +3213,20 @@ def mark_all_notifications_read():
 def health():
     return jsonify({'status': 'ok', 'message': 'Server is running'}), 200
 
+@app.route('/api/version')
+def version():
+    commit = (
+        os.getenv('RENDER_GIT_COMMIT')
+        or os.getenv('GIT_COMMIT')
+        or os.getenv('COMMIT_SHA')
+        or 'unknown'
+    )
+    return jsonify({
+        'status': 'ok',
+        'commit': commit,
+        'server_time_utc': datetime.utcnow().isoformat() + 'Z'
+    }), 200
+
 # Simple test endpoint for POST
 @app.route('/api/test-post', methods=['POST'])
 @require_auth
