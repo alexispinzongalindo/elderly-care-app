@@ -2863,6 +2863,20 @@ function showPage(pageName) {
                 return;
             }
 
+            // CRITICAL: If care notes is inside billing (which is often display:none), move it out
+            const billingPage = document.getElementById('billing');
+            if (billingPage) {
+                if (careNotesPage.parentElement && careNotesPage.parentElement.id === 'billing') {
+                    console.log('⚠️⚠️⚠️ CRITICAL: Care Notes page is INSIDE billing page! Moving it out...');
+                    const mainContainer = billingPage.parentElement; // Should be main.container
+                    if (mainContainer) {
+                        mainContainer.insertBefore(careNotesPage, billingPage.nextSibling);
+                        console.log('✅ Care Notes page moved out of billing page');
+                        console.log('✅ New parent:', careNotesPage.parentElement?.tagName, careNotesPage.parentElement?.id);
+                    }
+                }
+            }
+
             console.log('✅ Care notes page element found in DOM');
             console.log('✅ Element ID:', careNotesPage.id);
             console.log('✅ Element classes:', careNotesPage.className);
