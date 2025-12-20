@@ -1325,8 +1325,10 @@
 
             <!-- Daily Care Notes Page -->
             <div id="carenotes" class="page">
-                <h2>Daily Care Notes / Notas Diarias de Cuidado</h2>
-                <button class="btn btn-primary" onclick="showCareNoteForm()">+ Add Care Note / Agregar Nota de Cuidado</button>
+                <div class="page-header">
+                    <h2>Daily Care Notes / Notas Diarias de Cuidado</h2>
+                    <button class="btn btn-primary" onclick="showCareNoteForm()">+ Add Care Note / Agregar Nota de Cuidado</button>
+                </div>
 
                 <!-- Care Note Form -->
                 <div id="careNoteForm" class="form-card" style="display: none; margin-top: 2rem;">
@@ -1498,15 +1500,17 @@
 
             <!-- Financial Management Page (Admin Only) -->
             <div id="financial" class="page">
-                <h2>Financial Management / Gestión Financiera</h2>
-                <p style="color: var(--dark-gray); margin-bottom: 2rem;">Manage bank accounts, transactions, and reconciliation / Gestionar cuentas bancarias, transacciones y conciliación</p>
+                <div class="page-header">
+                    <h2>Financial Management / Gestión Financiera</h2>
+                    <p style="color: var(--dark-gray); margin-bottom: 2rem;">Manage bank accounts, transactions, and reconciliation / Gestionar cuentas bancarias, transacciones y conciliación</p>
 
-                <!-- Tabs Navigation -->
-                <div class="button-group" style="margin-bottom: 2rem; border-bottom: 2px solid var(--light-gray); padding-bottom: 1rem;">
-                    <button class="btn btn-primary" onclick="showFinancialTab('accounts')" id="tabAccounts">Bank Accounts / Cuentas Bancarias</button>
-                    <button class="btn btn-secondary" onclick="showFinancialTab('transactions')" id="tabTransactions">Transactions / Transacciones</button>
-                    <button class="btn btn-secondary" onclick="showFinancialTab('reconciliation')" id="tabReconciliation">Reconciliation / Conciliación</button>
-                    <button class="btn btn-secondary" onclick="showFinancialTab('receipts')" id="tabReceipts">Payment Receipts / Recibos de Pago</button>
+                    <!-- Tabs Navigation -->
+                    <div class="button-group" style="margin-bottom: 2rem; border-bottom: 2px solid var(--light-gray); padding-bottom: 1rem;">
+                        <button class="btn btn-primary" onclick="showFinancialTab('accounts')" id="tabAccounts">Bank Accounts / Cuentas Bancarias</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('transactions')" id="tabTransactions">Transactions / Transacciones</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('reconciliation')" id="tabReconciliation">Reconciliation / Conciliación</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('receipts')" id="tabReceipts">Payment Receipts / Recibos de Pago</button>
+                    </div>
                 </div>
 
                 <!-- Bank Accounts Tab -->

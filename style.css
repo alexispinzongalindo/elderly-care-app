@@ -366,14 +366,23 @@ body {
     max-width: 1200px;
     margin: 1.5rem auto;
     padding: 0 1.5rem;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    position: relative !important;
-    z-index: 1 !important;
-    overflow-x: hidden !important;
-    width: 100%;
-    box-sizing: border-box;
+}
+
+/* Sticky page headers (Care Notes + Financial) */
+#carenotes .page-header,
+#financial .page-header {
+    position: sticky;
+    top: var(--sticky-offset, 0px);
+    z-index: 50;
+    background: var(--light-gray);
+    padding-top: 0.5rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+#carenotes .page-header h2,
+#financial .page-header h2 {
+    margin-bottom: 0.75rem;
 }
 
 /* Prevent horizontal scrolling on mobile */

@@ -7942,6 +7942,15 @@ function setDateTimeToDropdowns(dateTimeString, yearId, monthId, dayId, timeId) 
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
+    function updateStickyHeaderOffset() {
+        const navbar = document.querySelector('.navbar');
+        const navbarHeight = navbar ? navbar.getBoundingClientRect().height : 0;
+        document.documentElement.style.setProperty('--sticky-offset', `${Math.ceil(navbarHeight)}px`);
+    }
+
+    updateStickyHeaderOffset();
+    window.addEventListener('resize', updateStickyHeaderOffset);
+
     // Load language from localStorage if available (but wait for login to use staff preferred_language)
     // Only set language from localStorage if user is not logged in yet
     if (!authToken || !currentStaff) {
