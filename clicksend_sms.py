@@ -65,15 +65,16 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
 
     try:
         # Prepare request data
+        # ClickSend API v3 format - "from" field is optional, remove if None
+        message_data = {
+            "body": message,
+            "to": formatted_phone
+        }
+        # Only add "from" if we have a specific number (otherwise ClickSend uses default)
+        # Omitting "from" allows ClickSend to use account default number
+        
         data = {
-            "messages": [
-                {
-                    "source": "python",  # Can be customized
-                    "body": message,
-                    "to": formatted_phone,
-                    "from": None  # ClickSend will use default number, or set a specific number
-                }
-            ]
+            "messages": [message_data]
         }
 
         json_data = json.dumps(data).encode('utf-8')
