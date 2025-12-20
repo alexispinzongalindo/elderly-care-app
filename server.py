@@ -79,9 +79,12 @@ if not USE_CLICKSEND:
 app = Flask(__name__, static_folder='.')
 CORS(app)
 
-DATABASE = 'elder_care.db'
+DATABASE = os.getenv('DB_PATH', 'elder_care.db')
 
 def get_db():
+    db_dir = os.path.dirname(DATABASE)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
