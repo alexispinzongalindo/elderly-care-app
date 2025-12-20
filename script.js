@@ -1526,26 +1526,24 @@ async function saveNewResident(event) {
 
     console.log('🔍 Using form:', usePageForm ? 'PAGE FORM' : 'MODAL FORM');
 
-    // Get full name field and split it into first and last name
-    const fullNameModal = document.getElementById('newFullName');
-    const fullNamePage = document.getElementById('newFullNamePage');
-    const fullNameEl = usePageForm ? fullNamePage : fullNameModal;
+    // Get values from the form that was submitted
+    const firstNameModal = document.getElementById('newFirstName');
+    const firstNamePage = document.getElementById('newFirstNamePage');
+    const firstNameEl = usePageForm ? firstNamePage : firstNameModal;
 
     console.log('🔍 FORM ELEMENT CHECK:');
-    console.log('  Modal fullName element:', fullNameModal, 'Value:', fullNameModal?.value);
-    console.log('  Page fullName element:', fullNamePage, 'Value:', fullNamePage?.value);
+    console.log('  Modal firstName element:', firstNameModal, 'Value:', firstNameModal?.value);
+    console.log('  Page firstName element:', firstNamePage, 'Value:', firstNamePage?.value);
     console.log('  Using form:', usePageForm ? 'PAGE' : 'MODAL');
-    console.log('  Selected fullName element:', fullNameEl, 'Value:', fullNameEl?.value);
+    console.log('  Selected firstName element:', firstNameEl, 'Value:', firstNameEl?.value);
 
-    // Split full name into first and last name
-    let firstName = '';
-    let lastName = '';
-    if (fullNameEl && fullNameEl.value.trim()) {
-        const nameParts = fullNameEl.value.trim().split(/\s+/);
-        firstName = nameParts[0] || '';
-        lastName = nameParts.slice(1).join(' ') || '';
-    }
-    console.log('  Split name - First:', firstName, 'Last:', lastName);
+    const lastNameModal = document.getElementById('newLastName');
+    const lastNamePage = document.getElementById('newLastNamePage');
+    const lastNameEl = usePageForm ? lastNamePage : lastNameModal;
+
+    console.log('  Modal lastName element:', lastNameModal, 'Value:', lastNameModal?.value);
+    console.log('  Page lastName element:', lastNamePage, 'Value:', lastNamePage?.value);
+    console.log('  Selected lastName element:', lastNameEl, 'Value:', lastNameEl?.value);
     // Get other fields from the form that was submitted
     const genderEl = usePageForm ? document.getElementById('newGenderPage') : document.getElementById('newGender');
     const roomEl = usePageForm ? document.getElementById('newRoomNumberPage') : document.getElementById('newRoomNumber');
@@ -1724,8 +1722,8 @@ async function saveNewResident(event) {
     }
 
     const resident = {
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
+        first_name: firstNameEl.value.trim(),
+        last_name: lastNameEl.value.trim(),
         date_of_birth: dateOfBirth || null,
         gender: genderEl ? genderEl.value : '',
         room_number: roomEl ? roomEl.value : '',
@@ -3893,9 +3891,8 @@ async function editResident(id) {
             if (modalEl) modalEl.value = value || '';
         };
 
-        // Combine first and last name into full name
-        const fullName = `${resident.first_name || ''} ${resident.last_name || ''}`.trim();
-        setValue('newFullNamePage', 'newFullName', fullName);
+        setValue('newFirstNamePage', 'newFirstName', resident.first_name);
+        setValue('newLastNamePage', 'newLastName', resident.last_name);
         setValue('newGenderPage', 'newGender', resident.gender);
         setValue('newRoomNumberPage', 'newRoomNumber', resident.room_number);
         setValue('newBedNumberPage', 'newBedNumber', resident.bed_number);
