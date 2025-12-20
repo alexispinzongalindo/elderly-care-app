@@ -433,6 +433,21 @@ body {
     z-index: 1 !important;
 }
 
+/* Ensure reports page has proper dimensions when active */
+#reports.page.active,
+#reports.active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    min-height: 400px !important;
+    width: 100% !important;
+    padding: 2rem !important;
+    overflow: visible !important;
+    background: var(--light-gray) !important;
+}
+
 /* CRITICAL: Force incidents page to show when active */
 #incidents.page.active,
 #incidents.active,
@@ -1429,24 +1444,25 @@ h3 {
         grid-template-columns: repeat(3, 1fr) !important;
     }
 }
-    
+
+@media (max-width: 1024px) {
     .form-row {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .calendar-grid {
         gap: 2px;
     }
-    
+
     .calendar-day {
         min-height: 90px;
         padding: 0.4rem;
     }
-    
+
     .nav-menu {
         gap: 0.5rem;
     }
-    
+
     .nav-link {
         padding: 0.4rem 0.5rem;
         font-size: 0.8rem;

@@ -8,7 +8,6 @@ const API_URL = '/api';
 // Authentication state
 let authToken = localStorage.getItem('authToken');
 let currentStaff = JSON.parse(localStorage.getItem('currentStaff') || 'null');
-let currentResidentId = localStorage.getItem('currentResidentId');
 
 // Edit state tracking
 let editingMedicationId = null;
@@ -19,6 +18,7 @@ let editingPaymentId = null;
 
 // Language system
 let currentLanguage = 'en'; // Default to English
+let appInitialized = false;
 let currentUser = null;
 
 // Phone number formatting function - formats as (XXX) XXX-XXXX
@@ -1909,6 +1909,11 @@ async function saveNewResident(event) {
 }
 
 function initApp() {
+    if (appInitialized) {
+        return;
+    }
+    appInitialized = true;
+
     console.log('🚀 Initializing app...');
 
     // Test server connection
