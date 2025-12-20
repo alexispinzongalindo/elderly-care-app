@@ -1182,7 +1182,9 @@ async function handleLogin(event) {
             }
 
             hideLoginModal();
-            showResidentSelector();
+            // Let checkAuth decide whether to show resident selector or initialize the app
+            // (prevents a "blank" screen when currentResidentId already exists)
+            checkAuth();
             showMessage('Login successful! / ¡Inicio de sesión exitoso!', 'success');
         } else {
             // Login failed - show error message
