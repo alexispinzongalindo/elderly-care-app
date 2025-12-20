@@ -8,6 +8,7 @@ const API_URL = '/api';
 // Authentication state
 let authToken = localStorage.getItem('authToken');
 let currentStaff = JSON.parse(localStorage.getItem('currentStaff') || 'null');
+let currentResidentId = localStorage.getItem('currentResidentId');
 
 // Edit state tracking
 let editingMedicationId = null;
