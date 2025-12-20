@@ -3715,7 +3715,7 @@ async function loadResidents() {
                 ? `<div class="resident-photo-thumb"><img src="${resident.photo_path}" alt="${resident.first_name} ${resident.last_name}"></div>`
                 : '';
 
-            const residentName = `${resident.first_name || ''} ${resident.last_name || ''}`.trim() || 'Unnamed Resident / Residente Sin Nombre';
+            const residentName = `${resident.first_name || ''}\u00A0${resident.last_name || ''}`.trim() || 'Unnamed Resident / Residente Sin Nombre';
 
             console.log('Creating resident card for:', residentName, 'ID:', resident.id);
 
@@ -3745,38 +3745,38 @@ async function loadResidents() {
             details.className = 'item-details';
             if (resident.room_number) {
                 const p = document.createElement('p');
-                p.innerHTML = `<strong>Room / Habitación:</strong> ${resident.room_number}`;
+                p.innerHTML = `<strong>Room / Habitación:</strong>&nbsp;${resident.room_number}`;
                 details.appendChild(p);
             }
             if (resident.bed_number) {
                 const p = document.createElement('p');
-                p.innerHTML = `<strong>Bed / Cama:</strong> ${resident.bed_number}`;
+                p.innerHTML = `<strong>Bed / Cama:</strong>&nbsp;${resident.bed_number}`;
                 details.appendChild(p);
             }
             if (resident.date_of_birth) {
                 const p = document.createElement('p');
-                p.innerHTML = `<strong>Date of Birth / Fecha de Nacimiento:</strong> ${new Date(resident.date_of_birth).toLocaleDateString()}`;
+                p.innerHTML = `<strong>Date of Birth / Fecha de Nacimiento:</strong>&nbsp;${new Date(resident.date_of_birth).toLocaleDateString()}`;
                 details.appendChild(p);
             }
             if (resident.gender) {
                 const p = document.createElement('p');
-                p.innerHTML = `<strong>Gender / Género:</strong> ${resident.gender}`;
+                p.innerHTML = `<strong>Gender / Género:</strong>&nbsp;${resident.gender}`;
                 details.appendChild(p);
             }
             if (resident.emergency_contact_name) {
                 const p = document.createElement('p');
                 const formattedPhone = resident.emergency_contact_phone_formatted || formatPhoneNumber(resident.emergency_contact_phone) || '';
-                p.innerHTML = `<strong>Emergency Contact / Contacto de Emergencia:</strong> ${resident.emergency_contact_name}${formattedPhone ? ` (${formattedPhone})` : ''}`;
+                p.innerHTML = `<strong>Emergency Contact / Contacto de Emergencia:</strong>&nbsp;${resident.emergency_contact_name}${formattedPhone ? ` (${formattedPhone})` : ''}`;
                 details.appendChild(p);
             }
             if (resident.medical_conditions) {
                 const p = document.createElement('p');
-                p.innerHTML = `<strong>Medical Conditions / Condiciones Médicas:</strong> ${resident.medical_conditions}`;
+                p.innerHTML = `<strong>Medical Conditions / Condiciones Médicas:</strong>&nbsp;${resident.medical_conditions}`;
                 details.appendChild(p);
             }
             if (resident.allergies) {
                 const p = document.createElement('p');
-                p.innerHTML = `<strong>Allergies / Alergias:</strong> ${resident.allergies}`;
+                p.innerHTML = `<strong>Allergies / Alergias:</strong>&nbsp;${resident.allergies}`;
                 details.appendChild(p);
             }
             detailsContainer.appendChild(details);

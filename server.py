@@ -488,6 +488,18 @@ def format_phone_number(phone):
     # Return original if can't format
     return phone
 
+def _normalize_person_name_part(value: str) -> str:
+    if value is None:
+        return ''
+    return str(value).strip()
+
+def _resident_display_name(first_name, last_name) -> str:
+    first = _normalize_person_name_part(first_name)
+    last = _normalize_person_name_part(last_name)
+    full = f"{first} {last}".strip()
+    # Collapse multiple spaces
+    return re.sub(r'\s+', ' ', full)
+
 def get_current_staff(request):
     """Get current logged-in staff from session token"""
     session_token = request.headers.get('Authorization')
@@ -674,6 +686,8 @@ def residents():
         residents_list = []
         for row in cursor.fetchall():
             resident_dict = dict(row)
+            resident_dict['full_name'] = _resident_display_name(resident_dict.get('first_name'), resident_dict.get('last_name'))
+            resident_dict['display_name'] = resident_dict['full_name']
             # Format emergency contact phone number for display
             if resident_dict.get('emergency_contact_phone'):
                 resident_dict['emergency_contact_phone_formatted'] = format_phone_number(resident_dict['emergency_contact_phone'])
@@ -697,6 +711,9 @@ def residents():
                 conn.close()
                 return jsonify({'error': 'Last name is required / El apellido es requerido'}), 400
 
+            first_name = _normalize_person_name_part(data.get('first_name'))
+            last_name = _normalize_person_name_part(data.get('last_name'))
+
             # Get carrier value and normalize empty strings to None
             carrier_value = data.get('emergency_contact_carrier')
             if carrier_value == '' or carrier_value is None:
@@ -711,8 +728,8 @@ def residents():
                     medical_conditions, allergies, dietary_restrictions, notes, photo_path
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
-                data.get('first_name'),
-                data.get('last_name'),
+                first_name,
+                last_name,
                 data.get('date_of_birth'),
                 data.get('room_number'),
                 data.get('bed_number'),
@@ -758,6 +775,8 @@ def resident_detail(id):
             conn.close()
             return jsonify({'error': 'Resident not found'}), 404
         resident_dict = dict(resident)
+        resident_dict['full_name'] = _resident_display_name(resident_dict.get('first_name'), resident_dict.get('last_name'))
+        resident_dict['display_name'] = resident_dict['full_name']
         # Format emergency contact phone number for display
         if resident_dict.get('emergency_contact_phone'):
             resident_dict['emergency_contact_phone_formatted'] = format_phone_number(resident_dict['emergency_contact_phone'])
@@ -766,6 +785,9 @@ def resident_detail(id):
 
     elif request.method == 'PUT':
         data = request.json
+
+        first_name = _normalize_person_name_part(data.get('first_name'))
+        last_name = _normalize_person_name_part(data.get('last_name'))
 
         # Very visible logging for carrier debugging
         print("=" * 70, flush=True)
@@ -786,8 +808,8 @@ def resident_detail(id):
 
         # Prepare all values for UPDATE
         update_values = (
-            data.get('first_name'),
-            data.get('last_name'),
+            first_name,
+            last_name,
             data.get('date_of_birth'),
             data.get('room_number'),
             data.get('bed_number'),
@@ -3469,7 +3491,11 @@ def static_files(path):
 
         # In production, prefer minified versions if they exist
         # Check for .min.js, .min.css files first for faster loading
-        use_minified = os.getenv('USE_MINIFIED', 'true').lower() == 'true'
+        use_minified_env = os.getenv('USE_MINIFIED')
+        if use_minified_env is None:
+            use_minified = False
+        else:
+            use_minified = use_minified_env.lower() == 'true'
         original_path = path
         if use_minified:
             # Check if minified version exists and use it instead
