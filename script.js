@@ -5262,7 +5262,7 @@ async function loadCareNotes() {
 
     // FORCE VISIBILITY IMMEDIATELY
     container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
-    
+
     // Show loading state immediately
     container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading care notes...</div>';
 
@@ -5309,6 +5309,41 @@ async function loadCareNotes() {
             container.innerHTML = emptyStateHTML;
             return;
         }
+
+        // Render notes if they exist
+        container.innerHTML = notes.map(note => {
+            const date = new Date(note.note_date);
+            const timeDisplay = note.note_time ? ` - ${note.note_time}` : '';
+            return `
+                <div class="item-card" style="margin-bottom: 1rem; padding: 1.5rem; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                    <div class="item-header">
+                        <h3>${date.toLocaleDateString()}${timeDisplay} - ${note.resident_name || 'N/A'}</h3>
+                        ${note.shift ? `<span class="badge badge-success">${note.shift}</span>` : ''}
+                    </div>
+                    <div class="item-details">
+                        ${note.appetite_rating ? `<p><strong>Appetite / Apetito:</strong> ${note.appetite_rating}</p>` : ''}
+                        ${note.fluid_intake ? `<p><strong>Fluid Intake / Ingesta de Líquidos:</strong> ${note.fluid_intake}</p>` : ''}
+                        ${note.meal_breakfast ? `<p><strong>Breakfast / Desayuno:</strong> ${note.meal_breakfast}</p>` : ''}
+                        ${note.meal_lunch ? `<p><strong>Lunch / Almuerzo:</strong> ${note.meal_lunch}</p>` : ''}
+                        ${note.meal_dinner ? `<p><strong>Dinner / Cena:</strong> ${note.meal_dinner}</p>` : ''}
+                        ${note.toileting ? `<p><strong>Toileting / Uso de Baño:</strong> ${note.toileting}</p>` : ''}
+                        ${note.mobility ? `<p><strong>Mobility / Movilidad:</strong> ${note.mobility}</p>` : ''}
+                        ${note.pain_level ? `<p><strong>Pain Level / Nivel de Dolor:</strong> ${note.pain_level}${note.pain_location ? ` - ${note.pain_location}` : ''}</p>` : ''}
+                        ${note.skin_condition ? `<p><strong>Skin Condition / Condición de la Piel:</strong> ${note.skin_condition}</p>` : ''}
+                        ${note.sleep_hours ? `<p><strong>Sleep / Sueño:</strong> ${note.sleep_hours} hours / horas</p>` : ''}
+                        ${note.sleep_quality ? `<p><strong>Sleep Quality / Calidad:</strong> ${note.sleep_quality}</p>` : ''}
+                        ${note.mood ? `<p><strong>Mood / Estado de Ánimo:</strong> ${note.mood}</p>` : ''}
+                        ${note.activities ? `<p><strong>Activities / Actividades:</strong> ${note.activities}</p>` : ''}
+                        ${note.general_notes ? `<p><strong>Notes / Notas:</strong> ${note.general_notes}</p>` : ''}
+                        <p><strong>Recorded by / Registrado por:</strong> ${note.staff_name || 'N/A'}</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-sm btn-primary" onclick="editCareNote(${note.id})">Edit / Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteCareNote(${note.id})">Delete / Eliminar</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
 
         console.log('📝 Rendering', notes.length, 'care notes');
         container.innerHTML = notes.map(note => {
