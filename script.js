@@ -2885,6 +2885,7 @@ function showPage(pageName) {
             loadIncidents();
         }
         else if (pageName === 'carenotes') {
+            console.log('📝📝📝 CARENOTES BLOCK EXECUTING 📝📝📝');
             console.log('%c📝📝📝 SHOWING CARE NOTES PAGE 📝📝📝', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
 
             const carenotesPage = document.getElementById('carenotes');
@@ -3007,13 +3008,23 @@ function showPage(pageName) {
             console.log('✅ Care notes page offsetWidth:', carenotesPage.offsetWidth);
 
             // Load care notes - call immediately and also after delay
-            console.log('📝 IMMEDIATELY calling loadCareNotes()');
-            loadCareNotes();
-            
+            console.log('📝 STEP 1: About to call loadCareNotes() immediately');
+            try {
+                loadCareNotes();
+                console.log('📝 STEP 2: loadCareNotes() call completed');
+            } catch (error) {
+                console.error('❌ ERROR calling loadCareNotes():', error);
+            }
+
             // Also call after delay as backup
             setTimeout(() => {
-                console.log('📝 Calling loadCareNotes() again after delay');
-                loadCareNotes();
+                console.log('📝 STEP 3: Calling loadCareNotes() again after 100ms delay');
+                try {
+                    loadCareNotes();
+                    console.log('📝 STEP 4: Second loadCareNotes() call completed');
+                } catch (error) {
+                    console.error('❌ ERROR in delayed loadCareNotes() call:', error);
+                }
             }, 100);
         }
         else if (pageName === 'notifications') {
@@ -5211,6 +5222,7 @@ function hideCareNoteForm() {
 }
 
 async function loadCareNotes() {
+    console.log('📝📝📝 loadCareNotes() FUNCTION STARTING 📝📝📝');
     console.log('📝 loadCareNotes() called');
     try {
         // Check if user is authenticated
