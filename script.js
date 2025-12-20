@@ -2343,6 +2343,26 @@ function showPage(pageName) {
     console.log('📄 Current URL:', window.location.href);
     console.log('📄 Timestamp:', new Date().toISOString());
 
+    const resetLayoutStyles = (el) => {
+        if (!el) return;
+        el.style.removeProperty('display');
+        el.style.removeProperty('visibility');
+        el.style.removeProperty('opacity');
+        el.style.removeProperty('position');
+        el.style.removeProperty('left');
+        el.style.removeProperty('right');
+        el.style.removeProperty('top');
+        el.style.removeProperty('bottom');
+        el.style.removeProperty('transform');
+        el.style.removeProperty('height');
+        el.style.removeProperty('max-height');
+        el.style.removeProperty('min-height');
+        el.style.removeProperty('width');
+        el.style.removeProperty('max-width');
+        el.style.removeProperty('overflow');
+        el.style.removeProperty('z-index');
+    };
+
     if (!pageName) {
         console.error('❌ showPage called with no pageName!');
         return;
@@ -2385,6 +2405,8 @@ function showPage(pageName) {
     const targetPage = document.getElementById(pageName);
     if (targetPage) {
         targetPage.classList.add('active');
+
+        resetLayoutStyles(targetPage);
 
         // CRITICAL: For financial page, scroll to top immediately
         if (pageName === 'financial') {
@@ -2445,9 +2467,13 @@ function showPage(pageName) {
         // Also ensure main.container is visible
         const mainContainer = targetPage.closest('main.container');
         if (mainContainer) {
+            resetLayoutStyles(mainContainer);
             mainContainer.style.setProperty('display', 'block', 'important');
             mainContainer.style.setProperty('visibility', 'visible', 'important');
             mainContainer.style.setProperty('opacity', '1', 'important');
+            mainContainer.style.setProperty('position', 'relative', 'important');
+            mainContainer.style.setProperty('width', '100%', 'important');
+            mainContainer.style.setProperty('min-height', '1px', 'important');
         }
 
         // Only show the target page with !important
@@ -2459,6 +2485,14 @@ function showPage(pageName) {
         if (pageName === 'financial') {
             targetPage.style.setProperty('position', 'relative', 'important');
             targetPage.style.setProperty('z-index', '10', 'important');
+        }
+
+        // SPECIAL HANDLING FOR REPORTS PAGE - reset any leftover offscreen/absolute styles
+        if (pageName === 'reports') {
+            targetPage.style.setProperty('position', 'relative', 'important');
+            targetPage.style.setProperty('z-index', '1', 'important');
+            targetPage.style.setProperty('min-height', '400px', 'important');
+            targetPage.style.setProperty('width', '100%', 'important');
         }
         targetPage.style.setProperty('visibility', 'visible', 'important');
         targetPage.style.setProperty('opacity', '1', 'important');
