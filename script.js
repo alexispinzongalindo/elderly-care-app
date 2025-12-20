@@ -1254,6 +1254,16 @@ async function loadResidentsForSelector() {
 }
 
 function selectResident() {
+    // If user is not authenticated, force login instead of initializing the app.
+    if (!authToken || !currentStaff) {
+        console.warn('selectResident called while unauthenticated; redirecting to login');
+        localStorage.removeItem('currentResidentId');
+        currentResidentId = null;
+        showLoginModal();
+        showMessage('Please log in to continue / Por favor inicie sesión para continuar', 'error');
+        return;
+    }
+
     const select = document.getElementById('residentSelect');
     const residentId = select.value;
 
@@ -3983,6 +3993,16 @@ async function loadResidents() {
 }
 
 function selectResidentById(residentId) {
+    // If user is not authenticated, force login instead of navigating into the app.
+    if (!authToken || !currentStaff) {
+        console.warn('selectResidentById called while unauthenticated; redirecting to login');
+        localStorage.removeItem('currentResidentId');
+        currentResidentId = null;
+        showLoginModal();
+        showMessage('Please log in to continue / Por favor inicie sesión para continuar', 'error');
+        return;
+    }
+
     currentResidentId = residentId;
     localStorage.setItem('currentResidentId', residentId);
     loadCurrentResidentInfo(residentId);
