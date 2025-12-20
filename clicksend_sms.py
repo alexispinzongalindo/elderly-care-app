@@ -83,11 +83,11 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
         auth_string = f"{CLICKSEND_USERNAME}:{CLICKSEND_API_KEY}"
         auth_bytes = auth_string.encode('utf-8')
         auth_b64 = base64.b64encode(auth_bytes).decode('utf-8')
-        
+
         req = urllib.request.Request(CLICKSEND_SMS_API, data=json_data, method='POST')
         req.add_header('Authorization', f'Basic {auth_b64}')
         req.add_header('Content-Type', 'application/json')
-        
+
         # Debug: Log authentication (but don't log the actual key)
         print(f"📱 Sending SMS via ClickSend to {formatted_phone}...")
         print(f"   Using username: {CLICKSEND_USERNAME} (API key: {'SET' if CLICKSEND_API_KEY else 'NOT SET'})", flush=True)
@@ -113,6 +113,14 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
         try:
             error_data = json.loads(error_body)
             print(f"   Error details: {error_data}")
+            if e.code == 401:
+                print(f"   🔍 401 Unauthorized - Check your credentials:")
+                print(f"      - Username: {CLICKSEND_USERNAME}")
+                print(f"      - API Key: {'SET' if CLICKSEND_API_KEY else 'NOT SET'} (length: {len(CLICKSEND_API_KEY) if CLICKSEND_API_KEY else 0})")
+                print(f"   💡 Tips:")
+                print(f"      - Make sure username is your ClickSend username (not email if different)")
+                print(f"      - Verify API key is correct in ClickSend dashboard")
+                print(f"      - Check that your ClickSend account has credits")
         except:
             pass
         return False
