@@ -2485,6 +2485,18 @@ function showPage(pageName) {
         console.log('✅ Target page offsetHeight:', targetPage.offsetHeight);
         console.log('✅ Target page offsetWidth:', targetPage.offsetWidth);
 
+        // CRITICAL: If page has 0 height/width, force it visible (can happen with carenotes)
+        if (targetPage.offsetHeight === 0 || targetPage.offsetWidth === 0) {
+            console.log('⚠️ Page has 0 dimensions, forcing visibility with !important');
+            targetPage.style.setProperty('display', 'block', 'important');
+            targetPage.style.setProperty('visibility', 'visible', 'important');
+            targetPage.style.setProperty('opacity', '1', 'important');
+            targetPage.style.setProperty('position', 'relative', 'important');
+            targetPage.style.setProperty('min-height', '400px', 'important');
+            targetPage.style.setProperty('width', '100%', 'important');
+            targetPage.style.removeProperty('left');
+            targetPage.style.removeProperty('right');
+        }
 
         // Update nav links
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -5037,17 +5049,41 @@ function hideCareNoteForm() {
 }
 
 async function loadCareNotes() {
+    console.log('📝📝📝 loadCareNotes() CALLED 📝📝📝');
     const container = document.getElementById('careNotesList');
     if (!container) {
         console.error('❌ careNotesList container not found!');
         showMessage('Error: Care notes container not found / Error: Contenedor de notas no encontrado', 'error');
         return;
     }
+    console.log('✅ Container found');
 
-    // Ensure container is visible
-    container.style.display = 'block';
-    container.style.visibility = 'visible';
-    container.style.opacity = '1';
+    // CRITICAL: Ensure parent page is visible first
+    const carenotesPage = document.getElementById('carenotes');
+    if (carenotesPage) {
+        const pageHeight = carenotesPage.offsetHeight;
+        const pageWidth = carenotesPage.offsetWidth;
+        console.log('📝 Carenotes page dimensions:', pageHeight, 'x', pageWidth);
+        if (pageHeight === 0 || pageWidth === 0) {
+            console.log('⚠️ Page has 0 dimensions, forcing visibility with !important');
+            carenotesPage.style.setProperty('display', 'block', 'important');
+            carenotesPage.style.setProperty('visibility', 'visible', 'important');
+            carenotesPage.style.setProperty('opacity', '1', 'important');
+            carenotesPage.style.setProperty('position', 'relative', 'important');
+            carenotesPage.style.setProperty('min-height', '400px', 'important');
+            carenotesPage.style.setProperty('width', '100%', 'important');
+            carenotesPage.style.removeProperty('left');
+            carenotesPage.style.removeProperty('right');
+        }
+    }
+
+    // Ensure container is visible with !important
+    container.style.setProperty('display', 'block', 'important');
+    container.style.setProperty('visibility', 'visible', 'important');
+    container.style.setProperty('opacity', '1', 'important');
+    container.style.setProperty('min-height', '200px', 'important');
+    container.style.setProperty('width', '100%', 'important');
+    console.log('✅ Container visibility forced');
 
     // Show loading state
     container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading care notes...</div>';
@@ -5088,23 +5124,27 @@ async function loadCareNotes() {
 
         if (!notes || notes.length === 0) {
             console.log('📝 No care notes found, showing empty state');
-            container.style.display = 'block';
-            container.style.visibility = 'visible';
-            container.style.opacity = '1';
+            // Force container visible again before showing empty state
+            container.style.setProperty('display', 'block', 'important');
+            container.style.setProperty('visibility', 'visible', 'important');
+            container.style.setProperty('opacity', '1', 'important');
+            container.style.setProperty('min-height', '200px', 'important');
+            container.style.setProperty('width', '100%', 'important');
             container.innerHTML = `
-                <div class="empty-state" style="padding: 2rem; text-align: center; color: #666; display: block; visibility: visible; opacity: 1;">
+                <div class="empty-state" style="padding: 2rem; text-align: center; color: #666; display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 150px !important; width: 100% !important;">
                     <p style="font-size: 1.1em; margin-bottom: 0.5rem; font-weight: 500;">${t('common.noCareNotes')}</p>
                     <p style="margin-top: 1rem; color: #888;">Click the "Add Care Note" button above to create your first care note.</p>
                 </div>
             `;
             console.log('✅ Empty state displayed, container innerHTML length:', container.innerHTML.length);
+            console.log('✅ Container offsetHeight after empty state:', container.offsetHeight);
             return;
         }
 
         console.log('📝 Rendering', notes.length, 'care notes');
-        container.style.display = 'block';
-        container.style.visibility = 'visible';
-        container.style.opacity = '1';
+        container.style.setProperty('display', 'block', 'important');
+        container.style.setProperty('visibility', 'visible', 'important');
+        container.style.setProperty('opacity', '1', 'important');
         container.innerHTML = notes.map(note => {
             const date = new Date(note.note_date);
             const timeDisplay = note.note_time ? ` - ${note.note_time}` : '';
