@@ -20,9 +20,10 @@ import base64
 from sms_service import normalize_phone  # Reuse phone normalization
 
 # ClickSend Configuration
-CLICKSEND_API_KEY = os.getenv('CLICKSEND_API_KEY', '')
-CLICKSEND_USERNAME = os.getenv('CLICKSEND_USERNAME', '')  # Your ClickSend username/email
-CLICKSEND_WHATSAPP_ENABLED = os.getenv('CLICKSEND_WHATSAPP_ENABLED', '').lower() == 'true'
+# Strip whitespace to avoid auth issues from copy/paste
+CLICKSEND_API_KEY = os.getenv('CLICKSEND_API_KEY', '').strip()
+CLICKSEND_USERNAME = os.getenv('CLICKSEND_USERNAME', '').strip()  # Your ClickSend username/email
+CLICKSEND_WHATSAPP_ENABLED = os.getenv('CLICKSEND_WHATSAPP_ENABLED', '').lower().strip() == 'true'
 
 # ClickSend API endpoints
 CLICKSEND_SMS_API = "https://rest.clicksend.com/v3/sms/send"
@@ -65,13 +66,13 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
 
     try:
         # Prepare request data
-        # ClickSend API v3 format - "from" field is optional, remove if None
+        # ClickSend API v3 format requires "source" field (can be phone number or identifier)
         message_data = {
+            "source": "sdk",  # ClickSend SDK identifier (or use a phone number if you have one)
             "body": message,
             "to": formatted_phone
         }
-        # Only add "from" if we have a specific number (otherwise ClickSend uses default)
-        # Omitting "from" allows ClickSend to use account default number
+        # Note: "from" field is NOT used in ClickSend v3 API - use "source" instead
         
         data = {
             "messages": [message_data]
@@ -89,9 +90,12 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
         req.add_header('Authorization', f'Basic {auth_b64}')
         req.add_header('Content-Type', 'application/json')
 
-        # Debug: Log authentication (but don't log the actual key)
+        # Debug: Log request details (but don't log full auth string)
         print(f"📱 Sending SMS via ClickSend to {formatted_phone}...")
-        print(f"   Using username: {CLICKSEND_USERNAME} (API key: {'SET' if CLICKSEND_API_KEY else 'NOT SET'})", flush=True)
+        print(f"   Username: {CLICKSEND_USERNAME}")
+        print(f"   API Key: {'SET' if CLICKSEND_API_KEY else 'NOT SET'} (length: {len(CLICKSEND_API_KEY) if CLICKSEND_API_KEY else 0})")
+        print(f"   Request URL: {CLICKSEND_SMS_API}")
+        print(f"   Request body: {json.dumps(data, indent=2)}", flush=True)
         with urllib.request.urlopen(req, timeout=10) as response:
             response_data = json.loads(response.read().decode('utf-8'))
 
@@ -111,19 +115,34 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8')
         print(f"❌ ClickSend API HTTP Error {e.code}: {error_body}")
+        
+        # Parse error response for details
         try:
             error_data = json.loads(error_body)
-            print(f"   Error details: {error_data}")
-            if e.code == 401:
-                print(f"   🔍 401 Unauthorized - Check your credentials:")
-                print(f"      - Username: {CLICKSEND_USERNAME}")
-                print(f"      - API Key: {'SET' if CLICKSEND_API_KEY else 'NOT SET'} (length: {len(CLICKSEND_API_KEY) if CLICKSEND_API_KEY else 0})")
-                print(f"   💡 Tips:")
-                print(f"      - Make sure username is your ClickSend username (not email if different)")
-                print(f"      - Verify API key is correct in ClickSend dashboard")
-                print(f"      - Check that your ClickSend account has credits")
+            print(f"   📋 Parsed error response:")
+            for key, value in error_data.items():
+                print(f"      {key}: {value}")
         except:
-            pass
+            print(f"   📋 Raw error response: {error_body}")
+        
+        if e.code == 401:
+            print(f"\n   🔍 401 UNAUTHORIZED - Authentication Failed")
+            print(f"   📝 Credentials being used:")
+            print(f"      - Username: '{CLICKSEND_USERNAME}' (length: {len(CLICKSEND_USERNAME)})")
+            print(f"      - API Key: {'SET' if CLICKSEND_API_KEY else 'NOT SET'} (length: {len(CLICKSEND_API_KEY) if CLICKSEND_API_KEY else 0})")
+            print(f"      - First 4 chars of API key: {CLICKSEND_API_KEY[:4] if len(CLICKSEND_API_KEY) >= 4 else 'N/A'}...")
+            print(f"\n   💡 Troubleshooting steps:")
+            print(f"      1. Verify credentials in ClickSend dashboard (API section)")
+            print(f"      2. Check for hidden spaces - credentials have been trimmed")
+            print(f"      3. Ensure account is fully activated")
+            print(f"      4. Verify account has credits/balance")
+            print(f"      5. Try regenerating API key in ClickSend dashboard")
+            print(f"      6. If using email as username, try using actual username instead")
+            
+            # Log auth string format (without exposing full key)
+            auth_preview = f"{CLICKSEND_USERNAME}:[HIDDEN]"
+            print(f"\n   🔐 Auth string format: {auth_preview}")
+        
         return False
     except Exception as e:
         print(f"❌ Error sending SMS via ClickSend: {type(e).__name__}: {str(e)}")
