@@ -5253,103 +5253,60 @@ function hideCareNoteForm() {
 }
 
 async function loadCareNotes() {
-    console.log('📝📝📝 loadCareNotes() FUNCTION STARTING 📝📝📝');
-    console.log('📝 loadCareNotes() called');
+    // GET CONTAINER IMMEDIATELY - make it visible right away
+    const container = document.getElementById('careNotesList');
+    if (!container) {
+        console.error('❌ careNotesList container not found!');
+        return;
+    }
+
+    // FORCE VISIBILITY IMMEDIATELY
+    container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
+    
+    // Show loading state immediately
+    container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading care notes...</div>';
+
     try {
-        // Check if user is authenticated
         if (!authToken) {
-            console.error('❌ No auth token available, redirecting to login');
             checkAuth();
+            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #d32f2f;">Please log in</div>';
             return;
         }
 
         const url = currentResidentId ? `/api/care-notes?resident_id=${currentResidentId}` : '/api/care-notes';
-        console.log('📝 Fetching care notes from:', url);
-        console.log('📝 Auth headers:', { 'Authorization': 'Bearer [HIDDEN]' });
-
         const response = await fetch(url, {
             headers: getAuthHeaders(),
-            cache: 'no-store' // Force fresh request
+            cache: 'no-store'
         });
 
-        console.log('📝 Response status:', response.status);
-        console.log('📝 Response ok:', response.ok);
-
-        // Handle authentication errors
         if (response.status === 401) {
-            console.error('❌ Authentication failed - token expired or invalid');
-            showMessage('Session expired. Please log in again / Sesión expirada. Por favor inicie sesión nuevamente', 'error');
+            showMessage('Session expired. Please log in again', 'error');
             localStorage.removeItem('authToken');
             localStorage.removeItem('currentStaff');
             authToken = null;
             currentStaff = null;
             checkAuth();
+            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #d32f2f;">Session expired. Please log in.</div>';
             return;
         }
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ Failed to load care notes:', response.status, errorText);
-            throw new Error(`Failed to load care notes: ${response.status} - ${errorText}`);
+            throw new Error(`Failed to load care notes: ${response.status}`);
         }
 
         const notes = await response.json();
-        console.log('📝 Care notes received:', notes.length, 'notes');
-        console.log('📝 Notes data:', notes);
 
-        const container = document.getElementById('careNotesList');
-        if (!container) {
-            console.error('❌ careNotesList container not found!');
-            console.error('❌ Searching for container in DOM...');
-            const searchResult = document.querySelector('#careNotesList, [id="careNotesList"]');
-            console.error('❌ QuerySelector result:', searchResult);
-            return;
-        }
-
-        console.log('✅ careNotesList container found');
-        console.log('✅ Container before forcing - display:', window.getComputedStyle(container).display);
-        console.log('✅ Container before forcing - visibility:', window.getComputedStyle(container).visibility);
-        console.log('✅ Container before forcing - offsetHeight:', container.offsetHeight);
-
-        // Aggressively ensure container is visible
-        container.style.setProperty('display', 'block', 'important');
-        container.style.setProperty('visibility', 'visible', 'important');
-        container.style.setProperty('opacity', '1', 'important');
-        container.style.setProperty('min-height', '200px', 'important');
-        container.style.setProperty('width', '100%', 'important');
-        container.style.setProperty('padding', '1rem', 'important');
-
-        console.log('✅ Container after forcing - display:', window.getComputedStyle(container).display);
-        console.log('✅ Container after forcing - visibility:', window.getComputedStyle(container).visibility);
-        console.log('✅ Container after forcing - offsetHeight:', container.offsetHeight);
+        // FORCE VISIBILITY AGAIN
+        container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
 
         if (!notes || notes.length === 0) {
-            console.log('📝 No care notes found, showing empty state');
-            const emptyStateHTML = '<div class="empty-state" style="padding: 2rem !important; text-align: center !important; color: #666 !important; background: white !important; border-radius: 8px !important; margin: 1rem 0 !important; border: 1px solid #ddd !important; display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 150px !important; width: 100% !important;"><p style="font-size: 1.1em !important; margin-bottom: 0.5rem !important; font-weight: 500 !important; display: block !important; visibility: visible !important;">' + t('common.noCareNotes') + '</p><p style="margin-top: 1rem !important; color: #888 !important; display: block !important; visibility: visible !important;">Click the "Add Care Note" button above to create your first care note.</p></div>';
+            const emptyStateHTML = `
+                <div style="padding: 2rem; text-align: center; color: #666; background: white; border-radius: 8px; margin: 1rem 0; border: 1px solid #ddd; display: block; visibility: visible; opacity: 1; min-height: 150px; width: 100%;">
+                    <p style="font-size: 1.1em; margin-bottom: 0.5rem; font-weight: 500;">${t('common.noCareNotes')}</p>
+                    <p style="margin-top: 1rem; color: #888;">Click the "Add Care Note" button above to create your first care note.</p>
+                </div>
+            `;
             container.innerHTML = emptyStateHTML;
-            console.log('✅ Empty state HTML set in container');
-            console.log('✅ Container innerHTML length:', container.innerHTML.length);
-
-            // AGGRESSIVE: Force container and its content to be visible
-            container.style.setProperty('display', 'block', 'important');
-            container.style.setProperty('visibility', 'visible', 'important');
-            container.style.setProperty('opacity', '1', 'important');
-            container.style.setProperty('min-height', '200px', 'important');
-            container.style.setProperty('width', '100%', 'important');
-            container.style.setProperty('padding', '1rem', 'important');
-
-            // Force the empty state div to be visible
-            const emptyStateDiv = container.querySelector('.empty-state');
-            if (emptyStateDiv) {
-                emptyStateDiv.style.setProperty('display', 'block', 'important');
-                emptyStateDiv.style.setProperty('visibility', 'visible', 'important');
-                emptyStateDiv.style.setProperty('opacity', '1', 'important');
-            }
-
-            // Force a reflow to ensure the content is visible
-            void container.offsetHeight;
-            console.log('✅ Container offsetHeight after empty state:', container.offsetHeight);
-            console.log('✅ Container computed display:', window.getComputedStyle(container).display);
             return;
         }
 
