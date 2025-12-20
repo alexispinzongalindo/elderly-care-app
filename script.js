@@ -2508,18 +2508,6 @@ function showPage(pageName) {
             }
         });
 
-        // Ensure the user actually sees the page content (Safari can make it look "blank" at the top)
-        if (pageName === 'carenotes') {
-            setTimeout(() => {
-                try {
-                    targetPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } catch (e) {
-                    // Fallback
-                    window.scrollTo({ top: 0, behavior: 'instant' });
-                }
-            }, 0);
-        }
-
         // Load page-specific data
         if (pageName === 'dashboard') {
             // Force grid layout immediately - run multiple times to ensure it sticks
@@ -3018,6 +3006,20 @@ function showPage(pageName) {
             } else {
                 console.error('❌ Care notes list container NOT FOUND!');
             }
+
+            // Safari can render at height 0 initially; scroll after visibility fixes (with retries)
+            const scrollToCareNotes = (delayMs) => {
+                setTimeout(() => {
+                    try {
+                        careNotesPage.scrollIntoView({ behavior: 'instant', block: 'start' });
+                    } catch (e) {
+                        window.scrollTo({ top: 0, behavior: 'instant' });
+                    }
+                }, delayMs);
+            };
+            scrollToCareNotes(0);
+            scrollToCareNotes(120);
+            scrollToCareNotes(350);
 
             // Verify visibility with computed styles
             setTimeout(() => {
