@@ -3006,7 +3006,11 @@ function showPage(pageName) {
             console.log('✅ Care notes page offsetHeight:', carenotesPage.offsetHeight);
             console.log('✅ Care notes page offsetWidth:', carenotesPage.offsetWidth);
 
-            loadCareNotes();
+            // Load care notes with a small delay to ensure page is fully rendered
+            setTimeout(() => {
+                console.log('📝 Calling loadCareNotes() after page is shown');
+                loadCareNotes();
+            }, 100);
         }
         else if (pageName === 'notifications') {
             loadNotificationsPage();
@@ -5203,20 +5207,30 @@ function hideCareNoteForm() {
 }
 
 async function loadCareNotes() {
+    console.log('📝 loadCareNotes() called');
     try {
         // Check if user is authenticated
         if (!authToken) {
-            console.error('No auth token available, redirecting to login');
+            console.error('❌ No auth token available, redirecting to login');
             checkAuth();
             return;
         }
 
         const url = currentResidentId ? `/api/care-notes?resident_id=${currentResidentId}` : '/api/care-notes';
-        const response = await fetch(url, { headers: getAuthHeaders() });
+        console.log('📝 Fetching care notes from:', url);
+        console.log('📝 Auth headers:', { 'Authorization': 'Bearer [HIDDEN]' });
+        
+        const response = await fetch(url, { 
+            headers: getAuthHeaders(),
+            cache: 'no-store' // Force fresh request
+        });
+
+        console.log('📝 Response status:', response.status);
+        console.log('📝 Response ok:', response.ok);
 
         // Handle authentication errors
         if (response.status === 401) {
-            console.error('Authentication failed - token expired or invalid');
+            console.error('❌ Authentication failed - token expired or invalid');
             showMessage('Session expired. Please log in again / Sesión expirada. Por favor inicie sesión nuevamente', 'error');
             localStorage.removeItem('authToken');
             localStorage.removeItem('currentStaff');
@@ -5226,24 +5240,39 @@ async function loadCareNotes() {
             return;
         }
 
-        if (!response.ok) throw new Error(`Failed to load care notes: ${response.status}`);
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Failed to load care notes:', response.status, errorText);
+            throw new Error(`Failed to load care notes: ${response.status} - ${errorText}`);
+        }
 
         const notes = await response.json();
+        console.log('📝 Care notes received:', notes.length, 'notes');
+        console.log('📝 Notes data:', notes);
+        
         const container = document.getElementById('careNotesList');
         if (!container) {
             console.error('❌ careNotesList container not found!');
+            console.error('❌ Searching for container in DOM...');
+            const searchResult = document.querySelector('#careNotesList, [id="careNotesList"]');
+            console.error('❌ QuerySelector result:', searchResult);
             return;
         }
+
+        console.log('✅ careNotesList container found');
 
         // Ensure container is visible
         container.style.display = 'block';
         container.style.visibility = 'visible';
+        container.style.minHeight = '200px';
 
-        if (notes.length === 0) {
-            container.innerHTML = '<div class="empty-state" style="padding: 2rem; text-align: center; color: #666;"><p>No care notes found. / No se encontraron notas de cuidado.</p><p style="margin-top: 1rem;">Click the "Add Care Note" button above to create your first care note.</p></div>';
+        if (!notes || notes.length === 0) {
+            console.log('📝 No care notes found, showing empty state');
+            container.innerHTML = '<div class="empty-state" style="padding: 2rem; text-align: center; color: #666;"><p>' + t('common.noCareNotes') + '</p><p style="margin-top: 1rem;">Click the "Add Care Note" button above to create your first care note.</p></div>';
             return;
         }
 
+        console.log('📝 Rendering', notes.length, 'care notes');
         container.innerHTML = notes.map(note => {
             const date = new Date(note.note_date);
             const timeDisplay = note.note_time ? ` - ${note.note_time}` : '';
@@ -5277,9 +5306,18 @@ async function loadCareNotes() {
                 </div>
             `;
         }).join('');
+        console.log('✅ Care notes rendered successfully');
     } catch (error) {
-        console.error('Error loading care notes:', error);
-        showMessage('Error loading care notes / Error al cargar notas de cuidado', 'error');
+        console.error('❌ Error loading care notes:', error);
+        console.error('❌ Error stack:', error.stack);
+        const container = document.getElementById('careNotesList');
+        if (container) {
+            container.innerHTML = `<div class="empty-state" style="padding: 2rem; text-align: center; color: #d32f2f;">
+                <p>❌ Error loading care notes / Error al cargar notas de cuidado</p>
+                <p style="margin-top: 0.5rem; font-size: 0.9em;">${error.message}</p>
+            </div>`;
+        }
+        showMessage('Error loading care notes / Error al cargar notas de cuidado: ' + error.message, 'error');
     }
 }
 

@@ -2963,11 +2963,12 @@ def care_notes():
             note_date = request.args.get('date')
 
             query = '''
-                SELECT cn.*, r.first_name || ' ' || r.last_name as resident_name,
-                       s.full_name as staff_name
+                SELECT cn.*, 
+                       COALESCE(r.first_name || ' ' || r.last_name, 'Unknown Resident') as resident_name,
+                       COALESCE(s.full_name, 'Unknown Staff') as staff_name
                 FROM daily_care_notes cn
-                JOIN residents r ON cn.resident_id = r.id
-                JOIN staff s ON cn.staff_id = s.id
+                LEFT JOIN residents r ON cn.resident_id = r.id
+                LEFT JOIN staff s ON cn.staff_id = s.id
                 WHERE 1=1
             '''
             params = []
