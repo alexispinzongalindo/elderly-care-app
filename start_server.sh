@@ -31,9 +31,16 @@ echo "   SENDER_EMAIL: ${SENDER_EMAIL:+SET}${SENDER_EMAIL:-NOT SET}"
 echo "   SENDER_PASSWORD: ${SENDER_PASSWORD:+SET}${SENDER_PASSWORD:-NOT SET}"
 echo ""
 
+# Dev defaults (can be overridden by env vars)
+export PORT="${PORT:-5002}"
+export FLASK_ENV="${FLASK_ENV:-development}"
+export USE_MINIFIED="${USE_MINIFIED:-false}"
+
 # Start the server
 echo "🚀 Starting Elder Care Management Server..."
-echo "   Server will be available at: http://localhost:${PORT:-5001}"
+echo "   Server will be available at: http://localhost:${PORT}"
+echo "   Mode: ${FLASK_ENV} (auto-reload enabled)"
+echo "   USE_MINIFIED: ${USE_MINIFIED}"
 echo "   Press Ctrl+C to stop the server"
 echo ""
 echo "═══════════════════════════════════════════════════════════"
