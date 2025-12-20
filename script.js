@@ -5044,6 +5044,11 @@ async function loadCareNotes() {
         return;
     }
 
+    // Ensure container is visible
+    container.style.display = 'block';
+    container.style.visibility = 'visible';
+    container.style.opacity = '1';
+
     // Show loading state
     container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading care notes...</div>';
 
@@ -5055,21 +5060,11 @@ async function loadCareNotes() {
         }
 
         const url = currentResidentId ? `/api/care-notes?resident_id=${currentResidentId}` : '/api/care-notes';
+        console.log('📝 Fetching care notes from:', url);
         const response = await fetch(url, {
             headers: getAuthHeaders(),
             cache: 'no-store'
         });
-
-        if (response.status === 401) {
-            showMessage('Session expired. Please log in again', 'error');
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('currentStaff');
-            authToken = null;
-            currentStaff = null;
-            checkAuth();
-            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #d32f2f;">Session expired. Please log in.</div>';
-            return;
-        }
 
         if (response.status === 401) {
             showMessage('Session expired. Please log in again / Sesión expirada. Por favor inicie sesión nuevamente', 'error');
@@ -5089,18 +5084,27 @@ async function loadCareNotes() {
         }
 
         const notes = await response.json();
+        console.log('📝 Received care notes:', notes.length, 'notes');
 
         if (!notes || notes.length === 0) {
+            console.log('📝 No care notes found, showing empty state');
+            container.style.display = 'block';
+            container.style.visibility = 'visible';
+            container.style.opacity = '1';
             container.innerHTML = `
-                <div class="empty-state" style="padding: 2rem; text-align: center; color: #666;">
-                    <p>${t('common.noCareNotes')}</p>
+                <div class="empty-state" style="padding: 2rem; text-align: center; color: #666; display: block; visibility: visible; opacity: 1;">
+                    <p style="font-size: 1.1em; margin-bottom: 0.5rem; font-weight: 500;">${t('common.noCareNotes')}</p>
                     <p style="margin-top: 1rem; color: #888;">Click the "Add Care Note" button above to create your first care note.</p>
                 </div>
             `;
+            console.log('✅ Empty state displayed, container innerHTML length:', container.innerHTML.length);
             return;
         }
 
         console.log('📝 Rendering', notes.length, 'care notes');
+        container.style.display = 'block';
+        container.style.visibility = 'visible';
+        container.style.opacity = '1';
         container.innerHTML = notes.map(note => {
             const date = new Date(note.note_date);
             const timeDisplay = note.note_time ? ` - ${note.note_time}` : '';
