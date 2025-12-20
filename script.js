@@ -2852,6 +2852,176 @@ function showPage(pageName) {
             loadIncidents();
         }
         else if (pageName === 'carenotes') {
+            console.log('%c📝📝📝 SHOWING CARE NOTES PAGE 📝📝📝', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
+            
+            const careNotesPage = document.getElementById('carenotes');
+            if (!careNotesPage) {
+                console.error('❌❌❌ CARE NOTES PAGE ELEMENT NOT FOUND IN DOM! ❌❌❌');
+                alert('ERROR: Care notes page element (#carenotes) not found in DOM!');
+                return;
+            }
+            
+            console.log('✅ Care notes page element found in DOM');
+            console.log('✅ Element ID:', careNotesPage.id);
+            console.log('✅ Element classes:', careNotesPage.className);
+            console.log('✅ Element parent:', careNotesPage.parentElement?.tagName, careNotesPage.parentElement?.id);
+            console.log('✅ Element children count:', careNotesPage.children.length);
+            console.log('✅ Element innerHTML length:', careNotesPage.innerHTML.length);
+            
+            // CRITICAL: Ensure ALL parents are visible, starting from careNotesPage up to mainApp
+            let currentElement = careNotesPage;
+            let level = 0;
+            while (currentElement && level < 10) {
+                const computedStyle = window.getComputedStyle(currentElement);
+                const display = computedStyle.display;
+                const visibility = computedStyle.visibility;
+                const opacity = computedStyle.opacity;
+                
+                console.log(`🔍 Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}): display=${display}, visibility=${visibility}, opacity=${opacity}, offsetHeight=${currentElement.offsetHeight}, offsetWidth=${currentElement.offsetWidth}`);
+                
+                // Fix any parent with display:none (except intentionally hidden elements)
+                if (display === 'none' && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector') {
+                    console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - setting display to block with !important`);
+                    currentElement.style.setProperty('display', 'block', 'important');
+                    currentElement.style.setProperty('visibility', 'visible', 'important');
+                    currentElement.style.setProperty('opacity', '1', 'important');
+                    currentElement.style.setProperty('position', 'relative', 'important');
+                    currentElement.style.setProperty('z-index', '1', 'important');
+                    console.log(`✅ Fixed Parent ${level} - new display:`, window.getComputedStyle(currentElement).display);
+                }
+                
+                // Also fix if visibility is hidden or opacity is 0
+                if ((visibility === 'hidden' || opacity === '0') && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector') {
+                    console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - visibility/opacity issue`);
+                    currentElement.style.setProperty('visibility', 'visible', 'important');
+                    currentElement.style.setProperty('opacity', '1', 'important');
+                    currentElement.style.setProperty('display', 'block', 'important');
+                }
+                
+                // Stop at mainApp
+                if (currentElement.id === 'mainApp') {
+                    console.log(`🔧 CRITICAL: Found mainApp container - forcing visibility`);
+                    currentElement.style.setProperty('display', 'block', 'important');
+                    currentElement.style.setProperty('visibility', 'visible', 'important');
+                    currentElement.style.setProperty('opacity', '1', 'important');
+                    currentElement.style.setProperty('position', 'relative', 'important');
+                    currentElement.style.setProperty('z-index', '1', 'important');
+                    break;
+                }
+                
+                currentElement = currentElement.parentElement;
+                level++;
+            }
+            
+            // Also ensure main.container is visible
+            const mainContainer = careNotesPage.closest('main.container');
+            if (mainContainer) {
+                mainContainer.style.setProperty('display', 'block', 'important');
+                mainContainer.style.setProperty('visibility', 'visible', 'important');
+                mainContainer.style.setProperty('opacity', '1', 'important');
+                console.log('✅ main.container forced visible');
+            }
+            
+            // Force care notes page to be visible using cssText for maximum control
+            careNotesPage.classList.add('active');
+            careNotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+            console.log('✅ Care notes page forced visible with cssText');
+            
+            // Verify it worked
+            const computedStyle = window.getComputedStyle(careNotesPage);
+            console.log('✅ After forcing - display:', computedStyle.display);
+            console.log('✅ After forcing - visibility:', computedStyle.visibility);
+            console.log('✅ After forcing - opacity:', computedStyle.opacity);
+            console.log('✅ After forcing - offsetHeight:', careNotesPage.offsetHeight);
+            console.log('✅ After forcing - offsetWidth:', careNotesPage.offsetWidth);
+            
+            // Show ALL direct children of care notes page - USE CSS TEXT FOR MAXIMUM CONTROL
+            Array.from(careNotesPage.children).forEach((child, index) => {
+                console.log(`✅ Child ${index}:`, child.tagName, child.id || child.className, 'textContent:', child.textContent?.substring(0, 50));
+                const beforeDisplay = window.getComputedStyle(child).display;
+                const beforeVisibility = window.getComputedStyle(child).visibility;
+                const beforeOpacity = window.getComputedStyle(child).opacity;
+                const beforeHeight = child.offsetHeight;
+                const beforeWidth = child.offsetWidth;
+                console.log(`    Before: display=${beforeDisplay}, visibility=${beforeVisibility}, opacity=${beforeOpacity}, height=${beforeHeight}, width=${beforeWidth}`);
+                
+                // Don't hide forms if they're supposed to be hidden
+                if ((child.id === 'careNoteForm' || child.id === 'careNoteEditForm') && child.style.display === 'none') {
+                    console.log(`⚠️ Skipping ${child.id} (should be hidden)`);
+                    return;
+                }
+                
+                // Use cssText to completely replace styles for maximum control
+                const displayValue = child.tagName === 'BUTTON' ? 'inline-block' : 'block';
+                child.style.cssText = `display: ${displayValue} !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important;`;
+                
+                const afterDisplay = window.getComputedStyle(child).display;
+                const afterVisibility = window.getComputedStyle(child).visibility;
+                const afterOpacity = window.getComputedStyle(child).opacity;
+                const afterHeight = child.offsetHeight;
+                const afterWidth = child.offsetWidth;
+                console.log(`    After: display=${afterDisplay}, visibility=${afterVisibility}, opacity=${afterOpacity}, height=${afterHeight}, width=${afterWidth}`);
+                
+                if (afterHeight === 0 && afterWidth === 0) {
+                    console.error(`    ❌❌❌ CHILD ${index} HAS ZERO DIMENSIONS! ❌❌❌`);
+                }
+            });
+            
+            // Force specific elements to be visible
+            const careNotesH2 = careNotesPage.querySelector('h2');
+            const careNotesButton = careNotesPage.querySelector('button[onclick="showCareNoteForm()"]');
+            const careNotesList = document.getElementById('careNotesList');
+            
+            if (careNotesH2) {
+                careNotesH2.style.setProperty('display', 'block', 'important');
+                careNotesH2.style.setProperty('visibility', 'visible', 'important');
+                careNotesH2.style.setProperty('opacity', '1', 'important');
+                careNotesH2.style.setProperty('color', 'var(--text-color)', 'important');
+                careNotesH2.style.setProperty('margin-bottom', '1.5rem', 'important');
+                console.log('✅ Care notes H2 shown:', careNotesH2.textContent);
+            } else {
+                console.error('❌ Care notes H2 NOT FOUND!');
+            }
+            
+            if (careNotesButton) {
+                careNotesButton.style.setProperty('display', 'inline-block', 'important');
+                careNotesButton.style.setProperty('visibility', 'visible', 'important');
+                careNotesButton.style.setProperty('opacity', '1', 'important');
+                careNotesButton.style.setProperty('margin-bottom', '1.5rem', 'important');
+                careNotesButton.style.setProperty('cursor', 'pointer', 'important');
+                console.log('✅ Care notes button shown:', careNotesButton.textContent);
+            } else {
+                console.error('❌ Care notes button NOT FOUND!');
+            }
+            
+            if (careNotesList) {
+                careNotesList.style.setProperty('display', 'block', 'important');
+                careNotesList.style.setProperty('visibility', 'visible', 'important');
+                careNotesList.style.setProperty('opacity', '1', 'important');
+                careNotesList.style.setProperty('min-height', '200px', 'important');
+                careNotesList.style.setProperty('width', '100%', 'important');
+                console.log('✅ Care notes list container shown');
+            } else {
+                console.error('❌ Care notes list container NOT FOUND!');
+            }
+            
+            // Verify visibility with computed styles
+            setTimeout(() => {
+                const computedDisplay = window.getComputedStyle(careNotesPage).display;
+                const computedVisibility = window.getComputedStyle(careNotesPage).visibility;
+                const computedOpacity = window.getComputedStyle(careNotesPage).opacity;
+                console.log('🔍 Computed styles for care notes page:');
+                console.log('  - display:', computedDisplay);
+                console.log('  - visibility:', computedVisibility);
+                console.log('  - opacity:', computedOpacity);
+                console.log('  - offsetHeight:', careNotesPage.offsetHeight);
+                console.log('  - offsetWidth:', careNotesPage.offsetWidth);
+                if (computedDisplay === 'none' || computedVisibility === 'hidden' || computedOpacity === '0' || careNotesPage.offsetHeight === 0) {
+                    console.error('❌❌❌ PAGE IS STILL HIDDEN DESPITE ALL EFFORTS! ❌❌❌');
+                }
+            }, 100);
+            
+            console.log('🔄 Loading care notes page data...');
             loadCareNotes();
         }
         else if (pageName === 'notifications') {
