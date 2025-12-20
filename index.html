@@ -1766,10 +1766,19 @@
                             </div>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-primary">Generate PDF / Generar PDF</button>
+                            <button type="submit" class="btn btn-primary">Generate Preview / Generar Vista Previa</button>
+                            <button type="button" class="btn btn-secondary" onclick="printCurrentReport()">Print / Save as PDF</button>
                             <button type="button" class="btn btn-secondary" onclick="exportReportToCSV()">Export CSV / Exportar CSV</button>
                         </div>
                     </form>
+                </div>
+
+                <div class="form-card" id="reportPreviewCard" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
+                        <h3 id="reportPreviewTitle">Report Preview</h3>
+                        <div id="reportPreviewMeta" style="color: #666; font-size: 0.9rem;"></div>
+                    </div>
+                    <div id="reportPreview" style="margin-top: 1rem;"></div>
                 </div>
             </div>
         </main>

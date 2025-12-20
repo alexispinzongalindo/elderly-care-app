@@ -1061,6 +1061,33 @@ function hideResidentSelector() {
     document.getElementById('residentSelector').style.display = 'none';
 }
 
+async function validateAuthOnLoad() {
+    if (!authToken) return;
+
+    try {
+        const response = await fetch('/api/auth/me', { headers: getAuthHeaders(), cache: 'no-store' });
+        if (response.ok) {
+            const me = await response.json().catch(() => null);
+            if (me) {
+                currentStaff = me;
+                currentUser = me;
+                localStorage.setItem('currentStaff', JSON.stringify(currentStaff));
+            }
+            return;
+        }
+
+        if (response.status === 401) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentStaff');
+            authToken = null;
+            currentStaff = null;
+            currentUser = null;
+        }
+    } catch (error) {
+        console.error('Auth validation error:', error);
+    }
+}
+
 async function handleLogin(event) {
     event.preventDefault();
     const username = document.getElementById('loginUsername').value.trim();
@@ -1173,7 +1200,7 @@ async function handleLogin(event) {
 
 async function handleLogout() {
     try {
-        await fetch('/api/auth/logout', { method: 'POST' });
+        await fetch('/api/auth/logout', { method: 'POST', headers: getAuthHeaders() });
     } catch (error) {
         console.error('Logout error:', error);
     }
@@ -1750,6 +1777,13 @@ async function saveNewResident(event) {
     console.log('Date of birth:', dateOfBirth);
 
     try {
+        // Block save if not authenticated (prevents confusing 401 loops)
+        if (!authToken || !currentStaff) {
+            showMessage('Authentication required. Please log in again / Autenticación requerida. Por favor inicie sesión nuevamente', 'error');
+            checkAuth();
+            return;
+        }
+
         // Store editingResidentId in a local variable to prevent it from being lost
         const currentEditingId = editingResidentId;
         const isEditing = currentEditingId && currentEditingId !== null && currentEditingId !== undefined && currentEditingId !== 0;
@@ -1836,6 +1870,18 @@ async function saveNewResident(event) {
                 loadResidents();
             }
         } else {
+            // Handle auth errors consistently across the app
+            if (response.status === 401) {
+                console.error('Authentication failed - token expired or invalid');
+                showMessage('Session expired. Please log in again / Sesión expirada. Por favor inicie sesión nuevamente', 'error');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentStaff');
+                authToken = null;
+                currentStaff = null;
+                checkAuth();
+                return;
+            }
+
             // Read error response once
             let errorMsg = '';
             try {
@@ -5798,54 +5844,137 @@ async function generateReport(event) {
                 break;
         }
 
-        // Generate PDF
-        if (typeof window.jspdf === 'undefined') {
-            showMessage('PDF library not loaded. Please refresh. / Biblioteca PDF no cargada. Por favor recargue.', 'error');
-            return;
-        }
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        // Add title
-        doc.setFontSize(18);
-        doc.text(title, 14, 20);
-
-        // Add date range if provided
-        if (dateFrom || dateTo) {
-            doc.setFontSize(10);
-            doc.text(`Date Range: ${dateFrom || 'Start'} to ${dateTo || 'End'}`, 14, 30);
-        }
-
-        // Add data (simplified - would format better in production)
-        doc.setFontSize(10);
-        let y = 40;
-        doc.text(`Total Records: ${data.length}`, 14, y);
-        y += 10;
-
-        // Add summary data
-        if (data.length > 0 && data.length <= 50) {
-            data.forEach((item, index) => {
-                if (y > 270) {
-                    doc.addPage();
-                    y = 20;
-                }
-                const summary = JSON.stringify(item).substring(0, 80) + '...';
-                doc.text(`${index + 1}. ${summary}`, 14, y);
-                y += 7;
-            });
-        } else if (data.length > 50) {
-            doc.text('Too many records to display. Use CSV export for full data.', 14, y);
-        }
-
-        // Save PDF
-        doc.save(`${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
-        showMessage('PDF generated successfully / PDF generado exitosamente', 'success');
+        // Render preview (Option A: Print -> Save as PDF)
+        renderReportPreview({ title, reportType, dateFrom, dateTo, data });
+        showMessage('Preview generated / Vista previa generada', 'success');
 
     } catch (error) {
         console.error('Error generating report:', error);
         showMessage('Error generating report / Error al generar reporte', 'error');
     }
+}
+
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function buildSimpleTable(data, columns) {
+    if (!Array.isArray(data) || data.length === 0) {
+        return '<div style="padding: 0.75rem; color: #666;">No records found for the selected filters.</div>';
+    }
+
+    const header = columns.map(c => `<th style="text-align:left; padding: 0.5rem; border-bottom: 1px solid #ddd;">${escapeHtml(c.label)}</th>`).join('');
+    const rows = data.map(item => {
+        const tds = columns.map(c => {
+            const raw = typeof c.value === 'function' ? c.value(item) : item?.[c.key];
+            return `<td style="padding: 0.5rem; border-bottom: 1px solid #eee; vertical-align: top;">${escapeHtml(raw)}</td>`;
+        }).join('');
+        return `<tr>${tds}</tr>`;
+    }).join('');
+
+    return `
+        <div style="overflow:auto;">
+            <table style="width:100%; border-collapse: collapse;">
+                <thead><tr>${header}</tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>
+    `;
+}
+
+function renderReportPreview({ title, reportType, dateFrom, dateTo, data }) {
+    const card = document.getElementById('reportPreviewCard');
+    const titleEl = document.getElementById('reportPreviewTitle');
+    const metaEl = document.getElementById('reportPreviewMeta');
+    const container = document.getElementById('reportPreview');
+
+    if (!card || !titleEl || !metaEl || !container) return;
+
+    titleEl.textContent = title;
+    const rangeText = (dateFrom || dateTo)
+        ? `Date Range: ${dateFrom || 'Start'} to ${dateTo || 'End'}`
+        : 'Date Range: All';
+    metaEl.textContent = `${rangeText} | Total Records: ${Array.isArray(data) ? data.length : 0}`;
+
+    let html = '';
+    switch (reportType) {
+        case 'incidents':
+            html = buildSimpleTable(data, [
+                { key: 'incident_date', label: 'Date' },
+                { key: 'resident_name', label: 'Resident' },
+                { key: 'incident_type', label: 'Type' },
+                { key: 'severity', label: 'Severity' },
+                { key: 'location', label: 'Location' },
+                { key: 'description', label: 'Description' }
+            ]);
+            break;
+        case 'care_notes':
+            html = buildSimpleTable(data, [
+                { key: 'note_date', label: 'Date' },
+                { key: 'shift', label: 'Shift' },
+                { key: 'mood', label: 'Mood' },
+                { key: 'pain_level', label: 'Pain' },
+                { key: 'general_notes', label: 'Notes' }
+            ]);
+            break;
+        case 'medications':
+            html = buildSimpleTable(data, [
+                { key: 'name', label: 'Medication' },
+                { key: 'dosage', label: 'Dosage' },
+                { key: 'frequency', label: 'Frequency' },
+                { key: 'time_slots', label: 'Time Slots' },
+                { key: 'hours_interval', label: 'Hours Interval' },
+                { key: 'active', label: 'Active' }
+            ]);
+            break;
+        case 'appointments':
+            html = buildSimpleTable(data, [
+                { key: 'date', label: 'Date' },
+                { key: 'time', label: 'Time' },
+                { key: 'doctor_name', label: 'Doctor' },
+                { key: 'facility', label: 'Facility' },
+                { key: 'purpose', label: 'Purpose' },
+                { key: 'completed', label: 'Completed' }
+            ]);
+            break;
+        case 'vital_signs':
+            html = buildSimpleTable(data, [
+                { key: 'recorded_at', label: 'Recorded At' },
+                { key: 'systolic', label: 'SYS' },
+                { key: 'diastolic', label: 'DIA' },
+                { key: 'heart_rate', label: 'HR' },
+                { key: 'temperature', label: 'Temp' },
+                { key: 'glucose', label: 'Glucose' },
+                { key: 'weight', label: 'Weight' },
+                { key: 'notes', label: 'Notes' }
+            ]);
+            break;
+        case 'comprehensive':
+            html = '<div style="padding: 0.75rem; color: #666;">Comprehensive report preview is not implemented yet. Select a specific report type.</div>';
+            break;
+        default:
+            html = '<div style="padding: 0.75rem; color: #666;">Please select a report type.</div>';
+            break;
+    }
+
+    container.innerHTML = html;
+    card.style.display = 'block';
+}
+
+function printCurrentReport() {
+    const card = document.getElementById('reportPreviewCard');
+    const container = document.getElementById('reportPreview');
+
+    if (!card || card.style.display === 'none' || !container || !container.innerHTML.trim()) {
+        showMessage('Generate a preview first / Genere una vista previa primero', 'error');
+        return;
+    }
+    window.print();
 }
 
 function exportReportToCSV() {
@@ -7713,7 +7842,7 @@ function setDateTimeToDropdowns(dateTimeString, yearId, monthId, dayId, timeId) 
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Load language from localStorage if available (but wait for login to use staff preferred_language)
     // Only set language from localStorage if user is not logged in yet
     if (!authToken || !currentStaff) {
@@ -7722,6 +7851,8 @@ document.addEventListener('DOMContentLoaded', () => {
             setLanguage(savedLanguage); // Use setLanguage to ensure replaceDualLanguageText is called
         }
     }
+
+    await validateAuthOnLoad();
 
     checkAuth();
     if (authToken && currentStaff && currentResidentId) {
