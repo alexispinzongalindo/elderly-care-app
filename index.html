@@ -20,6 +20,9 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="stylesheet" href="style.css">
     <!-- jsPDF for PDF export -->
@@ -214,9 +217,9 @@
                             <span class="nav-title-text">Elder Care Tracker</span>
                         </h1>
                         <div class="quick-actions-nav" style="display: none;">
-                            <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeToggle" data-translate-title="common.darkMode" title="Dark Mode">🌙</button>
-                            <button class="btn-icon" onclick="printCurrentPage()" data-translate-title="common.print" title="Print">🖨️</button>
-                            <button class="btn-icon" onclick="showKeyboardShortcuts()" data-translate-title="common.keyboardShortcuts" title="Keyboard Shortcuts">⌨️</button>
+                            <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeToggle" data-translate-title="common.darkMode" title="Dark Mode"><i class="fas fa-moon"></i></button>
+                            <button class="btn-icon" onclick="printCurrentPage()" data-translate-title="common.print" title="Print"><i class="fas fa-print"></i></button>
+                            <button class="btn-icon" onclick="showKeyboardShortcuts()" data-translate-title="common.keyboardShortcuts" title="Keyboard Shortcuts"><i class="fas fa-keyboard"></i></button>
                         </div>
                     </div>
 
@@ -240,7 +243,7 @@
                         <div id="liveClock" class="live-clock"></div>
                         <div id="notificationsContainer" class="notifications-container" style="display: none;">
                             <button class="btn-icon notifications-bell" onclick="toggleNotifications()" id="notificationsBell" data-translate-title="nav.notifications">
-                                🔔
+                                <i class="fas fa-bell"></i>
                                 <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
                             </button>
                             <div id="notificationsDropdown" class="notifications-dropdown" style="display: none;">
@@ -259,38 +262,38 @@
                             <span class="user-role" id="userRole" style="display: none;"></span>
                             <button class="btn btn-sm btn-secondary" onclick="handleLogout()" data-translate="nav.logout" data-translate-title="nav.logout">Logout</button>
                         </div>
-                        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" onclick="toggleMobileMenu()">☰</button>
+                        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
                     </div>
                 </div>
                 <!-- Navigation Menu -->
                 <ul class="nav-menu" id="navMenu">
                     <!-- Main Navigation -->
-                    <li><a href="#" class="nav-link active" data-page="dashboard"><span class="nav-icon">📊</span><span data-translate="nav.dashboard">Dashboard</span></a></li>
+                    <li><a href="#" class="nav-link active" data-page="dashboard"><span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span><span data-translate="nav.dashboard">Dashboard</span></a></li>
 
                     <!-- Care Management Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.care">Care Management</span></li>
-                    <li><a href="#" class="nav-link" data-page="residents"><span class="nav-icon">👥</span><span data-translate="nav.residents">Residents</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="medications"><span class="nav-icon">💊</span><span data-translate="nav.medications">Medications</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="appointments"><span class="nav-icon">📅</span><span data-translate="nav.appointments">Appointments</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="vitalsigns"><span class="nav-icon">❤️</span><span data-translate="nav.vitalSigns">Vital Signs</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="carenotes"><span class="nav-icon">📝</span><span data-translate="nav.careNotes">Care Notes</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="residents"><span class="nav-icon"><i class="fas fa-users"></i></span><span data-translate="nav.residents">Residents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="medications"><span class="nav-icon"><i class="fas fa-pills"></i></span><span data-translate="nav.medications">Medications</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="appointments"><span class="nav-icon"><i class="fas fa-calendar-check"></i></span><span data-translate="nav.appointments">Appointments</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="vitalsigns"><span class="nav-icon"><i class="fas fa-heartbeat"></i></span><span data-translate="nav.vitalSigns">Vital Signs</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="carenotes"><span class="nav-icon"><i class="fas fa-sticky-note"></i></span><span data-translate="nav.careNotes">Care Notes</span></a></li>
 
                     <!-- Records & Reports Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.records">Records & Reports</span></li>
-                    <li><a href="#" class="nav-link" data-page="incidents" onclick="event.preventDefault(); console.log('🔴 INCIDENTS LINK CLICKED'); if(typeof showPage === 'function') { showPage('incidents'); } else { console.error('❌ showPage not defined!'); alert('Error: showPage function not found. Check console.'); } return false;"><span class="nav-icon">⚠️</span><span data-translate="nav.incidents">Incidents</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="calendar"><span class="nav-icon">📆</span><span data-translate="nav.calendar">Calendar</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="reports"><span class="nav-icon">📈</span><span data-translate="nav.reports">Reports</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="incidents" onclick="event.preventDefault(); console.log('🔴 INCIDENTS LINK CLICKED'); if(typeof showPage === 'function') { showPage('incidents'); } else { console.error('❌ showPage not defined!'); alert('Error: showPage function not found. Check console.'); } return false;"><span class="nav-icon"><i class="fas fa-exclamation-triangle"></i></span><span data-translate="nav.incidents">Incidents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="calendar"><span class="nav-icon"><i class="fas fa-calendar-alt"></i></span><span data-translate="nav.calendar">Calendar</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="reports"><span class="nav-icon"><i class="fas fa-chart-bar"></i></span><span data-translate="nav.reports">Reports</span></a></li>
 
                     <!-- Financial Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.financial">Financial</span></li>
-                    <li><a href="#" class="nav-link" data-page="billing"><span class="nav-icon">💰</span><span data-translate="nav.billing">Billing</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="financial" id="financialNavLink" style="display: none;"><span class="nav-icon">💳</span><span data-translate="nav.financial">Financial Management</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="billing"><span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span><span data-translate="nav.billing">Billing</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="financial" id="financialNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-credit-card"></i></span><span data-translate="nav.financial">Financial Management</span></a></li>
 
                     <!-- System Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.system">System</span></li>
-                    <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon">🔔</span><span data-translate="nav.notifications">Notifications</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon">👤</span><span data-translate="nav.staff">Staff</span></a></li>
-                    <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon">🚪</span><span data-translate="nav.logout">Logout</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon"><i class="fas fa-bell"></i></span><span data-translate="nav.notifications">Notifications</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-user-shield"></i></span><span data-translate="nav.staff">Staff</span></a></li>
+                    <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span data-translate="nav.logout">Logout</span></a></li>
                 </ul>
             </div>
         </nav>
@@ -304,7 +307,7 @@
                 <!-- Stats Grid with Cards Side by Side -->
                 <div class="stats-grid">
                     <div class="stat-card stat-card-medications">
-                        <div class="stat-icon">💊</div>
+                        <div class="stat-icon"><i class="fas fa-pills"></i></div>
                         <div class="stat-content">
                             <h3 data-translate="dashboard.medications">Medications</h3>
                             <p class="stat-number" id="medsTakenStat">0/0</p>
@@ -315,7 +318,7 @@
                         </div>
                     </div>
                     <div class="stat-card stat-card-appointments">
-                        <div class="stat-icon">📅</div>
+                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
                         <div class="stat-content">
                             <h3 data-translate="dashboard.appointments">Appointments</h3>
                             <p class="stat-number" id="apptsToday">0</p>
@@ -323,7 +326,7 @@
                         </div>
                     </div>
                     <div class="stat-card stat-card-residents">
-                        <div class="stat-icon">👥</div>
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
                         <div class="stat-content">
                             <h3 data-translate="dashboard.residents">Residents</h3>
                             <p class="stat-number" id="totalResidents">0</p>
@@ -331,7 +334,7 @@
                         </div>
                     </div>
                     <div class="stat-card stat-card-vitals" id="vitalsCard" style="display: none;">
-                        <div class="stat-icon">❤️</div>
+                        <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
                         <div class="stat-content">
                             <h3 data-translate="dashboard.vitalSigns">Vital Signs</h3>
                             <p class="stat-number" id="vitalsToday">0</p>
@@ -339,7 +342,7 @@
                         </div>
                     </div>
                     <div class="stat-card stat-card-billing" id="billingCard" style="display: none;">
-                        <div class="stat-icon">💰</div>
+                        <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
                         <div class="stat-content">
                             <h3 data-translate="dashboard.accountBalance">Account Balance</h3>
                             <p class="stat-number" id="accountBalance">$0.00</p>
