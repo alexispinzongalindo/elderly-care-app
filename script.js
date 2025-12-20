@@ -2538,14 +2538,14 @@ function showPage(pageName) {
                 // USE cssText to completely overwrite all styles - most aggressive approach
                 carenotesPage.classList.add('active');
                 carenotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important;';
-                
+
                 // Also force the container to show immediately
                 const container = document.getElementById('careNotesList');
                 if (container) {
                     container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
                     container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading...</div>';
                 }
-                
+
                 // Call loadCareNotes() IMMEDIATELY - don't wait
                 loadCareNotes();
             }
@@ -2905,151 +2905,56 @@ function showPage(pageName) {
             loadIncidents();
         }
         else if (pageName === 'carenotes') {
-            console.log('🔍 REACHED CARENOTES ELSE-IF BLOCK');
-            console.log('🔍 pageName value:', pageName);
-            console.log('🔍 pageName type:', typeof pageName);
-            console.log('🔍 pageName === "carenotes":', pageName === 'carenotes');
-            console.log('📝📝📝 CARENOTES BLOCK EXECUTING 📝📝📝');
             console.log('%c📝📝📝 SHOWING CARE NOTES PAGE 📝📝📝', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
 
+            // CRITICAL: Get carenotes page element FIRST
             const carenotesPage = document.getElementById('carenotes');
             if (!carenotesPage) {
-                console.error('❌ Care notes page not found!');
+                console.error('%c❌❌❌ CARENOTES PAGE ELEMENT NOT FOUND IN DOM! ❌❌❌', 'background: red; color: white; font-size: 20px; padding: 15px;');
+                alert('ERROR: Care notes page element (#carenotes) not found in DOM!');
                 return;
             }
-
             console.log('✅ Care notes page element found in DOM');
+
             console.log('✅ Element ID:', carenotesPage.id);
             console.log('✅ Element classes:', carenotesPage.className);
             console.log('✅ Element parent:', carenotesPage.parentElement?.tagName, carenotesPage.parentElement?.id);
-            console.log('✅ Element children count:', carenotesPage.children.length);
 
-            // CRITICAL: Ensure ALL parents are visible, starting from carenotesPage up to mainApp
-            let currentElement = carenotesPage;
-            let level = 0;
-            while (currentElement && level < 10) {
-                const computedStyle = window.getComputedStyle(currentElement);
-                const display = computedStyle.display;
-                const visibility = computedStyle.visibility;
-                const opacity = computedStyle.opacity;
-
-                console.log(`🔍 Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}): display=${display}, visibility=${visibility}, opacity=${opacity}`);
-
-                // Skip intentionally hidden elements
-                if (currentElement.id === 'loginModal' || currentElement.id === 'residentSelector' || currentElement.id === 'careNoteForm') {
-                    currentElement = currentElement.parentElement;
-                    level++;
-                    continue;
-                }
-
-                // Fix any parent with display:none
-                if (display === 'none') {
-                    console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - setting display to block with !important`);
-                    currentElement.style.setProperty('display', 'block', 'important');
-                    currentElement.style.setProperty('visibility', 'visible', 'important');
-                    currentElement.style.setProperty('opacity', '1', 'important');
-                    currentElement.style.setProperty('position', 'relative', 'important');
-                    currentElement.style.setProperty('z-index', '1', 'important');
-                }
-
-                // Also fix if visibility is hidden or opacity is 0
-                if (visibility === 'hidden' || opacity === '0') {
-                    console.log(`⚠️ Fixing Parent ${level} (${currentElement.tagName}#${currentElement.id || ''}) - visibility/opacity issue`);
-                    currentElement.style.setProperty('visibility', 'visible', 'important');
-                    currentElement.style.setProperty('opacity', '1', 'important');
-                    currentElement.style.setProperty('display', 'block', 'important');
-                }
-
-                // Stop at mainApp
-                if (currentElement.id === 'mainApp') {
-                    console.log(`🔧 CRITICAL: Found mainApp container - forcing visibility`);
-                    currentElement.style.setProperty('display', 'block', 'important');
-                    currentElement.style.setProperty('visibility', 'visible', 'important');
-                    currentElement.style.setProperty('opacity', '1', 'important');
-                    currentElement.style.setProperty('position', 'relative', 'important');
-                    currentElement.style.setProperty('z-index', '1', 'important');
-                    break;
-                }
-
-                currentElement = currentElement.parentElement;
-                level++;
-            }
-
-            // Also ensure main.container is visible
-            const mainContainer = carenotesPage.closest('main.container');
-            if (mainContainer) {
-                mainContainer.style.setProperty('display', 'block', 'important');
-                mainContainer.style.setProperty('visibility', 'visible', 'important');
-                mainContainer.style.setProperty('opacity', '1', 'important');
-                console.log('✅ main.container forced visible');
-            }
-
-            // Force carenotes page to be visible using cssText for maximum control
+            // CRITICAL: Show carenotes page and restore its children - EXACTLY like incidents page
             carenotesPage.classList.add('active');
-            carenotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important;';
+            carenotesPage.style.setProperty('display', 'block', 'important');
+            carenotesPage.style.setProperty('visibility', 'visible', 'important');
+            carenotesPage.style.setProperty('opacity', '1', 'important');
+            carenotesPage.style.setProperty('position', 'relative', 'important');
+            carenotesPage.style.setProperty('z-index', '1', 'important');
+            carenotesPage.style.removeProperty('left'); // Remove left: -9999px if it was set
+            carenotesPage.style.removeProperty('right'); // Remove any right positioning
 
-            // DOUBLE-CHECK: Force it again after a micro-delay to override any timing issues
-            setTimeout(() => {
-                carenotesPage.style.setProperty('display', 'block', 'important');
-                carenotesPage.style.setProperty('visibility', 'visible', 'important');
-                carenotesPage.style.setProperty('opacity', '1', 'important');
-                carenotesPage.style.setProperty('min-height', '400px', 'important');
-                carenotesPage.style.setProperty('width', '100%', 'important');
-                console.log('✅ Care notes page re-forced visible after timeout');
-            }, 50);
-
-            // Ensure all child elements are visible
-            Array.from(carenotesPage.children).forEach((child) => {
-                if (child.tagName === 'SCRIPT') return;
-                // Skip the form if it should be hidden
+            // Force show all direct children of carenotes page
+            Array.from(carenotesPage.children).forEach((child, index) => {
+                // Only restore if it's not a form that should be hidden
                 if (child.id === 'careNoteForm' && child.style.display === 'none') {
+                    // Keep form hidden if it should be hidden
                     return;
                 }
-                const display = child.tagName === 'BUTTON' ? 'inline-block' :
-                              child.classList.contains('item-list') ? 'block' : 'block';
-                child.style.setProperty('display', display, 'important');
+                // Force show everything else
+                child.style.setProperty('display', 'block', 'important');
                 child.style.setProperty('visibility', 'visible', 'important');
                 child.style.setProperty('opacity', '1', 'important');
-                if (child.tagName === 'H2') {
-                    child.style.setProperty('min-height', '30px', 'important');
-                    child.style.setProperty('margin-bottom', '1.5rem', 'important');
-                }
             });
 
-            // Ensure the careNotesList container exists and is visible
+            // Also force show key carenotes containers
             const careNotesList = document.getElementById('careNotesList');
             if (careNotesList) {
                 careNotesList.style.setProperty('display', 'block', 'important');
                 careNotesList.style.setProperty('visibility', 'visible', 'important');
-                careNotesList.style.setProperty('min-height', '200px', 'important');
-                console.log('✅ careNotesList container found and made visible');
-            } else {
-                console.error('❌ careNotesList container not found in DOM!');
             }
 
-            console.log('✅ Care notes page forced visible');
-            console.log('✅ Care notes page offsetHeight:', carenotesPage.offsetHeight);
-            console.log('✅ Care notes page offsetWidth:', carenotesPage.offsetWidth);
+            console.log('✅ Care notes page restored and shown');
 
-            // Load care notes - call immediately and also after delay
-            console.log('📝 STEP 1: About to call loadCareNotes() immediately');
-            try {
-                loadCareNotes();
-                console.log('📝 STEP 2: loadCareNotes() call completed');
-            } catch (error) {
-                console.error('❌ ERROR calling loadCareNotes():', error);
-            }
-
-            // Also call after delay as backup
-            setTimeout(() => {
-                console.log('📝 STEP 3: Calling loadCareNotes() again after 100ms delay');
-                try {
-                    loadCareNotes();
-                    console.log('📝 STEP 4: Second loadCareNotes() call completed');
-                } catch (error) {
-                    console.error('❌ ERROR in delayed loadCareNotes() call:', error);
-                }
-            }, 100);
+            // Load care notes - EXACTLY like incidents page calls loadIncidents()
+            console.log('🔄 Loading care notes page data...');
+            loadCareNotes();
         }
         else if (pageName === 'notifications') {
             loadNotificationsPage();
@@ -5265,7 +5170,7 @@ async function loadCareNotes() {
 
     // FORCE VISIBILITY IMMEDIATELY with cssText
     container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
-    
+
     // Show loading state immediately
     container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666; background: white; border-radius: 8px;">Loading care notes...</div>';
 
