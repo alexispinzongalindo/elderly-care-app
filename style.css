@@ -287,17 +287,22 @@ body {
 }
 
 .nav-icon {
-    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-right: 0.5rem;
-    display: inline-block;
-    vertical-align: middle;
-    width: 20px;
-    text-align: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
 }
 
 .nav-icon i {
-    color: var(--primary-color);
-    transition: color 0.3s ease;
+    color: white;
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
 }
 
 .nav-group-header {
@@ -323,13 +328,23 @@ body {
     color: var(--primary-color);
 }
 
+.nav-link:hover .nav-icon {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
 .nav-link:hover .nav-icon i {
-    color: var(--secondary-color);
+    transform: scale(1.1);
 }
 
 .nav-link.active {
     background-color: var(--primary-color);
     color: var(--white);
+}
+
+.nav-link.active .nav-icon {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .nav-link.active .nav-icon i {
@@ -804,20 +819,31 @@ h3 {
 }
 
 .stat-icon {
-    font-size: 2.5rem;
-    line-height: 1;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    color: var(--primary-color);
-    transition: color 0.3s ease, transform 0.3s ease;
+    transition: all 0.3s ease;
+    margin-right: 1rem;
 }
 
 .stat-icon i {
     font-size: 2.5rem;
+    color: white;
+    transition: transform 0.3s ease;
 }
 
 .stat-card:hover .stat-icon {
-    color: var(--secondary-color);
     transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card:hover .stat-icon i {
+    transform: scale(1.05);
 }
 
 .stat-content {
@@ -1526,8 +1552,9 @@ h3 {
     }
     
     .nav-icon {
-        display: inline-block; /* Show icons on mobile */
-        font-size: 1.3rem;
+        display: flex; /* Show icons on mobile */
+        width: 36px;
+        height: 36px;
         margin-right: 0.75rem;
         width: 24px;
         text-align: center;
