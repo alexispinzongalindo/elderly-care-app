@@ -2330,20 +2330,6 @@ function showPage(pageName) {
 
     const targetPage = document.getElementById(pageName);
     if (targetPage) {
-        // CRITICAL: For carenotes, apply styles IMMEDIATELY before anything else
-        if (pageName === 'carenotes') {
-            console.log('🔴🔴🔴 IMMEDIATE CARE NOTES FIX 🔴🔴🔴');
-            targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important;';
-            targetPage.classList.add('active');
-            // Force all children visible immediately
-            Array.from(targetPage.children).forEach((child) => {
-                if (child.tagName === 'SCRIPT') return;
-                if (child.id === 'careNoteForm' && child.style.display === 'none') return;
-                child.style.setProperty('display', child.tagName === 'BUTTON' ? 'inline-block' : 'block', 'important');
-                child.style.setProperty('visibility', 'visible', 'important');
-                child.style.setProperty('opacity', '1', 'important');
-            });
-        }
         targetPage.classList.add('active');
 
         // CRITICAL: For financial page, scroll to top immediately
@@ -2420,14 +2406,6 @@ function showPage(pageName) {
             targetPage.style.setProperty('position', 'relative', 'important');
             targetPage.style.setProperty('z-index', '10', 'important');
         }
-        // For carenotes page, ensure it stays visible
-        if (pageName === 'carenotes') {
-            targetPage.style.setProperty('position', 'relative', 'important');
-            targetPage.style.setProperty('z-index', '10', 'important');
-            targetPage.style.setProperty('min-height', '400px', 'important');
-            targetPage.style.setProperty('width', '100%', 'important');
-            targetPage.style.setProperty('padding', '2rem', 'important');
-        }
         targetPage.style.setProperty('visibility', 'visible', 'important');
         targetPage.style.setProperty('opacity', '1', 'important');
         targetPage.style.setProperty('position', 'relative', 'important');
@@ -2462,30 +2440,6 @@ function showPage(pageName) {
             });
         }
 
-        // SPECIAL HANDLING FOR CARE NOTES PAGE - Force dimensions immediately
-        if (pageName === 'carenotes') {
-            targetPage.style.setProperty('min-height', '400px', 'important');
-            targetPage.style.setProperty('width', '100%', 'important');
-            targetPage.style.setProperty('padding', '2rem', 'important');
-            // Force all children visible immediately
-            Array.from(targetPage.children).forEach((child) => {
-                if (child.tagName === 'SCRIPT') return;
-                // Skip the form if it should be hidden
-                if (child.id === 'careNoteForm' && child.style.display === 'none') {
-                    return;
-                }
-                const display = child.tagName === 'BUTTON' ? 'inline-block' :
-                              child.classList.contains('item-list') ? 'block' : 'block';
-                child.style.setProperty('display', display, 'important');
-                child.style.setProperty('visibility', 'visible', 'important');
-                child.style.setProperty('opacity', '1', 'important');
-                if (child.tagName === 'H2') {
-                    child.style.setProperty('min-height', '30px', 'important');
-                } else if (child.classList.contains('item-list')) {
-                    child.style.setProperty('min-height', '200px', 'important');
-                }
-            });
-        }
 
         // Force show ALL direct children
         Array.from(targetPage.children).forEach((child, index) => {
@@ -2531,25 +2485,6 @@ function showPage(pageName) {
         console.log('✅ Target page offsetHeight:', targetPage.offsetHeight);
         console.log('✅ Target page offsetWidth:', targetPage.offsetWidth);
 
-        // CRITICAL: Force carenotes page to be visible IMMEDIATELY (before any other logic)
-        if (pageName === 'carenotes') {
-            const carenotesPage = document.getElementById('carenotes');
-            if (carenotesPage) {
-                // USE cssText to completely overwrite all styles - most aggressive approach
-                carenotesPage.classList.add('active');
-                carenotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important;';
-
-                // Also force the container to show immediately
-                const container = document.getElementById('careNotesList');
-                if (container) {
-                    container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
-                    container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading...</div>';
-                }
-
-                // Call loadCareNotes() IMMEDIATELY - don't wait
-                loadCareNotes();
-            }
-        }
 
         // Update nav links
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -2905,55 +2840,6 @@ function showPage(pageName) {
             loadIncidents();
         }
         else if (pageName === 'carenotes') {
-            console.log('%c📝📝📝 SHOWING CARE NOTES PAGE 📝📝📝', 'background: #4ECDC4; color: white; font-size: 20px; font-weight: bold; padding: 15px;');
-
-            // CRITICAL: Get carenotes page element FIRST
-            const carenotesPage = document.getElementById('carenotes');
-            if (!carenotesPage) {
-                console.error('%c❌❌❌ CARENOTES PAGE ELEMENT NOT FOUND IN DOM! ❌❌❌', 'background: red; color: white; font-size: 20px; padding: 15px;');
-                alert('ERROR: Care notes page element (#carenotes) not found in DOM!');
-                return;
-            }
-            console.log('✅ Care notes page element found in DOM');
-
-            console.log('✅ Element ID:', carenotesPage.id);
-            console.log('✅ Element classes:', carenotesPage.className);
-            console.log('✅ Element parent:', carenotesPage.parentElement?.tagName, carenotesPage.parentElement?.id);
-
-            // CRITICAL: Show carenotes page and restore its children - EXACTLY like incidents page
-            carenotesPage.classList.add('active');
-            carenotesPage.style.setProperty('display', 'block', 'important');
-            carenotesPage.style.setProperty('visibility', 'visible', 'important');
-            carenotesPage.style.setProperty('opacity', '1', 'important');
-            carenotesPage.style.setProperty('position', 'relative', 'important');
-            carenotesPage.style.setProperty('z-index', '1', 'important');
-            carenotesPage.style.removeProperty('left'); // Remove left: -9999px if it was set
-            carenotesPage.style.removeProperty('right'); // Remove any right positioning
-
-            // Force show all direct children of carenotes page
-            Array.from(carenotesPage.children).forEach((child, index) => {
-                // Only restore if it's not a form that should be hidden
-                if (child.id === 'careNoteForm' && child.style.display === 'none') {
-                    // Keep form hidden if it should be hidden
-                    return;
-                }
-                // Force show everything else
-                child.style.setProperty('display', 'block', 'important');
-                child.style.setProperty('visibility', 'visible', 'important');
-                child.style.setProperty('opacity', '1', 'important');
-            });
-
-            // Also force show key carenotes containers
-            const careNotesList = document.getElementById('careNotesList');
-            if (careNotesList) {
-                careNotesList.style.setProperty('display', 'block', 'important');
-                careNotesList.style.setProperty('visibility', 'visible', 'important');
-            }
-
-            console.log('✅ Care notes page restored and shown');
-
-            // Load care notes - EXACTLY like incidents page calls loadIncidents()
-            console.log('🔄 Loading care notes page data...');
             loadCareNotes();
         }
         else if (pageName === 'notifications') {
@@ -5151,28 +5037,15 @@ function hideCareNoteForm() {
 }
 
 async function loadCareNotes() {
-    // GET CONTAINER IMMEDIATELY - make it visible right away
     const container = document.getElementById('careNotesList');
     if (!container) {
-        // Try to create it if it doesn't exist
-        const carenotesPage = document.getElementById('carenotes');
-        if (carenotesPage) {
-            const newContainer = document.createElement('div');
-            newContainer.id = 'careNotesList';
-            newContainer.className = 'item-list';
-            newContainer.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important; margin-top: 2rem !important;';
-            carenotesPage.appendChild(newContainer);
-            container = newContainer;
-        } else {
-            return;
-        }
+        console.error('❌ careNotesList container not found!');
+        showMessage('Error: Care notes container not found / Error: Contenedor de notas no encontrado', 'error');
+        return;
     }
 
-    // FORCE VISIBILITY IMMEDIATELY with cssText
-    container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
-
-    // Show loading state immediately
-    container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666; background: white; border-radius: 8px;">Loading care notes...</div>';
+    // Show loading state
+    container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading care notes...</div>';
 
     try {
         if (!authToken) {
@@ -5198,60 +5071,34 @@ async function loadCareNotes() {
             return;
         }
 
+        if (response.status === 401) {
+            showMessage('Session expired. Please log in again / Sesión expirada. Por favor inicie sesión nuevamente', 'error');
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentStaff');
+            authToken = null;
+            currentStaff = null;
+            checkAuth();
+            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #d32f2f;">Session expired. Please log in.</div>';
+            return;
+        }
+
         if (!response.ok) {
-            throw new Error(`Failed to load care notes: ${response.status}`);
+            const errorText = await response.text();
+            console.error('❌ Failed to load care notes:', response.status, errorText);
+            throw new Error(`Failed to load care notes: ${response.status} - ${errorText}`);
         }
 
         const notes = await response.json();
 
-        // FORCE VISIBILITY AGAIN
-        container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important;';
-
         if (!notes || notes.length === 0) {
-            const emptyStateHTML = `
-                <div style="padding: 2rem; text-align: center; color: #666; background: white; border-radius: 8px; margin: 1rem 0; border: 1px solid #ddd; display: block; visibility: visible; opacity: 1; min-height: 150px; width: 100%;">
-                    <p style="font-size: 1.1em; margin-bottom: 0.5rem; font-weight: 500;">${t('common.noCareNotes')}</p>
+            container.innerHTML = `
+                <div class="empty-state" style="padding: 2rem; text-align: center; color: #666;">
+                    <p>${t('common.noCareNotes')}</p>
                     <p style="margin-top: 1rem; color: #888;">Click the "Add Care Note" button above to create your first care note.</p>
                 </div>
             `;
-            container.innerHTML = emptyStateHTML;
             return;
         }
-
-        // Render notes if they exist
-        container.innerHTML = notes.map(note => {
-            const date = new Date(note.note_date);
-            const timeDisplay = note.note_time ? ` - ${note.note_time}` : '';
-            return `
-                <div class="item-card" style="margin-bottom: 1rem; padding: 1.5rem; background: white; border-radius: 8px; border: 1px solid #ddd;">
-                    <div class="item-header">
-                        <h3>${date.toLocaleDateString()}${timeDisplay} - ${note.resident_name || 'N/A'}</h3>
-                        ${note.shift ? `<span class="badge badge-success">${note.shift}</span>` : ''}
-                    </div>
-                    <div class="item-details">
-                        ${note.appetite_rating ? `<p><strong>Appetite / Apetito:</strong> ${note.appetite_rating}</p>` : ''}
-                        ${note.fluid_intake ? `<p><strong>Fluid Intake / Ingesta de Líquidos:</strong> ${note.fluid_intake}</p>` : ''}
-                        ${note.meal_breakfast ? `<p><strong>Breakfast / Desayuno:</strong> ${note.meal_breakfast}</p>` : ''}
-                        ${note.meal_lunch ? `<p><strong>Lunch / Almuerzo:</strong> ${note.meal_lunch}</p>` : ''}
-                        ${note.meal_dinner ? `<p><strong>Dinner / Cena:</strong> ${note.meal_dinner}</p>` : ''}
-                        ${note.toileting ? `<p><strong>Toileting / Uso de Baño:</strong> ${note.toileting}</p>` : ''}
-                        ${note.mobility ? `<p><strong>Mobility / Movilidad:</strong> ${note.mobility}</p>` : ''}
-                        ${note.pain_level ? `<p><strong>Pain Level / Nivel de Dolor:</strong> ${note.pain_level}${note.pain_location ? ` - ${note.pain_location}` : ''}</p>` : ''}
-                        ${note.skin_condition ? `<p><strong>Skin Condition / Condición de la Piel:</strong> ${note.skin_condition}</p>` : ''}
-                        ${note.sleep_hours ? `<p><strong>Sleep / Sueño:</strong> ${note.sleep_hours} hours / horas</p>` : ''}
-                        ${note.sleep_quality ? `<p><strong>Sleep Quality / Calidad:</strong> ${note.sleep_quality}</p>` : ''}
-                        ${note.mood ? `<p><strong>Mood / Estado de Ánimo:</strong> ${note.mood}</p>` : ''}
-                        ${note.activities ? `<p><strong>Activities / Actividades:</strong> ${note.activities}</p>` : ''}
-                        ${note.general_notes ? `<p><strong>Notes / Notas:</strong> ${note.general_notes}</p>` : ''}
-                        <p><strong>Recorded by / Registrado por:</strong> ${note.staff_name || 'N/A'}</p>
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn btn-sm btn-primary" onclick="editCareNote(${note.id})">Edit / Editar</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCareNote(${note.id})">Delete / Eliminar</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
 
         console.log('📝 Rendering', notes.length, 'care notes');
         container.innerHTML = notes.map(note => {
@@ -5290,11 +5137,9 @@ async function loadCareNotes() {
         console.log('✅ Care notes rendered successfully');
     } catch (error) {
         console.error('❌ Error loading care notes:', error);
-        console.error('❌ Error stack:', error.stack);
-        const container = document.getElementById('careNotesList');
         if (container) {
             container.innerHTML = `<div class="empty-state" style="padding: 2rem; text-align: center; color: #d32f2f;">
-                <p>❌ Error loading care notes / Error al cargar notas de cuidado</p>
+                <p>Error loading care notes / Error al cargar notas de cuidado</p>
                 <p style="margin-top: 0.5rem; font-size: 0.9em;">${error.message}</p>
             </div>`;
         }
