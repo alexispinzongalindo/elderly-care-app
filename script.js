@@ -3006,9 +3006,13 @@ function showPage(pageName) {
             console.log('✅ Care notes page offsetHeight:', carenotesPage.offsetHeight);
             console.log('✅ Care notes page offsetWidth:', carenotesPage.offsetWidth);
 
-            // Load care notes with a small delay to ensure page is fully rendered
+            // Load care notes - call immediately and also after delay
+            console.log('📝 IMMEDIATELY calling loadCareNotes()');
+            loadCareNotes();
+            
+            // Also call after delay as backup
             setTimeout(() => {
-                console.log('📝 Calling loadCareNotes() after page is shown');
+                console.log('📝 Calling loadCareNotes() again after delay');
                 loadCareNotes();
             }, 100);
         }
@@ -5219,8 +5223,8 @@ async function loadCareNotes() {
         const url = currentResidentId ? `/api/care-notes?resident_id=${currentResidentId}` : '/api/care-notes';
         console.log('📝 Fetching care notes from:', url);
         console.log('📝 Auth headers:', { 'Authorization': 'Bearer [HIDDEN]' });
-        
-        const response = await fetch(url, { 
+
+        const response = await fetch(url, {
             headers: getAuthHeaders(),
             cache: 'no-store' // Force fresh request
         });
@@ -5249,7 +5253,7 @@ async function loadCareNotes() {
         const notes = await response.json();
         console.log('📝 Care notes received:', notes.length, 'notes');
         console.log('📝 Notes data:', notes);
-        
+
         const container = document.getElementById('careNotesList');
         if (!container) {
             console.error('❌ careNotesList container not found!');
@@ -5268,7 +5272,12 @@ async function loadCareNotes() {
 
         if (!notes || notes.length === 0) {
             console.log('📝 No care notes found, showing empty state');
-            container.innerHTML = '<div class="empty-state" style="padding: 2rem; text-align: center; color: #666;"><p>' + t('common.noCareNotes') + '</p><p style="margin-top: 1rem;">Click the "Add Care Note" button above to create your first care note.</p></div>';
+            const emptyStateHTML = '<div class="empty-state" style="padding: 2rem; text-align: center; color: #666; background: white; border-radius: 8px; margin: 1rem 0; border: 1px solid #ddd;"><p style="font-size: 1.1em; margin-bottom: 0.5rem; font-weight: 500;">' + t('common.noCareNotes') + '</p><p style="margin-top: 1rem; color: #888;">Click the "Add Care Note" button above to create your first care note.</p></div>';
+            container.innerHTML = emptyStateHTML;
+            console.log('✅ Empty state HTML set in container');
+            console.log('✅ Container innerHTML length:', container.innerHTML.length);
+            // Force a reflow to ensure the content is visible
+            void container.offsetHeight;
             return;
         }
 
