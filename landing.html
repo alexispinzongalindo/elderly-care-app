@@ -39,6 +39,40 @@
             overflow-x: hidden;
         }
         
+        /* Language Switcher */
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 50px;
+            padding: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            gap: 5px;
+        }
+        
+        .lang-btn {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+        
+        .lang-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .lang-btn:hover:not(.active) {
+            background: var(--bg-light);
+        }
+        
         /* Hero Section */
         .hero {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -326,6 +360,11 @@
                 width: 100%;
                 max-width: 300px;
             }
+            
+            .language-switcher {
+                top: 10px;
+                right: 10px;
+            }
         }
         
         /* Animation */
@@ -346,6 +385,12 @@
     </style>
 </head>
 <body>
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button class="lang-btn active" onclick="setLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="setLanguage('es')" id="lang-es">ES</button>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
@@ -353,14 +398,14 @@
                 <div class="logo-container">
                     <img src="attached_assets/generated_images/medical_cross_heart_logo.png" alt="Elder Care Management Logo" onerror="this.style.display='none'">
                 </div>
-                <h1>Elder Care Management</h1>
-                <p>Comprehensive Healthcare Management System for Elderly Care Facilities</p>
-                <p style="font-size: 1rem; opacity: 0.9;">Serving Puerto Rico with Professional Care Solutions</p>
+                <h1 data-translate="hero.title">Elder Care Management</h1>
+                <p data-translate="hero.subtitle">Comprehensive Healthcare Management System for Elderly Care Facilities</p>
+                <p data-translate="hero.location" style="font-size: 1rem; opacity: 0.9;">Serving Puerto Rico with Professional Care Solutions</p>
                 <div class="cta-buttons">
-                    <a href="https://elderly-care-app-t8dz.onrender.com" class="btn-hero btn-hero-primary" target="_blank">
+                    <a href="https://elderly-care-app-t8dz.onrender.com" class="btn-hero btn-hero-primary" target="_blank" data-translate="hero.accessApp">
                         <i class="fas fa-rocket"></i> Access Application
                     </a>
-                    <a href="#features" class="btn-hero btn-hero-secondary">
+                    <a href="#features" class="btn-hero btn-hero-secondary" data-translate="hero.learnMore">
                         <i class="fas fa-info-circle"></i> Learn More
                     </a>
                 </div>
@@ -372,12 +417,12 @@
     <section class="qr-section">
         <div class="container">
             <div class="qr-container fade-in-up">
-                <h3><i class="fas fa-qrcode"></i> Scan to Access</h3>
-                <p style="color: var(--text-light); margin-bottom: 20px;">Scan this QR code with your mobile device to quickly access the application</p>
+                <h3 data-translate="qr.title"><i class="fas fa-qrcode"></i> Scan to Access</h3>
+                <p data-translate="qr.description" style="color: var(--text-light); margin-bottom: 20px;">Scan this QR code with your mobile device to quickly access the application</p>
                 <div id="qrcode"></div>
                 <div class="qr-instructions">
-                    <p><i class="fas fa-mobile-alt"></i> Point your camera at the QR code</p>
-                    <p style="margin-top: 5px;"><i class="fas fa-link"></i> Or click the link below</p>
+                    <p data-translate="qr.instruction1"><i class="fas fa-mobile-alt"></i> Point your camera at the QR code</p>
+                    <p data-translate="qr.instruction2" style="margin-top: 5px;"><i class="fas fa-link"></i> Or click the link below</p>
                 </div>
                 <a href="https://elderly-care-app-t8dz.onrender.com" target="_blank" style="display: inline-block; margin-top: 20px; color: var(--primary-color); text-decoration: none; font-weight: 600;">
                     <i class="fas fa-external-link-alt"></i> elderly-care-app-t8dz.onrender.com
@@ -390,8 +435,8 @@
     <section class="features" id="features">
         <div class="container">
             <div class="section-title">
-                <h2>Comprehensive Features</h2>
-                <p>Everything you need to manage elderly care facilities efficiently and professionally</p>
+                <h2 data-translate="features.title">Comprehensive Features</h2>
+                <p data-translate="features.subtitle">Everything you need to manage elderly care facilities efficiently and professionally</p>
             </div>
             
             <div class="feature-grid">
@@ -399,96 +444,96 @@
                     <div class="feature-icon">
                         <i class="fas fa-tachometer-alt"></i>
                     </div>
-                    <h3>Dashboard</h3>
-                    <p>Real-time overview of all critical information including medications, appointments, and vital signs. Get instant insights into resident health status.</p>
+                    <h3 data-translate="feature.dashboard.title">Dashboard</h3>
+                    <p data-translate="feature.dashboard.description">Real-time overview of all critical information including medications, appointments, and vital signs. Get instant insights into resident health status.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h3>Residents Management</h3>
-                    <p>Complete resident profiles with personal information, medical history, emergency contacts, and photo management. Track all residents in one place.</p>
+                    <h3 data-translate="feature.residents.title">Residents Management</h3>
+                    <p data-translate="feature.residents.description">Complete resident profiles with personal information, medical history, emergency contacts, and photo management. Track all residents in one place.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-pills"></i>
                     </div>
-                    <h3>Medications Tracking</h3>
-                    <p>Schedule and track medication administration with automated alerts. Monitor adherence and generate medication reports for healthcare providers.</p>
+                    <h3 data-translate="feature.medications.title">Medications Tracking</h3>
+                    <p data-translate="feature.medications.description">Schedule and track medication administration with automated alerts. Monitor adherence and generate medication reports for healthcare providers.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-calendar-check"></i>
                     </div>
-                    <h3>Appointments</h3>
-                    <p>Manage medical appointments, therapy sessions, and family visits. Set reminders and track appointment history for each resident.</p>
+                    <h3 data-translate="feature.appointments.title">Appointments</h3>
+                    <p data-translate="feature.appointments.description">Manage medical appointments, therapy sessions, and family visits. Set reminders and track appointment history for each resident.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-heartbeat"></i>
                     </div>
-                    <h3>Vital Signs</h3>
-                    <p>Track blood pressure, glucose levels, and weight with interactive charts. Color-coded health indicators and Apple Health integration.</p>
+                    <h3 data-translate="feature.vitals.title">Vital Signs</h3>
+                    <p data-translate="feature.vitals.description">Track blood pressure, glucose levels, and weight with interactive charts. Color-coded health indicators and Apple Health integration.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
-                    <h3>Calendar</h3>
-                    <p>Unified calendar view of all appointments, medication schedules, and important events. Export to Google Calendar for easy access.</p>
+                    <h3 data-translate="feature.calendar.title">Calendar</h3>
+                    <p data-translate="feature.calendar.description">Unified calendar view of all appointments, medication schedules, and important events. Export to Google Calendar for easy access.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-file-invoice-dollar"></i>
                     </div>
-                    <h3>Billing & Financial</h3>
-                    <p>Comprehensive billing system with invoice generation, payment tracking, and financial reporting. Manage accounts receivable efficiently.</p>
+                    <h3 data-translate="feature.billing.title">Billing & Financial</h3>
+                    <p data-translate="feature.billing.description">Comprehensive billing system with invoice generation, payment tracking, and financial reporting. Manage accounts receivable efficiently.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
-                    <h3>Incidents Management</h3>
-                    <p>Document and track incidents with detailed reporting. Generate incident reports and maintain compliance records for regulatory requirements.</p>
+                    <h3 data-translate="feature.incidents.title">Incidents Management</h3>
+                    <p data-translate="feature.incidents.description">Document and track incidents with detailed reporting. Generate incident reports and maintain compliance records for regulatory requirements.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-sticky-note"></i>
                     </div>
-                    <h3>Daily Care Notes</h3>
-                    <p>Record daily care activities including meals, mobility, pain levels, sleep quality, and mood. Comprehensive documentation for continuity of care.</p>
+                    <h3 data-translate="feature.carenotes.title">Daily Care Notes</h3>
+                    <p data-translate="feature.carenotes.description">Record daily care activities including meals, mobility, pain levels, sleep quality, and mood. Comprehensive documentation for continuity of care.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-bell"></i>
                     </div>
-                    <h3>Notifications</h3>
-                    <p>Automated alerts for medications, appointments, and critical events. Email and SMS notifications to keep staff and families informed.</p>
+                    <h3 data-translate="feature.notifications.title">Notifications</h3>
+                    <p data-translate="feature.notifications.description">Automated alerts for medications, appointments, and critical events. Email and SMS notifications to keep staff and families informed.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-chart-bar"></i>
                     </div>
-                    <h3>Reports & Analytics</h3>
-                    <p>Generate comprehensive reports on medications, appointments, vital signs, and financial data. Export to PDF for record keeping.</p>
+                    <h3 data-translate="feature.reports.title">Reports & Analytics</h3>
+                    <p data-translate="feature.reports.description">Generate comprehensive reports on medications, appointments, vital signs, and financial data. Export to PDF for record keeping.</p>
                 </div>
                 
                 <div class="feature-card fade-in-up">
                     <div class="feature-icon">
                         <i class="fas fa-user-shield"></i>
                     </div>
-                    <h3>Staff Management</h3>
-                    <p>Manage staff accounts, roles, and permissions. Track staff assignments and maintain secure access controls.</p>
+                    <h3 data-translate="feature.staff.title">Staff Management</h3>
+                    <p data-translate="feature.staff.description">Manage staff accounts, roles, and permissions. Track staff assignments and maintain secure access controls.</p>
                 </div>
             </div>
         </div>
@@ -498,8 +543,8 @@
     <section class="benefits">
         <div class="container">
             <div class="section-title" style="color: white;">
-                <h2 style="color: white;">Why Choose Elder Care Management?</h2>
-                <p style="color: rgba(255,255,255,0.9);">Designed specifically for elderly care facilities in Puerto Rico</p>
+                <h2 data-translate="benefits.title" style="color: white;">Why Choose Elder Care Management?</h2>
+                <p data-translate="benefits.subtitle" style="color: rgba(255,255,255,0.9);">Designed specifically for elderly care facilities in Puerto Rico</p>
             </div>
             
             <div class="row">
@@ -507,48 +552,48 @@
                     <div class="benefit-icon">
                         <i class="fas fa-shield-alt"></i>
                     </div>
-                    <h4>Secure & Compliant</h4>
-                    <p>HIPAA-compliant data management with secure authentication and role-based access control.</p>
+                    <h4 data-translate="benefit.secure.title">Secure & Compliant</h4>
+                    <p data-translate="benefit.secure.description">HIPAA-compliant data management with secure authentication and role-based access control.</p>
                 </div>
                 
                 <div class="col-md-4 benefit-item fade-in-up">
                     <div class="benefit-icon">
                         <i class="fas fa-mobile-alt"></i>
                     </div>
-                    <h4>Mobile-Friendly</h4>
-                    <p>Fully responsive design works seamlessly on tablets, smartphones, and desktop computers.</p>
+                    <h4 data-translate="benefit.mobile.title">Mobile-Friendly</h4>
+                    <p data-translate="benefit.mobile.description">Fully responsive design works seamlessly on tablets, smartphones, and desktop computers.</p>
                 </div>
                 
                 <div class="col-md-4 benefit-item fade-in-up">
                     <div class="benefit-icon">
                         <i class="fas fa-language"></i>
                     </div>
-                    <h4>Bilingual Support</h4>
-                    <p>Full English and Spanish language support for staff and families in Puerto Rico.</p>
+                    <h4 data-translate="benefit.bilingual.title">Bilingual Support</h4>
+                    <p data-translate="benefit.bilingual.description">Full English and Spanish language support for staff and families in Puerto Rico.</p>
                 </div>
                 
                 <div class="col-md-4 benefit-item fade-in-up">
                     <div class="benefit-icon">
                         <i class="fas fa-sync-alt"></i>
                     </div>
-                    <h4>Real-Time Updates</h4>
-                    <p>Live data synchronization ensures all staff members have access to the latest information.</p>
+                    <h4 data-translate="benefit.realtime.title">Real-Time Updates</h4>
+                    <p data-translate="benefit.realtime.description">Live data synchronization ensures all staff members have access to the latest information.</p>
                 </div>
                 
                 <div class="col-md-4 benefit-item fade-in-up">
                     <div class="benefit-icon">
                         <i class="fas fa-cloud"></i>
                     </div>
-                    <h4>Cloud-Based</h4>
-                    <p>Access your data from anywhere, anytime. No installation required, works in any modern browser.</p>
+                    <h4 data-translate="benefit.cloud.title">Cloud-Based</h4>
+                    <p data-translate="benefit.cloud.description">Access your data from anywhere, anytime. No installation required, works in any modern browser.</p>
                 </div>
                 
                 <div class="col-md-4 benefit-item fade-in-up">
                     <div class="benefit-icon">
                         <i class="fas fa-headset"></i>
                     </div>
-                    <h4>Easy to Use</h4>
-                    <p>Intuitive interface designed for healthcare professionals. Minimal training required.</p>
+                    <h4 data-translate="benefit.easy.title">Easy to Use</h4>
+                    <p data-translate="benefit.easy.description">Intuitive interface designed for healthcare professionals. Minimal training required.</p>
                 </div>
             </div>
         </div>
@@ -557,14 +602,14 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p><strong>Elder Care Management System</strong></p>
-            <p>Professional Healthcare Solutions for Puerto Rico</p>
+            <p data-translate="footer.title"><strong>Elder Care Management System</strong></p>
+            <p data-translate="footer.subtitle">Professional Healthcare Solutions for Puerto Rico</p>
             <p style="margin-top: 20px;">
-                <a href="https://elderly-care-app-t8dz.onrender.com" target="_blank">
+                <a href="https://elderly-care-app-t8dz.onrender.com" target="_blank" data-translate="footer.access">
                     <i class="fas fa-external-link-alt"></i> Access Application
                 </a>
             </p>
-            <p style="margin-top: 10px; font-size: 0.9rem;">
+            <p style="margin-top: 10px; font-size: 0.9rem;" data-translate="footer.copyright">
                 &copy; 2025 Elder Care Management. All rights reserved.
             </p>
         </div>
@@ -574,19 +619,209 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     
     <script>
-        // Generate QR Code
+        // Translation dictionary
+        const translations = {
+            en: {
+                'hero.title': 'Elder Care Management',
+                'hero.subtitle': 'Comprehensive Healthcare Management System for Elderly Care Facilities',
+                'hero.location': 'Serving Puerto Rico with Professional Care Solutions',
+                'hero.accessApp': 'Access Application',
+                'hero.learnMore': 'Learn More',
+                'qr.title': 'Scan to Access',
+                'qr.description': 'Scan this QR code with your mobile device to quickly access the application',
+                'qr.instruction1': 'Point your camera at the QR code',
+                'qr.instruction2': 'Or click the link below',
+                'features.title': 'Comprehensive Features',
+                'features.subtitle': 'Everything you need to manage elderly care facilities efficiently and professionally',
+                'feature.dashboard.title': 'Dashboard',
+                'feature.dashboard.description': 'Real-time overview of all critical information including medications, appointments, and vital signs. Get instant insights into resident health status.',
+                'feature.residents.title': 'Residents Management',
+                'feature.residents.description': 'Complete resident profiles with personal information, medical history, emergency contacts, and photo management. Track all residents in one place.',
+                'feature.medications.title': 'Medications Tracking',
+                'feature.medications.description': 'Schedule and track medication administration with automated alerts. Monitor adherence and generate medication reports for healthcare providers.',
+                'feature.appointments.title': 'Appointments',
+                'feature.appointments.description': 'Manage medical appointments, therapy sessions, and family visits. Set reminders and track appointment history for each resident.',
+                'feature.vitals.title': 'Vital Signs',
+                'feature.vitals.description': 'Track blood pressure, glucose levels, and weight with interactive charts. Color-coded health indicators and Apple Health integration.',
+                'feature.calendar.title': 'Calendar',
+                'feature.calendar.description': 'Unified calendar view of all appointments, medication schedules, and important events. Export to Google Calendar for easy access.',
+                'feature.billing.title': 'Billing & Financial',
+                'feature.billing.description': 'Comprehensive billing system with invoice generation, payment tracking, and financial reporting. Manage accounts receivable efficiently.',
+                'feature.incidents.title': 'Incidents Management',
+                'feature.incidents.description': 'Document and track incidents with detailed reporting. Generate incident reports and maintain compliance records for regulatory requirements.',
+                'feature.carenotes.title': 'Daily Care Notes',
+                'feature.carenotes.description': 'Record daily care activities including meals, mobility, pain levels, sleep quality, and mood. Comprehensive documentation for continuity of care.',
+                'feature.notifications.title': 'Notifications',
+                'feature.notifications.description': 'Automated alerts for medications, appointments, and critical events. Email and SMS notifications to keep staff and families informed.',
+                'feature.reports.title': 'Reports & Analytics',
+                'feature.reports.description': 'Generate comprehensive reports on medications, appointments, vital signs, and financial data. Export to PDF for record keeping.',
+                'feature.staff.title': 'Staff Management',
+                'feature.staff.description': 'Manage staff accounts, roles, and permissions. Track staff assignments and maintain secure access controls.',
+                'benefits.title': 'Why Choose Elder Care Management?',
+                'benefits.subtitle': 'Designed specifically for elderly care facilities in Puerto Rico',
+                'benefit.secure.title': 'Secure & Compliant',
+                'benefit.secure.description': 'HIPAA-compliant data management with secure authentication and role-based access control.',
+                'benefit.mobile.title': 'Mobile-Friendly',
+                'benefit.mobile.description': 'Fully responsive design works seamlessly on tablets, smartphones, and desktop computers.',
+                'benefit.bilingual.title': 'Bilingual Support',
+                'benefit.bilingual.description': 'Full English and Spanish language support for staff and families in Puerto Rico.',
+                'benefit.realtime.title': 'Real-Time Updates',
+                'benefit.realtime.description': 'Live data synchronization ensures all staff members have access to the latest information.',
+                'benefit.cloud.title': 'Cloud-Based',
+                'benefit.cloud.description': 'Access your data from anywhere, anytime. No installation required, works in any modern browser.',
+                'benefit.easy.title': 'Easy to Use',
+                'benefit.easy.description': 'Intuitive interface designed for healthcare professionals. Minimal training required.',
+                'footer.title': 'Elder Care Management System',
+                'footer.subtitle': 'Professional Healthcare Solutions for Puerto Rico',
+                'footer.access': 'Access Application',
+                'footer.copyright': '© 2025 Elder Care Management. All rights reserved.'
+            },
+            es: {
+                'hero.title': 'Gestión de Cuidado de Ancianos',
+                'hero.subtitle': 'Sistema Integral de Gestión de Salud para Instalaciones de Cuidado de Ancianos',
+                'hero.location': 'Sirviendo a Puerto Rico con Soluciones de Cuidado Profesional',
+                'hero.accessApp': 'Acceder a la Aplicación',
+                'hero.learnMore': 'Aprender Más',
+                'qr.title': 'Escanear para Acceder',
+                'qr.description': 'Escanea este código QR con tu dispositivo móvil para acceder rápidamente a la aplicación',
+                'qr.instruction1': 'Apunta tu cámara al código QR',
+                'qr.instruction2': 'O haz clic en el enlace a continuación',
+                'features.title': 'Características Integrales',
+                'features.subtitle': 'Todo lo que necesitas para gestionar instalaciones de cuidado de ancianos de manera eficiente y profesional',
+                'feature.dashboard.title': 'Panel de Control',
+                'feature.dashboard.description': 'Vista general en tiempo real de toda la información crítica incluyendo medicamentos, citas y signos vitales. Obtén información instantánea sobre el estado de salud de los residentes.',
+                'feature.residents.title': 'Gestión de Residentes',
+                'feature.residents.description': 'Perfiles completos de residentes con información personal, historial médico, contactos de emergencia y gestión de fotos. Rastrea todos los residentes en un solo lugar.',
+                'feature.medications.title': 'Seguimiento de Medicamentos',
+                'feature.medications.description': 'Programa y rastrea la administración de medicamentos con alertas automatizadas. Monitorea la adherencia y genera informes de medicamentos para proveedores de atención médica.',
+                'feature.appointments.title': 'Citas',
+                'feature.appointments.description': 'Gestiona citas médicas, sesiones de terapia y visitas familiares. Establece recordatorios y rastrea el historial de citas para cada residente.',
+                'feature.vitals.title': 'Signos Vitales',
+                'feature.vitals.description': 'Rastrea la presión arterial, niveles de glucosa y peso con gráficos interactivos. Indicadores de salud codificados por colores e integración con Apple Health.',
+                'feature.calendar.title': 'Calendario',
+                'feature.calendar.description': 'Vista de calendario unificada de todas las citas, horarios de medicamentos y eventos importantes. Exporta a Google Calendar para fácil acceso.',
+                'feature.billing.title': 'Facturación y Finanzas',
+                'feature.billing.description': 'Sistema de facturación integral con generación de facturas, seguimiento de pagos e informes financieros. Gestiona las cuentas por cobrar de manera eficiente.',
+                'feature.incidents.title': 'Gestión de Incidentes',
+                'feature.incidents.description': 'Documenta y rastrea incidentes con informes detallados. Genera informes de incidentes y mantén registros de cumplimiento para requisitos regulatorios.',
+                'feature.carenotes.title': 'Notas de Cuidado Diario',
+                'feature.carenotes.description': 'Registra actividades de cuidado diario incluyendo comidas, movilidad, niveles de dolor, calidad del sueño y estado de ánimo. Documentación integral para continuidad del cuidado.',
+                'feature.notifications.title': 'Notificaciones',
+                'feature.notifications.description': 'Alertas automatizadas para medicamentos, citas y eventos críticos. Notificaciones por correo electrónico y SMS para mantener informados al personal y las familias.',
+                'feature.reports.title': 'Informes y Análisis',
+                'feature.reports.description': 'Genera informes integrales sobre medicamentos, citas, signos vitales y datos financieros. Exporta a PDF para mantenimiento de registros.',
+                'feature.staff.title': 'Gestión de Personal',
+                'feature.staff.description': 'Gestiona cuentas de personal, roles y permisos. Rastrea asignaciones de personal y mantén controles de acceso seguros.',
+                'benefits.title': '¿Por Qué Elegir Gestión de Cuidado de Ancianos?',
+                'benefits.subtitle': 'Diseñado específicamente para instalaciones de cuidado de ancianos en Puerto Rico',
+                'benefit.secure.title': 'Seguro y Cumplimiento',
+                'benefit.secure.description': 'Gestión de datos compatible con HIPAA con autenticación segura y control de acceso basado en roles.',
+                'benefit.mobile.title': 'Compatible con Móviles',
+                'benefit.mobile.description': 'Diseño totalmente responsivo funciona perfectamente en tabletas, smartphones y computadoras de escritorio.',
+                'benefit.bilingual.title': 'Soporte Bilingüe',
+                'benefit.bilingual.description': 'Soporte completo en inglés y español para personal y familias en Puerto Rico.',
+                'benefit.realtime.title': 'Actualizaciones en Tiempo Real',
+                'benefit.realtime.description': 'La sincronización de datos en vivo garantiza que todo el personal tenga acceso a la información más reciente.',
+                'benefit.cloud.title': 'Basado en la Nube',
+                'benefit.cloud.description': 'Accede a tus datos desde cualquier lugar, en cualquier momento. No se requiere instalación, funciona en cualquier navegador moderno.',
+                'benefit.easy.title': 'Fácil de Usar',
+                'benefit.easy.description': 'Interfaz intuitiva diseñada para profesionales de la salud. Se requiere capacitación mínima.',
+                'footer.title': 'Sistema de Gestión de Cuidado de Ancianos',
+                'footer.subtitle': 'Soluciones Profesionales de Atención Médica para Puerto Rico',
+                'footer.access': 'Acceder a la Aplicación',
+                'footer.copyright': '© 2025 Gestión de Cuidado de Ancianos. Todos los derechos reservados.'
+            }
+        };
+
+        // Current language
+        let currentLanguage = 'en';
+
+        // Get language from localStorage or default to 'en'
+        function getStoredLanguage() {
+            const stored = localStorage.getItem('landingPageLanguage');
+            return stored && (stored === 'en' || stored === 'es') ? stored : 'en';
+        }
+
+        // Translate function
+        function t(key) {
+            return translations[currentLanguage][key] || translations['en'][key] || key;
+        }
+
+        // Set language and update UI
+        function setLanguage(lang) {
+            if (lang !== 'en' && lang !== 'es') {
+                console.error('Invalid language:', lang);
+                return;
+            }
+
+            currentLanguage = lang;
+            document.documentElement.lang = lang;
+            
+            // Save to localStorage
+            localStorage.setItem('landingPageLanguage', lang);
+
+            // Update language button states
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            document.getElementById('lang-es').classList.toggle('active', lang === 'es');
+
+            // Update all translated elements
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                const translation = t(key);
+                
+                // Check if element has an icon that should be preserved
+                const icon = el.querySelector('i');
+                
+                // Handle different element types
+                if (el.tagName === 'BUTTON' || (el.tagName === 'INPUT' && el.type === 'button')) {
+                    // For buttons, preserve icon if it exists
+                    if (icon) {
+                        el.innerHTML = icon.outerHTML + ' ' + translation;
+                    } else {
+                        el.textContent = translation;
+                    }
+                } else if (el.tagName === 'A') {
+                    // For links, preserve icon if it exists
+                    if (icon) {
+                        el.innerHTML = icon.outerHTML + ' ' + translation;
+                    } else {
+                        el.textContent = translation;
+                    }
+                } else if (el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3' || el.tagName === 'H4') {
+                    // For headings, preserve icon if it exists (like in QR section)
+                    if (icon) {
+                        el.innerHTML = icon.outerHTML + ' ' + translation;
+                    } else {
+                        el.textContent = translation;
+                    }
+                } else {
+                    // For other elements (p, div, etc.), just set text content
+                    el.textContent = translation;
+                }
+            });
+        }
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Set initial language
+            currentLanguage = getStoredLanguage();
+            setLanguage(currentLanguage);
+
             const appUrl = 'https://elderly-care-app-t8dz.onrender.com';
             
             // Generate QR code
-            new QRCode(document.getElementById("qrcode"), {
-                text: appUrl,
-                width: 200,
-                height: 200,
-                colorDark: "#2c5aa0",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
+            const qrContainer = document.getElementById("qrcode");
+            if (qrContainer) {
+                qrContainer.innerHTML = ''; // Clear any existing QR code
+                new QRCode(qrContainer, {
+                    text: appUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#2c5aa0",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
             
             // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
