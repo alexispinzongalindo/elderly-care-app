@@ -2489,10 +2489,25 @@ function showPage(pageName) {
 
         // SPECIAL HANDLING FOR REPORTS PAGE - reset any leftover offscreen/absolute styles
         if (pageName === 'reports') {
-            targetPage.style.setProperty('position', 'relative', 'important');
-            targetPage.style.setProperty('z-index', '1', 'important');
-            targetPage.style.setProperty('min-height', '400px', 'important');
-            targetPage.style.setProperty('width', '100%', 'important');
+            // If reports is nested under a page that can be hidden (e.g., billing/financial), move it out.
+            const reportsPage = document.getElementById('reports');
+            const billingPage = document.getElementById('billing');
+            if (reportsPage && billingPage && reportsPage.parentElement && reportsPage.parentElement.id === 'billing') {
+                console.log('⚠️⚠️⚠️ CRITICAL: Reports page is INSIDE billing page! Moving it out...');
+                const mainContainer = billingPage.parentElement; // Should be main.container
+                if (mainContainer) {
+                    mainContainer.insertBefore(reportsPage, billingPage.nextSibling);
+                    console.log('✅ Reports page moved out of billing page');
+                    console.log('✅ New parent:', reportsPage.parentElement?.tagName, reportsPage.parentElement?.id);
+                }
+            }
+
+            // Force reports page visible using cssText for maximum control (Safari can keep it at 0x0 otherwise)
+            targetPage.classList.add('active');
+            targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+
+            // Force a reflow so Safari recalculates dimensions
+            void targetPage.offsetHeight;
         }
         targetPage.style.setProperty('visibility', 'visible', 'important');
         targetPage.style.setProperty('opacity', '1', 'important');
@@ -2573,7 +2588,7 @@ function showPage(pageName) {
         console.log('✅ Target page offsetHeight:', targetPage.offsetHeight);
         console.log('✅ Target page offsetWidth:', targetPage.offsetWidth);
 
-        // CRITICAL: If page has 0 height/width, force it visible (can happen with carenotes)
+        // CRITICAL: If page has 0 height/width, force it visible (can happen with carenotes/reports)
         if (targetPage.offsetHeight === 0 || targetPage.offsetWidth === 0) {
             console.log('⚠️ Page has 0 dimensions, forcing visibility with !important');
             targetPage.style.setProperty('display', 'block', 'important');
@@ -2584,6 +2599,28 @@ function showPage(pageName) {
             targetPage.style.setProperty('width', '100%', 'important');
             targetPage.style.removeProperty('left');
             targetPage.style.removeProperty('right');
+
+            // Reports sometimes needs an extra tick to get non-zero layout in Safari.
+            if (pageName === 'reports') {
+                setTimeout(() => {
+                    try {
+                        targetPage.style.setProperty('display', 'block', 'important');
+                        targetPage.style.setProperty('visibility', 'visible', 'important');
+                        targetPage.style.setProperty('opacity', '1', 'important');
+                        targetPage.style.setProperty('position', 'relative', 'important');
+                        targetPage.style.setProperty('min-height', '400px', 'important');
+                        targetPage.style.setProperty('width', '100%', 'important');
+                        targetPage.style.setProperty('z-index', '10', 'important');
+                        targetPage.style.removeProperty('left');
+                        targetPage.style.removeProperty('right');
+                        // Force reflow again
+                        void targetPage.offsetHeight;
+                        console.log('🔁 Reports retry dimensions:', targetPage.offsetHeight, 'x', targetPage.offsetWidth);
+                    } catch (e) {
+                        console.error('Error in reports retry visibility fix:', e);
+                    }
+                }, 0);
+            }
         }
 
         // Update nav links
