@@ -47,7 +47,7 @@ send_incident_alert_sms = None
 send_custom_alert_sms = None
 
 if USE_CLICKSEND:
-    # Try ClickSend first (more reliable, costs ~$0.0075/SMS)
+    # Try ClickSend first (more reliable, costs ~$0.09/SMS)
     try:
         from clicksend_sms import (
             send_medication_alert_sms,

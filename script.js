@@ -5329,7 +5329,7 @@ async function loadCareNotes() {
             container.innerHTML = emptyStateHTML;
             console.log('✅ Empty state HTML set in container');
             console.log('✅ Container innerHTML length:', container.innerHTML.length);
-            
+
             // AGGRESSIVE: Force container and its content to be visible
             container.style.setProperty('display', 'block', 'important');
             container.style.setProperty('visibility', 'visible', 'important');
@@ -5337,7 +5337,7 @@ async function loadCareNotes() {
             container.style.setProperty('min-height', '200px', 'important');
             container.style.setProperty('width', '100%', 'important');
             container.style.setProperty('padding', '1rem', 'important');
-            
+
             // Force the empty state div to be visible
             const emptyStateDiv = container.querySelector('.empty-state');
             if (emptyStateDiv) {
@@ -5345,7 +5345,7 @@ async function loadCareNotes() {
                 emptyStateDiv.style.setProperty('visibility', 'visible', 'important');
                 emptyStateDiv.style.setProperty('opacity', '1', 'important');
             }
-            
+
             // Force a reflow to ensure the content is visible
             void container.offsetHeight;
             console.log('✅ Container offsetHeight after empty state:', container.offsetHeight);

@@ -1,6 +1,6 @@
 """
 ClickSend SMS Service Integration
-Alternative to email-to-SMS gateways - more reliable but costs ~$0.0075/SMS
+Alternative to email-to-SMS gateways - more reliable but costs ~$0.09/SMS
 Supports SMS and WhatsApp Business API
 
 Setup:

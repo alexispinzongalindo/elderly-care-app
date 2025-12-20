@@ -1,14 +1,14 @@
 # ClickSend SMS Integration Guide
 
 ## Overview
-ClickSend is a paid SMS/WhatsApp service that provides more reliable delivery than the free email-to-SMS gateways. It costs approximately **$0.0075 per SMS** (~$7.50 per 1,000 messages).
+ClickSend is a paid SMS/WhatsApp service that provides more reliable delivery than the free email-to-SMS gateways. It costs approximately **$0.09 per SMS** (~$90 per 1,000 messages).
 
 ## Why Use ClickSend?
 - ✅ **More reliable** - Direct SMS API delivery (no carrier email gateways)
 - ✅ **WhatsApp support** - Can send WhatsApp messages too
 - ✅ **Delivery tracking** - Better delivery confirmation than email-to-SMS
 - ✅ **International support** - Better international SMS delivery
-- ⚠️ **Costs money** - ~$0.0075/SMS vs FREE for email-to-SMS
+- ⚠️ **Costs money** - ~$0.09/SMS vs FREE for email-to-SMS
 
 ## Current System Behavior
 
@@ -82,15 +82,15 @@ python clicksend_sms.py
 - **WhatsApp**: No
 
 ### ClickSend (Paid)
-- **Cost**: ~$0.0075 per SMS (~$7.50 per 1,000)
+- **Cost**: ~$0.09 per SMS (~$90 per 1,000)
 - **Reliability**: High (direct SMS API)
 - **Delivery confirmation**: Yes
 - **WhatsApp**: Yes (additional setup required)
 
 ### Example Monthly Cost
-- 100 SMS alerts/month: **$0.75**
-- 500 SMS alerts/month: **$3.75**
-- 1,000 SMS alerts/month: **$7.50**
+- 100 SMS alerts/month: **$9.00**
+- 500 SMS alerts/month: **$45.00**
+- 1,000 SMS alerts/month: **$90.00**
 
 ## Switching Back to Free Email-to-SMS
 
