@@ -31,38 +31,38 @@ CLICKSEND_WHATSAPP_API = "https://rest.clicksend.com/v3/whatsapp/messages"
 def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
     """
     Send SMS via ClickSend API
-    
+
     Args:
         phone: Recipient phone number (any format)
         message: SMS message text
         carrier: Carrier name (not needed for ClickSend, kept for API compatibility)
         language: 'en' or 'es' (not used, kept for API compatibility)
-    
+
     Returns:
         bool: True if SMS sent successfully, False otherwise
     """
     if not CLICKSEND_API_KEY:
         print("❌ ClickSend API key not configured. Set CLICKSEND_API_KEY environment variable.")
         return False
-    
+
     if not CLICKSEND_USERNAME:
         print("❌ ClickSend username not configured. Set CLICKSEND_USERNAME environment variable.")
         return False
-    
+
     # Normalize phone number
     normalized = normalize_phone(phone)
     if not normalized:
         print(f"⚠️ Invalid phone number format: {phone}")
         return False
-    
+
     # Format phone with country code (US/PR: +1)
     formatted_phone = f"+1{normalized}"
-    
+
     # Truncate message to 160 characters for SMS compatibility
     if len(message) > 160:
         message = message[:157] + "..."
         print(f"⚠️ Message truncated to 160 characters for SMS compatibility")
-    
+
     try:
         # Prepare request data
         data = {
@@ -75,10 +75,11 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
                 }
             ]
         }
-        
+
         json_data = json.dumps(data).encode('utf-8')
-        
+
         # Create request with basic auth
+        # ClickSend uses username:api_key format for Basic Auth
         auth_string = f"{CLICKSEND_USERNAME}:{CLICKSEND_API_KEY}"
         auth_bytes = auth_string.encode('utf-8')
         auth_b64 = base64.b64encode(auth_bytes).decode('utf-8')
@@ -87,10 +88,12 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
         req.add_header('Authorization', f'Basic {auth_b64}')
         req.add_header('Content-Type', 'application/json')
         
+        # Debug: Log authentication (but don't log the actual key)
         print(f"📱 Sending SMS via ClickSend to {formatted_phone}...")
+        print(f"   Using username: {CLICKSEND_USERNAME} (API key: {'SET' if CLICKSEND_API_KEY else 'NOT SET'})", flush=True)
         with urllib.request.urlopen(req, timeout=10) as response:
             response_data = json.loads(response.read().decode('utf-8'))
-            
+
             if response.getcode() == 200:
                 # Check response for success
                 if response_data.get('response_code') == 'SUCCESS' or response_data.get('http_code') == 200:
@@ -103,7 +106,7 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
             else:
                 print(f"❌ ClickSend API returned status {response.getcode()}: {response_data}")
                 return False
-                
+
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8')
         print(f"❌ ClickSend API HTTP Error {e.code}: {error_body}")
@@ -122,32 +125,32 @@ def send_sms_via_clicksend(phone, message, carrier=None, language='en'):
 def send_whatsapp_via_clicksend(phone, message, language='en'):
     """
     Send WhatsApp message via ClickSend (requires WhatsApp Business API setup)
-    
+
     Args:
         phone: Recipient phone number (any format)
         message: Message text
         language: 'en' or 'es' (not used, kept for API compatibility)
-    
+
     Returns:
         bool: True if message sent successfully, False otherwise
     """
     if not CLICKSEND_WHATSAPP_ENABLED:
         print("⚠️ ClickSend WhatsApp not enabled. Set CLICKSEND_WHATSAPP_ENABLED=true")
         return False
-    
+
     if not CLICKSEND_API_KEY or not CLICKSEND_USERNAME:
         print("❌ ClickSend credentials not configured")
         return False
-    
+
     # Normalize phone number
     normalized = normalize_phone(phone)
     if not normalized:
         print(f"⚠️ Invalid phone number format: {phone}")
         return False
-    
+
     # Format phone with country code
     formatted_phone = f"+1{normalized}"
-    
+
     try:
         # Prepare request data for WhatsApp
         data = {
@@ -155,29 +158,29 @@ def send_whatsapp_via_clicksend(phone, message, language='en'):
             "body": message,
             "from": None  # ClickSend will use default WhatsApp Business number
         }
-        
+
         json_data = json.dumps(data).encode('utf-8')
-        
+
         # Create request with basic auth
         auth_string = f"{CLICKSEND_USERNAME}:{CLICKSEND_API_KEY}"
         auth_bytes = auth_string.encode('utf-8')
         auth_b64 = base64.b64encode(auth_bytes).decode('utf-8')
-        
+
         req = urllib.request.Request(CLICKSEND_WHATSAPP_API, data=json_data, method='POST')
         req.add_header('Authorization', f'Basic {auth_b64}')
         req.add_header('Content-Type', 'application/json')
-        
+
         print(f"💬 Sending WhatsApp via ClickSend to {formatted_phone}...")
         with urllib.request.urlopen(req, timeout=10) as response:
             response_data = json.loads(response.read().decode('utf-8'))
-            
+
             if response.getcode() == 200:
                 print(f"✅ WhatsApp sent successfully via ClickSend to {formatted_phone}")
                 return True
             else:
                 print(f"❌ ClickSend WhatsApp API returned status {response.getcode()}: {response_data}")
                 return False
-                
+
     except Exception as e:
         print(f"❌ Error sending WhatsApp via ClickSend: {type(e).__name__}: {str(e)}")
         import traceback
@@ -195,7 +198,7 @@ def send_medication_alert_sms(resident_name, medication_name, scheduled_time, ph
         message = f"⚠️ Alerta: {resident_name} - Medicamento '{medication_name}' no administrado a las {scheduled_time}"
     else:
         message = f"⚠️ Alert: {resident_name} - Medication '{medication_name}' not taken at {scheduled_time}"
-    
+
     return send_sms_via_clicksend(phone, message, carrier, language)
 
 def send_vital_signs_alert_sms(resident_name, vital_type, value, threshold, phone, carrier=None, language='en'):
@@ -204,7 +207,7 @@ def send_vital_signs_alert_sms(resident_name, vital_type, value, threshold, phon
         message = f"🚨 Alerta: {resident_name} - {vital_type}: {value} (Umbral: {threshold})"
     else:
         message = f"🚨 Alert: {resident_name} - {vital_type}: {value} (Threshold: {threshold})"
-    
+
     return send_sms_via_clicksend(phone, message, carrier, language)
 
 def send_incident_alert_sms(resident_name, incident_type, severity, phone, carrier=None, language='en'):
@@ -213,7 +216,7 @@ def send_incident_alert_sms(resident_name, incident_type, severity, phone, carri
         message = f"⚠️ Incidente: {resident_name} - {incident_type} (Severidad: {severity})"
     else:
         message = f"⚠️ Incident: {resident_name} - {incident_type} (Severity: {severity})"
-    
+
     return send_sms_via_clicksend(phone, message, carrier, language)
 
 def send_custom_alert_sms(phone, message, carrier=None, language='en'):
@@ -224,23 +227,23 @@ def send_custom_alert_sms(phone, message, carrier=None, language='en'):
 if __name__ == '__main__':
     print("📱 ClickSend SMS Service Test")
     print("=" * 50)
-    
+
     if not CLICKSEND_API_KEY:
         print("❌ CLICKSEND_API_KEY not set")
         exit(1)
-    
+
     if not CLICKSEND_USERNAME:
         print("❌ CLICKSEND_USERNAME not set")
         exit(1)
-    
+
     test_phone = input("Enter test phone number (10 digits): ").strip()
     if not test_phone:
         print("No phone number provided, exiting.")
         exit(1)
-    
+
     test_message = "Test SMS from Elder Care Management System via ClickSend"
     result = send_sms_via_clicksend(test_phone, test_message)
-    
+
     if result:
         print("\n✅ Test SMS sent successfully!")
         print(f"   Check phone: {test_phone}")

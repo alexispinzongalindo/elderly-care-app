@@ -2780,7 +2780,8 @@ def incidents():
                         # Send SMS to emergency contact (if not already sent to staff)
                         if emergency_contact_phone:
                             # Check if emergency contact phone is already in staff_phones
-                            emergency_phone_already_contacted = any(phone == emergency_contact_phone for phone, _ in staff_phones)
+                            # staff_phones is a list of tuples: (phone, carrier, language)
+                            emergency_phone_already_contacted = any(phone == emergency_contact_phone for phone, _, _ in staff_phones)
                             if not emergency_phone_already_contacted:
                                 # Add delay before emergency contact SMS
                                 time.sleep(0.6)
