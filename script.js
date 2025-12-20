@@ -2549,7 +2549,7 @@ function showPage(pageName) {
             } else {
                 console.error('❌ Carenotes page element not found!');
             }
-            
+
             // FALLBACK: Ensure loadCareNotes() is called
             console.log('🔧 FALLBACK: Scheduling loadCareNotes() call');
             setTimeout(() => {
@@ -5318,19 +5318,38 @@ async function loadCareNotes() {
         container.style.setProperty('min-height', '200px', 'important');
         container.style.setProperty('width', '100%', 'important');
         container.style.setProperty('padding', '1rem', 'important');
-        
+
         console.log('✅ Container after forcing - display:', window.getComputedStyle(container).display);
         console.log('✅ Container after forcing - visibility:', window.getComputedStyle(container).visibility);
         console.log('✅ Container after forcing - offsetHeight:', container.offsetHeight);
 
         if (!notes || notes.length === 0) {
             console.log('📝 No care notes found, showing empty state');
-            const emptyStateHTML = '<div class="empty-state" style="padding: 2rem; text-align: center; color: #666; background: white; border-radius: 8px; margin: 1rem 0; border: 1px solid #ddd;"><p style="font-size: 1.1em; margin-bottom: 0.5rem; font-weight: 500;">' + t('common.noCareNotes') + '</p><p style="margin-top: 1rem; color: #888;">Click the "Add Care Note" button above to create your first care note.</p></div>';
+            const emptyStateHTML = '<div class="empty-state" style="padding: 2rem !important; text-align: center !important; color: #666 !important; background: white !important; border-radius: 8px !important; margin: 1rem 0 !important; border: 1px solid #ddd !important; display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 150px !important; width: 100% !important;"><p style="font-size: 1.1em !important; margin-bottom: 0.5rem !important; font-weight: 500 !important; display: block !important; visibility: visible !important;">' + t('common.noCareNotes') + '</p><p style="margin-top: 1rem !important; color: #888 !important; display: block !important; visibility: visible !important;">Click the "Add Care Note" button above to create your first care note.</p></div>';
             container.innerHTML = emptyStateHTML;
             console.log('✅ Empty state HTML set in container');
             console.log('✅ Container innerHTML length:', container.innerHTML.length);
+            
+            // AGGRESSIVE: Force container and its content to be visible
+            container.style.setProperty('display', 'block', 'important');
+            container.style.setProperty('visibility', 'visible', 'important');
+            container.style.setProperty('opacity', '1', 'important');
+            container.style.setProperty('min-height', '200px', 'important');
+            container.style.setProperty('width', '100%', 'important');
+            container.style.setProperty('padding', '1rem', 'important');
+            
+            // Force the empty state div to be visible
+            const emptyStateDiv = container.querySelector('.empty-state');
+            if (emptyStateDiv) {
+                emptyStateDiv.style.setProperty('display', 'block', 'important');
+                emptyStateDiv.style.setProperty('visibility', 'visible', 'important');
+                emptyStateDiv.style.setProperty('opacity', '1', 'important');
+            }
+            
             // Force a reflow to ensure the content is visible
             void container.offsetHeight;
+            console.log('✅ Container offsetHeight after empty state:', container.offsetHeight);
+            console.log('✅ Container computed display:', window.getComputedStyle(container).display);
             return;
         }
 
