@@ -2905,6 +2905,31 @@ function showPage(pageName) {
             targetPage.style.removeProperty('left');
             targetPage.style.removeProperty('right');
 
+            // Ensure the containing layout can actually expand.
+            if (mainContainer) {
+                mainContainer.style.setProperty('min-height', '400px', 'important');
+                mainContainer.style.setProperty('display', 'block', 'important');
+                mainContainer.style.setProperty('visibility', 'visible', 'important');
+                mainContainer.style.setProperty('opacity', '1', 'important');
+            }
+
+            // Safari can report 0x0 until the next frame even when styles are correct.
+            // Do a next-frame retry with a stronger cssText reset.
+            window.requestAnimationFrame(() => {
+                try {
+                    const rect = targetPage.getBoundingClientRect();
+                    if (rect.height === 0 || rect.width === 0) {
+                        targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important;';
+                        // Force reflow
+                        void targetPage.offsetHeight;
+                        const rectAfter = targetPage.getBoundingClientRect();
+                        console.log('🔁 Page retry dimensions:', rectAfter.height, 'x', rectAfter.width);
+                    }
+                } catch (e) {
+                    console.error('Error in page retry visibility fix:', e);
+                }
+            });
+
             // Reports sometimes needs an extra tick to get non-zero layout in Safari.
             if (pageName === 'reports') {
                 setTimeout(() => {
@@ -6283,10 +6308,43 @@ function formatHistoryDayPill(dateObj) {
     return `${weekday}, ${day}-${month}-${year}`;
 }
 
+function parseJournalDate(value) {
+    if (!value) return null;
+
+    // Accept Date objects
+    if (value instanceof Date) {
+        return isNaN(value.getTime()) ? null : value;
+    }
+
+    // Accept numeric timestamps (ms since epoch)
+    if (typeof value === 'number') {
+        const d = new Date(value);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    // Strings: handle SQLite-style timestamps that Safari often fails to parse.
+    const raw = String(value).trim();
+    if (!raw) return null;
+
+    let normalized = raw;
+
+    // Convert "YYYY-MM-DD HH:MM:SS" -> "YYYY-MM-DDTHH:MM:SS"
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(normalized)) {
+        normalized = normalized.replace(' ', 'T');
+    }
+
+    // If it's ISO without timezone, add Z (treat as UTC)
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(normalized)) {
+        normalized = normalized + 'Z';
+    }
+
+    const d = new Date(normalized);
+    return isNaN(d.getTime()) ? null : d;
+}
+
 function getEntryDate(entry) {
     const when = entry.occurred_at || entry.created_at;
-    const dateObj = when ? new Date(when) : null;
-    return dateObj && !isNaN(dateObj.getTime()) ? dateObj : null;
+    return parseJournalDate(when);
 }
 
 function escapeHtml(str) {
@@ -6321,8 +6379,16 @@ async function loadJournalPage() {
 
         const recentEntries = entries
             .map(e => ({ entry: e, dateObj: getEntryDate(e) }))
-            .filter(x => x.dateObj && x.dateObj >= cutoff)
-            .sort((a, b) => b.dateObj - a.dateObj);
+            // Keep entries even if date parsing fails (Safari + SQLite timestamps).
+            // Only apply the 30-day cutoff when we have a valid date.
+            .filter(x => !x.dateObj || x.dateObj >= cutoff)
+            .sort((a, b) => {
+                // Unknown dates go last.
+                if (!a.dateObj && !b.dateObj) return 0;
+                if (!a.dateObj) return 1;
+                if (!b.dateObj) return -1;
+                return b.dateObj - a.dateObj;
+            });
 
         if (recentEntries.length === 0) {
             container.innerHTML = '<div class="empty-state">No history found. / No se encontró historial.</div>';
@@ -6331,12 +6397,19 @@ async function loadJournalPage() {
 
         const groups = new Map();
         for (const { entry, dateObj } of recentEntries) {
-            const dayKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+            const dayKey = dateObj
+                ? `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`
+                : 'unknown';
             if (!groups.has(dayKey)) groups.set(dayKey, []);
             groups.get(dayKey).push({ entry, dateObj });
         }
 
-        const groupKeys = Array.from(groups.keys()).sort((a, b) => (a < b ? 1 : -1));
+        const groupKeys = Array.from(groups.keys()).sort((a, b) => {
+            if (a === 'unknown' && b === 'unknown') return 0;
+            if (a === 'unknown') return 1;
+            if (b === 'unknown') return -1;
+            return a < b ? 1 : -1;
+        });
 
         let html = '';
         html += '<div class="history-subtitle">Dose history for me over the last 30 days:</div>';
@@ -6346,12 +6419,12 @@ async function loadJournalPage() {
             const pillDate = items[0]?.dateObj;
             html += `
                 <div class="history-day">
-                    <div class="history-day-pill">${escapeHtml(formatHistoryDayPill(pillDate))}</div>
+                    <div class="history-day-pill">${key === 'unknown' ? 'Unknown date' : escapeHtml(formatHistoryDayPill(pillDate))}</div>
                 </div>
             `;
 
             for (const { entry, dateObj } of items) {
-                const timeText = dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                const timeText = dateObj ? dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
                 const staffName = entry.staff_name || 'Unknown';
                 const typeLabel = formatJournalType(entry.entry_type);
                 const title = entry.title || typeLabel;
