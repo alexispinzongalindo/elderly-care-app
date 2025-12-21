@@ -22,6 +22,33 @@ let currentLanguage = 'en'; // Default to English
 let appInitialized = false;
 let currentUser = null;
 
+let languageObserver = null;
+let languageObserverTimer = null;
+
+function installLanguageObserver() {
+    if (languageObserver) return;
+    if (!document.body) return;
+
+    languageObserver = new MutationObserver(() => {
+        if (languageObserverTimer) window.clearTimeout(languageObserverTimer);
+        languageObserverTimer = window.setTimeout(() => {
+            try {
+                updateTranslations();
+                replaceDualLanguageText();
+            } catch (e) {
+                console.error('Error applying language updates:', e);
+            }
+        }, 80);
+    });
+
+    languageObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true
+    });
+}
+
 // Phone number formatting function - formats as (XXX) XXX-XXXX
 function formatPhoneNumber(phone) {
     if (!phone) return phone;
@@ -132,7 +159,7 @@ const translations = {
         'login.submit': 'Login',
         'login.placeholder.username': 'Enter username',
         'login.placeholder.password': 'Enter password',
-        'login.hint': 'Default: admin / admin123',
+        'login.hint': 'Default credentials: admin (password: admin123)',
 
         // Resident Selector
         'resident.select': 'Select Resident',
@@ -271,6 +298,12 @@ const translations = {
         'vitals.notes': 'Notes',
         'vitals.save': 'Save Vital Signs',
 
+        'vitals.section.bloodPressure': 'Blood Pressure',
+        'vitals.section.bloodGlucose': 'Blood Glucose',
+        'vitals.section.temperature': 'Temperature',
+        'vitals.section.heartRate': 'Heart Rate',
+        'vitals.section.weight': 'Weight',
+
         // Care Notes
         'carenote.title': 'Care Notes',
         'carenote.add': 'Add Care Note',
@@ -350,6 +383,36 @@ const translations = {
         'dashboard.balance': 'Saldo',
         'dashboard.overdue': 'Vencido',
         'dashboard.quickAccess': 'Acceso Rápido',
+        'dashboard.kpi.medAdherence': 'Adherencia a Medicamentos',
+        'dashboard.kpi.takenToday': 'Tomados hoy',
+        'dashboard.kpi.medsDueNextHour': 'Medicamentos Pendientes (Próxima Hora)',
+        'dashboard.kpi.needsAction': 'Requiere acción',
+        'dashboard.kpi.medsScheduledToday': 'Medicamentos Programados Hoy',
+        'dashboard.kpi.activeMeds': 'Medicamentos activos',
+        'dashboard.kpi.vitalsRecordedToday': 'Signos Vitales Registrados Hoy',
+        'dashboard.kpi.activeStaff': 'Personal Activo',
+        'dashboard.kpi.availableToday': 'Disponible hoy',
+        'dashboard.kpi.incidents7d': 'Incidentes (Últimos 7 Días)',
+        'dashboard.kpi.safetyFollowups': 'Seguridad y seguimientos',
+        'dashboard.kpi.careNotes24h': 'Notas de Cuidado (Últimas 24 Horas)',
+        'dashboard.kpi.documentationActivity': 'Actividad de documentación',
+        'dashboard.kpi.activeResidents': 'Residentes Activos',
+        'dashboard.kpi.currentlyInCare': 'Actualmente en cuidado',
+        'dashboard.kpi.appointmentsToday': 'Citas Hoy',
+        'dashboard.kpi.scheduled': 'Programadas',
+        'dashboard.widget.needsAttention': 'Requiere Atención',
+        'dashboard.widget.upcomingAppointments': 'Próximas Citas',
+        'dashboard.widget.medicationSchedule': 'Horario de Medicamentos',
+        'dashboard.widget.recentActivity': 'Actividad Reciente',
+        'dashboard.widget.quickActions': 'Acciones Rápidas',
+        'dashboard.empty.allCaughtUp': 'Todo al día',
+        'dashboard.empty.noUpcomingAppointments': 'No hay citas próximas',
+        'dashboard.empty.noMedicationsScheduled': 'No hay medicamentos programados',
+        'dashboard.empty.noRecentActivity': 'No hay actividad reciente',
+        'dashboard.attention.medsDueSoon': 'dosis de medicamento(s) pronto',
+        'dashboard.attention.nextHourWindow': 'Ventana de medicamentos de la próxima hora',
+        'dashboard.attention.incidentsIn7d': 'incidente(s) en los últimos 7 días',
+        'dashboard.attention.reviewFollowups': 'Revisar seguimientos y documentación',
 
         // Common
         'common.search': 'Buscar',
@@ -395,6 +458,18 @@ const translations = {
         'common.errorLoading': 'Error al cargar',
         'common.tapToTakePhoto': 'Toca para tomar foto',
         'common.cameraAutoOpen': 'La cámara se abrirá automáticamente',
+        'common.today': 'Hoy',
+        'common.justNow': 'Ahora mismo',
+        'common.minutesAgo': 'm',
+        'common.hoursAgo': 'h',
+        'common.daysAgo': 'd',
+
+        'activity.vitalRecorded': 'Vital signs recorded',
+        'activity.careNoteAdded': 'Care note added',
+    },
+    es: {
+        'activity.vitalRecorded': 'Signos vitales registrados',
+        'activity.careNoteAdded': 'Nota de cuidado agregada',
 
         // Login
         'login.title': 'Gestión de Cuidado de Ancianos',
@@ -404,7 +479,7 @@ const translations = {
         'login.submit': 'Iniciar Sesión',
         'login.placeholder.username': 'Ingrese usuario',
         'login.placeholder.password': 'Ingrese contraseña',
-        'login.hint': 'Por defecto: admin / admin123',
+        'login.hint': 'Credenciales por defecto: admin (contraseña: admin123)',
 
         // Resident Selector
         'resident.select': 'Seleccionar Residente',
@@ -546,6 +621,12 @@ const translations = {
         'vitals.notes': 'Notas',
         'vitals.save': 'Guardar Signos Vitales',
 
+        'vitals.section.bloodPressure': 'Presión Arterial',
+        'vitals.section.bloodGlucose': 'Glucosa en Sangre',
+        'vitals.section.temperature': 'Temperatura',
+        'vitals.section.heartRate': 'Frecuencia Cardíaca',
+        'vitals.section.weight': 'Peso',
+
         // Care Notes
         'carenote.title': 'Notas de Cuidado',
         'carenote.add': 'Agregar Nota de Cuidado',
@@ -595,6 +676,17 @@ const translations = {
 // Translation function
 function t(key) {
     return translations[currentLanguage][key] || key;
+}
+
+function normalizeBilingualString(text) {
+    if (!text || typeof text !== 'string') return text;
+    if (!text.includes(' / ')) return text;
+    const dualLangPattern = /([^/]+)\s*\/\s*([^/]+)/g;
+    return text.replace(dualLangPattern, (match, englishPart, spanishPart) => {
+        const en = String(englishPart).trim();
+        const es = String(spanishPart).trim();
+        return currentLanguage === 'es' ? es : en;
+    });
 }
 
 // Set language and update UI
@@ -735,11 +827,11 @@ function setLanguage(lang) {
         langSelector.value = lang;
     }
 
-    // Replace all dual-language text with single language
-    replaceDualLanguageText();
-
     // Update all translatable elements
     updateTranslations();
+
+    // Replace all dual-language text with single language
+    replaceDualLanguageText();
 
     // Update dashboard date to new language
     const dateEl = document.getElementById('dashboardDate');
@@ -796,24 +888,62 @@ function updateTranslations() {
         el.textContent = t(key);
     });
 
-    // Update month options dynamically
-    const monthSelects = document.querySelectorAll('select[id*="BirthMonth"], select[id*="birthMonth"]');
+    const monthNames = {
+        '0': 'january',
+        '1': 'february',
+        '2': 'march',
+        '3': 'april',
+        '4': 'may',
+        '5': 'june',
+        '6': 'july',
+        '7': 'august',
+        '8': 'september',
+        '9': 'october',
+        '10': 'november',
+        '11': 'december',
+
+        '01': 'january',
+        '02': 'february',
+        '03': 'march',
+        '04': 'april',
+        '05': 'may',
+        '06': 'june',
+        '07': 'july',
+        '08': 'august',
+        '09': 'september',
+        '10': 'october',
+        '11': 'november',
+        '12': 'december'
+    };
+
+    // Update month options dynamically (all month selects across the app)
+    const monthSelects = document.querySelectorAll('select[id*="Month"], select[id*="month"]');
     monthSelects.forEach(select => {
         Array.from(select.options).forEach(option => {
-            if (option.value && option.value !== '') {
-                const monthKey = `month.${option.value.toLowerCase()}`;
-                const monthNames = {
-                    '01': 'january', '02': 'february', '03': 'march', '04': 'april',
-                    '05': 'may', '06': 'june', '07': 'july', '08': 'august',
-                    '09': 'september', '10': 'october', '11': 'november', '12': 'december'
-                };
-                if (monthNames[option.value]) {
-                    option.textContent = t(`month.${monthNames[option.value]}`);
-                }
-            } else {
+            const v = option.value;
+            if (!v) {
                 option.textContent = t('resident.month');
+                return;
+            }
+
+            // Support both numeric 0-11 and string 01-12 month values
+            if (monthNames[v] || monthNames[String(v)]) {
+                const key = monthNames[v] ? monthNames[v] : monthNames[String(v)];
+                option.textContent = t(`month.${key}`);
             }
         });
+    });
+
+    // Normalize common Year/Month/Day placeholder options for date dropdowns
+    const dateSelects = document.querySelectorAll('select');
+    dateSelects.forEach(select => {
+        const id = (select.id || '').toLowerCase();
+        const firstOpt = select.options && select.options.length ? select.options[0] : null;
+        if (!firstOpt || firstOpt.value !== '') return;
+
+        if (id.includes('year')) firstOpt.textContent = t('resident.year');
+        else if (id.includes('month')) firstOpt.textContent = t('resident.month');
+        else if (id.includes('day')) firstOpt.textContent = t('resident.day');
     });
 
     // Update gender options
@@ -1925,6 +2055,8 @@ function initApp() {
     if (appInitialized) {
         return;
     }
+
+    installLanguageObserver();
     appInitialized = true;
 
     console.log('🚀 Initializing app...');
@@ -3451,7 +3583,7 @@ function showPage(pageName) {
 
 function showMessage(message, type = 'success') {
     const messageBox = document.getElementById('messageBox');
-    messageBox.textContent = message;
+    messageBox.textContent = normalizeBilingualString(message);
     messageBox.className = `message-box ${type} show`;
 
     setTimeout(() => {
@@ -3763,21 +3895,21 @@ function renderDashboardAttention() {
     if (medsDueNow > 0) {
         items.push({
             level: 'warning',
-            title: `${medsDueNow} medication dose(s) due soon`,
-            detail: 'Next hour medication window',
+            title: `${medsDueNow} ${t('dashboard.attention.medsDueSoon')}`,
+            detail: t('dashboard.attention.nextHourWindow'),
             action: "showPage('medications');"
         });
     }
     if (incidents7d > 0) {
         items.push({
             level: 'danger',
-            title: `${incidents7d} incident(s) in last 7 days`,
-            detail: 'Review follow-ups & documentation',
+            title: `${incidents7d} ${t('dashboard.attention.incidentsIn7d')}`,
+            detail: t('dashboard.attention.reviewFollowups'),
             action: "showPage('incidents');"
         });
     }
     if (items.length === 0) {
-        listEl.innerHTML = '<div class="empty-state">All caught up</div>';
+        listEl.innerHTML = `<div class="empty-state">${t('dashboard.empty.allCaughtUp')}</div>`;
         return;
     }
 
@@ -3827,7 +3959,7 @@ async function loadUpcomingAppointments() {
         if (!listEl) return;
 
         if (upcoming.length === 0) {
-            listEl.innerHTML = '<p class="empty-state">No upcoming appointments / No hay citas próximas</p>';
+            listEl.innerHTML = `<p class="empty-state">${t('dashboard.empty.noUpcomingAppointments')}</p>`;
             return;
         }
 
@@ -3840,7 +3972,7 @@ async function loadUpcomingAppointments() {
                     <div class="upcoming-item-content">
                         <div class="upcoming-item-title">${apt.doctor_name || 'Appointment'}</div>
                         <div class="upcoming-item-time">
-                            ${isToday ? 'Today / Hoy' : aptDate.toLocaleDateString()} at ${apt.time}
+                            ${isToday ? t('common.today') : aptDate.toLocaleDateString()} ${apt.time ? `at ${apt.time}` : ''}
                             ${apt.facility ? ' - ' + apt.facility : ''}
                         </div>
                     </div>
@@ -3868,7 +4000,7 @@ async function loadMedicationReminders() {
         if (!listEl) return;
 
         if (activeMeds.length === 0) {
-            listEl.innerHTML = '<p class="empty-state">No medications scheduled / No hay medicamentos programados</p>';
+            listEl.innerHTML = `<p class="empty-state">${t('dashboard.empty.noMedicationsScheduled')}</p>`;
             return;
         }
 
@@ -3910,7 +4042,7 @@ async function loadRecentActivity() {
                     activities.push({
                         type: 'vital',
                         icon: '❤️',
-                        title: 'Vital Signs Recorded / Signos Vitales Registrados',
+                        title: t('activity.vitalRecorded'),
                         time: new Date(vs.recorded_at),
                         id: vs.id
                     });
@@ -3932,7 +4064,7 @@ async function loadRecentActivity() {
                     activities.push({
                         type: 'note',
                         icon: '📝',
-                        title: 'Care Note Added / Nota de Cuidado Agregada',
+                        title: t('activity.careNoteAdded'),
                         time: new Date(note.created_at),
                         id: note.id
                     });
@@ -3950,7 +4082,7 @@ async function loadRecentActivity() {
         if (!listEl) return;
 
         if (recent.length === 0) {
-            listEl.innerHTML = '<p class="empty-state">No recent activity / No hay actividad reciente</p>';
+            listEl.innerHTML = `<p class="empty-state">${t('dashboard.empty.noRecentActivity')}</p>`;
             return;
         }
 
@@ -3978,10 +4110,10 @@ function getTimeAgo(date) {
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
-    if (minutes < 1) return 'Just now / Ahora mismo';
-    if (minutes < 60) return `${minutes}m ago / hace ${minutes}m`;
-    if (hours < 24) return `${hours}h ago / hace ${hours}h`;
-    if (days < 7) return `${days}d ago / hace ${days}d`;
+    if (minutes < 1) return t('common.justNow');
+    if (minutes < 60) return currentLanguage === 'es' ? `hace ${minutes}${t('common.minutesAgo')}` : `${minutes}${t('common.minutesAgo')}`;
+    if (hours < 24) return currentLanguage === 'es' ? `hace ${hours}${t('common.hoursAgo')}` : `${hours}${t('common.hoursAgo')}`;
+    if (days < 7) return currentLanguage === 'es' ? `hace ${days}${t('common.daysAgo')}` : `${days}${t('common.daysAgo')}`;
     return date.toLocaleDateString();
 }
 

@@ -47,7 +47,7 @@
                     <button type="submit" class="btn btn-primary" style="width: 100%;" data-translate="login.submit">Login</button>
                 </div>
             </form>
-            <p class="login-hint" data-translate="login.hint">Default: admin / admin123</p>
+            <p class="login-hint" data-translate="login.hint">Default credentials: admin (password: admin123)</p>
         </div>
     </div>
 
@@ -86,29 +86,29 @@
                             <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                 <div class="form-group" style="margin: 0;">
                                     <select id="newBirthYear" class="form-control">
-                                        <option value="">Year / Año</option>
+                                        <option value="">Year</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="newBirthMonth" class="form-control">
-                                        <option value="">Month / Mes</option>
-                                        <option value="01">January / Enero</option>
-                                        <option value="02">February / Febrero</option>
-                                        <option value="03">March / Marzo</option>
-                                        <option value="04">April / Abril</option>
-                                        <option value="05">May / Mayo</option>
-                                        <option value="06">June / Junio</option>
-                                        <option value="07">July / Julio</option>
-                                        <option value="08">August / Agosto</option>
-                                        <option value="09">September / Septiembre</option>
-                                        <option value="10">October / Octubre</option>
-                                        <option value="11">November / Noviembre</option>
-                                        <option value="12">December / Diciembre</option>
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="newBirthDay" class="form-control">
-                                        <option value="">Day / Día</option>
+                                        <option value="">Day</option>
                                     </select>
                                 </div>
                             </div>
@@ -117,9 +117,9 @@
                             <label data-translate="resident.gender">Gender</label>
                             <select id="newGender">
                                 <option value="">-- Select --</option>
-                                <option value="Male">Male / Masculino</option>
-                                <option value="Female">Female / Femenino</option>
-                                <option value="Other">Other / Otro</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
                     </div>
@@ -316,11 +316,11 @@
                         <div class="kpi-card kpi-card-primary" data-kpi="med-adherence">
                             <div class="kpi-icon kpi-icon-med"><i class="fas fa-pills"></i></div>
                             <div class="kpi-body">
-                                <div class="kpi-label">Medication Adherence</div>
+                                <div class="kpi-label" data-translate="dashboard.kpi.medAdherence">Medication Adherence</div>
                                 <div class="kpi-value" id="medsTakenStat">0/0</div>
                                 <div class="kpi-meta">
                                     <span class="kpi-chip" id="medsAdherenceChip">0%</span>
-                                    <span class="kpi-sub">Taken today</span>
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.takenToday">Taken today</span>
                                 </div>
                                 <div class="kpi-progress" id="medsProgress" style="display: none;">
                                     <div class="kpi-progress-bar" id="medsProgressBar"></div>
@@ -331,10 +331,10 @@
                         <div class="kpi-card" data-kpi="med-due">
                             <div class="kpi-icon kpi-icon-warning"><i class="fas fa-clock"></i></div>
                             <div class="kpi-body">
-                                <div class="kpi-label">Medications Due (Next Hour)</div>
+                                <div class="kpi-label" data-translate="dashboard.kpi.medsDueNextHour">Medications Due (Next Hour)</div>
                                 <div class="kpi-value" id="medsDueNow">0</div>
                                 <div class="kpi-meta">
-                                    <span class="kpi-sub">Needs action</span>
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.needsAction">Needs action</span>
                                 </div>
                             </div>
                         </div>
@@ -342,10 +342,10 @@
                         <div class="kpi-card" data-kpi="med-today">
                             <div class="kpi-icon kpi-icon-teal"><i class="fas fa-calendar-day"></i></div>
                             <div class="kpi-body">
-                                <div class="kpi-label">Medications Scheduled Today</div>
+                                <div class="kpi-label" data-translate="dashboard.kpi.medsScheduledToday">Medications Scheduled Today</div>
                                 <div class="kpi-value" id="medsDueToday">0</div>
                                 <div class="kpi-meta">
-                                    <span class="kpi-sub">Active meds</span>
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.activeMeds">Active meds</span>
                                 </div>
                             </div>
                         </div>
@@ -353,7 +353,7 @@
                         <div class="kpi-card" data-kpi="vitals-today" id="vitalsCard" style="display: none;">
                             <div class="kpi-icon kpi-icon-vitals"><i class="fas fa-heartbeat"></i></div>
                             <div class="kpi-body">
-                                <div class="kpi-label">Vital Signs Recorded Today</div>
+                                <div class="kpi-label" data-translate="dashboard.kpi.vitalsRecordedToday">Vital Signs Recorded Today</div>
                                 <div class="kpi-value" id="vitalsToday">0</div>
                                 <div class="kpi-meta">
                                     <span class="kpi-chip kpi-chip-muted" id="vitalsMissingToday">0 missing</span>
@@ -364,10 +364,10 @@
                         <div class="kpi-card" data-kpi="staff">
                             <div class="kpi-icon kpi-icon-staff"><i class="fas fa-user-nurse"></i></div>
                             <div class="kpi-body">
-                                <div class="kpi-label">Active Staff</div>
+                                <div class="kpi-label" data-translate="dashboard.kpi.activeStaff">Active Staff</div>
                                 <div class="kpi-value" id="activeStaffCount">0</div>
                                 <div class="kpi-meta">
-                                    <span class="kpi-sub">Available today</span>
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.availableToday">Available today</span>
                                 </div>
                             </div>
                         </div>
@@ -375,10 +375,10 @@
                         <div class="kpi-card" data-kpi="incidents">
                             <div class="kpi-icon kpi-icon-danger"><i class="fas fa-exclamation-triangle"></i></div>
                             <div class="kpi-body">
-                                <div class="kpi-label">Incidents (Last 7 Days)</div>
+                                <div class="kpi-label" data-translate="dashboard.kpi.incidents7d">Incidents (Last 7 Days)</div>
                                 <div class="kpi-value" id="incidents7d">0</div>
                                 <div class="kpi-meta">
-                                    <span class="kpi-sub">Safety & follow-ups</span>
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.safetyFollowups">Safety &amp; follow-ups</span>
                                 </div>
                             </div>
                         </div>
@@ -386,10 +386,10 @@
                         <div class="kpi-card" data-kpi="notes">
                             <div class="kpi-icon kpi-icon-blue"><i class="fas fa-sticky-note"></i></div>
                             <div class="kpi-body">
-                                <div class="kpi-label">Care Notes (Last 24 Hours)</div>
+                                <div class="kpi-label" data-translate="dashboard.kpi.careNotes24h">Care Notes (Last 24 Hours)</div>
                                 <div class="kpi-value" id="notes24h">0</div>
                                 <div class="kpi-meta">
-                                    <span class="kpi-sub">Documentation activity</span>
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.documentationActivity">Documentation activity</span>
                                 </div>
                             </div>
                         </div>
@@ -397,10 +397,10 @@
                         <div class="kpi-card" data-kpi="residents">
                             <div class="kpi-icon kpi-icon-muted"><i class="fas fa-users"></i></div>
                             <div class="kpi-body">
-                                <div class="kpi-label">Active Residents</div>
+                                <div class="kpi-label" data-translate="dashboard.kpi.activeResidents">Active Residents</div>
                                 <div class="kpi-value" id="totalResidents">0</div>
                                 <div class="kpi-meta">
-                                    <span class="kpi-sub">Currently in care</span>
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.currentlyInCare">Currently in care</span>
                                 </div>
                             </div>
                         </div>
@@ -408,10 +408,10 @@
                         <div class="kpi-card" data-kpi="appointments" style="display: none;">
                             <div class="kpi-icon kpi-icon-muted"><i class="fas fa-calendar-check"></i></div>
                             <div class="kpi-body">
-                                <div class="kpi-label">Appointments Today</div>
+                                <div class="kpi-label" data-translate="dashboard.kpi.appointmentsToday">Appointments Today</div>
                                 <div class="kpi-value" id="apptsToday">0</div>
                                 <div class="kpi-meta">
-                                    <span class="kpi-sub">Scheduled</span>
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.scheduled">Scheduled</span>
                                 </div>
                             </div>
                         </div>
@@ -432,14 +432,14 @@
                         <div class="dashboard-column">
                             <div class="dashboard-widget">
                                 <div class="widget-header">
-                                    <h3><span class="widget-title-icon"><i class="fas fa-bell"></i></span> Needs Attention</h3>
+                                    <h3><span class="widget-title-icon"><i class="fas fa-bell"></i></span> <span data-translate="dashboard.widget.needsAttention">Needs Attention</span></h3>
                                 </div>
                                 <div class="attention-list" id="dashboardAttentionList"></div>
                             </div>
 
                             <div class="dashboard-widget">
                                 <div class="widget-header">
-                                    <h3><span class="widget-title-icon"><i class="fas fa-clock"></i></span> Upcoming Appointments</h3>
+                                    <h3><span class="widget-title-icon"><i class="fas fa-clock"></i></span> <span data-translate="dashboard.widget.upcomingAppointments">Upcoming Appointments</span></h3>
                                 </div>
                                 <div class="upcoming-list" id="upcomingAppointmentsList"></div>
                             </div>
@@ -448,21 +448,21 @@
                         <div class="dashboard-column">
                             <div class="dashboard-widget">
                                 <div class="widget-header">
-                                    <h3><span class="widget-title-icon"><i class="fas fa-pills"></i></span> Medication Schedule</h3>
+                                    <h3><span class="widget-title-icon"><i class="fas fa-pills"></i></span> <span data-translate="dashboard.widget.medicationSchedule">Medication Schedule</span></h3>
                                 </div>
                                 <div class="reminders-list" id="medicationRemindersList"></div>
                             </div>
 
                             <div class="dashboard-widget">
                                 <div class="widget-header">
-                                    <h3><span class="widget-title-icon"><i class="fas fa-stream"></i></span> Recent Activity</h3>
+                                    <h3><span class="widget-title-icon"><i class="fas fa-stream"></i></span> <span data-translate="dashboard.widget.recentActivity">Recent Activity</span></h3>
                                 </div>
                                 <div class="activity-list" id="recentActivityList"></div>
                             </div>
 
                             <div class="dashboard-widget">
                                 <div class="widget-header">
-                                    <h3><span class="widget-title-icon"><i class="fas fa-bolt"></i></span> Quick Actions</h3>
+                                    <h3><span class="widget-title-icon"><i class="fas fa-bolt"></i></span> <span data-translate="dashboard.widget.quickActions">Quick Actions</span></h3>
                                 </div>
                                 <div class="quick-actions-grid" style="margin-top: 1rem;">
                                     <button class="quick-action-btn" onclick="showPage('medications'); setTimeout(() => showMedicationForm(), 100);" data-translate-title="medication.add">
@@ -521,29 +521,29 @@
                                 <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                     <div class="form-group" style="margin: 0;">
                                         <select id="newBirthYearPage" class="form-control">
-                                            <option value="">Year / Año</option>
+                                            <option value="">Year</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin: 0;">
                                         <select id="newBirthMonthPage" class="form-control">
-                                            <option value="">Month / Mes</option>
-                                            <option value="01">January / Enero</option>
-                                            <option value="02">February / Febrero</option>
-                                            <option value="03">March / Marzo</option>
-                                            <option value="04">April / Abril</option>
-                                            <option value="05">May / Mayo</option>
-                                            <option value="06">June / Junio</option>
-                                            <option value="07">July / Julio</option>
-                                            <option value="08">August / Agosto</option>
-                                            <option value="09">September / Septiembre</option>
-                                            <option value="10">October / Octubre</option>
-                                            <option value="11">November / Noviembre</option>
-                                            <option value="12">December / Diciembre</option>
+                                            <option value="">Month</option>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin: 0;">
                                         <select id="newBirthDayPage" class="form-control">
-                                            <option value="">Day / Día</option>
+                                            <option value="">Day</option>
                                         </select>
                                     </div>
                                 </div>
@@ -552,9 +552,9 @@
                                 <label data-translate="resident.gender">Gender</label>
                                 <select id="newGenderPage">
                                     <option value="">-- Select --</option>
-                                    <option value="Male">Male / Masculino</option>
-                                    <option value="Female">Female / Femenino</option>
-                                    <option value="Other">Other / Otro</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                         </div>
@@ -772,29 +772,29 @@
                             <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                                 <div class="form-group" style="margin: 0;">
                                     <select id="medStartYear" class="form-control">
-                                        <option value="">Year / Año</option>
+                                        <option value="">Year</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="medStartMonth" class="form-control">
-                                        <option value="">Month / Mes</option>
-                                        <option value="01">Jan / Ene</option>
-                                        <option value="02">Feb</option>
-                                        <option value="03">Mar</option>
-                                        <option value="04">Apr / Abr</option>
-                                        <option value="05">May / May</option>
-                                        <option value="06">Jun</option>
-                                        <option value="07">Jul</option>
-                                        <option value="08">Aug / Ago</option>
-                                        <option value="09">Sep</option>
-                                        <option value="10">Oct</option>
-                                        <option value="11">Nov</option>
-                                        <option value="12">Dec / Dic</option>
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="medStartDay" class="form-control">
-                                        <option value="">Day / Día</option>
+                                        <option value="">Day</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
@@ -813,29 +813,29 @@
                             <div id="medEndDateGroup" class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                                 <div class="form-group" style="margin: 0;">
                                     <select id="medEndYear" class="form-control">
-                                        <option value="">Year / Año</option>
+                                        <option value="">Year</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="medEndMonth" class="form-control">
-                                        <option value="">Month / Mes</option>
-                                        <option value="01">Jan / Ene</option>
-                                        <option value="02">Feb</option>
-                                        <option value="03">Mar</option>
-                                        <option value="04">Apr / Abr</option>
-                                        <option value="05">May / May</option>
-                                        <option value="06">Jun</option>
-                                        <option value="07">Jul</option>
-                                        <option value="08">Aug / Ago</option>
-                                        <option value="09">Sep</option>
-                                        <option value="10">Oct</option>
-                                        <option value="11">Nov</option>
-                                        <option value="12">Dec / Dic</option>
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="medEndDay" class="form-control">
-                                        <option value="">Day / Día</option>
+                                        <option value="">Day</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
@@ -866,29 +866,29 @@
                             <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                 <div class="form-group" style="margin: 0;">
                                     <select id="apptYear" class="form-control" required>
-                                        <option value="">Year / Año *</option>
+                                        <option value="">Year</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="apptMonth" class="form-control" required>
-                                        <option value="">Month / Mes *</option>
-                                        <option value="01">January / Enero</option>
-                                        <option value="02">February / Febrero</option>
-                                        <option value="03">March / Marzo</option>
-                                        <option value="04">April / Abril</option>
-                                        <option value="05">May / Mayo</option>
-                                        <option value="06">June / Junio</option>
-                                        <option value="07">July / Julio</option>
-                                        <option value="08">August / Agosto</option>
-                                        <option value="09">September / Septiembre</option>
-                                        <option value="10">October / Octubre</option>
-                                        <option value="11">November / Noviembre</option>
-                                        <option value="12">December / Diciembre</option>
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="apptDay" class="form-control" required>
-                                        <option value="">Day / Día *</option>
+                                        <option value="">Day</option>
                                     </select>
                                 </div>
                             </div>
@@ -935,29 +935,29 @@
                             <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                                 <div class="form-group" style="margin: 0;">
                                     <select id="vsYear" class="form-control" required>
-                                        <option value="">Year / Año *</option>
+                                        <option value="">Year</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="vsMonth" class="form-control" required>
-                                        <option value="">Month / Mes *</option>
-                                        <option value="01">Jan / Ene</option>
-                                        <option value="02">Feb</option>
-                                        <option value="03">Mar</option>
-                                        <option value="04">Apr / Abr</option>
-                                        <option value="05">May / May</option>
-                                        <option value="06">Jun</option>
-                                        <option value="07">Jul</option>
-                                        <option value="08">Aug / Ago</option>
-                                        <option value="09">Sep</option>
-                                        <option value="10">Oct</option>
-                                        <option value="11">Nov</option>
-                                        <option value="12">Dec / Dic</option>
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <select id="vsDay" class="form-control" required>
-                                        <option value="">Day / Día *</option>
+                                        <option value="">Day</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
@@ -967,7 +967,7 @@
                         </div>
 
                         <div class="form-section">
-                            <h4>🩸 Blood Pressure / Presión Arterial</h4>
+                            <h4>🩸 <span data-translate="vitals.section.bloodPressure">Blood Pressure</span></h4>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="vsSystolic">Systolic (mmHg)</label>
@@ -981,7 +981,7 @@
                         </div>
 
                         <div class="form-section">
-                            <h4>🩹 Blood Glucose / Glucosa en Sangre</h4>
+                            <h4>🩹 <span data-translate="vitals.section.bloodGlucose">Blood Glucose</span></h4>
                             <div class="form-group">
                                 <label for="vsGlucose">Glucose Level (mg/dL)</label>
                                 <input type="number" id="vsGlucose" min="0" max="600" step="0.1" placeholder="100">
@@ -989,7 +989,7 @@
                         </div>
 
                         <div class="form-section">
-                            <h4>🌡️ Temperature / Temperatura</h4>
+                            <h4>🌡️ <span data-translate="vitals.section.temperature">Temperature</span></h4>
                             <div class="form-group">
                                 <label for="vsTemperature">Temperature (°F)</label>
                                 <input type="number" id="vsTemperature" min="90" max="110" step="0.1" placeholder="98.6">
@@ -997,7 +997,7 @@
                         </div>
 
                         <div class="form-section">
-                            <h4>❤️ Heart Rate / Frecuencia Cardíaca</h4>
+                            <h4>❤️ <span data-translate="vitals.section.heartRate">Heart Rate</span></h4>
                             <div class="form-group">
                                 <label for="vsHeartRate">Heart Rate (bpm)</label>
                                 <input type="number" id="vsHeartRate" min="30" max="200" placeholder="72">
@@ -1005,7 +1005,7 @@
                         </div>
 
                         <div class="form-section">
-                            <h4>⚖️ Weight / Peso</h4>
+                            <h4>⚖️ <span data-translate="vitals.section.weight">Weight</span></h4>
                             <div class="form-group">
                                 <label for="vsWeight">Weight (lbs)</label>
                                 <input type="number" id="vsWeight" min="0" max="1000" step="0.1" placeholder="150">
@@ -1037,25 +1037,25 @@
                 <div class="form-card">
                     <div class="calendar-controls" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
                         <div class="form-group" style="margin: 0; flex: 1; min-width: 120px;">
-                            <label for="calendarYear" style="font-size: 0.9rem; margin-bottom: 0.25rem;">Year / Año</label>
+                            <label for="calendarYear" style="font-size: 0.9rem; margin-bottom: 0.25rem;" data-translate="resident.year">Year</label>
                             <select id="calendarYear" class="form-control" style="padding: 0.5rem;">
                             </select>
                         </div>
                         <div class="form-group" style="margin: 0; flex: 1; min-width: 150px;">
-                            <label for="calendarMonth" style="font-size: 0.9rem; margin-bottom: 0.25rem;">Month / Mes</label>
+                            <label for="calendarMonth" style="font-size: 0.9rem; margin-bottom: 0.25rem;" data-translate="resident.month">Month</label>
                             <select id="calendarMonth" class="form-control" style="padding: 0.5rem;">
-                                <option value="0">January / Enero</option>
-                                <option value="1">February / Febrero</option>
-                                <option value="2">March / Marzo</option>
-                                <option value="3">April / Abril</option>
-                                <option value="4">May / Mayo</option>
-                                <option value="5">June / Junio</option>
-                                <option value="6">July / Julio</option>
-                                <option value="7">August / Agosto</option>
-                                <option value="8">September / Septiembre</option>
-                                <option value="9">October / Octubre</option>
-                                <option value="10">November / Noviembre</option>
-                                <option value="11">December / Diciembre</option>
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
                             </select>
                         </div>
                         <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
@@ -1114,78 +1114,78 @@
                                 <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                     <div class="form-group" style="margin: 0;">
                                         <select id="billYear" class="form-control" required>
-                                            <option value="">Year / Año *</option>
+                                            <option value="">Year</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin: 0;">
                                         <select id="billMonth" class="form-control" required>
-                                            <option value="">Month / Mes *</option>
-                                            <option value="01">January / Enero</option>
-                                            <option value="02">February / Febrero</option>
-                                            <option value="03">March / Marzo</option>
-                                            <option value="04">April / Abril</option>
-                                            <option value="05">May / Mayo</option>
-                                            <option value="06">June / Junio</option>
-                                            <option value="07">July / Julio</option>
-                                            <option value="08">August / Agosto</option>
-                                            <option value="09">September / Septiembre</option>
-                                            <option value="10">October / Octubre</option>
-                                            <option value="11">November / Noviembre</option>
-                                            <option value="12">December / Diciembre</option>
+                                            <option value="">Month</option>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin: 0;">
                                         <select id="billDay" class="form-control" required>
-                                            <option value="">Day / Día *</option>
+                                            <option value="">Day</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Due Date / Fecha de Vencimiento *</label>
+                                <label data-translate="billing.dueDate">Due Date *</label>
                                 <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                     <div class="form-group" style="margin: 0;">
                                         <select id="billDueYear" class="form-control" required>
-                                            <option value="">Year / Año *</option>
+                                            <option value="">Year</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin: 0;">
                                         <select id="billDueMonth" class="form-control" required>
-                                            <option value="">Month / Mes *</option>
-                                            <option value="01">January / Enero</option>
-                                            <option value="02">February / Febrero</option>
-                                            <option value="03">March / Marzo</option>
-                                            <option value="04">April / Abril</option>
-                                            <option value="05">May / Mayo</option>
-                                            <option value="06">June / Junio</option>
-                                            <option value="07">July / Julio</option>
-                                            <option value="08">August / Agosto</option>
-                                            <option value="09">September / Septiembre</option>
-                                            <option value="10">October / Octubre</option>
-                                            <option value="11">November / Noviembre</option>
-                                            <option value="12">December / Diciembre</option>
+                                            <option value="">Month</option>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin: 0;">
                                         <select id="billDueDay" class="form-control" required>
-                                            <option value="">Day / Día *</option>
+                                            <option value="">Day</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="billAmount">Amount / Monto ($) *</label>
+                                    <label for="billAmount" data-translate="billing.amount">Amount *</label>
                                     <input type="number" id="billAmount" step="0.01" min="0" required placeholder="0.00">
                                 </div>
                                 <div class="form-group">
                                     <label data-translate="carenote.category">Category</label>
                                     <select id="billCategory">
-                                        <option value="Monthly Fee">Monthly Fee / Cuota Mensual</option>
-                                        <option value="Medical Services">Medical Services / Servicios Médicos</option>
-                                        <option value="Medications">Medications / Medicamentos</option>
-                                        <option value="Special Care">Special Care / Cuidado Especial</option>
-                                        <option value="Other">Other / Otro</option>
+                                        <option value="Monthly Fee">Monthly Fee</option>
+                                        <option value="Medical Services">Medical Services</option>
+                                        <option value="Medications">Medications</option>
+                                        <option value="Special Care">Special Care</option>
+                                        <option value="Other">Other</option>
                                     </select>
                                 </div>
                             </div>
@@ -1199,7 +1199,7 @@
                             </div>
                             <div class="button-group">
                                 <button type="submit" class="btn btn-success" data-translate="billing.save">Save Bill</button>
-                                <button type="button" class="btn btn-secondary" onclick="hideBillForm()">Cancel / Cancelar</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideBillForm()" data-translate="common.cancel">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -1207,39 +1207,39 @@
 
                 <!-- Record Payment Form -->
                 <div class="form-card">
-                    <h3>Record Payment / Registrar Pago</h3>
-                    <button class="btn btn-primary" onclick="showPaymentForm()">+ Record Payment / Registrar Pago</button>
+                    <h3 data-translate="payment.add">Record Payment</h3>
+                    <button class="btn btn-primary" onclick="showPaymentForm()" data-translate="payment.add">+ Record Payment</button>
 
                     <div id="paymentForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                         <form id="newPaymentForm" onsubmit="savePayment(event)">
                             <div class="form-group">
-                                <label>Payment Date / Fecha de Pago *</label>
+                                <label>Payment Date *</label>
                                 <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                                     <div class="form-group" style="margin: 0;">
                                         <select id="paymentYear" class="form-control" required>
-                                            <option value="">Year / Año *</option>
+                                            <option value="">Year</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin: 0;">
                                         <select id="paymentMonth" class="form-control" required>
-                                            <option value="">Month / Mes *</option>
-                                            <option value="01">January / Enero</option>
-                                            <option value="02">February / Febrero</option>
-                                            <option value="03">March / Marzo</option>
-                                            <option value="04">April / Abril</option>
-                                            <option value="05">May / Mayo</option>
-                                            <option value="06">June / Junio</option>
-                                            <option value="07">July / Julio</option>
-                                            <option value="08">August / Agosto</option>
-                                            <option value="09">September / Septiembre</option>
-                                            <option value="10">October / Octubre</option>
-                                            <option value="11">November / Noviembre</option>
-                                            <option value="12">December / Diciembre</option>
+                                            <option value="">Month</option>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin: 0;">
                                         <select id="paymentDay" class="form-control" required>
-                                            <option value="">Day / Día *</option>
+                                            <option value="">Day</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1247,31 +1247,31 @@
                             <div class="form-row">
                                 <div class="form-group">
                                 <div class="form-group">
-                                    <label for="paymentAmount">Amount / Monto ($) *</label>
+                                    <label for="paymentAmount" data-translate="billing.amount">Amount *</label>
                                     <input type="number" id="paymentAmount" step="0.01" min="0" required placeholder="0.00">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="paymentMethod">Payment Method / Método de Pago</label>
+                                    <label for="paymentMethod">Payment Method</label>
                                     <select id="paymentMethod">
-                                        <option value="Cash">Cash / Efectivo</option>
-                                        <option value="Check">Check / Cheque</option>
-                                        <option value="Credit Card">Credit Card / Tarjeta de Crédito</option>
-                                        <option value="Debit Card">Debit Card / Tarjeta de Débito</option>
-                                        <option value="Bank Transfer">Bank Transfer / Transferencia Bancaria</option>
-                                        <option value="Other">Other / Otro</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Check">Check</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                        <option value="Debit Card">Debit Card</option>
+                                        <option value="Bank Transfer">Bank Transfer</option>
+                                        <option value="Other">Other</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="paymentReference">Reference Number / Número de Referencia</label>
+                                    <label for="paymentReference">Reference Number</label>
                                     <input type="text" id="paymentReference" placeholder="Check #, Transaction ID, etc.">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="paymentBillId">Apply to Bill / Aplicar a Factura (Optional)</label>
+                                <label for="paymentBillId">Apply to Bill (Optional)</label>
                                 <select id="paymentBillId">
-                                    <option value="">-- Select bill -- / Seleccionar factura</option>
+                                    <option value="" data-translate="common.selectBill">Select bill</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -1279,8 +1279,8 @@
                                 <textarea id="paymentNotes" rows="2"></textarea>
                             </div>
                             <div class="button-group">
-                                <button type="submit" class="btn btn-success">Record Payment / Registrar Pago</button>
-                                <button type="button" class="btn btn-secondary" onclick="hidePaymentForm()">Cancel / Cancelar</button>
+                                <button type="submit" class="btn btn-success" data-translate="payment.add">Record Payment</button>
+                                <button type="button" class="btn btn-secondary" onclick="hidePaymentForm()" data-translate="common.cancel">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -1288,74 +1288,74 @@
 
                 <!-- Bills List -->
                 <div style="margin-top: 2rem;">
-                    <h3>Bills / Facturas</h3>
+                    <h3>Bills</h3>
                     <div id="billsList" class="item-list"></div>
                 </div>
 
                 <!-- Payments List -->
                 <div style="margin-top: 2rem;">
-                    <h3>Payment History / Historial de Pagos</h3>
+                    <h3>Payment History</h3>
                     <div id="paymentsList" class="item-list"></div>
                 </div>
             </div>
 
             <!-- Incident Reports Page -->
             <div id="incidents" class="page" style="display: none;">
-                <h2 id="incidentsH2" style="display: block !important; visibility: visible !important; opacity: 1 !important; color: var(--text-color) !important; margin-bottom: 1.5rem !important; font-size: 1.8rem !important; font-weight: bold !important; position: relative !important; z-index: 1 !important; width: 100% !important; height: auto !important;">Incident Reports / Reportes de Incidentes</h2>
-                <button id="incidentsButton" class="btn btn-primary" onclick="showIncidentForm()" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1.5rem !important; padding: 0.75rem 1.5rem !important; font-size: 1rem !important; cursor: pointer !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important; background: var(--primary-color) !important; color: white !important; border: none !important;">+ Report Incident / Reportar Incidente</button>
+                <h2 id="incidentsH2" style="display: block !important; visibility: visible !important; opacity: 1 !important; color: var(--text-color) !important; margin-bottom: 1.5rem !important; font-size: 1.8rem !important; font-weight: bold !important; position: relative !important; z-index: 1 !important; width: 100% !important; height: auto !important;" data-translate="incident.title">Incident Reports</h2>
+                <button id="incidentsButton" class="btn btn-primary" onclick="showIncidentForm()" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1.5rem !important; padding: 0.75rem 1.5rem !important; font-size: 1rem !important; cursor: pointer !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important; background: var(--primary-color) !important; color: white !important; border: none !important;" data-translate="incident.add">+ Report Incident</button>
 
                 <!-- Incident Form -->
                 <div id="incidentForm" class="form-card" style="display: none; margin-top: 2rem;">
-                    <h3 id="incidentFormTitle">Report Incident / Reportar Incidente</h3>
+                    <h3 id="incidentFormTitle" data-translate="incident.add">Report Incident</h3>
                     <form id="newIncidentForm" onsubmit="saveIncident(event)" enctype="multipart/form-data">
                         <!-- Timestamp Section -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentDate">Incident Date & Time / Fecha y Hora del Incidente *</label>
+                                <label for="incidentDate">Incident Date &amp; Time *</label>
                                 <input type="datetime-local" id="incidentDate" required>
-                                <small class="form-hint">Timestamp when the incident occurred / Marca de tiempo cuando ocurrió el incidente</small>
+                                <small class="form-hint">Timestamp when the incident occurred</small>
                             </div>
                         </div>
 
                         <!-- Staff and Residents Section -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentStaffId">Reporting Staff / Personal que Reporta *</label>
+                                <label for="incidentStaffId">Reporting Staff *</label>
                                 <select id="incidentStaffId" required>
-                                    <option value="">-- Select Staff / Seleccionar Personal --</option>
+                                    <option value="">-- Select Staff --</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="incidentResidents">Residents Involved / Residentes Involucrados *</label>
+                                <label for="incidentResidents">Residents Involved *</label>
                                 <select id="incidentResidents" multiple required style="min-height: 120px;">
-                                    <option value="">-- Select Residents / Seleccionar Residentes --</option>
+                                    <option value="">-- Select Residents --</option>
                                 </select>
-                                <small class="form-hint">Hold Ctrl/Cmd to select multiple / Mantenga Ctrl/Cmd para seleccionar múltiples</small>
+                                <small class="form-hint">Hold Ctrl/Cmd to select multiple</small>
                             </div>
                         </div>
 
                         <!-- Incident Type and Severity -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentType">Incident Type / Tipo de Incidente *</label>
+                                <label for="incidentType">Incident Type *</label>
                                 <select id="incidentType" required>
                                     <option value="">-- Select --</option>
-                                    <option value="Fall">Fall / Caída</option>
-                                    <option value="Injury">Injury / Lesión</option>
-                                    <option value="Medication Error">Medication Error / Error de Medicamento</option>
-                                    <option value="Behavioral">Behavioral / Conductual</option>
-                                    <option value="Medical Emergency">Medical Emergency / Emergencia Médica</option>
-                                    <option value="Equipment Failure">Equipment Failure / Falla de Equipo</option>
-                                    <option value="Other">Other / Otro</option>
+                                    <option value="Fall">Fall</option>
+                                    <option value="Injury">Injury</option>
+                                    <option value="Medication Error">Medication Error</option>
+                                    <option value="Behavioral">Behavioral</option>
+                                    <option value="Medical Emergency">Medical Emergency</option>
+                                    <option value="Equipment Failure">Equipment Failure</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="incidentSeverity">Severity / Gravedad *</label>
+                                <label for="incidentSeverity">Severity *</label>
                                 <select id="incidentSeverity" required>
-                                    <option value="minor">Minor / Menor</option>
-                                    <option value="moderate">Moderate / Moderado</option>
-                                    <option value="major">Major / Mayor</option>
-                                    <option value="critical">Critical / Crítico</option>
+                                    <option value="minor">Minor</option>
+                                    <option value="moderate">Moderate</option>
+                                    <option value="major">Major</option>
+                                    <option value="critical">Critical</option>
                                 </select>
                             </div>
                         </div>
@@ -1370,31 +1370,31 @@
 
                         <!-- Description Section -->
                         <div class="form-group">
-                            <label for="incidentDescription">Description / Descripción del Incidente *</label>
-                            <textarea id="incidentDescription" rows="6" required placeholder="Provide a detailed description of what happened, who was involved, and any immediate observations... / Proporcione una descripción detallada de lo que sucedió, quién estuvo involucrado y cualquier observación inmediata..."></textarea>
+                            <label for="incidentDescription">Description *</label>
+                            <textarea id="incidentDescription" rows="6" required placeholder="Provide a detailed description of what happened, who was involved, and any immediate observations..."></textarea>
                         </div>
 
                         <!-- Photo Upload Section -->
                         <div class="form-group">
-                            <label>Incident Photos / Fotos del Incidente</label>
+                            <label>Incident Photos</label>
                             <div class="photo-upload-area" id="incidentPhotoArea">
                                 <input type="file" id="incidentPhotos" multiple accept="image/*" capture="environment" style="display: none;" onchange="handleIncidentPhotos(event)">
                                 <div class="photo-upload-placeholder" onclick="document.getElementById('incidentPhotos').click()">
                                     <div class="photo-upload-icon">📷</div>
-                                    <p><strong>Tap to Upload Photos / Toca para Subir Fotos</strong></p>
-                                    <p>Camera will open automatically / La cámara se abrirá automáticamente</p>
-                                    <p class="photo-upload-hint">You can select multiple photos / Puedes seleccionar múltiples fotos</p>
+                                    <p><strong>Tap to Upload Photos</strong></p>
+                                    <p>Camera will open automatically</p>
+                                    <p class="photo-upload-hint">You can select multiple photos</p>
                                 </div>
                                 <div id="incidentPhotoPreview" class="photo-preview-grid"></div>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentWitnesses">Witnesses / Testigos</label>
+                                <label for="incidentWitnesses">Witnesses</label>
                                 <input type="text" id="incidentWitnesses" placeholder="Names of witnesses">
                             </div>
                             <div class="form-group">
-                                <label for="incidentActions">Actions Taken / Acciones Tomadas</label>
+                                <label for="incidentActions">Actions Taken</label>
                                 <textarea id="incidentActions" rows="3" placeholder="What was done in response..."></textarea>
                             </div>
                         </div>
@@ -1402,27 +1402,27 @@
                             <div class="form-group">
                                 <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
                                     <input type="checkbox" id="incidentFamilyNotified">
-                                    <span>Family Notified / Familia Notificada</span>
+                                    <span>Family Notified</span>
                                 </label>
                             </div>
                             <div class="form-group" id="familyNotificationDateGroup" style="display: none;">
-                                <label for="familyNotificationDate">Notification Date / Fecha de Notificación</label>
+                                <label for="familyNotificationDate">Notification Date</label>
                                 <input type="datetime-local" id="familyNotificationDate">
                             </div>
                         </div>
                         <div class="form-group">
                             <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
                                 <input type="checkbox" id="incidentFollowUp">
-                                <span>Follow-up Required / Seguimiento Requerido</span>
+                                <span>Follow-up Required</span>
                             </label>
                         </div>
                         <div class="form-group" id="followUpNotesGroup" style="display: none;">
-                            <label for="followUpNotes">Follow-up Notes / Notas de Seguimiento</label>
+                            <label for="followUpNotes">Follow-up Notes</label>
                             <textarea id="followUpNotes" rows="2"></textarea>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-success">Save Report / Guardar Reporte</button>
-                            <button type="button" class="btn btn-secondary" onclick="hideIncidentForm()">Cancel / Cancelar</button>
+                            <button type="submit" class="btn btn-success">Save Report</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideIncidentForm()" data-translate="common.cancel">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -1433,13 +1433,13 @@
             <!-- Daily Care Notes Page -->
             <div id="carenotes" class="page">
                 <div class="page-header">
-                    <h2>Daily Care Notes / Notas Diarias de Cuidado</h2>
-                    <button class="btn btn-primary" onclick="showCareNoteForm()">+ Add Care Note / Agregar Nota de Cuidado</button>
+                    <h2 data-translate="carenote.title">Care Notes</h2>
+                    <button class="btn btn-primary" onclick="showCareNoteForm()" data-translate="carenote.add">+ Add Care Note</button>
                 </div>
 
                 <!-- Care Note Form -->
                 <div id="careNoteForm" class="form-card" style="display: none; margin-top: 2rem;">
-                    <h3 id="careNoteFormTitle">Add Care Note / Agregar Nota de Cuidado</h3>
+                    <h3 id="careNoteFormTitle" data-translate="carenote.add">Add Care Note</h3>
                     <form id="newCareNoteForm" onsubmit="saveCareNote(event)">
                         <div class="form-row">
                             <div class="form-group">
@@ -1447,147 +1447,147 @@
                                 <input type="date" id="careNoteDate" required>
                             </div>
                             <div class="form-group">
-                                <label for="careNoteTime">Time / Hora</label>
+                                <label for="careNoteTime" data-translate="carenote.time">Time</label>
                                 <input type="time" id="careNoteTime">
                             </div>
                             <div class="form-group">
-                                <label for="careNoteShift">Shift / Turno</label>
+                                <label for="careNoteShift">Shift</label>
                                 <select id="careNoteShift">
                                     <option value="">-- Select --</option>
-                                    <option value="Morning">Morning / Mañana</option>
-                                    <option value="Afternoon">Afternoon / Tarde</option>
-                                    <option value="Evening">Evening / Noche</option>
-                                    <option value="Night">Night / Noche</option>
+                                    <option value="Morning">Morning</option>
+                                    <option value="Afternoon">Afternoon</option>
+                                    <option value="Evening">Evening</option>
+                                    <option value="Night">Night</option>
                                 </select>
                             </div>
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Nutrition & Hydration / Nutrición e Hidratación</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Nutrition &amp; Hydration</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="appetiteRating">Appetite / Apetito</label>
+                                <label for="appetiteRating">Appetite</label>
                                 <select id="appetiteRating">
                                     <option value="">-- Select --</option>
-                                    <option value="Poor">Poor / Pobre</option>
-                                    <option value="Fair">Fair / Regular</option>
-                                    <option value="Good">Good / Bueno</option>
-                                    <option value="Excellent">Excellent / Excelente</option>
+                                    <option value="Poor">Poor</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Excellent">Excellent</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="fluidIntake">Fluid Intake / Ingesta de Líquidos</label>
+                                <label for="fluidIntake">Fluid Intake</label>
                                 <input type="text" id="fluidIntake" placeholder="e.g., 6 glasses water, 2 cups juice">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mealBreakfast">Breakfast / Desayuno</label>
+                                <label for="mealBreakfast">Breakfast</label>
                                 <textarea id="mealBreakfast" rows="2" placeholder="What was eaten, how much..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="mealLunch">Lunch / Almuerzo</label>
+                                <label for="mealLunch">Lunch</label>
                                 <textarea id="mealLunch" rows="2" placeholder="What was eaten, how much..."></textarea>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mealDinner">Dinner / Cena</label>
+                                <label for="mealDinner">Dinner</label>
                                 <textarea id="mealDinner" rows="2" placeholder="What was eaten, how much..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="mealSnacks">Snacks / Meriendas</label>
+                                <label for="mealSnacks">Snacks</label>
                                 <textarea id="mealSnacks" rows="2" placeholder="Snacks consumed..."></textarea>
                             </div>
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Personal Care / Cuidado Personal</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Personal Care</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="bathing">Bathing / Baño</label>
+                                <label for="bathing">Bathing</label>
                                 <textarea id="bathing" rows="2" placeholder="Bathing details..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="hygiene">Hygiene / Higiene</label>
+                                <label for="hygiene">Hygiene</label>
                                 <textarea id="hygiene" rows="2" placeholder="Hygiene details..."></textarea>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="toileting">Toileting / Uso de Baño</label>
+                                <label for="toileting">Toileting</label>
                                 <textarea id="toileting" rows="2" placeholder="Frequency, type, any issues..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="skinCondition">Skin Condition / Condición de la Piel</label>
+                                <label for="skinCondition">Skin Condition</label>
                                 <textarea id="skinCondition" rows="2" placeholder="Any redness, sores, wounds, pressure points..."></textarea>
                             </div>
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Mobility & Pain / Movilidad y Dolor</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Mobility &amp; Pain</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mobility">Mobility / Movilidad</label>
+                                <label for="mobility">Mobility</label>
                                 <textarea id="mobility" rows="2" placeholder="How resident moved, assistance needed, distance..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="painLevel">Pain Level / Nivel de Dolor</label>
+                                <label for="painLevel">Pain Level</label>
                                 <select id="painLevel">
                                     <option value="">-- Select --</option>
-                                    <option value="None">None / Ninguno</option>
-                                    <option value="Mild (1-3)">Mild (1-3) / Leve</option>
-                                    <option value="Moderate (4-6)">Moderate (4-6) / Moderado</option>
-                                    <option value="Severe (7-10)">Severe (7-10) / Severo</option>
+                                    <option value="None">None</option>
+                                    <option value="Mild (1-3)">Mild (1-3)</option>
+                                    <option value="Moderate (4-6)">Moderate (4-6)</option>
+                                    <option value="Severe (7-10)">Severe (7-10)</option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="painLocation">Pain Location / Ubicación del Dolor</label>
+                            <label for="painLocation">Pain Location</label>
                             <input type="text" id="painLocation" placeholder="Where the pain is located...">
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Sleep / Sueño</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Sleep</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="sleepHours">Hours Slept / Horas Dormidas</label>
+                                <label for="sleepHours">Hours Slept</label>
                                 <input type="number" id="sleepHours" step="0.5" min="0" max="24" placeholder="e.g., 7.5">
                             </div>
                             <div class="form-group">
-                                <label for="sleepQuality">Sleep Quality / Calidad del Sueño</label>
+                                <label for="sleepQuality">Sleep Quality</label>
                                 <select id="sleepQuality">
                                     <option value="">-- Select --</option>
-                                    <option value="Excellent">Excellent / Excelente</option>
-                                    <option value="Good">Good / Bueno</option>
-                                    <option value="Fair">Fair / Regular</option>
-                                    <option value="Poor">Poor / Pobre</option>
-                                    <option value="Restless">Restless / Inquieto</option>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                    <option value="Restless">Restless</option>
                                 </select>
                             </div>
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Mood & Behavior / Estado de Ánimo y Conducta</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Mood &amp; Behavior</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mood">Mood / Estado de Ánimo</label>
+                                <label for="mood">Mood</label>
                                 <select id="mood">
                                     <option value="">-- Select --</option>
-                                    <option value="Happy">Happy / Feliz</option>
-                                    <option value="Content">Content / Contento</option>
-                                    <option value="Neutral">Neutral / Neutral</option>
-                                    <option value="Sad">Sad / Triste</option>
-                                    <option value="Agitated">Agitated / Agitado</option>
-                                    <option value="Confused">Confused / Confundido</option>
+                                    <option value="Happy">Happy</option>
+                                    <option value="Content">Content</option>
+                                    <option value="Neutral">Neutral</option>
+                                    <option value="Sad">Sad</option>
+                                    <option value="Agitated">Agitated</option>
+                                    <option value="Confused">Confused</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="behaviorNotes">Behavior Notes / Notas de Conducta</label>
+                                <label for="behaviorNotes">Behavior Notes</label>
                                 <textarea id="behaviorNotes" rows="3" placeholder="Behavior observations..."></textarea>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="activities">Activities / Actividades</label>
+                            <label for="activities">Activities</label>
                             <textarea id="activities" rows="2" placeholder="Activities participated in..."></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="generalNotes">General Notes / Notas Generales</label>
+                            <label for="generalNotes">General Notes</label>
                             <textarea id="generalNotes" rows="4" placeholder="Any other observations or notes..."></textarea>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-success">Save Note / Guardar Nota</button>
-                            <button type="button" class="btn btn-secondary" onclick="hideCareNoteForm()">Cancel / Cancelar</button>
+                            <button type="submit" class="btn btn-success">Save Note</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideCareNoteForm()" data-translate="common.cancel">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -1597,10 +1597,10 @@
 
             <!-- Notifications Page -->
             <div id="notifications" class="page">
-                <h2>Notifications / Notificaciones</h2>
+                <h2 data-translate="nav.notifications">Notifications</h2>
                 <div class="button-group" style="margin-bottom: 1rem;">
-                    <button class="btn btn-secondary" onclick="markAllNotificationsRead()">Mark All Read / Marcar Todas como Leídas</button>
-                    <button class="btn btn-primary" onclick="loadNotificationsPage()">Refresh / Actualizar</button>
+                    <button class="btn btn-secondary" onclick="markAllNotificationsRead()" data-translate="common.markAllRead">Mark All Read</button>
+                    <button class="btn btn-primary" onclick="loadNotificationsPage()">Refresh</button>
                 </div>
                 <div id="notificationsPageList" class="item-list"></div>
             </div>
@@ -1608,67 +1608,67 @@
             <!-- Financial Management Page (Admin Only) -->
             <div id="financial" class="page">
                 <div class="page-header">
-                    <h2>Financial Management / Gestión Financiera</h2>
-                    <p style="color: var(--dark-gray); margin-bottom: 2rem;">Manage bank accounts, transactions, and reconciliation / Gestionar cuentas bancarias, transacciones y conciliación</p>
+                    <h2 data-translate="nav.financial">Financial Management</h2>
+                    <p style="color: var(--dark-gray); margin-bottom: 2rem;">Manage bank accounts, transactions, and reconciliation</p>
 
                     <!-- Tabs Navigation -->
                     <div class="button-group" style="margin-bottom: 2rem; border-bottom: 2px solid var(--light-gray); padding-bottom: 1rem;">
-                        <button class="btn btn-primary" onclick="showFinancialTab('accounts')" id="tabAccounts">Bank Accounts / Cuentas Bancarias</button>
-                        <button class="btn btn-secondary" onclick="showFinancialTab('transactions')" id="tabTransactions">Transactions / Transacciones</button>
-                        <button class="btn btn-secondary" onclick="showFinancialTab('reconciliation')" id="tabReconciliation">Reconciliation / Conciliación</button>
-                        <button class="btn btn-secondary" onclick="showFinancialTab('receipts')" id="tabReceipts">Payment Receipts / Recibos de Pago</button>
+                        <button class="btn btn-primary" onclick="showFinancialTab('accounts')" id="tabAccounts">Bank Accounts</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('transactions')" id="tabTransactions">Transactions</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('reconciliation')" id="tabReconciliation">Reconciliation</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('receipts')" id="tabReceipts">Payment Receipts</button>
                     </div>
                 </div>
 
                 <!-- Bank Accounts Tab -->
                 <div id="financialAccounts" class="financial-tab">
                     <div class="form-card">
-                        <h3>Bank Accounts / Cuentas Bancarias</h3>
-                        <button class="btn btn-primary" onclick="showBankAccountForm()">+ Add Bank Account / Agregar Cuenta Bancaria</button>
+                        <h3>Bank Accounts</h3>
+                        <button class="btn btn-primary" onclick="showBankAccountForm()">+ Add Bank Account</button>
 
                         <div id="bankAccountForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                             <form id="newBankAccountForm" onsubmit="saveBankAccount(event)">
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Account Name / Nombre de Cuenta *</label>
+                                        <label>Account Name *</label>
                                         <input type="text" id="accountName" required placeholder="e.g., Main Checking">
                                     </div>
                                     <div class="form-group">
-                                        <label>Bank Name / Nombre del Banco *</label>
+                                        <label>Bank Name *</label>
                                         <input type="text" id="bankName" required placeholder="e.g., Banco Popular">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Account Number / Número de Cuenta</label>
+                                        <label>Account Number</label>
                                         <input type="text" id="accountNumber" placeholder="****1234">
                                     </div>
                                     <div class="form-group">
-                                        <label>Routing Number / Número de Ruta</label>
+                                        <label>Routing Number</label>
                                         <input type="text" id="routingNumber" placeholder="000000000">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Account Type / Tipo de Cuenta</label>
+                                        <label>Account Type</label>
                                         <select id="accountType">
-                                            <option value="checking">Checking / Corriente</option>
-                                            <option value="savings">Savings / Ahorros</option>
-                                            <option value="other">Other / Otro</option>
+                                            <option value="checking">Checking</option>
+                                            <option value="savings">Savings</option>
+                                            <option value="other">Other</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Opening Balance / Saldo Inicial ($)</label>
+                                        <label>Opening Balance ($)</label>
                                         <input type="number" id="openingBalance" step="0.01" value="0.00">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Notes / Notas</label>
+                                    <label>Notes</label>
                                     <textarea id="accountNotes" rows="2"></textarea>
                                 </div>
                                 <div class="button-group">
-                                    <button type="submit" class="btn btn-success">Save Account / Guardar Cuenta</button>
-                                    <button type="button" class="btn btn-secondary" onclick="hideBankAccountForm()">Cancel / Cancelar</button>
+                                    <button type="submit" class="btn btn-success">Save Account</button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideBankAccountForm()" data-translate="common.cancel">Cancel</button>
                                 </div>
                             </form>
                         </div>
@@ -1679,68 +1679,67 @@
                 <!-- Transactions Tab -->
                 <div id="financialTransactions" class="financial-tab" style="display: none;">
                     <div class="form-card">
-                        <h3>Transactions / Transacciones</h3>
-                        <button class="btn btn-primary" onclick="showTransactionForm()">+ Add Transaction / Agregar Transacción</button>
+                        <h3>Transactions</h3>
+                        <button class="btn btn-primary" onclick="showTransactionForm()">+ Add Transaction</button>
 
                         <div id="transactionForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                             <form id="newTransactionForm" onsubmit="saveTransaction(event)">
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Bank Account / Cuenta Bancaria *</label>
+                                        <label>Bank Account *</label>
                                         <select id="transactionBankAccount" required></select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Transaction Type / Tipo de Transacción *</label>
+                                        <label>Transaction Type *</label>
                                         <select id="transactionType" required>
-                                            <option value="deposit">Deposit / Depósito</option>
-                                            <option value="withdrawal">Withdrawal / Retiro</option>
+                                            <option value="deposit">Deposit</option>
+                                            <option value="withdrawal">Withdrawal</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Date / Fecha *</label>
+                                        <label>Date *</label>
                                         <input type="date" id="transactionDate" required>
                                     </div>
                                     <div class="form-group">
-                                        <label>Amount / Monto ($) *</label>
+                                        <label>Amount ($) *</label>
                                         <input type="number" id="transactionAmount" step="0.01" min="0" required>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Description / Descripción *</label>
+                                    <label>Description *</label>
                                     <input type="text" id="transactionDescription" required placeholder="e.g., Payment from Resident">
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Check Number / Número de Cheque</label>
+                                        <label>Check Number</label>
                                         <input type="text" id="transactionCheckNumber" placeholder="Optional">
                                     </div>
                                     <div class="form-group">
-                                        <label>Payee / Beneficiario</label>
+                                        <label>Payee</label>
                                         <input type="text" id="transactionPayee" placeholder="Optional">
                                     </div>
                                 </div>
                                 <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Category / Categoría</label>
+                                        <label>Category</label>
                                         <input type="text" id="transactionCategory" placeholder="e.g., Payment, Expense">
                                     </div>
                                     <div class="form-group">
-                                        <label>Reconciled / Conciliado</label>
+                                        <label>Reconciled</label>
                                         <select id="transactionReconciled">
-                                            <option value="0">No / No</option>
-                                            <option value="1">Yes / Sí</option>
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Notes / Notas</label>
+                                    <label>Notes</label>
                                     <textarea id="transactionNotes" rows="2"></textarea>
                                 </div>
                                 <div class="button-group">
-                                    <button type="submit" class="btn btn-success">Save Transaction / Guardar Transacción</button>
-                                    <button type="button" class="btn btn-secondary" onclick="hideTransactionForm()">Cancel / Cancelar</button>
+                                    <button type="submit" class="btn btn-success">Save Transaction</button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideTransactionForm()" data-translate="common.cancel">Cancel</button>
                                 </div>
                             </form>
                         </div>
@@ -1748,17 +1747,17 @@
                     <div class="form-card" style="margin-top: 2rem;">
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Filter by Account / Filtrar por Cuenta</label>
+                                <label>Filter by Account</label>
                                 <select id="filterTransactionAccount" onchange="loadTransactions()">
-                                    <option value="">All Accounts / Todas las Cuentas</option>
+                                    <option value="">All Accounts</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Show Reconciled / Mostrar Conciliados</label>
+                                <label>Show Reconciled</label>
                                 <select id="filterReconciled" onchange="loadTransactions()">
-                                    <option value="">All / Todos</option>
-                                    <option value="true">Reconciled Only / Solo Conciliados</option>
-                                    <option value="false">Unreconciled Only / Solo No Conciliados</option>
+                                    <option value="">All</option>
+                                    <option value="true">Reconciled Only</option>
+                                    <option value="false">Unreconciled Only</option>
                                 </select>
                             </div>
                         </div>
@@ -1769,39 +1768,39 @@
                 <!-- Reconciliation Tab -->
                 <div id="financialReconciliation" class="financial-tab" style="display: none;">
                     <div class="form-card">
-                        <h3>Reconcile Account / Conciliar Cuenta</h3>
+                        <h3>Reconcile Account</h3>
                         <form id="reconciliationForm" onsubmit="reconcileAccount(event)">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Bank Account / Cuenta Bancaria *</label>
+                                    <label>Bank Account *</label>
                                     <select id="reconcileBankAccount" required onchange="loadUnreconciledTransactions()"></select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Statement Date / Fecha del Estado de Cuenta *</label>
+                                    <label>Statement Date *</label>
                                     <input type="date" id="statementDate" required>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Statement Balance / Saldo del Estado ($) *</label>
+                                    <label>Statement Balance ($) *</label>
                                     <input type="number" id="statementBalance" step="0.01" required>
                                 </div>
                                 <div class="form-group">
-                                    <label>Current Balance / Saldo Actual</label>
+                                    <label>Current Balance</label>
                                     <input type="text" id="currentAccountBalance" readonly style="background: var(--light-gray);">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Select Transactions to Reconcile / Seleccionar Transacciones a Conciliar</label>
+                                <label>Select Transactions to Reconcile</label>
                                 <div id="unreconciledTransactions" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--medium-gray); padding: 1rem; border-radius: 8px; background: var(--white);"></div>
                             </div>
                             <div class="form-group">
-                                <label>Notes / Notas</label>
+                                <label>Notes</label>
                                 <textarea id="reconciliationNotes" rows="2"></textarea>
                             </div>
                             <div class="button-group">
-                                <button type="submit" class="btn btn-success">Reconcile / Conciliar</button>
-                                <button type="button" class="btn btn-secondary" onclick="loadReconciliationHistory()">View History / Ver Historial</button>
+                                <button type="submit" class="btn btn-success">Reconcile</button>
+                                <button type="button" class="btn btn-secondary" onclick="loadReconciliationHistory()">View History</button>
                             </div>
                         </form>
                     </div>
@@ -1811,12 +1810,12 @@
                 <!-- Payment Receipts Tab -->
                 <div id="financialReceipts" class="financial-tab" style="display: none;">
                     <div class="form-card">
-                        <h3>Payment Receipts / Recibos de Pago</h3>
+                        <h3>Payment Receipts</h3>
                         <div class="form-group">
-                            <label>Search by Receipt Number or Payment ID / Buscar por Número de Recibo o ID de Pago</label>
+                            <label>Search by Receipt Number or Payment ID</label>
                             <div class="form-row">
                                 <input type="text" id="receiptSearch" class="form-control" placeholder="Receipt Number or Payment ID">
-                                <button class="btn btn-primary" onclick="searchReceipt()">Search / Buscar</button>
+                                <button class="btn btn-primary" onclick="searchReceipt()">Search</button>
                             </div>
                         </div>
                     </div>
@@ -1826,60 +1825,60 @@
 
             <!-- Reports Page -->
             <div id="reports" class="page">
-                <h2>Reports & Analytics / Reportes y Análisis</h2>
+                <h2>Reports &amp; Analytics</h2>
 
                 <div class="stats-grid" style="margin-bottom: 2rem;">
                     <div class="stat-card">
-                        <h3>Total Incidents / Total Incidentes</h3>
+                        <h3>Total Incidents</h3>
                         <p class="stat-number" id="totalIncidents">0</p>
-                        <p class="stat-label">This Month / Este Mes</p>
+                        <p class="stat-label">This Month</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Care Notes / Notas de Cuidado</h3>
+                        <h3>Care Notes</h3>
                         <p class="stat-number" id="totalCareNotes">0</p>
-                        <p class="stat-label">This Month / Este Mes</p>
+                        <p class="stat-label">This Month</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Medications Due / Medicamentos Pendientes</h3>
+                        <h3>Medications Due</h3>
                         <p class="stat-number" id="medicationsDue">0</p>
-                        <p class="stat-label">Today / Hoy</p>
+                        <p class="stat-label">Today</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Appointments / Citas</h3>
+                        <h3>Appointments</h3>
                         <p class="stat-number" id="upcomingAppointments">0</p>
-                        <p class="stat-label">This Week / Esta Semana</p>
+                        <p class="stat-label">This Week</p>
                     </div>
                 </div>
 
                 <div class="form-card">
-                    <h3>Generate Report / Generar Reporte</h3>
+                    <h3>Generate Report</h3>
                     <form id="reportForm" onsubmit="generateReport(event)">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="reportType">Report Type / Tipo de Reporte *</label>
+                                <label for="reportType">Report Type *</label>
                                 <select id="reportType" required>
                                     <option value="">-- Select --</option>
-                                    <option value="incidents">Incident Report / Reporte de Incidentes</option>
-                                    <option value="care_notes">Care Notes Summary / Resumen de Notas de Cuidado</option>
-                                    <option value="medications">Medication Report / Reporte de Medicamentos</option>
-                                    <option value="appointments">Appointments Report / Reporte de Citas</option>
-                                    <option value="vital_signs">Vital Signs Report / Reporte de Signos Vitales</option>
-                                    <option value="comprehensive">Comprehensive Report / Reporte Integral</option>
+                                    <option value="incidents">Incident Report</option>
+                                    <option value="care_notes">Care Notes Summary</option>
+                                    <option value="medications">Medication Report</option>
+                                    <option value="appointments">Appointments Report</option>
+                                    <option value="vital_signs">Vital Signs Report</option>
+                                    <option value="comprehensive">Comprehensive Report</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="reportDateFrom">From Date / Desde</label>
+                                <label for="reportDateFrom">From Date</label>
                                 <input type="date" id="reportDateFrom">
                             </div>
                             <div class="form-group">
-                                <label for="reportDateTo">To Date / Hasta</label>
+                                <label for="reportDateTo">To Date</label>
                                 <input type="date" id="reportDateTo">
                             </div>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-primary">Generate Preview / Generar Vista Previa</button>
-                            <button type="button" class="btn btn-secondary" onclick="printCurrentReport()">Print / Save as PDF</button>
-                            <button type="button" class="btn btn-secondary" onclick="exportReportToCSV()">Export CSV / Exportar CSV</button>
+                            <button type="submit" class="btn btn-primary">Generate Preview</button>
+                            <button type="button" class="btn btn-secondary" onclick="printCurrentReport()">Print (Save as PDF)</button>
+                            <button type="button" class="btn btn-secondary" onclick="exportReportToCSV()">Export CSV</button>
                         </div>
                     </form>
                 </div>
@@ -1900,38 +1899,38 @@
     <!-- Keyboard Shortcuts Modal -->
     <div id="shortcutsModal" class="modal" style="display: none;">
         <div class="form-card" style="max-width: 600px;">
-            <h2>Keyboard Shortcuts / Atajos de Teclado</h2>
+            <h2 data-translate="common.keyboardShortcuts">Keyboard Shortcuts</h2>
             <div class="shortcuts-list">
                 <div class="shortcut-item">
-                    <kbd>/</kbd> <span>Focus search / Enfocar búsqueda</span>
+                    <kbd>/</kbd> <span>Focus search</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>Esc</kbd> <span>Close modals / Cerrar modales</span>
+                    <kbd>Esc</kbd> <span>Close modals</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>Ctrl/Cmd + P</kbd> <span>Print current page / Imprimir página actual</span>
+                    <kbd>Ctrl/Cmd + P</kbd> <span>Print current page</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>Ctrl/Cmd + D</kbd> <span>Toggle dark mode / Alternar modo oscuro</span>
+                    <kbd>Ctrl/Cmd + D</kbd> <span>Toggle dark mode</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>1</kbd> <span>Go to Dashboard / Ir a Panel</span>
+                    <kbd>1</kbd> <span>Go to Dashboard</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>2</kbd> <span>Go to Residents / Ir a Residentes</span>
+                    <kbd>2</kbd> <span>Go to Residents</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>3</kbd> <span>Go to Medications / Ir a Medicamentos</span>
+                    <kbd>3</kbd> <span>Go to Medications</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>4</kbd> <span>Go to Appointments / Ir a Citas</span>
+                    <kbd>4</kbd> <span>Go to Appointments</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>?</kbd> <span>Show this help / Mostrar esta ayuda</span>
+                    <kbd>?</kbd> <span>Show this help</span>
                 </div>
             </div>
             <div class="button-group" style="margin-top: 1.5rem;">
-                <button class="btn btn-primary" onclick="hideKeyboardShortcuts()">Close / Cerrar</button>
+                <button class="btn btn-primary" onclick="hideKeyboardShortcuts()" data-translate="common.close">Close</button>
             </div>
         </div>
     </div>
