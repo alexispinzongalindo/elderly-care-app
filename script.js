@@ -10,6 +10,24 @@ let authToken = localStorage.getItem('authToken');
 let currentStaff = JSON.parse(localStorage.getItem('currentStaff') || 'null');
 let currentResidentId = localStorage.getItem('currentResidentId');
 
+function normalizeAuthState() {
+    // iOS/Safari can sometimes persist unexpected string values; treat them as logged-out.
+    if (typeof authToken === 'string') {
+        const normalized = authToken.trim();
+        if (!normalized || normalized === 'null' || normalized === 'undefined') {
+            authToken = null;
+        }
+    }
+
+    if (currentStaff && (typeof currentStaff !== 'object' || !currentStaff.id)) {
+        currentStaff = null;
+    }
+
+    if (!authToken || !currentStaff) {
+        currentUser = null;
+    }
+}
+
 // Edit state tracking
 let editingMedicationId = null;
 let editingAppointmentId = null;
@@ -1325,15 +1343,21 @@ async function validateAuthOnLoad() {
             return;
         }
 
-        if (response.status === 401) {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('currentStaff');
-            authToken = null;
-            currentStaff = null;
-            currentUser = null;
-        }
+        // Any non-OK response means we cannot trust the local session.
+        // This avoids skipping the login UI when the token is expired, invalid, or the server rejects it.
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentStaff');
+        authToken = null;
+        currentStaff = null;
+        currentUser = null;
     } catch (error) {
         console.error('Auth validation error:', error);
+        // If validation cannot be completed (network/server error), do NOT auto-enter the app.
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentStaff');
+        authToken = null;
+        currentStaff = null;
+        currentUser = null;
     }
 }
 
@@ -2608,11 +2632,16 @@ function initNavigation() {
 
     // Add event listener to menu toggle button (backup to onclick)
     if (menuToggle && navMenu) {
-        menuToggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMobileMenu();
-        });
+        // Avoid double-toggling when the button already has an inline onclick handler.
+        // On mobile, both handlers firing would toggle twice and appear to do nothing.
+        const hasInlineOnClick = !!menuToggle.getAttribute('onclick');
+        if (!hasInlineOnClick) {
+            menuToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMobileMenu();
+            });
+        }
     }
 }
 
@@ -8495,7 +8524,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    normalizeAuthState();
     await validateAuthOnLoad();
+    normalizeAuthState();
 
     checkAuth();
     if (authToken && currentStaff && currentResidentId) {
