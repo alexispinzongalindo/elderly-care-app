@@ -187,6 +187,7 @@ body {
     gap: 0.4rem;
     font-weight: 700;
     margin: 0;
+    line-height: 1;
     white-space: nowrap;
     flex-shrink: 1;
     min-width: 0;
@@ -202,6 +203,8 @@ body {
     height: 35px;
     width: 35px;
     object-fit: contain;
+    display: block;
+    align-self: center;
     flex-shrink: 0;
 }
 
@@ -798,7 +801,7 @@ h3 {
 .stats-grid {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
-    gap: 1rem;
+    gap: 1.25rem;
     margin-bottom: 1.5rem;
     margin-top: 0.75rem;
     width: 100%;
@@ -814,56 +817,76 @@ h3 {
 
 .stat-card {
     background: var(--white);
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    padding: 1.1rem 1.15rem;
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
     display: flex;
     align-items: center;
     gap: 1rem;
     transition: transform 0.2s, box-shadow 0.2s;
-    border-left: 3px solid transparent;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-left: 4px solid transparent;
 }
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
 }
 
 .stat-card-medications {
-    border-left-color: #4CAF50;
+    border-left-color: #22c55e;
 }
 
 .stat-card-appointments {
-    border-left-color: #2196F3;
+    border-left-color: #3b82f6;
 }
 
 .stat-card-residents {
-    border-left-color: #9C27B0;
+    border-left-color: #8b5cf6;
 }
 
 .stat-card-vitals {
-    border-left-color: #F44336;
+    border-left-color: #ef4444;
 }
 
 .stat-card-billing {
-    border-left-color: #FF9800;
+    border-left-color: #f59e0b;
 }
 
 .stat-icon {
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 15px;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     transition: all 0.3s ease;
-    margin-right: 1rem;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10);
+}
+
+.stat-card-medications .stat-icon {
+    background: linear-gradient(135deg, #16a34a, #4ade80);
+}
+
+.stat-card-appointments .stat-icon {
+    background: linear-gradient(135deg, #2563eb, #60a5fa);
+}
+
+.stat-card-residents .stat-icon {
+    background: linear-gradient(135deg, #7c3aed, #c4b5fd);
+}
+
+.stat-card-vitals .stat-icon {
+    background: linear-gradient(135deg, #dc2626, #fb7185);
+}
+
+.stat-card-billing .stat-icon {
+    background: linear-gradient(135deg, #d97706, #fbbf24);
 }
 
 .stat-icon i {
-    font-size: 2.5rem;
+    font-size: 1.65rem;
     color: white;
     transition: transform 0.3s ease;
 }
@@ -882,23 +905,24 @@ h3 {
 }
 
 .stat-card h3 {
-    color: var(--dark-gray);
-    font-size: 0.9rem;
+    color: rgba(44, 62, 80, 0.80);
+    font-size: 0.85rem;
     margin-bottom: 0.4rem;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.2px;
 }
 
 .stat-number {
-    font-size: 1.9rem;
-    font-weight: bold;
+    font-size: 1.85rem;
+    font-weight: 800;
     color: var(--primary-color);
     margin-bottom: 0.2rem;
     line-height: 1.2;
 }
 
 .stat-label {
-    color: var(--dark-gray);
-    font-size: 0.8rem;
+    color: rgba(44, 62, 80, 0.62);
+    font-size: 0.82rem;
     margin: 0;
 }
 
@@ -945,7 +969,8 @@ h3 {
     background: var(--white);
     padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
 }
 
 .dashboard-widget h3 {
@@ -972,20 +997,19 @@ h3 {
     align-items: center;
     gap: 0.75rem;
     padding: 1.25rem;
-    background: var(--light-gray);
-    border: 2px solid transparent;
-    border-radius: 10px;
+    background: var(--white);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    border-radius: 14px;
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
 }
 
 .quick-action-btn:hover {
-    background: var(--primary-color);
-    color: var(--white);
-    border-color: var(--primary-color);
+    background: rgba(44, 90, 160, 0.06);
+    border-color: rgba(44, 90, 160, 0.35);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
 }
 
 .quick-action-btn:hover .quick-action-icon {
@@ -1017,7 +1041,7 @@ h3 {
 .reminder-item,
 .activity-item {
     padding: 1rem;
-    border-bottom: 1px solid var(--light-gray);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -1027,7 +1051,7 @@ h3 {
 .upcoming-item:hover,
 .reminder-item:hover,
 .activity-item:hover {
-    background: var(--light-gray);
+    background: rgba(44, 90, 160, 0.06);
 }
 
 .upcoming-item:last-child,
@@ -1061,12 +1085,12 @@ h3 {
 .reminder-item-time,
 .activity-item-time {
     font-size: 0.85rem;
-    color: var(--dark-gray);
+    color: rgba(44, 62, 80, 0.62);
 }
 
 .empty-state {
     text-align: center;
-    color: var(--dark-gray);
+    color: rgba(44, 62, 80, 0.62);
     padding: 2rem;
     font-style: italic;
 }
