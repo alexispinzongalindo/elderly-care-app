@@ -119,7 +119,7 @@ def backfill_journal_entries(conn):
         if row and int(row['count']) > 0:
             return
 
-        cursor.execute('SELECT id, resident_id, recorded_at, systolic, diastolic, glucose, weight, temperature, heart_rate, notes, staff_id FROM vital_signs ORDER BY COALESCE(recorded_at, created_at) ASC')
+        cursor.execute('SELECT id, resident_id, recorded_at, systolic, diastolic, glucose, weight, temperature, heart_rate, notes, staff_id FROM vital_signs ORDER BY COALESCE(recorded_at, id) ASC')
         for vs in cursor.fetchall() or []:
             if _journal_entry_exists(conn, 'vital_signs', vs['id']):
                 continue
@@ -662,6 +662,21 @@ def init_db():
 
     conn.commit()
     conn.close()
+
+_db_initialized = False
+
+def ensure_db_initialized():
+    global _db_initialized
+    if _db_initialized:
+        return
+    try:
+        init_db()
+    except Exception as e:
+        print(f"⚠️ Warning: init_db failed: {e}")
+    finally:
+        _db_initialized = True
+
+ensure_db_initialized()
 
 # Authentication helper functions
 def hash_password(password):
@@ -3903,9 +3918,9 @@ def static_files(path):
         return jsonify({'error': f'Error serving file {path}: {str(e)}'}), 404
 
 if __name__ == '__main__':
-    init_db()
+    ensure_db_initialized()
     # Use PORT from environment (for cloud deployment) or default to 5001
     port = int(os.environ.get('PORT', 5001))
     # Disable debug in production
-    debug_mode = os.environ.get('FLASK_ENV') == 'development'
+    debug_mode = os.environ.get('FLASK_DEBUG', '0') == '1'
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
