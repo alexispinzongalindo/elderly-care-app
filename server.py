@@ -100,6 +100,152 @@ def get_staff_display_name(conn, staff_id):
     except Exception:
         return None
 
+def _journal_entry_exists(conn, source_table, source_id):
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            'SELECT 1 FROM journal_entries WHERE source_table = ? AND source_id = ? LIMIT 1',
+            (source_table, source_id)
+        )
+        return cursor.fetchone() is not None
+    except Exception:
+        return False
+
+def backfill_journal_entries(conn):
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT COUNT(*) AS count FROM journal_entries')
+        row = cursor.fetchone()
+        if row and int(row['count']) > 0:
+            return
+
+        cursor.execute('SELECT id, resident_id, recorded_at, systolic, diastolic, glucose, weight, temperature, heart_rate, notes, staff_id FROM vital_signs ORDER BY COALESCE(recorded_at, created_at) ASC')
+        for vs in cursor.fetchall() or []:
+            if _journal_entry_exists(conn, 'vital_signs', vs['id']):
+                continue
+            parts = []
+            if vs['systolic'] is not None and vs['diastolic'] is not None:
+                parts.append(f"BP: {vs['systolic']}/{vs['diastolic']}")
+            if vs['heart_rate'] is not None:
+                parts.append(f"HR: {vs['heart_rate']}")
+            if vs['temperature'] is not None:
+                parts.append(f"Temp: {vs['temperature']}")
+            if vs['glucose'] is not None:
+                parts.append(f"Glucose: {vs['glucose']}")
+            if vs['weight'] is not None:
+                parts.append(f"Weight: {vs['weight']}")
+            details = ' | '.join(parts)
+            if vs['notes']:
+                details = (details + ' | ' if details else '') + str(vs['notes']).strip()
+
+            create_journal_entry(
+                conn,
+                resident_id=int(vs['resident_id']),
+                entry_type='vital_signs',
+                title='Vital Signs Recorded',
+                details=details,
+                occurred_at=(vs['recorded_at'] or datetime.utcnow().isoformat() + 'Z'),
+                staff_id=int(vs['staff_id']) if vs['staff_id'] else None,
+                staff_name=get_staff_display_name(conn, int(vs['staff_id'])) if vs['staff_id'] else None,
+                source_table='vital_signs',
+                source_id=int(vs['id'])
+            )
+
+        cursor.execute('SELECT id, resident_id, incident_date, incident_type, severity, description, staff_id FROM incident_reports ORDER BY COALESCE(incident_date, created_at) ASC')
+        for inc in cursor.fetchall() or []:
+            if _journal_entry_exists(conn, 'incident_reports', inc['id']):
+                continue
+            severity = (inc['severity'] or 'minor')
+            incident_type = (inc['incident_type'] or 'Incident')
+            description = (inc['description'] or '').strip()
+            details = incident_type + (f" | {description[:200]}" if description else '')
+
+            create_journal_entry(
+                conn,
+                resident_id=int(inc['resident_id']),
+                entry_type='incident',
+                title=f"Incident Reported ({severity})",
+                details=details,
+                occurred_at=(inc['incident_date'] or datetime.utcnow().isoformat() + 'Z'),
+                staff_id=int(inc['staff_id']) if inc['staff_id'] else None,
+                staff_name=get_staff_display_name(conn, int(inc['staff_id'])) if inc['staff_id'] else None,
+                source_table='incident_reports',
+                source_id=int(inc['id'])
+            )
+
+        cursor.execute('SELECT id, resident_id, note_date, note_time, shift, general_notes, staff_id, created_at FROM daily_care_notes ORDER BY COALESCE(created_at, note_date) ASC')
+        for note in cursor.fetchall() or []:
+            if _journal_entry_exists(conn, 'daily_care_notes', note['id']):
+                continue
+            shift = (note['shift'] or '').strip()
+            general_notes = (note['general_notes'] or '').strip()
+            details = ''
+            if shift:
+                details = f"Shift: {shift}"
+            if general_notes:
+                details = (details + ' | ' if details else '') + general_notes[:300]
+
+            occurred_at = None
+            if note['note_date'] and note['note_time']:
+                occurred_at = f"{note['note_date']}T{note['note_time']}Z"
+            else:
+                occurred_at = note['created_at'] or datetime.utcnow().isoformat() + 'Z'
+
+            create_journal_entry(
+                conn,
+                resident_id=int(note['resident_id']),
+                entry_type='care_note',
+                title='Care Note Created',
+                details=details,
+                occurred_at=occurred_at,
+                staff_id=int(note['staff_id']) if note['staff_id'] else None,
+                staff_name=get_staff_display_name(conn, int(note['staff_id'])) if note['staff_id'] else None,
+                source_table='daily_care_notes',
+                source_id=int(note['id'])
+            )
+
+        cursor.execute('''
+            SELECT ml.id, ml.medication_id, ml.taken_at, ml.scheduled_time, ml.status, ml.staff_id,
+                   m.resident_id, m.name, m.dosage
+            FROM medication_logs ml
+            JOIN medications m ON m.id = ml.medication_id
+            ORDER BY COALESCE(ml.taken_at, ml.id) ASC
+        ''')
+        for ml in cursor.fetchall() or []:
+            if _journal_entry_exists(conn, 'medication_logs', ml['id']):
+                continue
+            med_name = (ml['name'] or 'Medication')
+            dosage = (ml['dosage'] or '').strip()
+            status = (ml['status'] or '').strip().lower()
+            scheduled = (ml['scheduled_time'] or '').strip()
+
+            title = 'Medication Logged'
+            if status == 'taken':
+                title = 'Medication Administered'
+            elif status == 'missed':
+                title = 'Medication Missed'
+
+            details = med_name + (f" ({dosage})" if dosage else '')
+            if scheduled:
+                details += f" | Scheduled: {scheduled}"
+            if status:
+                details += f" | Status: {status}"
+
+            create_journal_entry(
+                conn,
+                resident_id=int(ml['resident_id']),
+                entry_type='medication',
+                title=title,
+                details=details,
+                occurred_at=(ml['taken_at'] or datetime.utcnow().isoformat() + 'Z'),
+                staff_id=int(ml['staff_id']) if ml['staff_id'] else None,
+                staff_name=get_staff_display_name(conn, int(ml['staff_id'])) if ml['staff_id'] else None,
+                source_table='medication_logs',
+                source_id=int(ml['id'])
+            )
+    except Exception as e:
+        print(f"⚠️ Warning: Journal backfill failed: {e}")
+
 def create_journal_entry(conn, *, resident_id, entry_type, title, details, occurred_at=None, staff_id=None, staff_name=None, source_table=None, source_id=None):
     try:
         if not staff_name and staff_id:
@@ -511,6 +657,8 @@ def init_db():
             VALUES (?, ?, ?, ?, ?, ?)
         ''', ('admin', default_password, 'Administrator', 'admin', 'admin@eldercare.pr', 1))
         print('✅ Default admin user created: username=admin, password=admin123')
+
+    backfill_journal_entries(conn)
 
     conn.commit()
     conn.close()
