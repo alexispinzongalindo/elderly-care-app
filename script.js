@@ -24,19 +24,45 @@ let currentUser = null;
 
 let languageObserver = null;
 let languageObserverTimer = null;
+let isApplyingLanguageUpdate = false;
 
 function installLanguageObserver() {
     if (languageObserver) return;
     if (!document.body) return;
 
     languageObserver = new MutationObserver(() => {
+        if (isApplyingLanguageUpdate) return;
         if (languageObserverTimer) window.clearTimeout(languageObserverTimer);
         languageObserverTimer = window.setTimeout(() => {
             try {
+                if (isApplyingLanguageUpdate) return;
+                isApplyingLanguageUpdate = true;
+
+                // Avoid observer feedback loops: disconnect while we mutate text/attributes
+                try {
+                    languageObserver.disconnect();
+                } catch (e) {
+                    // ignore
+                }
+
                 updateTranslations();
                 replaceDualLanguageText();
+
+                // Reconnect observer
+                try {
+                    languageObserver.observe(document.body, {
+                        childList: true,
+                        subtree: true,
+                        characterData: true,
+                        attributes: true
+                    });
+                } catch (e) {
+                    console.error('Error re-installing language observer:', e);
+                }
             } catch (e) {
                 console.error('Error applying language updates:', e);
+            } finally {
+                isApplyingLanguageUpdate = false;
             }
         }, 80);
     });
@@ -2533,7 +2559,15 @@ function initNavigation() {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
+            // Logout link has no data-page and uses onclick handler; don't route it through showPage
+            if (link.classList.contains('logout-link')) {
+                return;
+            }
             const page = link.dataset.page;
+            if (!page) {
+                console.warn('Nav link clicked without data-page; skipping showPage', link);
+                return;
+            }
             showPage(page);
 
             navLinks.forEach(l => l.classList.remove('active'));
