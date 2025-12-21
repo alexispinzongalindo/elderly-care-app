@@ -301,112 +301,195 @@
         <main class="container">
             <!-- Dashboard Page -->
             <div id="dashboard" class="page active">
-                <div class="dashboard-header">
-                    <h2 data-translate="dashboard.title">Dashboard</h2>
-                    <p id="dashboardDate" class="dashboard-subtitle"></p>
-                </div>
+                <div class="dashboard-shell">
+                    <div class="dashboard-header">
+                        <div class="dashboard-title-block">
+                            <h2 data-translate="dashboard.title">Dashboard</h2>
+                            <p id="dashboardDate" class="dashboard-subtitle"></p>
+                        </div>
+                        <div class="dashboard-context">
+                            <div class="dashboard-context-pill" id="dashboardContextPill" style="display: none;"></div>
+                        </div>
+                    </div>
 
-                <!-- Stats Grid with Cards Side by Side -->
-                <div class="stats-grid">
-                    <div class="stat-card stat-card-medications">
-                        <div class="stat-icon"><i class="fas fa-pills"></i></div>
-                        <div class="stat-content">
-                            <h3 data-translate="dashboard.medications">Medications</h3>
-                            <p class="stat-number" id="medsTakenStat">0/0</p>
-                            <p class="stat-label" data-translate="dashboard.medicationsTaken">Taken Today</p>
-                            <div class="stat-progress" id="medsProgress" style="display: none;">
-                                <div class="stat-progress-bar" id="medsProgressBar"></div>
+                    <div class="kpi-grid" id="dashboardKpiGrid">
+                        <div class="kpi-card kpi-card-primary" data-kpi="med-adherence">
+                            <div class="kpi-icon kpi-icon-med"><i class="fas fa-pills"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Medication Adherence</div>
+                                <div class="kpi-value" id="medsTakenStat">0/0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-chip" id="medsAdherenceChip">0%</span>
+                                    <span class="kpi-sub">Taken today</span>
+                                </div>
+                                <div class="kpi-progress" id="medsProgress" style="display: none;">
+                                    <div class="kpi-progress-bar" id="medsProgressBar"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="med-due">
+                            <div class="kpi-icon kpi-icon-warning"><i class="fas fa-clock"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Medications Due (Next Hour)</div>
+                                <div class="kpi-value" id="medsDueNow">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub">Needs action</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="med-today">
+                            <div class="kpi-icon kpi-icon-teal"><i class="fas fa-calendar-day"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Medications Scheduled Today</div>
+                                <div class="kpi-value" id="medsDueToday">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub">Active meds</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="vitals-today" id="vitalsCard" style="display: none;">
+                            <div class="kpi-icon kpi-icon-vitals"><i class="fas fa-heartbeat"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Vital Signs Recorded Today</div>
+                                <div class="kpi-value" id="vitalsToday">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-chip kpi-chip-muted" id="vitalsMissingToday">0 missing</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="staff">
+                            <div class="kpi-icon kpi-icon-staff"><i class="fas fa-user-nurse"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Active Staff</div>
+                                <div class="kpi-value" id="activeStaffCount">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub">Available today</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="incidents">
+                            <div class="kpi-icon kpi-icon-danger"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Incidents (Last 7 Days)</div>
+                                <div class="kpi-value" id="incidents7d">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub">Safety & follow-ups</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="notes">
+                            <div class="kpi-icon kpi-icon-blue"><i class="fas fa-sticky-note"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Care Notes (Last 24 Hours)</div>
+                                <div class="kpi-value" id="notes24h">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub">Documentation activity</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="residents">
+                            <div class="kpi-icon kpi-icon-muted"><i class="fas fa-users"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Active Residents</div>
+                                <div class="kpi-value" id="totalResidents">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub">Currently in care</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="appointments" style="display: none;">
+                            <div class="kpi-icon kpi-icon-muted"><i class="fas fa-calendar-check"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Appointments Today</div>
+                                <div class="kpi-value" id="apptsToday">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub">Scheduled</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="billing" id="billingCard" style="display: none;">
+                            <div class="kpi-icon kpi-icon-muted"><i class="fas fa-file-invoice-dollar"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.accountBalance">Account Balance</div>
+                                <div class="kpi-value" id="accountBalance">$0.00</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub" id="balanceLabel" data-translate="dashboard.balance">Balance</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="stat-card stat-card-appointments">
-                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-                        <div class="stat-content">
-                            <h3 data-translate="dashboard.appointments">Appointments</h3>
-                            <p class="stat-number" id="apptsToday">0</p>
-                            <p class="stat-label" data-translate="dashboard.appointmentsScheduled">Scheduled Today</p>
-                        </div>
-                    </div>
-                    <div class="stat-card stat-card-residents">
-                        <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        <div class="stat-content">
-                            <h3 data-translate="dashboard.residents">Residents</h3>
-                            <p class="stat-number" id="totalResidents">0</p>
-                            <p class="stat-label" data-translate="dashboard.residentsActive">Active</p>
-                        </div>
-                    </div>
-                    <div class="stat-card stat-card-vitals" id="vitalsCard" style="display: none;">
-                        <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
-                        <div class="stat-content">
-                            <h3 data-translate="dashboard.vitalSigns">Vital Signs</h3>
-                            <p class="stat-number" id="vitalsToday">0</p>
-                            <p class="stat-label" data-translate="dashboard.vitalSignsRecorded">Recorded Today</p>
-                        </div>
-                    </div>
-                    <div class="stat-card stat-card-billing" id="billingCard" style="display: none;">
-                        <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                        <div class="stat-content">
-                            <h3 data-translate="dashboard.accountBalance">Account Balance</h3>
-                            <p class="stat-number" id="accountBalance">$0.00</p>
-                            <p class="stat-label" id="balanceLabel" data-translate="dashboard.balance">Balance</p>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="dashboard-grid">
-                    <div class="dashboard-column">
-                        <div class="dashboard-widget">
-                            <h3>Upcoming Appointments</h3>
-                            <div class="upcoming-list" id="upcomingAppointmentsList"></div>
+                    <div class="dashboard-grid">
+                        <div class="dashboard-column">
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-bell"></i></span> Needs Attention</h3>
+                                </div>
+                                <div class="attention-list" id="dashboardAttentionList"></div>
+                            </div>
+
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-clock"></i></span> Upcoming Appointments</h3>
+                                </div>
+                                <div class="upcoming-list" id="upcomingAppointmentsList"></div>
+                            </div>
                         </div>
 
-                        <div class="dashboard-widget">
-                            <h3>Medication Reminders</h3>
-                            <div class="reminders-list" id="medicationRemindersList"></div>
-                        </div>
-                    </div>
+                        <div class="dashboard-column">
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-pills"></i></span> Medication Schedule</h3>
+                                </div>
+                                <div class="reminders-list" id="medicationRemindersList"></div>
+                            </div>
 
-                    <div class="dashboard-column">
-                        <div class="dashboard-widget">
-                            <h3>Recent Activity</h3>
-                            <div class="activity-list" id="recentActivityList"></div>
-                        </div>
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-stream"></i></span> Recent Activity</h3>
+                                </div>
+                                <div class="activity-list" id="recentActivityList"></div>
+                            </div>
 
-                        <div class="dashboard-widget">
-                            <h3 data-translate="dashboard.quickAccess">Quick Access</h3>
-                            <div class="quick-actions-grid" style="margin-top: 1rem;">
-                                <button class="quick-action-btn" onclick="showPage('medications'); setTimeout(() => showMedicationForm(), 100);" data-translate-title="medication.add">
-                                    <span class="quick-action-icon">💊</span>
-                                    <span data-translate="medication.add">Add Medication</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="showPage('appointments'); setTimeout(() => showAppointmentForm(), 100);" data-translate-title="appointment.add">
-                                    <span class="quick-action-icon">📅</span>
-                                    <span data-translate="appointment.add">Add Appointment</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="showPage('vitalsigns'); setTimeout(() => showVitalSignForm(), 100);" data-translate-title="vitals.add">
-                                    <span class="quick-action-icon">❤️</span>
-                                    <span data-translate="vitals.add">Add Vital Signs</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="showPage('carenotes'); setTimeout(() => showCareNoteForm(), 100);" data-translate-title="carenote.add">
-                                    <span class="quick-action-icon">📝</span>
-                                    <span data-translate="carenote.add">Add Care Note</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="showPage('incidents'); setTimeout(() => showIncidentForm(), 100);" data-translate-title="incident.add">
-                                    <span class="quick-action-icon">⚠️</span>
-                                    <span data-translate="incident.add">Report Incident</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="showPage('billing'); setTimeout(() => showBillForm(), 100);" data-translate-title="billing.add">
-                                    <span class="quick-action-icon">💰</span>
-                                    <span data-translate="billing.add">Add Bill</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="showPage('residents'); setTimeout(() => showAddResidentForm(), 100);" data-translate-title="resident.add">
-                                    <span class="quick-action-icon">👥</span>
-                                    <span data-translate="resident.add">Add Resident</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="showPage('calendar');" data-translate-title="nav.calendar">
-                                    <span class="quick-action-icon">📆</span>
-                                    <span data-translate="nav.calendar">View Calendar</span>
-                                </button>
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-bolt"></i></span> Quick Actions</h3>
+                                </div>
+                                <div class="quick-actions-grid" style="margin-top: 1rem;">
+                                    <button class="quick-action-btn" onclick="showPage('medications'); setTimeout(() => showMedicationForm(), 100);" data-translate-title="medication.add">
+                                        <span class="quick-action-icon">💊</span>
+                                        <span data-translate="medication.add">Add Medication</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('vitalsigns'); setTimeout(() => showVitalSignForm(), 100);" data-translate-title="vitals.add">
+                                        <span class="quick-action-icon">❤️</span>
+                                        <span data-translate="vitals.add">Add Vital Signs</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('staff');" data-translate-title="nav.staff">
+                                        <span class="quick-action-icon">🧑‍⚕️</span>
+                                        <span data-translate="nav.staff">Staff</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('incidents'); setTimeout(() => showIncidentForm(), 100);" data-translate-title="incident.add">
+                                        <span class="quick-action-icon">⚠️</span>
+                                        <span data-translate="incident.add">Report Incident</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('carenotes'); setTimeout(() => showCareNoteForm(), 100);" data-translate-title="carenote.add">
+                                        <span class="quick-action-icon">📝</span>
+                                        <span data-translate="carenote.add">Add Care Note</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('appointments'); setTimeout(() => showAppointmentForm(), 100);" data-translate-title="appointment.add">
+                                        <span class="quick-action-icon">📅</span>
+                                        <span data-translate="appointment.add">Add Appointment</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

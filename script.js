@@ -1958,20 +1958,23 @@ function initApp() {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            const statsGrid = document.querySelector('.stats-grid');
-            if (statsGrid && document.getElementById('dashboard')?.classList.contains('active')) {
-                const width = window.innerWidth;
-                if (width >= 1025) {
-                    statsGrid.style.setProperty('grid-template-columns', 'repeat(3, 1fr)', 'important');
-                } else if (width >= 769) {
-                    statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
-                } else if (width >= 481) {
-                    statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
-                } else {
-                    statsGrid.style.setProperty('grid-template-columns', '1fr', 'important');
-                }
-                statsGrid.style.setProperty('display', 'grid', 'important');
+            const activePage = document.querySelector('.page.active');
+            if (!activePage) return;
+
+            const statsGrid = activePage.querySelector('.stats-grid');
+            if (!statsGrid) return;
+
+            const width = window.innerWidth;
+            if (width >= 1025) {
+                statsGrid.style.setProperty('grid-template-columns', 'repeat(3, 1fr)', 'important');
+            } else if (width >= 769) {
+                statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+            } else if (width >= 481) {
+                statsGrid.style.setProperty('grid-template-columns', 'repeat(2, 1fr)', 'important');
+            } else {
+                statsGrid.style.setProperty('grid-template-columns', '1fr', 'important');
             }
+            statsGrid.style.setProperty('display', 'grid', 'important');
         }, 250);
     });
 }
@@ -2660,45 +2663,6 @@ function showPage(pageName) {
 
         // Load page-specific data
         if (pageName === 'dashboard') {
-            // Force grid layout immediately - run multiple times to ensure it sticks
-            const forceGridLayout = () => {
-                const statsGrid = document.querySelector('.stats-grid');
-                if (statsGrid) {
-                    const width = window.innerWidth;
-                    console.log('🔧 [showPage] Fixing dashboard grid. Width:', width);
-                    let columns = 'repeat(3, 1fr)';
-                    if (width >= 1025) {
-                        columns = 'repeat(3, 1fr)';
-                    } else if (width >= 769) {
-                        columns = 'repeat(2, 1fr)';
-                    } else if (width >= 481) {
-                        columns = 'repeat(2, 1fr)';
-                    } else {
-                        columns = '1fr';
-                    }
-                    statsGrid.style.setProperty('display', 'grid', 'important');
-                    statsGrid.style.setProperty('grid-template-columns', columns, 'important');
-                    statsGrid.style.setProperty('width', '100%', 'important');
-                    statsGrid.style.setProperty('max-width', '100%', 'important');
-                    console.log('✅ [showPage] Applied grid:', columns);
-
-                    // Force cards to not be full width
-                    const cards = statsGrid.querySelectorAll('.stat-card');
-                    cards.forEach(card => {
-                        card.style.setProperty('width', 'auto', 'important');
-                        card.style.setProperty('max-width', '100%', 'important');
-                    });
-                } else {
-                    console.warn('⚠️ [showPage] stats-grid not found');
-                }
-            };
-
-            // Run immediately and after short delays to ensure it sticks
-            forceGridLayout();
-            setTimeout(forceGridLayout, 50);
-            setTimeout(forceGridLayout, 200);
-            setTimeout(forceGridLayout, 500);
-
             loadDashboard();
         }
         else if (pageName === 'residents') loadResidents();
@@ -3498,37 +3462,7 @@ function showMessage(message, type = 'success') {
 // Dashboard
 async function loadDashboard() {
     try {
-        // Force stats-grid to display side-by-side (backup for CSS)
-        const statsGrid = document.querySelector('.stats-grid');
-        if (statsGrid) {
-            const width = window.innerWidth;
-            console.log('🔧 Fixing dashboard grid layout. Window width:', width);
-            let columns = 'repeat(3, 1fr)';
-            if (width >= 1025) {
-                columns = 'repeat(3, 1fr)';
-            } else if (width >= 769) {
-                columns = 'repeat(2, 1fr)';
-            } else if (width >= 481) {
-                columns = 'repeat(2, 1fr)';
-            } else {
-                columns = '1fr';
-            }
-            statsGrid.style.setProperty('display', 'grid', 'important');
-            statsGrid.style.setProperty('grid-template-columns', columns, 'important');
-            statsGrid.style.setProperty('width', '100%', 'important');
-            statsGrid.style.setProperty('max-width', '100%', 'important');
-            console.log('✅ Applied grid layout:', columns);
-
-            // Also force each stat-card to not be full width
-            const statCards = statsGrid.querySelectorAll('.stat-card');
-            statCards.forEach(card => {
-                card.style.setProperty('width', 'auto', 'important');
-                card.style.setProperty('max-width', '100%', 'important');
-                card.style.setProperty('flex-shrink', '1', 'important');
-            });
-        } else {
-            console.warn('⚠️ stats-grid element not found!');
-        }
+        // Dashboard layout is handled by CSS (kpi-grid + widgets)
 
         // Set dashboard date - only in selected language
         const dateEl = document.getElementById('dashboardDate');
@@ -3581,6 +3515,12 @@ async function loadDashboard() {
         if (medsStatEl) {
             medsStatEl.textContent = `${medsTaken}/${totalMeds}`;
 
+            const adherenceChip = document.getElementById('medsAdherenceChip');
+            if (adherenceChip) {
+                const pct = totalMeds > 0 ? Math.round((medsTaken / totalMeds) * 100) : 0;
+                adherenceChip.textContent = `${pct}%`;
+            }
+
             // Show progress bar if there are medications
             const progressEl = document.getElementById('medsProgress');
             const progressBarEl = document.getElementById('medsProgressBar');
@@ -3597,6 +3537,18 @@ async function loadDashboard() {
         if (apptsEl) {
             apptsEl.textContent = apptsToday;
         }
+
+        // Derived medication metrics (due today / due next hour)
+        await loadMedicationKpis();
+
+        // Derived vital sign metrics (today)
+        await loadVitalKpis();
+
+        // Staff & operations metrics
+        await loadStaffOpsKpis();
+
+        // Needs attention panel
+        renderDashboardAttention();
 
         // Load total residents
         try {
@@ -3645,11 +3597,203 @@ async function loadDashboard() {
         // Set default values on error
         const medsStatEl = document.getElementById('medsTakenStat');
         if (medsStatEl) medsStatEl.textContent = '0/0';
+        const adherenceChip = document.getElementById('medsAdherenceChip');
+        if (adherenceChip) adherenceChip.textContent = '0%';
+        const medsDueNowEl = document.getElementById('medsDueNow');
+        if (medsDueNowEl) medsDueNowEl.textContent = '0';
+        const medsDueTodayEl = document.getElementById('medsDueToday');
+        if (medsDueTodayEl) medsDueTodayEl.textContent = '0';
         const apptsEl = document.getElementById('apptsToday');
         if (apptsEl) apptsEl.textContent = '0';
         const residentsEl = document.getElementById('totalResidents');
         if (residentsEl) residentsEl.textContent = '0';
+        const staffEl = document.getElementById('activeStaffCount');
+        if (staffEl) staffEl.textContent = '0';
+        const incidentsEl = document.getElementById('incidents7d');
+        if (incidentsEl) incidentsEl.textContent = '0';
+        const notesEl = document.getElementById('notes24h');
+        if (notesEl) notesEl.textContent = '0';
     }
+}
+
+async function loadMedicationKpis() {
+    try {
+        const url = currentResidentId
+            ? `${API_URL}/medications?resident_id=${currentResidentId}`
+            : `${API_URL}/medications`;
+        const response = await fetch(url, { headers: getAuthHeaders() });
+        if (!response.ok) return;
+
+        const medications = await response.json();
+        const activeMeds = medications.filter(m => m.active);
+        const medsDueTodayEl = document.getElementById('medsDueToday');
+        if (medsDueTodayEl) medsDueTodayEl.textContent = String(activeMeds.length);
+
+        const now = new Date();
+        const nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+        const toMinutes = (t) => {
+            if (!t || typeof t !== 'string') return null;
+            const [h, m] = t.split(':').map(Number);
+            if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+            return (h * 60) + m;
+        };
+        const nowMin = (now.getHours() * 60) + now.getMinutes();
+        const nextMin = (nextHour.getHours() * 60) + nextHour.getMinutes();
+
+        let dueNextHour = 0;
+        activeMeds.forEach(med => {
+            let times = [];
+            try {
+                times = JSON.parse(med.time_slots || '[]');
+            } catch (_) {
+                times = [];
+            }
+            times.forEach(t => {
+                const mins = toMinutes(t);
+                if (mins === null) return;
+                if (nextHour.toDateString() !== now.toDateString()) {
+                    // If crossing midnight, count times >= now OR <= next
+                    if (mins >= nowMin || mins <= nextMin) dueNextHour += 1;
+                } else if (mins >= nowMin && mins <= nextMin) {
+                    dueNextHour += 1;
+                }
+            });
+        });
+
+        const medsDueNowEl = document.getElementById('medsDueNow');
+        if (medsDueNowEl) medsDueNowEl.textContent = String(dueNextHour);
+    } catch (error) {
+        console.error('Error loading medication KPIs:', error);
+    }
+}
+
+async function loadVitalKpis() {
+    try {
+        const vitalsCard = document.getElementById('vitalsCard');
+        if (!vitalsCard) return;
+
+        const url = currentResidentId
+            ? `${API_URL}/vital-signs?resident_id=${currentResidentId}`
+            : `${API_URL}/vital-signs`;
+        const response = await fetch(url, { headers: getAuthHeaders() });
+        if (!response.ok) {
+            vitalsCard.style.display = 'none';
+            return;
+        }
+
+        const vitalSigns = await response.json();
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(startOfDay);
+        endOfDay.setDate(endOfDay.getDate() + 1);
+
+        const todayCount = vitalSigns.filter(vs => {
+            const t = new Date(vs.recorded_at);
+            return t >= startOfDay && t < endOfDay;
+        }).length;
+
+        vitalsCard.style.display = 'flex';
+        const vitalsTodayEl = document.getElementById('vitalsToday');
+        if (vitalsTodayEl) vitalsTodayEl.textContent = String(todayCount);
+
+        // We don't currently have an expected schedule for vitals; show 0 missing.
+        const missingEl = document.getElementById('vitalsMissingToday');
+        if (missingEl) missingEl.textContent = '0 missing';
+    } catch (error) {
+        console.error('Error loading vital KPIs:', error);
+    }
+}
+
+async function loadStaffOpsKpis() {
+    try {
+        // Active staff
+        const staffRes = await fetch('/api/staff', { headers: getAuthHeaders() });
+        if (staffRes.ok) {
+            const staffList = await staffRes.json();
+            const active = staffList.filter(s => s.active === 1 || s.active === true).length;
+            const staffEl = document.getElementById('activeStaffCount');
+            if (staffEl) staffEl.textContent = String(active);
+        }
+
+        // Incidents last 7 days
+        const incUrl = currentResidentId
+            ? `${API_URL}/incidents?resident_id=${currentResidentId}`
+            : `${API_URL}/incidents`;
+        const incRes = await fetch(incUrl, { headers: getAuthHeaders() });
+        if (incRes.ok) {
+            const incidents = await incRes.json();
+            const since = new Date();
+            since.setDate(since.getDate() - 7);
+            const count = incidents.filter(i => {
+                const t = new Date(i.incident_date);
+                return Number.isFinite(t.getTime()) && t >= since;
+            }).length;
+            const el = document.getElementById('incidents7d');
+            if (el) el.textContent = String(count);
+        }
+
+        // Notes last 24 hours
+        const notesUrl = currentResidentId
+            ? `${API_URL}/care-notes?resident_id=${currentResidentId}`
+            : `${API_URL}/care-notes`;
+        const notesRes = await fetch(notesUrl, { headers: getAuthHeaders() });
+        if (notesRes.ok) {
+            const notes = await notesRes.json();
+            const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            const count = notes.filter(n => {
+                const t = new Date(n.created_at);
+                return Number.isFinite(t.getTime()) && t >= since;
+            }).length;
+            const el = document.getElementById('notes24h');
+            if (el) el.textContent = String(count);
+        }
+    } catch (error) {
+        console.error('Error loading staff/ops KPIs:', error);
+    }
+}
+
+function renderDashboardAttention() {
+    const listEl = document.getElementById('dashboardAttentionList');
+    if (!listEl) return;
+
+    const medsDueNow = Number(document.getElementById('medsDueNow')?.textContent || 0);
+    const incidents7d = Number(document.getElementById('incidents7d')?.textContent || 0);
+
+    const items = [];
+    if (medsDueNow > 0) {
+        items.push({
+            level: 'warning',
+            title: `${medsDueNow} medication dose(s) due soon`,
+            detail: 'Next hour medication window',
+            action: "showPage('medications');"
+        });
+    }
+    if (incidents7d > 0) {
+        items.push({
+            level: 'danger',
+            title: `${incidents7d} incident(s) in last 7 days`,
+            detail: 'Review follow-ups & documentation',
+            action: "showPage('incidents');"
+        });
+    }
+    if (items.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">All caught up</div>';
+        return;
+    }
+
+    listEl.innerHTML = items.map(i => {
+        const badge = i.level === 'danger' ? 'attention-badge attention-badge-danger' : 'attention-badge attention-badge-warning';
+        return `
+            <button class="attention-item" onclick="${i.action}">
+                <span class="${badge}"></span>
+                <span class="attention-text">
+                    <span class="attention-title">${i.title}</span>
+                    <span class="attention-sub">${i.detail}</span>
+                </span>
+                <span class="attention-chevron"><i class="fas fa-chevron-right"></i></span>
+            </button>
+        `;
+    }).join('');
 }
 
 async function loadUpcomingAppointments() {
