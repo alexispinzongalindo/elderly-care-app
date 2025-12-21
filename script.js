@@ -2361,6 +2361,8 @@ function showPage(pageName) {
     console.log('📄 Current URL:', window.location.href);
     console.log('📄 Timestamp:', new Date().toISOString());
 
+    const scrollYBefore = window.scrollY;
+
     const resetLayoutStyles = (el) => {
         if (!el) return;
         el.style.removeProperty('display');
@@ -2646,6 +2648,14 @@ function showPage(pageName) {
 
         if (typeof window.updateStickyHeaderOffset === 'function') {
             window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
+        }
+
+        if (pageName === 'financial') {
+            window.requestAnimationFrame(() => {
+                if (Math.abs(window.scrollY - scrollYBefore) > 2) {
+                    window.scrollTo({ top: scrollYBefore, behavior: 'instant' });
+                }
+            });
         }
 
         // Load page-specific data
@@ -8263,10 +8273,7 @@ async function loadBankAccounts() {
 
                         // If button is below viewport, scroll to it
                         if (isOffScreenY && rect.y > window.innerHeight) {
-                            console.log('📍 Button is below viewport - scrolling to it...');
-                            addButton.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-                            // Also try scrolling the window
-                            window.scrollTo({ top: Math.max(0, rect.top + window.scrollY - 100), behavior: 'smooth' });
+                            console.log('📍 Button is below viewport - skipping auto-scroll');
                         }
 
                         // Walk up the entire parent chain and fix ALL containers
@@ -8309,21 +8316,7 @@ async function loadBankAccounts() {
 
                                 // Try scrolling to the button first
                                 if (isStillOffScreenY) {
-                                    console.log('📍 Attempting scroll to button...');
-                                    addButton.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-                                    window.scrollTo({ top: Math.max(0, newRect.top + window.scrollY - 50), behavior: 'smooth' });
-
-                                    // After scroll, check again
-                                    setTimeout(() => {
-                                        const finalRect = addButton.getBoundingClientRect();
-                                        if (finalRect.y < 0 || finalRect.y > window.innerHeight) {
-                                            console.error('❌❌ Button still off-screen after scroll - using emergency fix');
-                                            // Emergency: Move button to a safe location at top of viewport
-                                            addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 150px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 9999 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;';
-                                        } else {
-                                            console.log('✅ Button visible after scroll! y:', finalRect.y);
-                                        }
-                                    }, 300);
+                                    console.log('📍 Button still off-screen after fix - skipping auto-scroll');
                                 } else {
                                     // Only x is off-screen, use emergency fix
                                     addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: fixed !important; top: 150px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 9999 !important; background: #2196F3 !important; color: white !important; padding: 0.75rem 1.5rem !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;';
