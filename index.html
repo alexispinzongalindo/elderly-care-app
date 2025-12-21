@@ -1609,22 +1609,22 @@
             <div id="financial" class="page">
                 <div class="page-header">
                     <h2 data-translate="nav.financial">Financial Management</h2>
-                    <p style="color: var(--dark-gray); margin-bottom: 2rem;">Manage bank accounts, transactions, and reconciliation</p>
+                    <p style="color: var(--dark-gray); margin-bottom: 2rem;" data-translate="financial.subtitle">Manage bank accounts, transactions, and reconciliation</p>
 
                     <!-- Tabs Navigation -->
                     <div class="button-group" style="margin-bottom: 2rem; border-bottom: 2px solid var(--light-gray); padding-bottom: 1rem;">
-                        <button class="btn btn-primary" onclick="showFinancialTab('accounts')" id="tabAccounts">Bank Accounts</button>
-                        <button class="btn btn-secondary" onclick="showFinancialTab('transactions')" id="tabTransactions">Transactions</button>
-                        <button class="btn btn-secondary" onclick="showFinancialTab('reconciliation')" id="tabReconciliation">Reconciliation</button>
-                        <button class="btn btn-secondary" onclick="showFinancialTab('receipts')" id="tabReceipts">Payment Receipts</button>
+                        <button class="btn btn-primary" onclick="showFinancialTab('accounts')" id="tabAccounts" data-translate="financial.tab.accounts">Bank Accounts</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('transactions')" id="tabTransactions" data-translate="financial.tab.transactions">Transactions</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('reconciliation')" id="tabReconciliation" data-translate="financial.tab.reconciliation">Reconciliation</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('receipts')" id="tabReceipts" data-translate="financial.tab.receipts">Payment Receipts</button>
                     </div>
                 </div>
 
                 <!-- Bank Accounts Tab -->
                 <div id="financialAccounts" class="financial-tab">
                     <div class="form-card">
-                        <h3>Bank Accounts</h3>
-                        <button class="btn btn-primary" onclick="showBankAccountForm()">+ Add Bank Account</button>
+                        <h3 data-translate="financial.accounts.title">Bank Accounts</h3>
+                        <button class="btn btn-primary" onclick="showBankAccountForm()" data-translate="financial.accounts.add">+ Add Bank Account</button>
 
                         <div id="bankAccountForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                             <form id="newBankAccountForm" onsubmit="saveBankAccount(event)">
@@ -1679,8 +1679,8 @@
                 <!-- Transactions Tab -->
                 <div id="financialTransactions" class="financial-tab" style="display: none;">
                     <div class="form-card">
-                        <h3>Transactions</h3>
-                        <button class="btn btn-primary" onclick="showTransactionForm()">+ Add Transaction</button>
+                        <h3 data-translate="financial.transactions.title">Transactions</h3>
+                        <button class="btn btn-primary" onclick="showTransactionForm()" data-translate="financial.transactions.add">+ Add Transaction</button>
 
                         <div id="transactionForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                             <form id="newTransactionForm" onsubmit="saveTransaction(event)">
@@ -1747,17 +1747,17 @@
                     <div class="form-card" style="margin-top: 2rem;">
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Filter by Account</label>
+                                <label data-translate="financial.transactions.filterByAccount">Filter by Account</label>
                                 <select id="filterTransactionAccount" onchange="loadTransactions()">
-                                    <option value="">All Accounts</option>
+                                    <option value="" data-translate="financial.transactions.allAccounts">All Accounts</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Show Reconciled</label>
+                                <label data-translate="financial.transactions.showReconciled">Show Reconciled</label>
                                 <select id="filterReconciled" onchange="loadTransactions()">
-                                    <option value="">All</option>
-                                    <option value="true">Reconciled Only</option>
-                                    <option value="false">Unreconciled Only</option>
+                                    <option value="" data-translate="financial.transactions.reconciledFilter.all">All</option>
+                                    <option value="true" data-translate="financial.transactions.reconciledFilter.reconciledOnly">Reconciled Only</option>
+                                    <option value="false" data-translate="financial.transactions.reconciledFilter.unreconciledOnly">Unreconciled Only</option>
                                 </select>
                             </div>
                         </div>
@@ -1768,7 +1768,7 @@
                 <!-- Reconciliation Tab -->
                 <div id="financialReconciliation" class="financial-tab" style="display: none;">
                     <div class="form-card">
-                        <h3>Reconcile Account</h3>
+                        <h3 data-translate="financial.reconciliation.title">Reconcile Account</h3>
                         <form id="reconciliationForm" onsubmit="reconcileAccount(event)">
                             <div class="form-row">
                                 <div class="form-group">
@@ -1810,12 +1810,12 @@
                 <!-- Payment Receipts Tab -->
                 <div id="financialReceipts" class="financial-tab" style="display: none;">
                     <div class="form-card">
-                        <h3>Payment Receipts</h3>
+                        <h3 data-translate="financial.receipts.title">Payment Receipts</h3>
                         <div class="form-group">
-                            <label>Search by Receipt Number or Payment ID</label>
+                            <label data-translate="financial.receipts.searchLabel">Search by Receipt Number or Payment ID</label>
                             <div class="form-row">
                                 <input type="text" id="receiptSearch" class="form-control" placeholder="Receipt Number or Payment ID">
-                                <button class="btn btn-primary" onclick="searchReceipt()">Search</button>
+                                <button class="btn btn-primary" onclick="searchReceipt()" data-translate="common.search">Search</button>
                             </div>
                         </div>
                     </div>
@@ -1825,7 +1825,7 @@
 
             <!-- Reports Page -->
             <div id="reports" class="page">
-                <h2>Reports &amp; Analytics</h2>
+                <h2 data-translate="nav.reports">Reports</h2>
 
                 <div class="stats-grid" style="margin-bottom: 2rem;">
                     <div class="stat-card">
@@ -1851,34 +1851,34 @@
                 </div>
 
                 <div class="form-card">
-                    <h3>Generate Report</h3>
+                    <h3 data-translate="reports.generate">Generate Report</h3>
                     <form id="reportForm" onsubmit="generateReport(event)">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="reportType">Report Type *</label>
+                                <label for="reportType" data-translate="reports.type">Report Type *</label>
                                 <select id="reportType" required>
                                     <option value="">-- Select --</option>
-                                    <option value="incidents">Incident Report</option>
-                                    <option value="care_notes">Care Notes Summary</option>
-                                    <option value="medications">Medication Report</option>
-                                    <option value="appointments">Appointments Report</option>
-                                    <option value="vital_signs">Vital Signs Report</option>
-                                    <option value="comprehensive">Comprehensive Report</option>
+                                    <option value="incidents" data-translate="reports.type.incidents">Incident Report</option>
+                                    <option value="care_notes" data-translate="reports.type.care_notes">Care Notes Summary</option>
+                                    <option value="medications" data-translate="reports.type.medications">Medication Report</option>
+                                    <option value="appointments" data-translate="reports.type.appointments">Appointments Report</option>
+                                    <option value="vital_signs" data-translate="reports.type.vital_signs">Vital Signs Report</option>
+                                    <option value="comprehensive" data-translate="reports.type.comprehensive">Comprehensive Report</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="reportDateFrom">From Date</label>
+                                <label for="reportDateFrom" data-translate="reports.from">From Date</label>
                                 <input type="date" id="reportDateFrom">
                             </div>
                             <div class="form-group">
-                                <label for="reportDateTo">To Date</label>
+                                <label for="reportDateTo" data-translate="reports.to">To Date</label>
                                 <input type="date" id="reportDateTo">
                             </div>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-primary">Generate Preview</button>
+                            <button type="submit" class="btn btn-primary" data-translate="reports.generatePreview">Generate Preview</button>
                             <button type="button" class="btn btn-secondary" onclick="printCurrentReport()">Print (Save as PDF)</button>
-                            <button type="button" class="btn btn-secondary" onclick="exportReportToCSV()">Export CSV</button>
+                            <button type="button" class="btn btn-secondary" onclick="exportReportToCSV()" data-translate="reports.exportCsv">Export CSV</button>
                         </div>
                     </form>
                 </div>
