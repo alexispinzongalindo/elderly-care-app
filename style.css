@@ -105,7 +105,7 @@ body {
     left: 0;
     right: 0;
     width: 100%;
-    z-index: 200;
+    z-index: 2000;
 }
 
 .nav-container {
@@ -482,6 +482,21 @@ body {
     opacity: 1 !important;
     position: relative !important;
     z-index: 1 !important;
+}
+
+/* Ensure history page has proper dimensions when active (Safari can report 0x0) */
+#history.page.active,
+#history.active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    min-height: 400px !important;
+    width: 100% !important;
+    padding: 2rem !important;
+    overflow: visible !important;
+    background: var(--light-gray) !important;
 }
 
 /* Ensure reports page has proper dimensions when active */
@@ -1875,6 +1890,8 @@ h3 {
     /* Mobile phone styles */
     .menu-toggle {
         display: block;
+        position: relative;
+        z-index: 2100;
     }
     
     .nav-menu {
@@ -1888,7 +1905,7 @@ h3 {
         flex-direction: column;
         padding: 0;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        z-index: 1000;
+        z-index: 2050;
         overflow-y: auto;
         overflow-x: hidden;
         white-space: normal;
