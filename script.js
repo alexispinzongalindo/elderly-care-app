@@ -44,7 +44,6 @@ function installLanguageObserver() {
                 } catch (e) {
                     // ignore
                 }
-
                 updateTranslations();
                 replaceDualLanguageText();
 
@@ -131,6 +130,35 @@ const translations = {
         'dashboard.balance': 'Balance',
         'dashboard.overdue': 'Overdue',
         'dashboard.quickAccess': 'Quick Access',
+
+        'dashboard.kpi.medAdherence': 'Medication Adherence',
+        'dashboard.kpi.takenToday': 'Taken today',
+        'dashboard.kpi.medsDueNextHour': 'Medications Due (Next Hour)',
+        'dashboard.kpi.needsAction': 'Needs action',
+        'dashboard.kpi.medsScheduledToday': 'Medications Scheduled Today',
+        'dashboard.kpi.activeMeds': 'Active meds',
+        'dashboard.kpi.vitalsRecordedToday': 'Vital Signs Recorded Today',
+        'dashboard.kpi.activeStaff': 'Active Staff',
+        'dashboard.kpi.availableToday': 'Available today',
+        'dashboard.kpi.incidents7d': 'Incidents (Last 7 Days)',
+        'dashboard.kpi.safetyFollowups': 'Safety & follow-ups',
+        'dashboard.kpi.careNotes24h': 'Care Notes (Last 24 Hours)',
+        'dashboard.kpi.documentationActivity': 'Documentation activity',
+        'dashboard.kpi.activeResidents': 'Active Residents',
+        'dashboard.kpi.currentlyInCare': 'Currently in care',
+        'dashboard.kpi.appointmentsToday': 'Appointments Today',
+        'dashboard.kpi.scheduled': 'Scheduled',
+
+        'dashboard.widget.needsAttention': 'Needs Attention',
+        'dashboard.widget.upcomingAppointments': 'Upcoming Appointments',
+        'dashboard.widget.medicationSchedule': 'Medication Schedule',
+        'dashboard.widget.recentActivity': 'Recent Activity',
+        'dashboard.widget.quickActions': 'Quick Actions',
+
+        'dashboard.empty.allCaughtUp': 'All caught up',
+        'dashboard.empty.noUpcomingAppointments': 'No upcoming appointments',
+        'dashboard.empty.noMedicationsScheduled': 'No medications scheduled',
+        'dashboard.empty.noRecentActivity': 'No recent activity',
 
         // Common
         'common.search': 'Search',
@@ -3401,6 +3429,9 @@ function showPage(pageName) {
         else if (pageName === 'notifications') {
             loadNotificationsPage();
         }
+        else if (pageName === 'history') {
+            loadJournalPage();
+        }
         else if (pageName === 'reports') {
             loadReportsAnalytics();
         }
@@ -6204,6 +6235,121 @@ async function markNotificationRead(id) {
         }
     } catch (error) {
         console.error('Error marking notification read:', error);
+    }
+}
+
+// History / Journal
+function formatJournalType(entryType) {
+    if (!entryType) return 'General';
+    const t = String(entryType).replace(/_/g, ' ');
+    return t.replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatHistoryDayPill(dateObj) {
+    if (!dateObj || isNaN(dateObj.getTime())) return '';
+    const weekday = dateObj.toLocaleDateString(undefined, { weekday: 'short' });
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = dateObj.toLocaleDateString(undefined, { month: 'short' });
+    const year = String(dateObj.getFullYear());
+    return `${weekday}, ${day}-${month}-${year}`;
+}
+
+function getEntryDate(entry) {
+    const when = entry.occurred_at || entry.created_at;
+    const dateObj = when ? new Date(when) : null;
+    return dateObj && !isNaN(dateObj.getTime()) ? dateObj : null;
+}
+
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+async function loadJournalPage() {
+    try {
+        const container = document.getElementById('journalPageList');
+        if (!container) return;
+
+        const url = currentResidentId
+            ? `/api/journal?resident_id=${currentResidentId}&limit=500`
+            : `/api/journal?limit=500`;
+        const response = await fetch(url, { headers: getAuthHeaders() });
+
+        if (!response.ok) throw new Error(`Failed to load journal: ${response.status}`);
+
+        const entriesRaw = await response.json();
+        const entries = Array.isArray(entriesRaw) ? entriesRaw : [];
+
+        const now = new Date();
+        const cutoff = new Date(now);
+        cutoff.setDate(cutoff.getDate() - 30);
+        cutoff.setHours(0, 0, 0, 0);
+
+        const recentEntries = entries
+            .map(e => ({ entry: e, dateObj: getEntryDate(e) }))
+            .filter(x => x.dateObj && x.dateObj >= cutoff)
+            .sort((a, b) => b.dateObj - a.dateObj);
+
+        if (recentEntries.length === 0) {
+            container.innerHTML = '<div class="empty-state">No history found. / No se encontró historial.</div>';
+            return;
+        }
+
+        const groups = new Map();
+        for (const { entry, dateObj } of recentEntries) {
+            const dayKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+            if (!groups.has(dayKey)) groups.set(dayKey, []);
+            groups.get(dayKey).push({ entry, dateObj });
+        }
+
+        const groupKeys = Array.from(groups.keys()).sort((a, b) => (a < b ? 1 : -1));
+
+        let html = '';
+        html += '<div class="history-subtitle">Dose history for me over the last 30 days:</div>';
+
+        for (const key of groupKeys) {
+            const items = groups.get(key) || [];
+            const pillDate = items[0]?.dateObj;
+            html += `
+                <div class="history-day">
+                    <div class="history-day-pill">${escapeHtml(formatHistoryDayPill(pillDate))}</div>
+                </div>
+            `;
+
+            for (const { entry, dateObj } of items) {
+                const timeText = dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                const staffName = entry.staff_name || 'Unknown';
+                const typeLabel = formatJournalType(entry.entry_type);
+                const title = entry.title || typeLabel;
+                const details = entry.details || '';
+
+                html += `
+                    <div class="history-entry-card">
+                        <div class="history-entry-time">${escapeHtml(timeText)}</div>
+                        <div class="history-entry-body">
+                            <div class="history-entry-main">
+                                <div class="history-entry-title">${escapeHtml(title)}</div>
+                                ${details ? `<div class="history-entry-details">${escapeHtml(details)}</div>` : ''}
+                            </div>
+                            <div class="history-entry-meta">
+                                <span class="history-entry-type">${escapeHtml(typeLabel)}</span>
+                                <span class="history-entry-performer">Performed by: ${escapeHtml(staffName)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        container.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading journal page:', error);
+        showMessage('Error loading history / Error al cargar historial', 'error');
     }
 }
 

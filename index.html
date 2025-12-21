@@ -292,6 +292,7 @@
                     <!-- System Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.system">System</span></li>
                     <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon"><i class="fas fa-bell"></i></span><span data-translate="nav.notifications">Notifications</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="history"><span class="nav-icon"><i class="fas fa-book"></i></span><span>History</span></a></li>
                     <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-user-shield"></i></span><span data-translate="nav.staff">Staff</span></a></li>
                     <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span data-translate="nav.logout">Logout</span></a></li>
                 </ul>
@@ -1603,6 +1604,15 @@
                     <button class="btn btn-primary" onclick="loadNotificationsPage()">Refresh</button>
                 </div>
                 <div id="notificationsPageList" class="item-list"></div>
+            </div>
+
+            <!-- History / Journal Page -->
+            <div id="history" class="page">
+                <h2>History / Journal</h2>
+                <div class="button-group" style="margin-bottom: 1rem;">
+                    <button class="btn btn-primary" onclick="loadJournalPage()">Refresh</button>
+                </div>
+                <div id="journalPageList" class="item-list"></div>
             </div>
 
             <!-- Financial Management Page (Admin Only) -->

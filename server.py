@@ -89,6 +89,43 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+def get_staff_display_name(conn, staff_id):
+    if not staff_id:
+        return None
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT full_name FROM staff WHERE id = ?', (staff_id,))
+        row = cursor.fetchone()
+        return row['full_name'] if row and row['full_name'] else None
+    except Exception:
+        return None
+
+def create_journal_entry(conn, *, resident_id, entry_type, title, details, occurred_at=None, staff_id=None, staff_name=None, source_table=None, source_id=None):
+    try:
+        if not staff_name and staff_id:
+            staff_name = get_staff_display_name(conn, staff_id)
+
+        conn.cursor().execute('''
+            INSERT INTO journal_entries (
+                resident_id, entry_type, title, details,
+                occurred_at,
+                staff_id, staff_name,
+                source_table, source_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            resident_id,
+            entry_type,
+            title,
+            details,
+            occurred_at,
+            staff_id,
+            staff_name,
+            source_table,
+            source_id
+        ))
+    except Exception as e:
+        print(f"⚠️ Warning: Could not create journal entry: {e}")
+
 def init_db():
     conn = get_db()
     cursor = conn.cursor()
@@ -443,6 +480,25 @@ def init_db():
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             expires_at DATETIME,
             FOREIGN KEY (resident_id) REFERENCES residents (id)
+        )
+    ''')
+
+    # Journal / History table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS journal_entries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resident_id INTEGER NOT NULL,
+            entry_type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            details TEXT,
+            occurred_at DATETIME,
+            staff_id INTEGER,
+            staff_name TEXT,
+            source_table TEXT,
+            source_id INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (resident_id) REFERENCES residents (id),
+            FOREIGN KEY (staff_id) REFERENCES staff (id)
         )
     ''')
 
@@ -981,6 +1037,37 @@ def log_medication(id):
     conn.commit()
     log_id = cursor.lastrowid
 
+    try:
+        cursor.execute('''
+            SELECT m.name, m.dosage, r.id as resident_id, r.first_name, r.last_name
+            FROM medications m
+            JOIN residents r ON m.resident_id = r.id
+            WHERE m.id = ?
+        ''', (id,))
+        row = cursor.fetchone()
+        if row:
+            resident_id = row['resident_id']
+            med_name = row['name']
+            dosage = row['dosage']
+            resident_name = f"{row['first_name']} {row['last_name']}"
+            title = f"Medication {medication_status.title()}"
+            details = f"{resident_name} - {med_name} {dosage} | Scheduled: {scheduled_time}"
+            create_journal_entry(
+                conn,
+                resident_id=resident_id,
+                entry_type='medication',
+                title=title,
+                details=details,
+                occurred_at=datetime.utcnow().isoformat() + 'Z',
+                staff_id=staff_id,
+                staff_name=request.current_staff.get('full_name'),
+                source_table='medication_logs',
+                source_id=log_id
+            )
+            conn.commit()
+    except Exception as e:
+        print(f"⚠️ Warning: Could not journal medication log: {e}")
+
     # If medication is marked as "missed", send email alert in background
     if medication_status == 'missed' and EMAIL_SERVICE_AVAILABLE:
         def send_medication_alert_background():
@@ -1319,6 +1406,40 @@ def vital_signs():
         ))
         conn.commit()
         sign_id = cursor.lastrowid
+
+        try:
+            cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (resident_id,))
+            resident_row = cursor.fetchone()
+            resident_name = f"{resident_row['first_name']} {resident_row['last_name']}" if resident_row else 'Unknown Resident'
+            parts = []
+            if systolic is not None and diastolic is not None:
+                parts.append(f"BP {systolic}/{diastolic}")
+            if glucose is not None:
+                parts.append(f"Glucose {glucose}")
+            if temperature is not None:
+                parts.append(f"Temp {temperature}")
+            if heart_rate is not None:
+                parts.append(f"HR {heart_rate}")
+            if data.get('weight') is not None:
+                parts.append(f"Weight {data.get('weight')}")
+            vitals_summary = ', '.join(parts) if parts else 'Vitals recorded'
+            notes_text = (data.get('notes') or '').strip()
+            details = f"{resident_name} - {vitals_summary}" + (f" | Notes: {notes_text}" if notes_text else '')
+            create_journal_entry(
+                conn,
+                resident_id=resident_id,
+                entry_type='vital_signs',
+                title='Vital Signs Recorded',
+                details=details,
+                occurred_at=(data.get('recorded_at') or datetime.utcnow().isoformat() + 'Z'),
+                staff_id=staff_id,
+                staff_name=request.current_staff.get('full_name'),
+                source_table='vital_signs',
+                source_id=sign_id
+            )
+            conn.commit()
+        except Exception as e:
+            print(f"⚠️ Warning: Could not journal vital signs: {e}")
 
         # Check for critical values and send alerts in background
         critical_alerts = []
@@ -2510,9 +2631,9 @@ def incidents():
         print(f"✅ All required fields validated")
 
         try:
-            # Use provided staff_id or fallback to current staff
-            staff_id = data.get('staff_id') or request.current_staff['id']
-            print(f"👤 Using staff_id: {staff_id}")
+            # Always credit the currently logged-in staff (ignore any staff_id provided by the client)
+            staff_id = request.current_staff['id']
+            print(f"👤 Using staff_id (logged-in): {staff_id}")
 
             print(f"💾 Attempting to INSERT incident into database...")
             cursor.execute('''
@@ -2545,6 +2666,31 @@ def incidents():
             conn.commit()
             incident_id = cursor.lastrowid
             print(f"✅ Transaction committed successfully! Incident ID: {incident_id}")
+
+            try:
+                cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (int(data.get('resident_id')),))
+                resident_row = cursor.fetchone()
+                resident_name = f"{resident_row['first_name']} {resident_row['last_name']}" if resident_row else 'Unknown Resident'
+                incident_type = data.get('incident_type') or 'Incident'
+                severity = data.get('severity', 'minor')
+                description = (data.get('description') or '').strip()
+                title = f"Incident Reported ({severity})"
+                details = f"{resident_name} - {incident_type}" + (f" | {description[:200]}" if description else '')
+                create_journal_entry(
+                    conn,
+                    resident_id=int(data.get('resident_id')),
+                    entry_type='incident',
+                    title=title,
+                    details=details,
+                    occurred_at=(data.get('incident_date') or datetime.utcnow().isoformat() + 'Z'),
+                    staff_id=int(staff_id),
+                    staff_name=request.current_staff.get('full_name'),
+                    source_table='incident_reports',
+                    source_id=incident_id
+                )
+                conn.commit()
+            except Exception as e:
+                print(f"⚠️ Warning: Could not journal incident report: {e}")
 
             # Verify the incident was saved
             cursor.execute('SELECT * FROM incident_reports WHERE id = ?', (incident_id,))
@@ -3056,6 +3202,34 @@ def care_notes():
         ))
         conn.commit()
         note_id = cursor.lastrowid
+
+        try:
+            cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (data.get('resident_id'),))
+            resident_row = cursor.fetchone()
+            resident_name = f"{resident_row['first_name']} {resident_row['last_name']}" if resident_row else 'Unknown Resident'
+            note_date = data.get('note_date') or ''
+            note_time = data.get('note_time') or ''
+            shift = data.get('shift') or ''
+            general_notes = (data.get('general_notes') or '').strip()
+            details = f"{resident_name} - Care note {note_date} {note_time} {shift}".strip()
+            if general_notes:
+                details = details + f" | {general_notes[:200]}"
+            create_journal_entry(
+                conn,
+                resident_id=data.get('resident_id'),
+                entry_type='care_note',
+                title='Care Note Created',
+                details=details,
+                occurred_at=datetime.utcnow().isoformat() + 'Z',
+                staff_id=request.current_staff['id'],
+                staff_name=request.current_staff.get('full_name'),
+                source_table='daily_care_notes',
+                source_id=note_id
+            )
+            conn.commit()
+        except Exception as e:
+            print(f"⚠️ Warning: Could not journal care note: {e}")
+
         conn.close()
         return jsonify({'id': note_id, 'message': 'Care note created successfully'}), 201
 
@@ -3181,6 +3355,51 @@ def notifications():
         notification_id = cursor.lastrowid
         conn.close()
         return jsonify({'id': notification_id, 'message': 'Notification created successfully'}), 201
+
+@app.route('/api/journal', methods=['GET'])
+@require_auth
+def journal_entries():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    resident_id = request.args.get('resident_id')
+    entry_type = request.args.get('entry_type')
+    since = request.args.get('since')
+    until = request.args.get('until')
+    limit = request.args.get('limit', '200')
+
+    try:
+        limit_int = int(limit)
+    except Exception:
+        limit_int = 200
+    if limit_int < 1:
+        limit_int = 1
+    if limit_int > 500:
+        limit_int = 500
+
+    query = 'SELECT * FROM journal_entries WHERE 1=1'
+    params = []
+
+    if resident_id:
+        query += ' AND resident_id = ?'
+        params.append(resident_id)
+    if entry_type:
+        query += ' AND entry_type = ?'
+        params.append(entry_type)
+    if since:
+        query += ' AND COALESCE(occurred_at, created_at) >= ?'
+        params.append(since)
+    if until:
+        query += ' AND COALESCE(occurred_at, created_at) <= ?'
+        params.append(until)
+
+    query += ' ORDER BY COALESCE(occurred_at, created_at) DESC'
+    query += f' LIMIT {limit_int}'
+
+    cursor.execute(query, params)
+    rows = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return jsonify(rows)
 
 @app.route('/api/notifications/<int:id>/read', methods=['PUT'])
 @require_auth
