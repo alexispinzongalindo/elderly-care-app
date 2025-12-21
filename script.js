@@ -1941,6 +1941,9 @@ function initApp() {
         });
 
     document.getElementById('mainApp').style.display = 'block';
+    if (typeof window.updateStickyHeaderOffset === 'function') {
+        window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
+    }
     initNavigation();
     loadDashboard();
     updateClock();
@@ -2276,6 +2279,9 @@ function handleKeyboardShortcuts(event) {
                     link.classList.add('active');
                 }
             });
+            if (typeof window.updateStickyHeaderOffset === 'function') {
+                window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
+            }
         }
     }
 
@@ -2642,6 +2648,10 @@ function showPage(pageName) {
                 link.classList.add('active');
             }
         });
+
+        if (typeof window.updateStickyHeaderOffset === 'function') {
+            window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
+        }
 
         // Load page-specific data
         if (pageName === 'dashboard') {
@@ -7942,14 +7952,14 @@ function setDateTimeToDropdowns(dateTimeString, yearId, monthId, dayId, timeId) 
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
-    function updateStickyHeaderOffset() {
+    window.updateStickyHeaderOffset = function updateStickyHeaderOffset() {
         const navbar = document.querySelector('.navbar');
         const navbarHeight = navbar ? navbar.getBoundingClientRect().height : 0;
         document.documentElement.style.setProperty('--sticky-offset', `${Math.ceil(navbarHeight)}px`);
-    }
+    };
 
-    updateStickyHeaderOffset();
-    window.addEventListener('resize', updateStickyHeaderOffset);
+    window.updateStickyHeaderOffset();
+    window.addEventListener('resize', window.updateStickyHeaderOffset);
 
     // Load language from localStorage if available (but wait for login to use staff preferred_language)
     // Only set language from localStorage if user is not logged in yet
