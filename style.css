@@ -100,9 +100,12 @@ body {
 .navbar {
     background-color: var(--white);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 100;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 200;
 }
 
 .nav-container {
@@ -366,6 +369,10 @@ body {
     max-width: 1200px;
     margin: 1.5rem auto;
     padding: 0 1.5rem;
+}
+
+#mainApp > main.container {
+    margin-top: calc(1.5rem + var(--sticky-offset, 0px));
 }
 
 /* Sticky page headers (Care Notes + Financial) */
