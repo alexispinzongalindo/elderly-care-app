@@ -2426,12 +2426,7 @@ function showPage(pageName) {
 
         resetLayoutStyles(targetPage);
 
-        // CRITICAL: For financial page, scroll to top immediately
         if (pageName === 'financial') {
-            window.scrollTo({ top: 0, behavior: 'instant' });
-            // Also scroll the page container to top
-            targetPage.scrollTop = 0;
-            // Ensure no excessive top margin/padding causing offset
             targetPage.style.setProperty('margin-top', '0', 'important');
             targetPage.style.setProperty('padding-top', '2rem', 'important');
         }
@@ -8127,23 +8122,6 @@ function showFinancialTab(tab) {
                 accountsTab.style.setProperty('overflow', 'visible', 'important');
                 accountsTab.style.setProperty('overflow-x', 'visible', 'important');
                 accountsTab.style.setProperty('overflow-y', 'visible', 'important');
-            }
-
-            // Scroll window to top to ensure content is visible (button was at y:1300, way below viewport)
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            // Also scroll to the form-card button specifically
-            const formCard = document.querySelector('#financialAccounts .form-card');
-            if (formCard) {
-                const addButton = formCard.querySelector('button');
-                if (addButton) {
-                    setTimeout(() => {
-                        addButton.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-                        // Also try window scroll as backup
-                        const rect = addButton.getBoundingClientRect();
-                        window.scrollTo({ top: Math.max(0, rect.top + window.scrollY - 100), behavior: 'smooth' });
-                    }, 200);
-                }
             }
 
         loadBankAccounts();
