@@ -9105,6 +9105,7 @@ async function loadTransactions() {
                     <div>
                         <h3 class="item-title">${trans.description}</h3>
                         <p class="item-details">
+                            ${trans.resident_name ? `${trans.resident_name} • ` : ''}
                             ${trans.account_name} • ${trans.transaction_type} •
                             ${trans.transaction_date} •
                             <strong style="color: ${trans.transaction_type === 'deposit' ? 'var(--success-green)' : 'var(--error-red)'}">
@@ -9157,6 +9158,10 @@ async function loadBankAccountsForSelect(selectId) {
 }
 
 function showTransactionForm() {
+    if (!currentResidentId) {
+        showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
+        return;
+    }
     document.getElementById('transactionForm').style.display = 'block';
     if (!editingTransactionId) {
         document.getElementById('newTransactionForm').reset();
@@ -9234,7 +9239,13 @@ async function saveTransaction(event) {
     try {
         if (!checkFinancialAuth()) return;
 
+        if (!currentResidentId) {
+            showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
+            return;
+        }
+
         const transactionData = {
+            resident_id: currentResidentId,
             bank_account_id: parseInt(document.getElementById('transactionBankAccount').value),
             transaction_date: document.getElementById('transactionDate').value,
             transaction_type: document.getElementById('transactionType').value,

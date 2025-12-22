@@ -123,6 +123,14 @@ def backfill_journal_entries(conn):
         for vs in cursor.fetchall() or []:
             if _journal_entry_exists(conn, 'vital_signs', vs['id']):
                 continue
+            resident_name = 'Unknown Resident'
+            try:
+                cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (int(vs['resident_id']),))
+                resident_row = cursor.fetchone()
+                if resident_row:
+                    resident_name = f"{resident_row['first_name']} {resident_row['last_name']}"
+            except Exception:
+                pass
             parts = []
             if vs['systolic'] is not None and vs['diastolic'] is not None:
                 parts.append(f"BP: {vs['systolic']}/{vs['diastolic']}")
@@ -134,7 +142,7 @@ def backfill_journal_entries(conn):
                 parts.append(f"Glucose: {vs['glucose']}")
             if vs['weight'] is not None:
                 parts.append(f"Weight: {vs['weight']}")
-            details = ' | '.join(parts)
+            details = f"{resident_name} - " + (' | '.join(parts) if parts else 'Vitals recorded')
             if vs['notes']:
                 details = (details + ' | ' if details else '') + str(vs['notes']).strip()
 
@@ -482,6 +490,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS transactions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             bank_account_id INTEGER NOT NULL,
+            resident_id INTEGER,
             transaction_date DATE NOT NULL,
             transaction_type TEXT NOT NULL,
             description TEXT NOT NULL,
@@ -495,9 +504,16 @@ def init_db():
             notes TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (bank_account_id) REFERENCES bank_accounts (id),
+            FOREIGN KEY (resident_id) REFERENCES residents (id),
             FOREIGN KEY (payment_id) REFERENCES payments (id)
         )
     ''')
+
+    # Add resident_id column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE transactions ADD COLUMN resident_id INTEGER')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
 
     # Reconciliation records
     cursor.execute('''
@@ -1545,6 +1561,18 @@ def vital_signs():
     elif request.method == 'POST':
         data = request.json
         resident_id = data.get('resident_id')
+        if not resident_id:
+            conn.close()
+            return jsonify({'error': 'resident_id is required'}), 400
+        try:
+            resident_id = int(resident_id)
+        except Exception:
+            conn.close()
+            return jsonify({'error': 'resident_id must be a number'}), 400
+        cursor.execute('SELECT id FROM residents WHERE id = ?', (resident_id,))
+        if not cursor.fetchone():
+            conn.close()
+            return jsonify({'error': 'Resident not found'}), 400
         systolic = data.get('systolic')
         diastolic = data.get('diastolic')
         glucose = data.get('glucose')
@@ -2015,14 +2043,18 @@ def payments():
 
         # Create transaction record if bank account is specified
         if data.get('bank_account_id'):
+            cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (data.get('resident_id'),))
+            resident_row = cursor.fetchone()
+            resident_name = f"{resident_row['first_name']} {resident_row['last_name']}" if resident_row else f"Resident ID {data.get('resident_id')}"
             cursor.execute('''
-                INSERT INTO transactions (bank_account_id, transaction_date, transaction_type, description, amount, check_number, payee, category, payment_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO transactions (bank_account_id, resident_id, transaction_date, transaction_type, description, amount, check_number, payee, category, payment_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 data.get('bank_account_id'),
+                data.get('resident_id'),
                 data.get('payment_date'),
                 'deposit',
-                f"Payment from Resident ID {data.get('resident_id')}",
+                f"Payment from {resident_name}",
                 data.get('amount'),
                 data.get('reference_number', ''),
                 '',  # payee
@@ -2190,7 +2222,15 @@ def transactions():
     if request.method == 'GET':
         bank_account_id = request.args.get('bank_account_id')
         reconciled = request.args.get('reconciled')
-        query = 'SELECT t.*, ba.account_name FROM transactions t JOIN bank_accounts ba ON t.bank_account_id = ba.id'
+        query = """
+            SELECT
+                t.*,
+                ba.account_name,
+                (r.first_name || ' ' || r.last_name) AS resident_name
+            FROM transactions t
+            JOIN bank_accounts ba ON t.bank_account_id = ba.id
+            LEFT JOIN residents r ON t.resident_id = r.id
+        """
         params = []
 
         if bank_account_id:
@@ -2212,11 +2252,26 @@ def transactions():
 
     elif request.method == 'POST':
         data = request.json
+        resident_id = data.get('resident_id')
+        if not resident_id:
+            conn.close()
+            return jsonify({'error': 'resident_id is required'}), 400
+        try:
+            resident_id = int(resident_id)
+        except Exception:
+            conn.close()
+            return jsonify({'error': 'resident_id must be a number'}), 400
+        cursor.execute('SELECT id FROM residents WHERE id = ?', (resident_id,))
+        if not cursor.fetchone():
+            conn.close()
+            return jsonify({'error': 'Resident not found'}), 400
+
         cursor.execute('''
-            INSERT INTO transactions (bank_account_id, transaction_date, transaction_type, description, amount, check_number, payee, category, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO transactions (bank_account_id, resident_id, transaction_date, transaction_type, description, amount, check_number, payee, category, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data.get('bank_account_id'),
+            resident_id,
             data.get('transaction_date'),
             data.get('transaction_type'),  # 'deposit' or 'withdrawal'
             data.get('description'),
@@ -2250,15 +2305,34 @@ def transaction_detail(id):
     if request.method == 'PUT':
         # Get old transaction to reverse balance change
         cursor.execute('SELECT * FROM transactions WHERE id = ?', (id,))
-        old_trans = dict(cursor.fetchone())
+        old_row = cursor.fetchone()
+        if not old_row:
+            conn.close()
+            return jsonify({'error': 'Transaction not found'}), 404
+        old_trans = dict(old_row)
 
         data = request.json
+        resident_id = data.get('resident_id')
+        if not resident_id:
+            conn.close()
+            return jsonify({'error': 'resident_id is required'}), 400
+        try:
+            resident_id = int(resident_id)
+        except Exception:
+            conn.close()
+            return jsonify({'error': 'resident_id must be a number'}), 400
+        cursor.execute('SELECT id FROM residents WHERE id = ?', (resident_id,))
+        if not cursor.fetchone():
+            conn.close()
+            return jsonify({'error': 'Resident not found'}), 400
+
         cursor.execute('''
             UPDATE transactions
-            SET transaction_date = ?, transaction_type = ?, description = ?, amount = ?,
+            SET resident_id = ?, transaction_date = ?, transaction_type = ?, description = ?, amount = ?,
                 check_number = ?, payee = ?, category = ?, notes = ?
             WHERE id = ?
         ''', (
+            resident_id,
             data.get('transaction_date'),
             data.get('transaction_type'),
             data.get('description'),
