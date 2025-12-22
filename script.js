@@ -6287,6 +6287,83 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
+async function ensureHistoryResidentOptionsLoaded() {
+    const residentSelect = document.getElementById('historyResidentFilter');
+    if (!residentSelect) return;
+    if (residentSelect.dataset.loaded === 'true') return;
+
+    try {
+        const res = await fetch('/api/residents', { headers: getAuthHeaders() });
+        if (!res.ok) return;
+        const residentsRaw = await res.json();
+        const residents = Array.isArray(residentsRaw) ? residentsRaw : [];
+
+        residents.sort((a, b) => {
+            const aLast = String(a?.last_name || '').toLowerCase();
+            const bLast = String(b?.last_name || '').toLowerCase();
+            if (aLast !== bLast) return aLast.localeCompare(bLast);
+            const aFirst = String(a?.first_name || '').toLowerCase();
+            const bFirst = String(b?.first_name || '').toLowerCase();
+            return aFirst.localeCompare(bFirst);
+        });
+
+        const options = residents
+            .filter(r => r && r.id)
+            .map(r => {
+                const name = `${r.first_name || ''} ${r.last_name || ''}`.trim() || String(r.id);
+                const room = (r.room_number || '').trim();
+                const label = room ? `${name} (Room ${room})` : name;
+                return `<option value="${escapeHtml(r.id)}">${escapeHtml(label)}</option>`;
+            })
+            .join('');
+
+        residentSelect.innerHTML = '<option value="">Select Resident</option>' + options;
+        residentSelect.dataset.loaded = 'true';
+
+        // Default to current resident if available
+        if (currentResidentId) {
+            residentSelect.value = String(currentResidentId);
+        }
+    } catch (e) {
+        console.error('ensureHistoryResidentOptionsLoaded error:', e);
+    }
+}
+
+function setupHistoryResidentFilterControls() {
+    const allResidentsEl = document.getElementById('historyAllResidents');
+    const residentSelect = document.getElementById('historyResidentFilter');
+    if (!allResidentsEl || !residentSelect) return;
+    if (allResidentsEl.dataset.bound === 'true') return;
+
+    const syncEnabledState = () => {
+        const showAll = !!allResidentsEl.checked;
+        residentSelect.disabled = showAll;
+        if (!showAll) {
+            if (!residentSelect.dataset.loaded) {
+                ensureHistoryResidentOptionsLoaded();
+            }
+            if (!residentSelect.value && currentResidentId) {
+                residentSelect.value = String(currentResidentId);
+            }
+        }
+    };
+
+    allResidentsEl.addEventListener('change', () => {
+        syncEnabledState();
+    });
+
+    residentSelect.addEventListener('change', () => {
+        const v = (residentSelect.value || '').trim();
+        if (v) {
+            localStorage.setItem('currentResidentId', v);
+            currentResidentId = v;
+        }
+    });
+
+    allResidentsEl.dataset.bound = 'true';
+    syncEnabledState();
+}
+
 async function ensureHistoryStaffOptionsLoaded() {
     const staffSelect = document.getElementById('historyStaffFilter');
     if (!staffSelect) return;
@@ -6338,21 +6415,32 @@ async function loadJournalPage() {
         const container = document.getElementById('journalPageList');
         if (!container) return;
 
+        setupHistoryResidentFilterControls();
+        await ensureHistoryResidentOptionsLoaded();
         await ensureHistoryStaffOptionsLoaded();
 
         const allResidentsEl = document.getElementById('historyAllResidents');
+        const residentEl = document.getElementById('historyResidentFilter');
         const staffEl = document.getElementById('historyStaffFilter');
         const sinceEl = document.getElementById('historySince');
         const untilEl = document.getElementById('historyUntil');
 
         const showAllResidents = allResidentsEl ? allResidentsEl.checked : false;
+        const selectedResidentId = (residentEl?.value || '').trim();
         const staffId = (staffEl?.value || '').trim();
         const since = sinceEl?.value ? new Date(sinceEl.value).toISOString() : '';
         const until = untilEl?.value ? new Date(untilEl.value).toISOString() : '';
 
         const params = new URLSearchParams();
         params.set('limit', '500');
-        if (!showAllResidents && currentResidentId) params.set('resident_id', String(currentResidentId));
+        if (!showAllResidents) {
+            const residentIdToUse = selectedResidentId || (currentResidentId ? String(currentResidentId) : '');
+            if (!residentIdToUse) {
+                showMessage('Please select a resident / Por favor seleccione un residente', 'error');
+                return;
+            }
+            params.set('resident_id', residentIdToUse);
+        }
         if (staffId) params.set('staff_id', staffId);
         if (since) params.set('since', since);
         if (until) params.set('until', until);
