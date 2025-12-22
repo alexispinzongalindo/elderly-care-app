@@ -9436,7 +9436,7 @@ function displayReceipt(receipt) {
 
 // Initialize financial page when shown
 function initFinancialPage() {
-    console.log('💰💰💰 INITIALIZING FINANCIAL PAGE - AGGRESSIVE FIX 💰💰💰');
+    console.log('💰💰💰 INITIALIZING FINANCIAL PAGE 💰💰💰');
 
     // Check authentication first
     if (!authToken || !currentStaff) {
@@ -9471,6 +9471,18 @@ function initFinancialPage() {
     }
 
     console.log('✅ Financial page is in DOM, parent:', financialPage.parentElement?.tagName, financialPage.parentElement?.className);
+
+    const financialComputedStyle = window.getComputedStyle(financialPage);
+    const needsAggressiveFix =
+        financialComputedStyle.display === 'none' ||
+        financialComputedStyle.visibility === 'hidden' ||
+        financialPage.offsetHeight === 0 ||
+        financialPage.offsetWidth === 0;
+
+    if (!needsAggressiveFix) {
+        showFinancialTab('accounts');
+        return;
+    }
 
     // AGGRESSIVE FIX - Same approach as incidents page
     console.log('🔴 Starting aggressive financial page fix...');
@@ -9724,9 +9736,6 @@ function initFinancialPage() {
             console.log('✅✅✅ FINANCIAL PAGE HAS DIMENSIONS! ✅✅✅');
         }
     }, 200);
-
-    // Show the accounts tab (this will also load bank accounts)
-    showFinancialTab('accounts');
 }
 
 // Update showPage to handle financial page
