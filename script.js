@@ -2785,10 +2785,25 @@ function showPage(pageName) {
             try {
                 const mainContainerForPages = document.querySelector('#mainApp > main.container') || document.querySelector('main.container');
                 if (mainContainerForPages && targetPage.parentElement && targetPage.parentElement.classList && targetPage.parentElement.classList.contains('page')) {
+                    const ancestorChain = [];
+                    let p = targetPage.parentElement;
+                    let guard = 0;
+                    while (p && guard < 12) {
+                        ancestorChain.push({
+                            tag: p.tagName,
+                            id: p.id || null,
+                            className: p.className || null
+                        });
+                        if (p.id === 'mainApp') break;
+                        p = p.parentElement;
+                        guard++;
+                    }
+
                     console.warn('⚠️⚠️⚠️ CRITICAL: Page is nested inside another .page. Moving it out...', {
                         pageName,
                         currentParentId: targetPage.parentElement.id || null,
-                        currentParentClass: targetPage.parentElement.className || null
+                        currentParentClass: targetPage.parentElement.className || null,
+                        ancestorChain
                     });
                     mainContainerForPages.appendChild(targetPage);
                     console.log('✅ Page moved to main.container. New parent:', targetPage.parentElement?.tagName, targetPage.parentElement?.className);
