@@ -2653,6 +2653,39 @@ function showPage(pageName) {
 
     const scrollYBefore = window.scrollY;
 
+    const debugLayout = (label, el) => {
+        try {
+            if (!el) {
+                console.log(`🧭 LayoutDebug ${label}: <null>`);
+                return;
+            }
+            const cs = window.getComputedStyle(el);
+            const rect = el.getBoundingClientRect();
+            console.log(`🧭 LayoutDebug ${label}:`, {
+                tag: el.tagName,
+                id: el.id || null,
+                className: el.className || null,
+                display: cs.display,
+                visibility: cs.visibility,
+                opacity: cs.opacity,
+                position: cs.position,
+                overflow: cs.overflow,
+                overflowX: cs.overflowX,
+                overflowY: cs.overflowY,
+                height: cs.height,
+                width: cs.width,
+                minHeight: cs.minHeight,
+                minWidth: cs.minWidth,
+                maxHeight: cs.maxHeight,
+                maxWidth: cs.maxWidth,
+                transform: cs.transform,
+                rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
+            });
+        } catch (e) {
+            console.error(`🧭 LayoutDebug ${label} error:`, e);
+        }
+    };
+
     const resetLayoutStyles = (el) => {
         if (!el) return;
         el.style.removeProperty('display');
@@ -2814,11 +2847,23 @@ function showPage(pageName) {
             // Force a reflow so Safari recalculates dimensions
             void targetPage.offsetHeight;
         }
+
+        // SPECIAL HANDLING FOR HISTORY PAGE - Safari can keep it at 0x0 otherwise
+        if (pageName === 'history') {
+            // History was previously hidden via absolute/offscreen styles; ensure it is fully reset.
+            targetPage.classList.add('active');
+            targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: 0 !important; top: 0 !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+            // Force a reflow so Safari recalculates dimensions
+            void targetPage.offsetHeight;
+        }
+
         targetPage.style.setProperty('visibility', 'visible', 'important');
+        targetPage.style.setProperty('display', 'block', 'important');
         targetPage.style.setProperty('opacity', '1', 'important');
-        targetPage.style.setProperty('position', 'relative', 'important');
-        targetPage.style.removeProperty('left'); // Remove left: -9999px if it was set
-        targetPage.style.removeProperty('right'); // Remove any right positioning
+        if (pageName !== 'history' && pageName !== 'reports') {
+            targetPage.style.removeProperty('left'); // Remove left: -9999px if it was set
+            targetPage.style.removeProperty('right'); // Remove any right positioning
+        }
         if (pageName !== 'financial' && pageName !== 'carenotes') {
             targetPage.style.setProperty('z-index', '1', 'important');
         }
@@ -2896,6 +2941,13 @@ function showPage(pageName) {
         // CRITICAL: If page has 0 height/width, force it visible (can happen with carenotes/reports)
         if (targetPage.offsetHeight === 0 || targetPage.offsetWidth === 0) {
             console.log('⚠️ Page has 0 dimensions, forcing visibility with !important');
+
+            // Debug: identify which ancestor is collapsing layout.
+            debugLayout('targetPage(before-fix)', targetPage);
+            debugLayout('mainContainer(before-fix)', mainContainer);
+            debugLayout('#mainApp(before-fix)', document.getElementById('mainApp'));
+            debugLayout('body(before-fix)', document.body);
+
             targetPage.style.setProperty('display', 'block', 'important');
             targetPage.style.setProperty('visibility', 'visible', 'important');
             targetPage.style.setProperty('opacity', '1', 'important');
@@ -2924,6 +2976,11 @@ function showPage(pageName) {
                         void targetPage.offsetHeight;
                         const rectAfter = targetPage.getBoundingClientRect();
                         console.log('🔁 Page retry dimensions:', rectAfter.height, 'x', rectAfter.width);
+
+                        // Debug again after retry
+                        debugLayout('targetPage(after-retry)', targetPage);
+                        debugLayout('mainContainer(after-retry)', mainContainer);
+                        debugLayout('#mainApp(after-retry)', document.getElementById('mainApp'));
                     }
                 } catch (e) {
                     console.error('Error in page retry visibility fix:', e);
@@ -2980,6 +3037,9 @@ function showPage(pageName) {
         else if (pageName === 'residents') loadResidents();
         else if (pageName === 'medications') loadMedications();
         else if (pageName === 'appointments') loadAppointments();
+        else if (pageName === 'history') {
+            loadJournalPage();
+        }
         else if (pageName === 'vitalsigns') {
             clearVitalSignsForm();
             loadVitalSigns();
