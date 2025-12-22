@@ -1166,9 +1166,11 @@ window.fetch = function(url, options = {}) {
         }
 
         // Log all API requests - MAKE IT IMPOSSIBLE TO MISS
+        // NOTE: Do not embed URLs inside the formatted string because percent-encoded sequences
+        // (e.g. %3A) can be misinterpreted by DevTools formatting and appear mangled.
         console.log(
             `%c🌐🌐🌐 NETWORK REQUEST 🌐🌐🌐\n` +
-            `%c${method} ${url}\n` +
+            `%c${method}\n` +
             `%cTime: ${timestamp}\n` +
             `%cCache: ${options.cache || 'default'}`,
             'background: #2196F3; color: white; font-size: 16px; font-weight: bold; padding: 10px;',
@@ -1176,6 +1178,7 @@ window.fetch = function(url, options = {}) {
             'color: #666; font-size: 12px;',
             'color: #666; font-size: 12px;'
         );
+        console.log('URL:', url);
         console.log('Full request details:', {
             url: url,
             method: method,
@@ -1226,7 +1229,7 @@ window.fetch = function(url, options = {}) {
             const statusColor = response.ok ? '#4CAF50' : '#f44336';
             console.log(
                 `%c✅✅✅ NETWORK RESPONSE ✅✅✅\n` +
-                `%c${method} ${url}\n` +
+                `%c${method}\n` +
                 `%cStatus: ${response.status} ${response.statusText}\n` +
                 `%cTime: ${responseTimestamp}`,
                 'background: ' + statusColor + '; color: white; font-size: 16px; font-weight: bold; padding: 10px;',
@@ -1234,21 +1237,37 @@ window.fetch = function(url, options = {}) {
                 'color: ' + statusColor + '; font-size: 14px; font-weight: bold;',
                 'color: #666; font-size: 12px;'
             );
+            console.log('URL:', url);
             console.log('Full response details:', {
                 status: response.status,
                 statusText: response.statusText,
                 headers: Object.fromEntries(response.headers.entries())
             });
 
-            // Clone response to read body without consuming it
-            response.clone().json().then(data => {
-                console.log(`%c📦 Response data:`, 'background: #FF9800; color: white; padding: 5px;', data);
-            }).catch(() => {
-                // Not JSON, try text
-                response.clone().text().then(text => {
-                    console.log(`%c📦 Response text:`, 'background: #FF9800; color: white; padding: 5px;', text.substring(0, 200));
-                }).catch(() => {});
-            });
+            // Clone response to read body without consuming it.
+            // Safari can throw "Body is disturbed or locked" if clone() is called multiple times.
+            const clonedResponse = response.clone();
+            const contentType = (clonedResponse.headers.get('content-type') || '').toLowerCase();
+            const logPrefixStyle = 'background: #FF9800; color: white; padding: 5px;';
+            if (contentType.includes('application/json')) {
+                clonedResponse.json().then(data => {
+                    console.log(`%c📦 Response data:`, logPrefixStyle, data);
+                }).catch(() => {
+                    // JSON parse failed; fallback to text
+                    try {
+                        const fallbackClone = response.clone();
+                        fallbackClone.text().then(text => {
+                            console.log(`%c📦 Response text:`, logPrefixStyle, (text || '').substring(0, 200));
+                        }).catch(() => {});
+                    } catch (_) {}
+                });
+            } else {
+                clonedResponse.text().then(text => {
+                    console.log(`%c📦 Response text:`, logPrefixStyle, (text || '').substring(0, 200));
+                }).catch(() => {
+                    // Ignore non-text bodies (e.g., PDF)
+                });
+            }
 
             return response;
         }).catch(error => {
@@ -3664,9 +3683,6 @@ function showPage(pageName) {
         }
         else if (pageName === 'notifications') {
             loadNotificationsPage();
-        }
-        else if (pageName === 'history') {
-            loadJournalPage();
         }
         else if (pageName === 'reports') {
             loadReportsAnalytics();

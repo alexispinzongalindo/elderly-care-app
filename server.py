@@ -4444,8 +4444,8 @@ def static_files(path):
 
 if __name__ == '__main__':
     ensure_db_initialized()
-    # Use PORT from environment (for cloud deployment) or default to 5001
-    port = int(os.environ.get('PORT', 5001))
+    # Use PORT from environment (for cloud deployment) or default to 5002
+    port = int(os.environ.get('PORT', 5002))
     # Disable debug in production
     debug_mode = os.environ.get('FLASK_DEBUG', '0') == '1'
 
