@@ -24,16 +24,27 @@ try:
     )
     EMAIL_SERVICE_AVAILABLE = True
     # Check email configuration on startup
+    resend_api_key = os.getenv('RESEND_API_KEY', '')
+    resend_from = os.getenv('RESEND_FROM_EMAIL', '')
     sender_email = os.getenv('SENDER_EMAIL', '')
     sender_password = os.getenv('SENDER_PASSWORD', '')
-    if not sender_email or not sender_password:
+
+    if resend_api_key:
+        print("✅ Email provider: Resend")
+        print(f"   RESEND_API_KEY: SET")
+        print(f"   RESEND_FROM_EMAIL: {resend_from or 'NOT SET'}")
+        if not resend_from:
+            print("⚠️ WARNING: Resend enabled but RESEND_FROM_EMAIL is missing. Emails will fail.")
+    elif sender_email and sender_password:
+        print("✅ Email provider: SMTP")
+        print(f"   Sender: {sender_email}")
+    else:
         print("⚠️ WARNING: Email service available but not configured!")
+        print(f"   RESEND_API_KEY: {'SET' if resend_api_key else 'NOT SET'}")
+        print(f"   RESEND_FROM_EMAIL: {'SET' if resend_from else 'NOT SET'}")
         print(f"   SENDER_EMAIL: {'SET' if sender_email else 'NOT SET'}")
         print(f"   SENDER_PASSWORD: {'SET' if sender_password else 'NOT SET'}")
         print("   Email notifications will NOT work until environment variables are set.")
-    else:
-        print(f"✅ Email service configured and ready")
-        print(f"   Sender: {sender_email}")
 except ImportError:
     EMAIL_SERVICE_AVAILABLE = False
     print("⚠️ Email service not available. Email notifications will be disabled.")
