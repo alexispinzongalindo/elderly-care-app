@@ -73,10 +73,12 @@ def send_email_via_resend(to_email, subject, html_body, text_body=None, attachme
             for att in attachments:
                 try:
                     filename, content_bytes, mime_type = att
+                    # Resend expects attachments as { filename, content } where content is base64.
+                    # (For remote files it supports { path, filename }.)
+                    # Do not include non-standard keys like content_type; Resend will reject them.
                     encoded_attachments.append({
                         "filename": filename,
-                        "content": base64.b64encode(content_bytes).decode('utf-8'),
-                        "content_type": mime_type
+                        "content": base64.b64encode(content_bytes).decode('utf-8')
                     })
                 except Exception:
                     continue
