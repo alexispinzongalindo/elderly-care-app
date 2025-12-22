@@ -6822,6 +6822,146 @@ async function emailJournalPdf() {
     }
 }
 
+function getHistoryJournalReportPayload() {
+    const allResidentsEl = document.getElementById('historyAllResidents');
+    const residentEl = document.getElementById('historyResidentFilter');
+    const staffEl = document.getElementById('historyStaffFilter');
+    const sinceEl = document.getElementById('historySince');
+    const untilEl = document.getElementById('historyUntil');
+
+    const showAllResidents = allResidentsEl ? allResidentsEl.checked : false;
+    const selectedResidentId = (residentEl?.value || '').trim();
+    const staffId = (staffEl?.value || '').trim();
+    const since = sinceEl?.value ? new Date(sinceEl.value).toISOString() : null;
+    const until = untilEl?.value ? new Date(untilEl.value).toISOString() : null;
+
+    let residentIdToUse = null;
+    if (!showAllResidents) {
+        residentIdToUse = selectedResidentId || (currentResidentId ? String(currentResidentId) : '');
+        if (!residentIdToUse) {
+            showMessage('Please select a resident / Por favor seleccione un residente', 'error');
+            return null;
+        }
+    }
+
+    return {
+        resident_id: residentIdToUse || null,
+        staff_id: staffId || null,
+        since,
+        until
+    };
+}
+
+async function downloadHistoryJournalPdf() {
+    try {
+        const payload = getHistoryJournalReportPayload();
+        if (!payload) return;
+
+        const res = await fetch('/api/reports/journal/pdf', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            showMessage(err.error || 'Failed to generate PDF', 'error');
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'journal_report.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        console.error('downloadHistoryJournalPdf error:', e);
+        showMessage('Failed to download PDF', 'error');
+    }
+}
+
+async function printHistoryJournalPdf() {
+    try {
+        const payload = getHistoryJournalReportPayload();
+        if (!payload) return;
+
+        const res = await fetch('/api/reports/journal/pdf', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            showMessage(err.error || 'Failed to generate PDF', 'error');
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const w = window.open(url, '_blank');
+        if (!w) {
+            showMessage('Popup blocked. Please allow popups to print.', 'error');
+            return;
+        }
+
+        const revoke = () => {
+            try { URL.revokeObjectURL(url); } catch { /* ignore */ }
+        };
+
+        const onLoaded = () => {
+            try {
+                w.focus();
+                w.print();
+            } finally {
+                setTimeout(revoke, 1000);
+            }
+        };
+
+        try {
+            w.addEventListener('load', onLoaded, { once: true });
+        } catch {
+            setTimeout(onLoaded, 400);
+        }
+    } catch (e) {
+        console.error('printHistoryJournalPdf error:', e);
+        showMessage('Failed to print PDF', 'error');
+    }
+}
+
+async function emailHistoryJournalPdf() {
+    try {
+        const toEl = document.getElementById('historyEmailTo');
+        const toEmail = (toEl?.value || '').trim();
+        if (!toEmail) {
+            showMessage('Please enter an email address', 'error');
+            return;
+        }
+
+        const payload = getHistoryJournalReportPayload();
+        if (!payload) return;
+        payload.to_email = toEmail;
+
+        const res = await fetch('/api/reports/journal/email', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            showMessage(err.error || 'Failed to email PDF', 'error');
+            return;
+        }
+
+        showMessage('Report emailed successfully', 'success');
+    } catch (e) {
+        console.error('emailHistoryJournalPdf error:', e);
+        showMessage('Failed to email PDF', 'error');
+    }
+}
+
 function buildSimpleTable(data, columns) {
     if (!Array.isArray(data) || data.length === 0) {
         return '<div style="padding: 0.75rem; color: #666;">No records found for the selected filters.</div>';
