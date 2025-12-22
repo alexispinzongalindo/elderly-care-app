@@ -6287,15 +6287,77 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
+async function ensureHistoryStaffOptionsLoaded() {
+    const staffSelect = document.getElementById('historyStaffFilter');
+    if (!staffSelect) return;
+    if (staffSelect.dataset.loaded === 'true') return;
+
+    try {
+        const res = await fetch('/api/staff', { headers: getAuthHeaders() });
+        if (!res.ok) return;
+        const staff = await res.json();
+        const options = Array.isArray(staff)
+            ? staff
+                .filter(s => s && (s.active === 1 || s.active === true || s.active === undefined))
+                .map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.full_name || s.username || String(s.id))}</option>`)
+                .join('')
+            : '';
+        staffSelect.innerHTML = '<option value="">All Staff</option>' + options;
+        staffSelect.dataset.loaded = 'true';
+    } catch (e) {
+        console.error('ensureHistoryStaffOptionsLoaded error:', e);
+    }
+}
+
+function setHistoryYesterday() {
+    const sinceEl = document.getElementById('historySince');
+    const untilEl = document.getElementById('historyUntil');
+    if (!sinceEl || !untilEl) return;
+
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(start.getDate() - 1);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(now);
+    end.setDate(end.getDate() - 1);
+    end.setHours(23, 59, 59, 999);
+
+    // datetime-local expects local time without seconds
+    const toLocalInput = (d) => {
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
+    sinceEl.value = toLocalInput(start);
+    untilEl.value = toLocalInput(end);
+}
+
 async function loadJournalPage() {
     try {
         const container = document.getElementById('journalPageList');
         if (!container) return;
 
-        const url = currentResidentId
-            ? `/api/journal?resident_id=${currentResidentId}&limit=500`
-            : `/api/journal?limit=500`;
-        const response = await fetch(url, { headers: getAuthHeaders() });
+        await ensureHistoryStaffOptionsLoaded();
+
+        const allResidentsEl = document.getElementById('historyAllResidents');
+        const staffEl = document.getElementById('historyStaffFilter');
+        const sinceEl = document.getElementById('historySince');
+        const untilEl = document.getElementById('historyUntil');
+
+        const showAllResidents = allResidentsEl ? allResidentsEl.checked : false;
+        const staffId = (staffEl?.value || '').trim();
+        const since = sinceEl?.value ? new Date(sinceEl.value).toISOString() : '';
+        const until = untilEl?.value ? new Date(untilEl.value).toISOString() : '';
+
+        const params = new URLSearchParams();
+        params.set('limit', '500');
+        if (!showAllResidents && currentResidentId) params.set('resident_id', String(currentResidentId));
+        if (staffId) params.set('staff_id', staffId);
+        if (since) params.set('since', since);
+        if (until) params.set('until', until);
+
+        const response = await fetch(`/api/journal?${params.toString()}`, { headers: getAuthHeaders() });
 
         if (!response.ok) throw new Error(`Failed to load journal: ${response.status}`);
 
@@ -6342,7 +6404,11 @@ async function loadJournalPage() {
         });
 
         let html = '';
-        html += '<div class="history-subtitle">Dose history for me over the last 30 days:</div>';
+        if (showAllResidents || staffId || since || until) {
+            html += '<div class="history-subtitle">Filtered history results:</div>';
+        } else {
+            html += '<div class="history-subtitle">Dose history for me over the last 30 days:</div>';
+        }
 
         for (const key of groupKeys) {
             const items = groups.get(key) || [];
@@ -6359,6 +6425,7 @@ async function loadJournalPage() {
                 const typeLabel = formatJournalType(entry.entry_type);
                 const title = entry.title || typeLabel;
                 const details = entry.details || '';
+                const residentName = entry.resident_name || entry.resident || '';
 
                 html += `
                     <div class="history-entry-card">
@@ -6366,6 +6433,7 @@ async function loadJournalPage() {
                         <div class="history-entry-body">
                             <div class="history-entry-main">
                                 <div class="history-entry-title">${escapeHtml(title)}</div>
+                                ${(showAllResidents && residentName) ? `<div class="history-entry-details">Resident: ${escapeHtml(residentName)}</div>` : ''}
                                 ${details ? `<div class="history-entry-details">${escapeHtml(details)}</div>` : ''}
                             </div>
                             <div class="history-entry-meta">

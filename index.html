@@ -1608,6 +1608,36 @@
             <!-- History / Journal Page -->
             <div id="history" class="page">
                 <h2>History / Journal</h2>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="historyAllResidents" checked>
+                                All Residents
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="historyStaffFilter">Staff</label>
+                            <select id="historyStaffFilter" class="form-control">
+                                <option value="">All Staff</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="historySince">From (date/time)</label>
+                            <input type="datetime-local" id="historySince" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="historyUntil">To (date/time)</label>
+                            <input type="datetime-local" id="historyUntil" class="form-control">
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-bottom: 0;">
+                        <button class="btn btn-secondary" type="button" onclick="setHistoryYesterday()">Yesterday</button>
+                        <button class="btn btn-primary" type="button" onclick="loadJournalPage()">Apply / Refresh</button>
+                    </div>
+                </div>
                 <div class="button-group" style="margin-bottom: 1rem;">
                     <button class="btn btn-primary" onclick="loadJournalPage()">Refresh</button>
                 </div>

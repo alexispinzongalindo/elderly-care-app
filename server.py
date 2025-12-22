@@ -3710,6 +3710,7 @@ def journal_entries():
     cursor = conn.cursor()
 
     resident_id = request.args.get('resident_id')
+    staff_id = request.args.get('staff_id')
     entry_type = request.args.get('entry_type')
     since = request.args.get('since')
     until = request.args.get('until')
@@ -3724,23 +3725,35 @@ def journal_entries():
     if limit_int > 500:
         limit_int = 500
 
-    query = 'SELECT * FROM journal_entries WHERE 1=1'
+    query = """
+        SELECT
+            je.*,
+            (r.first_name || ' ' || r.last_name) AS resident_name,
+            COALESCE(je.staff_name, s.full_name) AS staff_name
+        FROM journal_entries je
+        LEFT JOIN residents r ON je.resident_id = r.id
+        LEFT JOIN staff s ON je.staff_id = s.id
+        WHERE 1=1
+    """
     params = []
 
     if resident_id:
-        query += ' AND resident_id = ?'
+        query += ' AND je.resident_id = ?'
         params.append(resident_id)
+    if staff_id:
+        query += ' AND je.staff_id = ?'
+        params.append(staff_id)
     if entry_type:
-        query += ' AND entry_type = ?'
+        query += ' AND je.entry_type = ?'
         params.append(entry_type)
     if since:
-        query += ' AND COALESCE(occurred_at, created_at) >= ?'
+        query += ' AND COALESCE(je.occurred_at, je.created_at) >= ?'
         params.append(since)
     if until:
-        query += ' AND COALESCE(occurred_at, created_at) <= ?'
+        query += ' AND COALESCE(je.occurred_at, je.created_at) <= ?'
         params.append(until)
 
-    query += ' ORDER BY COALESCE(occurred_at, created_at) DESC'
+    query += ' ORDER BY COALESCE(je.occurred_at, je.created_at) DESC'
     query += f' LIMIT {limit_int}'
 
     cursor.execute(query, params)
