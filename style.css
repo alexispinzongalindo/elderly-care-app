@@ -2616,6 +2616,26 @@ body.dark-mode kbd {
         page-break-inside: avoid;
         border: 1px solid #ccc;
     }
+
+    #journalPageList {
+        gap: 0 !important;
+    }
+
+    .history-entry-card {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        border-left: none !important;
+        padding: 0.5rem 0 !important;
+    }
+
+    #journalPageList .history-entry-card + .history-entry-card {
+        border-top: 1px solid #000 !important;
+        padding-top: 0.75rem !important;
+        margin-top: 0.75rem !important;
+    }
     
     @page {
         margin: 1cm;
