@@ -2673,6 +2673,7 @@ function showPage(pageName) {
 	// Guard against re-entrancy / rapid repeated calls (Safari can trigger duplicate events)
 	const now = Date.now();
 	const activePageEl = document.querySelector('.page.active');
+	const fromPageName = activePageEl ? activePageEl.id : null;
 	if (activePageEl && activePageEl.id === pageName) {
 		return;
 	}
@@ -2970,9 +2971,13 @@ function showPage(pageName) {
 					}
 				}, delayMs);
 			};
-			scrollToHistory(0);
-			scrollToHistory(120);
-			scrollToHistory(350);
+			// Only force-scroll when we are actually navigating into History from another page.
+			// Otherwise, re-showing the page (or accidental duplicate routing) can yank the user to the top.
+			if (fromPageName && fromPageName !== 'history') {
+				scrollToHistory(0);
+				scrollToHistory(120);
+				scrollToHistory(350);
+			}
 
             // Force a reflow so Safari recalculates dimensions
             void targetPage.offsetHeight;
@@ -6431,6 +6436,8 @@ async function loadJournalPage() {
         const container = document.getElementById('journalPageList');
         if (!container) return;
 
+        setupHistoryEnterKeyBehavior();
+
         setupHistoryResidentFilterControls();
         await ensureHistoryResidentOptionsLoaded();
         await ensureHistoryStaffOptionsLoaded();
@@ -6555,6 +6562,31 @@ async function loadJournalPage() {
         console.error('Error loading journal page:', error);
         showMessage('Error loading history / Error al cargar historial', 'error');
     }
+}
+
+function setupHistoryEnterKeyBehavior() {
+    const historyPage = document.getElementById('history');
+    if (!historyPage) return;
+    if (historyPage.dataset.enterBound === 'true') return;
+
+    const ids = ['historySince', 'historyUntil', 'historyResidentFilter', 'historyStaffFilter', 'historyEmailTo'];
+    ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            // On filter fields, Enter should refresh the list.
+            // On the email field, do nothing (avoid surprising sends).
+            if (id !== 'historyEmailTo') {
+                loadJournalPage();
+            }
+        });
+    });
+
+    historyPage.dataset.enterBound = 'true';
 }
 
 // Reports & Analytics
