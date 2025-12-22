@@ -91,14 +91,15 @@ def send_email_via_resend(to_email, subject, html_body, text_body=None, attachme
         
         print(f"📧 Sending email via Resend API to {to_email}...")
         with urllib.request.urlopen(req, timeout=10) as response:
+            status = response.getcode()
             response_data = json.loads(response.read().decode('utf-8'))
-            if response.getcode() == 200:
+            if status in (200, 201):
                 print(f"✅ Email sent successfully via Resend to {to_email}")
+                print(f"   Resend status: {status}")
                 print(f"   Resend ID: {response_data.get('id', 'N/A')}")
                 return True
-            else:
-                print(f"❌ Resend API returned status {response.getcode()}: {response_data}")
-                return False
+            print(f"❌ Resend API returned status {status}: {response_data}")
+            return False
                 
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8')
@@ -252,11 +253,14 @@ def send_email(to_email, subject, html_body, text_body=None, attachments=None):
     """
     # Prefer Resend API (works on Render), fallback to SMTP for local dev
     if USE_RESEND:
+        print('📧 Email provider: Resend')
         result = send_email_via_resend(to_email, subject, html_body, text_body, attachments)
         if result:
             return True
         # If Resend fails, fall back to SMTP (but log the attempt)
         print("⚠️ Resend failed, attempting SMTP fallback...")
+
+    print('📧 Email provider: SMTP')
 
     # Use SMTP (may not work on Render free tier)
     return send_email_via_smtp(to_email, subject, html_body, text_body, attachments)
