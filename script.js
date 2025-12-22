@@ -40,6 +40,10 @@ let currentLanguage = 'en'; // Default to English
 let appInitialized = false;
 let currentUser = null;
 
+let showPageInProgress = false;
+let lastShowPageName = null;
+let lastShowPageAt = 0;
+
 let languageObserver = null;
 let languageObserverTimer = null;
 let isApplyingLanguageUpdate = false;
@@ -2647,11 +2651,36 @@ function initNavigation() {
 
 // Make showPage globally accessible - CRITICAL FUNCTION
 function showPage(pageName) {
-    console.log('%c📄📄📄 showPage() CALLED with: ' + pageName + ' 📄📄📄', 'background: #FF6B6B; color: white; font-size: 18px; font-weight: bold; padding: 10px;');
-    console.log('📄 Current URL:', window.location.href);
-    console.log('📄 Timestamp:', new Date().toISOString());
+	// Guard against re-entrancy / rapid repeated calls (Safari can trigger duplicate events)
+	const now = Date.now();
+	const activePageEl = document.querySelector('.page.active');
+	if (activePageEl && activePageEl.id === pageName) {
+		return;
+	}
+	if (showPageInProgress) {
+		return;
+	}
+	if (lastShowPageName === pageName && (now - lastShowPageAt) < 600) {
+		return;
+	}
+	showPageInProgress = true;
+	lastShowPageName = pageName;
+	lastShowPageAt = now;
 
-    const scrollYBefore = window.scrollY;
+	try {
+		if (pageName === 'history') {
+			console.log('🧵 showPage(history) call stack:');
+			try {
+				console.trace('showPage(history)');
+			} catch (e) {
+				// ignore
+			}
+		}
+        console.log('%c📄📄📄 showPage() CALLED with: ' + pageName + ' 📄📄📄', 'background: #FF6B6B; color: white; font-size: 18px; font-weight: bold; padding: 10px;');
+        console.log('📄 Current URL:', window.location.href);
+        console.log('📄 Timestamp:', new Date().toISOString());
+
+        const scrollYBefore = window.scrollY;
 
     const debugLayout = (label, el) => {
         try {
@@ -2706,15 +2735,15 @@ function showPage(pageName) {
         el.style.removeProperty('z-index');
     };
 
-    if (!pageName) {
-        console.error('❌ showPage called with no pageName!');
-        return;
-    }
+        if (!pageName) {
+            console.error('❌ showPage called with no pageName!');
+            return;
+        }
 
     const pages = document.querySelectorAll('.page');
     console.log('📄 Found', pages.length, 'pages in DOM');
 
-    // CRITICAL: Hide ALL pages first with inline styles to override any forced visibility
+    // CRITICAL: Hide ALL pages first. Avoid offscreen absolute positioning; Safari can keep 0x0 layouts.
     pages.forEach(page => {
         if (page.id !== pageName) {
             // SPECIAL: Don't hide financial page if we're showing it
@@ -2722,14 +2751,17 @@ function showPage(pageName) {
                 return;
             }
             page.classList.remove('active');
-            // Use !important via setProperty to override any CSS - only hide the page container itself
-            // Don't hide children here as it can interfere with the target page's children
+            // Hide only via display/visibility; clear any positional hacks.
             page.style.setProperty('display', 'none', 'important');
             page.style.setProperty('visibility', 'hidden', 'important');
             page.style.setProperty('opacity', '0', 'important');
-            page.style.setProperty('position', 'absolute', 'important');
-            page.style.setProperty('left', '-9999px', 'important');
-            page.style.setProperty('z-index', '-1', 'important');
+            page.style.removeProperty('position');
+            page.style.removeProperty('left');
+            page.style.removeProperty('top');
+            page.style.removeProperty('right');
+            page.style.removeProperty('bottom');
+            page.style.removeProperty('transform');
+            page.style.removeProperty('z-index');
         }
     });
 
@@ -2745,8 +2777,8 @@ function showPage(pageName) {
         }
     }
 
-    const targetPage = document.getElementById(pageName);
-    if (targetPage) {
+        const targetPage = document.getElementById(pageName);
+        if (targetPage) {
         targetPage.classList.add('active');
 
         resetLayoutStyles(targetPage);
@@ -2852,7 +2884,44 @@ function showPage(pageName) {
         if (pageName === 'history') {
             // History was previously hidden via absolute/offscreen styles; ensure it is fully reset.
             targetPage.classList.add('active');
-            targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: 0 !important; top: 0 !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+            targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: 0 !important; top: 0 !important; z-index: 10 !important; min-height: 400px !important; height: auto !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+
+			// Ensure key child containers contribute to layout.
+			const historyH2 = targetPage.querySelector('h2');
+			if (historyH2) {
+				historyH2.style.setProperty('display', 'block', 'important');
+				historyH2.style.setProperty('visibility', 'visible', 'important');
+				historyH2.style.setProperty('opacity', '1', 'important');
+			}
+			const historyButtonGroup = targetPage.querySelector('.button-group');
+			if (historyButtonGroup) {
+				historyButtonGroup.style.setProperty('display', 'flex', 'important');
+				historyButtonGroup.style.setProperty('visibility', 'visible', 'important');
+				historyButtonGroup.style.setProperty('opacity', '1', 'important');
+				historyButtonGroup.style.setProperty('position', 'relative', 'important');
+			}
+			const journalList = document.getElementById('journalPageList');
+			if (journalList) {
+				journalList.style.setProperty('display', 'block', 'important');
+				journalList.style.setProperty('visibility', 'visible', 'important');
+				journalList.style.setProperty('opacity', '1', 'important');
+				journalList.style.setProperty('min-height', '200px', 'important');
+			}
+
+			// Safari sometimes needs scroll/next-ticks to settle layout.
+			const scrollToHistory = (delayMs) => {
+				setTimeout(() => {
+					try {
+						targetPage.scrollIntoView({ behavior: 'instant', block: 'start' });
+					} catch (e) {
+						window.scrollTo({ top: 0, behavior: 'instant' });
+					}
+				}, delayMs);
+			};
+			scrollToHistory(0);
+			scrollToHistory(120);
+			scrollToHistory(350);
+
             // Force a reflow so Safari recalculates dimensions
             void targetPage.offsetHeight;
         }
@@ -2947,6 +3016,7 @@ function showPage(pageName) {
             debugLayout('mainContainer(before-fix)', mainContainer);
             debugLayout('#mainApp(before-fix)', document.getElementById('mainApp'));
             debugLayout('body(before-fix)', document.body);
+            debugLayout('html(before-fix)', document.documentElement);
 
             targetPage.style.setProperty('display', 'block', 'important');
             targetPage.style.setProperty('visibility', 'visible', 'important');
@@ -2965,6 +3035,21 @@ function showPage(pageName) {
                 mainContainer.style.setProperty('opacity', '1', 'important');
             }
 
+            const mainAppEl = document.getElementById('mainApp');
+            if (mainAppEl) {
+                mainAppEl.style.setProperty('display', 'block', 'important');
+                mainAppEl.style.setProperty('visibility', 'visible', 'important');
+                mainAppEl.style.setProperty('opacity', '1', 'important');
+                mainAppEl.style.setProperty('width', '100%', 'important');
+                mainAppEl.style.setProperty('min-height', '100vh', 'important');
+            }
+            if (document.documentElement) {
+                document.documentElement.style.setProperty('min-height', '100vh', 'important');
+            }
+            if (document.body) {
+                document.body.style.setProperty('min-height', '100vh', 'important');
+            }
+
             // Safari can report 0x0 until the next frame even when styles are correct.
             // Do a next-frame retry with a stronger cssText reset.
             window.requestAnimationFrame(() => {
@@ -2981,6 +3066,8 @@ function showPage(pageName) {
                         debugLayout('targetPage(after-retry)', targetPage);
                         debugLayout('mainContainer(after-retry)', mainContainer);
                         debugLayout('#mainApp(after-retry)', document.getElementById('mainApp'));
+                        debugLayout('body(after-retry)', document.body);
+                        debugLayout('html(after-retry)', document.documentElement);
                     }
                 } catch (e) {
                     console.error('Error in page retry visibility fix:', e);
@@ -3822,6 +3909,13 @@ function showPage(pageName) {
 
     // Update all translatable elements (data-translate attributes)
     updateTranslations();
+} catch (error) {
+    console.error('Error showing page:', error);
+} finally {
+    // Always release guard, even on early returns/errors
+    showPageInProgress = false;
+}
+
 }
 
 function showMessage(message, type = 'success') {

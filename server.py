@@ -3923,4 +3923,25 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     # Disable debug in production
     debug_mode = os.environ.get('FLASK_DEBUG', '0') == '1'
-    app.run(host='0.0.0.0', port=port, debug=debug_mode)
+
+    # IMPORTANT: The Flask reloader can spawn a second process and cause unstable behavior
+    # in IDE runners (needing multiple "Run" presses, port contention). Default OFF.
+    use_reloader = os.environ.get('FLASK_USE_RELOADER', '0') == '1'
+
+    # If debug is off, never use the reloader.
+    if not debug_mode:
+        use_reloader = False
+
+    try:
+        app.run(
+            host='0.0.0.0',
+            port=port,
+            debug=debug_mode,
+            use_reloader=use_reloader,
+            threaded=True
+        )
+    except OSError as e:
+        # Common case: address already in use
+        print(f"❌ Failed to start server on port {port}: {e}")
+        print("   Tip: If this happens in an IDE, stop any previous run still holding the port.")
+        raise

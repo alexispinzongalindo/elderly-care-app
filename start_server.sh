@@ -36,10 +36,16 @@ export PORT="${PORT:-5002}"
 export FLASK_ENV="${FLASK_ENV:-development}"
 export USE_MINIFIED="${USE_MINIFIED:-false}"
 
+# IDE-friendly defaults:
+# - FLASK_DEBUG controls Flask debug mode
+# - FLASK_USE_RELOADER controls Werkzeug reloader (spawns multiple processes; can be unstable in IDE runners)
+export FLASK_DEBUG="${FLASK_DEBUG:-0}"
+export FLASK_USE_RELOADER="${FLASK_USE_RELOADER:-0}"
+
 # Start the server
 echo "🚀 Starting Elder Care Management Server..."
 echo "   Server will be available at: http://localhost:${PORT}"
-echo "   Mode: ${FLASK_ENV} (auto-reload enabled)"
+echo "   Mode: ${FLASK_ENV} (debug=${FLASK_DEBUG}, reloader=${FLASK_USE_RELOADER})"
 echo "   USE_MINIFIED: ${USE_MINIFIED}"
 echo "   Press Ctrl+C to stop the server"
 echo ""

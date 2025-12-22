@@ -406,6 +406,16 @@ body {
     padding: 0 1.5rem;
 }
 
+#mainApp {
+    width: 100%;
+    min-height: 100vh;
+}
+
+#mainApp > main.container {
+    width: 100%;
+    min-height: 1px;
+}
+
 #mainApp > main.container {
     margin-top: calc(1.5rem + var(--sticky-offset, 0px));
 }
