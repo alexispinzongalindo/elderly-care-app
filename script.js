@@ -2779,112 +2779,130 @@ function showPage(pageName) {
 
         const targetPage = document.getElementById(pageName);
         if (targetPage) {
-        targetPage.classList.add('active');
+            // CRITICAL: If any page is accidentally nested inside another `.page`, it will inherit
+            // display:none when showPage hides non-active pages, resulting in 0x0 layouts.
+            // Move the page back under main.container (same approach as the reports page fix).
+            try {
+                const mainContainerForPages = document.querySelector('#mainApp > main.container') || document.querySelector('main.container');
+                if (mainContainerForPages && targetPage.parentElement && targetPage.parentElement.classList && targetPage.parentElement.classList.contains('page')) {
+                    console.warn('⚠️⚠️⚠️ CRITICAL: Page is nested inside another .page. Moving it out...', {
+                        pageName,
+                        currentParentId: targetPage.parentElement.id || null,
+                        currentParentClass: targetPage.parentElement.className || null
+                    });
+                    mainContainerForPages.appendChild(targetPage);
+                    console.log('✅ Page moved to main.container. New parent:', targetPage.parentElement?.tagName, targetPage.parentElement?.className);
+                }
+            } catch (e) {
+                console.error('Error while ensuring page is not nested:', e);
+            }
 
-        resetLayoutStyles(targetPage);
+            targetPage.classList.add('active');
 
-        if (pageName === 'financial') {
-            targetPage.style.setProperty('margin-top', '0', 'important');
-            targetPage.style.setProperty('padding-top', '2rem', 'important');
-        }
+            resetLayoutStyles(targetPage);
 
-        // CRITICAL: Force ALL parent elements visible (same as incidents page fix)
-        let currentElement = targetPage;
-        let level = 0;
-        while (currentElement && level < 10) {
-            const computedStyle = window.getComputedStyle(currentElement);
-            const display = computedStyle.display;
-            const visibility = computedStyle.visibility;
-            const opacity = computedStyle.opacity;
+            if (pageName === 'financial') {
+                targetPage.style.setProperty('margin-top', '0', 'important');
+                targetPage.style.setProperty('padding-top', '2rem', 'important');
+            }
 
-            // Skip billing page if this page is inside it (shouldn't happen, but just in case)
-            if (currentElement.id === 'billing' && pageName !== 'billing') {
+            // CRITICAL: Force ALL parent elements visible (same as incidents page fix)
+            let currentElement = targetPage;
+            let level = 0;
+            while (currentElement && level < 10) {
+                const computedStyle = window.getComputedStyle(currentElement);
+                const display = computedStyle.display;
+                const visibility = computedStyle.visibility;
+                const opacity = computedStyle.opacity;
+
+                // Skip billing page if this page is inside it (shouldn't happen, but just in case)
+                if (currentElement.id === 'billing' && pageName !== 'billing') {
+                    currentElement = currentElement.parentElement;
+                    level++;
+                    continue;
+                }
+
+                // Fix any parent with display:none (except intentionally hidden elements)
+                if (display === 'none' && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm' && currentElement.id !== 'billForm' && currentElement.id !== 'paymentForm') {
+                    currentElement.style.setProperty('display', 'block', 'important');
+                    currentElement.style.setProperty('visibility', 'visible', 'important');
+                    currentElement.style.setProperty('opacity', '1', 'important');
+                    currentElement.style.setProperty('position', 'relative', 'important');
+                    currentElement.style.setProperty('z-index', '1', 'important');
+                }
+
+                // Also fix if visibility is hidden or opacity is 0
+                if ((visibility === 'hidden' || opacity === '0') && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm' && currentElement.id !== 'billForm' && currentElement.id !== 'paymentForm') {
+                    currentElement.style.setProperty('visibility', 'visible', 'important');
+                    currentElement.style.setProperty('opacity', '1', 'important');
+                    currentElement.style.setProperty('display', 'block', 'important');
+                }
+
+                // Stop at mainApp
+                if (currentElement.id === 'mainApp') {
+                    currentElement.style.setProperty('display', 'block', 'important');
+                    currentElement.style.setProperty('visibility', 'visible', 'important');
+                    currentElement.style.setProperty('opacity', '1', 'important');
+                    currentElement.style.setProperty('position', 'relative', 'important');
+                    currentElement.style.setProperty('z-index', '1', 'important');
+                    break;
+                }
+
                 currentElement = currentElement.parentElement;
                 level++;
-                continue;
             }
 
-            // Fix any parent with display:none (except intentionally hidden elements)
-            if (display === 'none' && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm' && currentElement.id !== 'billForm' && currentElement.id !== 'paymentForm') {
-                currentElement.style.setProperty('display', 'block', 'important');
-                currentElement.style.setProperty('visibility', 'visible', 'important');
-                currentElement.style.setProperty('opacity', '1', 'important');
-                currentElement.style.setProperty('position', 'relative', 'important');
-                currentElement.style.setProperty('z-index', '1', 'important');
+            // Also ensure main.container is visible
+            const mainContainer = targetPage.closest('main.container');
+            if (mainContainer) {
+                resetLayoutStyles(mainContainer);
+                mainContainer.style.setProperty('display', 'block', 'important');
+                mainContainer.style.setProperty('visibility', 'visible', 'important');
+                mainContainer.style.setProperty('opacity', '1', 'important');
+                mainContainer.style.setProperty('position', 'relative', 'important');
+                mainContainer.style.setProperty('width', '100%', 'important');
+                mainContainer.style.setProperty('min-height', '1px', 'important');
             }
 
-            // Also fix if visibility is hidden or opacity is 0
-            if ((visibility === 'hidden' || opacity === '0') && currentElement.id !== 'loginModal' && currentElement.id !== 'residentSelector' && currentElement.id !== 'incidentForm' && currentElement.id !== 'billForm' && currentElement.id !== 'paymentForm') {
-                currentElement.style.setProperty('visibility', 'visible', 'important');
-                currentElement.style.setProperty('opacity', '1', 'important');
-                currentElement.style.setProperty('display', 'block', 'important');
+            // Only show the target page with !important
+            targetPage.style.setProperty('display', 'block', 'important');
+            targetPage.style.setProperty('visibility', 'visible', 'important');
+            targetPage.style.setProperty('opacity', '1', 'important');
+
+            // For financial page, ensure it stays visible
+            if (pageName === 'financial') {
+                targetPage.style.setProperty('position', 'relative', 'important');
+                targetPage.style.setProperty('z-index', '10', 'important');
             }
 
-            // Stop at mainApp
-            if (currentElement.id === 'mainApp') {
-                currentElement.style.setProperty('display', 'block', 'important');
-                currentElement.style.setProperty('visibility', 'visible', 'important');
-                currentElement.style.setProperty('opacity', '1', 'important');
-                currentElement.style.setProperty('position', 'relative', 'important');
-                currentElement.style.setProperty('z-index', '1', 'important');
-                break;
-            }
-
-            currentElement = currentElement.parentElement;
-            level++;
-        }
-
-        // Also ensure main.container is visible
-        const mainContainer = targetPage.closest('main.container');
-        if (mainContainer) {
-            resetLayoutStyles(mainContainer);
-            mainContainer.style.setProperty('display', 'block', 'important');
-            mainContainer.style.setProperty('visibility', 'visible', 'important');
-            mainContainer.style.setProperty('opacity', '1', 'important');
-            mainContainer.style.setProperty('position', 'relative', 'important');
-            mainContainer.style.setProperty('width', '100%', 'important');
-            mainContainer.style.setProperty('min-height', '1px', 'important');
-        }
-
-        // Only show the target page with !important
-        targetPage.style.setProperty('display', 'block', 'important');
-        targetPage.style.setProperty('visibility', 'visible', 'important');
-        targetPage.style.setProperty('opacity', '1', 'important');
-
-        // For financial page, ensure it stays visible
-        if (pageName === 'financial') {
-            targetPage.style.setProperty('position', 'relative', 'important');
-            targetPage.style.setProperty('z-index', '10', 'important');
-        }
-
-        // SPECIAL HANDLING FOR REPORTS PAGE - reset any leftover offscreen/absolute styles
-        if (pageName === 'reports') {
-            // If reports is nested under a page that can be hidden (e.g., billing/financial), move it out.
-            const reportsPage = document.getElementById('reports');
-            const billingPage = document.getElementById('billing');
-            if (reportsPage && billingPage && reportsPage.parentElement && reportsPage.parentElement.id === 'billing') {
-                console.log('⚠️⚠️⚠️ CRITICAL: Reports page is INSIDE billing page! Moving it out...');
-                const mainContainer = billingPage.parentElement; // Should be main.container
-                if (mainContainer) {
-                    mainContainer.insertBefore(reportsPage, billingPage.nextSibling);
-                    console.log('✅ Reports page moved out of billing page');
-                    console.log('✅ New parent:', reportsPage.parentElement?.tagName, reportsPage.parentElement?.id);
+            // SPECIAL HANDLING FOR REPORTS PAGE - reset any leftover offscreen/absolute styles
+            if (pageName === 'reports') {
+                // If reports is nested under a page that can be hidden (e.g., billing/financial), move it out.
+                const reportsPage = document.getElementById('reports');
+                const billingPage = document.getElementById('billing');
+                if (reportsPage && billingPage && reportsPage.parentElement && reportsPage.parentElement.id === 'billing') {
+                    console.log('⚠️⚠️⚠️ CRITICAL: Reports page is INSIDE billing page! Moving it out...');
+                    const mainContainer = billingPage.parentElement; // Should be main.container
+                    if (mainContainer) {
+                        mainContainer.insertBefore(reportsPage, billingPage.nextSibling);
+                        console.log('✅ Reports page moved out of billing page');
+                        console.log('✅ New parent:', reportsPage.parentElement?.tagName, reportsPage.parentElement?.id);
+                    }
                 }
+
+                // Force reports page visible using cssText for maximum control (Safari can keep it at 0x0 otherwise)
+                targetPage.classList.add('active');
+                targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+
+                // Force a reflow so Safari recalculates dimensions
+                void targetPage.offsetHeight;
             }
 
-            // Force reports page visible using cssText for maximum control (Safari can keep it at 0x0 otherwise)
-            targetPage.classList.add('active');
-            targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
-
-            // Force a reflow so Safari recalculates dimensions
-            void targetPage.offsetHeight;
-        }
-
-        // SPECIAL HANDLING FOR HISTORY PAGE - Safari can keep it at 0x0 otherwise
-        if (pageName === 'history') {
-            // History was previously hidden via absolute/offscreen styles; ensure it is fully reset.
-            targetPage.classList.add('active');
-            targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: 0 !important; top: 0 !important; z-index: 10 !important; min-height: 400px !important; height: auto !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+            // SPECIAL HANDLING FOR HISTORY PAGE - Safari can keep it at 0x0 otherwise
+            if (pageName === 'history') {
+                // History was previously hidden via absolute/offscreen styles; ensure it is fully reset.
+                targetPage.classList.add('active');
+                targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: 0 !important; top: 0 !important; z-index: 10 !important; min-height: 400px !important; height: auto !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
 
 			// Ensure key child containers contribute to layout.
 			const historyH2 = targetPage.querySelector('h2');
@@ -3111,8 +3129,10 @@ function showPage(pageName) {
 
         if (pageName === 'financial') {
             window.requestAnimationFrame(() => {
-                if (Math.abs(window.scrollY - scrollYBefore) > 2) {
-                    window.scrollTo({ top: scrollYBefore, behavior: 'instant' });
+                try {
+                    targetPage.scrollIntoView({ behavior: 'instant', block: 'start' });
+                } catch (e) {
+                    window.scrollTo({ top: 0, behavior: 'instant' });
                 }
             });
         }
@@ -3637,284 +3657,25 @@ function showPage(pageName) {
             loadReportsAnalytics();
         }
         else if (pageName === 'financial') {
-            console.log('💰💰💰 FINANCIAL PAGE - COMPLETE REWRITE APPROACH 💰💰💰');
-
-            const financialPage = document.getElementById('financial');
-            if (!financialPage) {
-                console.error('❌ Financial page not found!');
-                return;
-            }
-
-            // COMPLETE REWRITE: Remove all inline styles and start fresh
-            financialPage.removeAttribute('style');
-            financialPage.className = 'page active';
-
-            // Check parent chain
-            let parent = financialPage.parentElement;
-            let level = 0;
-            while (parent && level < 5) {
-                const parentStyle = window.getComputedStyle(parent);
-                console.log(`🔍 Parent level ${level}:`, parent.tagName, parent.className, {
-                    display: parentStyle.display,
-                    visibility: parentStyle.visibility,
-                    height: parent.offsetHeight,
-                    width: parent.offsetWidth
-                });
-
-                // Force parent visible if needed
-                if (parentStyle.display === 'none' || parent.offsetHeight === 0) {
-                    parent.style.setProperty('display', 'block', 'important');
-                    parent.style.setProperty('visibility', 'visible', 'important');
-                    parent.style.setProperty('min-height', '600px', 'important');
-                    console.log(`⚠️ Fixed parent level ${level}`);
-                }
-
-                parent = parent.parentElement;
-                level++;
-            }
-
-            // Now set the financial page with ALL possible CSS properties
-            financialPage.style.cssText = `
-                display: block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                position: relative !important;
-                z-index: 999 !important;
-                height: 800px !important;
-                min-height: 800px !important;
-                max-height: none !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 2rem !important;
-                margin: 0 !important;
-                overflow: visible !important;
-                background: #f5f5f5 !important;
-                box-sizing: border-box !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: auto !important;
-            `;
-
-            // Force ALL children with explicit content - MORE AGGRESSIVE
-            Array.from(financialPage.children).forEach((child, idx) => {
-                if (child.tagName === 'SCRIPT') return;
-
-                let css = '';
-                if (child.tagName === 'H2') {
-                    css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 50px !important; margin: 1rem 0 !important; padding: 0.5rem 0 !important; font-size: 2rem !important; font-weight: bold !important; color: #333 !important; background: transparent !important; position: relative !important; z-index: 100 !important;';
-                } else if (child.tagName === 'P') {
-                    css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 40px !important; margin: 1rem 0 2rem 0 !important; padding: 0.5rem 0 !important; color: #666 !important; background: transparent !important; position: relative !important; z-index: 100 !important;';
-                } else if (child.classList.contains('button-group')) {
-                    css = 'display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 80px !important; margin: 2rem 0 !important; padding: 1rem 0 !important; background: transparent !important; position: relative !important; z-index: 100 !important; flex-wrap: wrap !important; gap: 1rem !important;';
-                } else if (child.classList.contains('financial-tab')) {
-                    css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 500px !important; margin: 1rem 0 !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important; position: relative !important; z-index: 100 !important;';
-                } else {
-                    css = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 100px !important; position: relative !important; z-index: 100 !important;';
-                }
-
-                child.style.cssText = css;
-                // Also set individual properties as backup
-                child.style.setProperty('display', child.tagName === 'H2' || child.classList.contains('button-group') ? (child.classList.contains('button-group') ? 'flex' : 'block') : 'block', 'important');
-                child.style.setProperty('visibility', 'visible', 'important');
-                child.style.setProperty('opacity', '1', 'important');
-                console.log(`✅ Child ${idx} (${child.tagName || child.className}) forced, height:`, child.offsetHeight, 'display:', window.getComputedStyle(child).display);
-            });
-
-            // Removed debug test div code
-
-            // Verify ALL children are visible with detailed logging
-            setTimeout(() => {
-                console.log('🔍🔍🔍 DETAILED CHILD VISIBILITY CHECK 🔍🔍🔍');
-                Array.from(financialPage.children).forEach((child, idx) => {
-                    if (child.tagName === 'SCRIPT') return;
-                    const computed = window.getComputedStyle(child);
-                    console.log(`Child ${idx} (${child.tagName || child.className}):`, {
-                        tagName: child.tagName,
-                        className: child.className,
-                        id: child.id,
-                        inDOM: child.isConnected,
-                        offsetHeight: child.offsetHeight,
-                        offsetWidth: child.offsetWidth,
-                        display: computed.display,
-                        visibility: computed.visibility,
-                        opacity: computed.opacity,
-                        backgroundColor: computed.backgroundColor,
-                        position: computed.position,
-                        zIndex: computed.zIndex
-                    });
-
-                    // If child has zero height but should be visible, force it again
-                    if (child.offsetHeight === 0 && computed.display !== 'none') {
-                        console.warn(`⚠️ Child ${idx} has zero height! Forcing again...`);
-                        child.style.setProperty('display', 'block', 'important');
-                        child.style.setProperty('min-height', '50px', 'important');
-                        child.style.setProperty('height', 'auto', 'important');
-                    }
-                });
-
-                const testDivCheck = document.getElementById('financialTestDiv');
-                if (testDivCheck) {
-                    console.log('🔍 Test div check:', {
-                        inDOM: testDivCheck.isConnected,
-                        parent: testDivCheck.parentElement?.id,
-                        height: testDivCheck.offsetHeight,
-                        width: testDivCheck.offsetWidth,
-                        display: window.getComputedStyle(testDivCheck).display,
-                        visibility: window.getComputedStyle(testDivCheck).visibility,
-                        opacity: window.getComputedStyle(testDivCheck).opacity,
-                        background: window.getComputedStyle(testDivCheck).backgroundColor
-                    });
-                } else {
-                    console.error('❌ Test div not found after creation!');
-                }
-            }, 100);
-
-            console.log('✅ Financial page completely rewritten, test div added');
-            console.log('🔍 Financial page dimensions:', {
-                height: financialPage.offsetHeight,
-                width: financialPage.offsetWidth,
-                display: window.getComputedStyle(financialPage).display
-            });
-
-            // CRITICAL: Show accounts tab IMMEDIATELY before initFinancialPage
-            console.log('🔴 CRITICAL: Showing accounts tab IMMEDIATELY...');
-            const accountsTab = document.getElementById('financialAccounts');
-            if (accountsTab) {
-                accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important; position: relative !important;';
-                console.log('✅ Accounts tab forced visible immediately, height:', accountsTab.offsetHeight);
-
-                // Force all children of accounts tab visible
-                Array.from(accountsTab.children).forEach((child) => {
-                    child.style.setProperty('display', 'block', 'important');
-                    child.style.setProperty('visibility', 'visible', 'important');
-                    child.style.setProperty('opacity', '1', 'important');
-                });
-
-                // AGGRESSIVE: Find and force form-card visible
-                const formCard = accountsTab.querySelector('.form-card');
-                if (formCard) {
-                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important;';
-                    console.log('✅✅✅ FORM-CARD FOUND AND FORCED VISIBLE IN showPage ✅✅✅');
-
-                    // Find and force button visible
-                    const button = formCard.querySelector('button');
-                    if (button) {
-                        button.style.setProperty('display', 'inline-block', 'important');
-                        button.style.setProperty('visibility', 'visible', 'important');
-                        button.style.setProperty('opacity', '1', 'important');
-
-                        console.log('✅✅✅ BUTTON FOUND AND FORCED VISIBLE IN showPage ✅✅✅');
-                        console.log('🔍 Button position:', button.getBoundingClientRect());
-                    } else {
-                        console.error('❌❌❌ BUTTON NOT FOUND IN FORM-CARD!');
-                    }
-                } else {
-                    console.error('❌❌❌ FORM-CARD NOT FOUND IN ACCOUNTS TAB!');
-                }
-            }
-
-            // Hide other tabs
-            ['financialTransactions', 'financialReconciliation', 'financialReceipts'].forEach(tabId => {
-                const tab = document.getElementById(tabId);
-                if (tab) {
-                    tab.style.setProperty('display', 'none', 'important');
-                }
-            });
-
-            // Update button styles
-            const tabButtons = financialPage.querySelectorAll('.button-group button');
-            tabButtons.forEach((btn, idx) => {
-                if (idx === 0) {
-                    btn.classList.remove('btn-secondary');
-                    btn.classList.add('btn-primary');
-                } else {
-                    btn.classList.remove('btn-primary');
-                    btn.classList.add('btn-secondary');
-                }
-            });
-
-            // ULTRA AGGRESSIVE FIX: Add test div and create button if missing
-            setTimeout(() => {
-
-                const accountsTab = document.getElementById('financialAccounts');
-                if (!accountsTab) {
-                    console.error('❌❌❌ ACCOUNTS TAB NOT FOUND!');
-                    return;
-                }
-
-                accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; min-height: 500px !important;';
-
-                // Try multiple selectors to find form-card
-                let formCard = accountsTab.querySelector('.form-card');
-                if (!formCard) {
-                    formCard = document.querySelector('#financialAccounts .form-card');
-                }
-                if (!formCard) {
-                    // Create form-card if it doesn't exist
-                    formCard = document.createElement('div');
-                    formCard.className = 'form-card';
-                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; margin-bottom: 1rem !important; min-height: 200px !important;';
-                    formCard.innerHTML = '<h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Bank Accounts / Cuentas Bancarias</h3>';
-                    accountsTab.insertBefore(formCard, accountsTab.firstChild);
-                    console.log('✅✅✅ CREATED FORM-CARD BECAUSE IT WAS MISSING ✅✅✅');
-                } else {
-                    formCard.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1rem !important; padding: 2rem !important; background: white !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10000 !important; min-height: 150px !important; width: 100% !important; box-sizing: border-box !important;';
-                    console.log('✅✅✅ FORM-CARD FOUND AND FORCED VISIBLE ✅✅✅');
-                }
-
-                // Find or create button
-                let addButton = formCard.querySelector('button');
-                if (!addButton) {
-                    addButton = document.querySelector('#financialAccounts button');
-                }
-
-                if (!addButton) {
-                    // CREATE BUTTON if it doesn't exist
-                    addButton = document.createElement('button');
-                    addButton.className = 'btn btn-primary';
-                    addButton.textContent = '+ Add Bank Account / Agregar Cuenta Bancaria';
-                    addButton.onclick = function() { showBankAccountForm(); };
-                    formCard.appendChild(addButton);
-                    console.log('✅✅✅ CREATED BUTTON BECAUSE IT WAS MISSING ✅✅✅');
-                }
-
-                // Force button visible with normal styling
-                addButton.style.setProperty('display', 'inline-block', 'important');
-                addButton.style.setProperty('visibility', 'visible', 'important');
-                addButton.style.setProperty('opacity', '1', 'important');
-                console.log('✅✅✅ BUTTON FORCED VISIBLE WITH NORMAL STYLING ✅✅✅');
-                console.log('🔍 Button position:', addButton.getBoundingClientRect());
-
-                const bankAccountsList = document.getElementById('bankAccountsList');
-                if (bankAccountsList) {
-                    bankAccountsList.style.setProperty('display', 'block', 'important');
-                    bankAccountsList.style.setProperty('visibility', 'visible', 'important');
-                    bankAccountsList.style.setProperty('opacity', '1', 'important');
-                    bankAccountsList.style.setProperty('min-height', '250px', 'important');
-
-                    if (!bankAccountsList.innerHTML || bankAccountsList.innerHTML.trim() === '') {
-                        bankAccountsList.innerHTML = '<div style="padding: 3rem; text-align: center; color: #333; background: #f5f5f5; border-radius: 8px; margin: 2rem 0; min-height: 200px; display: flex !important; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ddd; visibility: visible !important; opacity: 1 !important; width: 100%; box-sizing: border-box;"><p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 500; color: #555;">No bank accounts found.</p><p style="color: #666; font-size: 0.95rem;">Click "Add Bank Account" above to create your first account.</p></div>';
-                    }
-                }
-                initFinancialPage();
-            }, 100);
+            // Financial page should behave like any other page. The layout issues were caused by
+            // nested pages / forced CSS overrides. Keep initialization focused on data + tab state.
+            initFinancialPage();
         }
-    } else {
-        console.error('❌ Page not found:', pageName);
+        } else {
+            console.error('❌ Page not found:', pageName);
+        }
+
+        // Replace dual-language text with single language after page is shown
+        replaceDualLanguageText();
+
+        // Update all translatable elements (data-translate attributes)
+        updateTranslations();
+    } catch (error) {
+        console.error('Error showing page:', error);
+    } finally {
+        // Always release guard, even on early returns/errors
+        showPageInProgress = false;
     }
-
-    // Replace dual-language text with single language after page is shown
-    replaceDualLanguageText();
-
-    // Update all translatable elements (data-translate attributes)
-    updateTranslations();
-} catch (error) {
-    console.error('Error showing page:', error);
-} finally {
-    // Always release guard, even on early returns/errors
-    showPageInProgress = false;
-}
 
 }
 
