@@ -9,7 +9,8 @@ dependencies = [
     "openai>=2.9.0",
     "python-dotenv>=1.2.1",
     "marshmallow>=3.20.0",
-    "marshmallow-sqlalchemy>=0.29.0"
+    "marshmallow-sqlalchemy>=0.29.0",
+    "reportlab>=4.2.5"
 ]
 
 [tool.mypy]

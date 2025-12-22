@@ -6,9 +6,12 @@ Supports Resend API (HTTP-based, works on Render) and Gmail SMTP (for local dev)
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 from datetime import datetime
 import os
 import json
+import base64
 import urllib.request
 import urllib.parse
 import urllib.error
@@ -28,7 +31,7 @@ SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', '')  # Gmail App Password
 # Use Resend if API key is set, otherwise use SMTP
 USE_RESEND = bool(RESEND_API_KEY)
 
-def send_email_via_resend(to_email, subject, html_body, text_body=None):
+def send_email_via_resend(to_email, subject, html_body, text_body=None, attachments=None):
     """
     Send email using Resend API (HTTP-based, works on Render)
     
@@ -64,6 +67,21 @@ def send_email_via_resend(to_email, subject, html_body, text_body=None):
         
         if text_body:
             data["text"] = text_body
+
+        if attachments:
+            encoded_attachments = []
+            for att in attachments:
+                try:
+                    filename, content_bytes, mime_type = att
+                    encoded_attachments.append({
+                        "filename": filename,
+                        "content": base64.b64encode(content_bytes).decode('utf-8'),
+                        "content_type": mime_type
+                    })
+                except Exception:
+                    continue
+            if encoded_attachments:
+                data["attachments"] = encoded_attachments
         
         json_data = json.dumps(data).encode('utf-8')
         
@@ -97,7 +115,7 @@ def send_email_via_resend(to_email, subject, html_body, text_body=None):
         traceback.print_exc()
         return False
 
-def send_email_via_smtp(to_email, subject, html_body, text_body=None):
+def send_email_via_smtp(to_email, subject, html_body, text_body=None, attachments=None):
     """
     Send email using SMTP (Gmail, etc.) - for local development
     Works on local machines but may be blocked on Render free tier
@@ -124,18 +142,33 @@ def send_email_via_smtp(to_email, subject, html_body, text_body=None):
     
     try:
         # Create message
-        msg = MIMEMultipart('alternative')
+        msg = MIMEMultipart('mixed')
         msg['From'] = SENDER_EMAIL
         msg['To'] = to_email
         msg['Subject'] = subject
-        
+
         # Add text and HTML parts
+        alt_part = MIMEMultipart('alternative')
         if text_body:
             part1 = MIMEText(text_body, 'plain')
-            msg.attach(part1)
-        
+            alt_part.attach(part1)
+
         part2 = MIMEText(html_body, 'html')
-        msg.attach(part2)
+        alt_part.attach(part2)
+
+        msg.attach(alt_part)
+
+        if attachments:
+            for filename, content_bytes, mime_type in attachments:
+                try:
+                    main_type, sub_type = (mime_type.split('/', 1) + ['octet-stream'])[:2]
+                except Exception:
+                    main_type, sub_type = 'application', 'octet-stream'
+                part = MIMEBase(main_type, sub_type)
+                part.set_payload(content_bytes)
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f'attachment; filename="{filename}"')
+                msg.attach(part)
         
         # Try to send email - use SSL (port 465) first, then STARTTLS (port 587)
         # Render often blocks port 587, so we try 465 first
@@ -203,7 +236,7 @@ def send_email_via_smtp(to_email, subject, html_body, text_body=None):
         traceback.print_exc()
         return False
 
-def send_email(to_email, subject, html_body, text_body=None):
+def send_email(to_email, subject, html_body, text_body=None, attachments=None):
     """
     Send email - automatically chooses Resend API (if configured) or SMTP (fallback)
     
@@ -212,20 +245,21 @@ def send_email(to_email, subject, html_body, text_body=None):
         subject: Email subject
         html_body: HTML email body
         text_body: Plain text email body (optional)
+        attachments: List of attachments (filename, content_bytes, mime_type)
     
     Returns:
         bool: True if email sent successfully, False otherwise
     """
     # Prefer Resend API (works on Render), fallback to SMTP for local dev
     if USE_RESEND:
-        result = send_email_via_resend(to_email, subject, html_body, text_body)
+        result = send_email_via_resend(to_email, subject, html_body, text_body, attachments)
         if result:
             return True
         # If Resend fails, fall back to SMTP (but log the attempt)
         print("⚠️ Resend failed, attempting SMTP fallback...")
-    
+
     # Use SMTP (may not work on Render free tier)
-    return send_email_via_smtp(to_email, subject, html_body, text_body)
+    return send_email_via_smtp(to_email, subject, html_body, text_body, attachments)
 
 def send_medication_alert(resident_name, medication_name, scheduled_time, staff_email, language='en'):
     """

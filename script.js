@@ -6458,6 +6458,28 @@ async function generateReport(event) {
 
         // Collect data based on report type
         switch(reportType) {
+            case 'journal':
+                {
+                    const sinceEl = document.getElementById('journalSince');
+                    const untilEl = document.getElementById('journalUntil');
+                    const staffEl = document.getElementById('journalStaff');
+                    const since = sinceEl?.value ? new Date(sinceEl.value).toISOString() : '';
+                    const until = untilEl?.value ? new Date(untilEl.value).toISOString() : '';
+                    const staffId = staffEl?.value || '';
+
+                    const params = new URLSearchParams();
+                    if (currentResidentId) params.set('resident_id', String(currentResidentId));
+                    if (since) params.set('since', since);
+                    if (until) params.set('until', until);
+                    if (staffId) params.set('staff_id', staffId);
+
+                    const res = await fetch(`/api/reports/journal?${params.toString()}`, { headers: getAuthHeaders() });
+                    if (res.ok) {
+                        data = await res.json();
+                    }
+                    title = 'Journal Report / Reporte de Diario';
+                }
+                break;
             case 'incidents':
                 const incidentsRes = await fetch(`/api/incidents?resident_id=${currentResidentId || ''}`, { headers: getAuthHeaders() });
                 if (incidentsRes.ok) {
@@ -6527,6 +6549,121 @@ function escapeHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+async function ensureJournalStaffOptionsLoaded() {
+    const staffSelect = document.getElementById('journalStaff');
+    if (!staffSelect) return;
+    if (staffSelect.dataset.loaded === 'true') return;
+
+    try {
+        const res = await fetch('/api/staff', { headers: getAuthHeaders() });
+        if (!res.ok) return;
+        const staff = await res.json();
+        staffSelect.innerHTML = '<option value="">All Staff</option>' +
+            (Array.isArray(staff)
+                ? staff.map(s => `<option value="${s.id}">${escapeHtml(s.full_name || s.username || ('Staff ' + s.id))}</option>`).join('')
+                : '');
+        staffSelect.dataset.loaded = 'true';
+    } catch {
+        // ignore
+    }
+}
+
+function handleReportTypeChange() {
+    const typeEl = document.getElementById('reportType');
+    const extras = document.getElementById('journalReportExtras');
+    if (!typeEl || !extras) return;
+
+    if (typeEl.value === 'journal') {
+        extras.style.display = 'block';
+        ensureJournalStaffOptionsLoaded();
+    } else {
+        extras.style.display = 'none';
+    }
+}
+
+async function downloadJournalPdf() {
+    try {
+        const sinceEl = document.getElementById('journalSince');
+        const untilEl = document.getElementById('journalUntil');
+        const staffEl = document.getElementById('journalStaff');
+        const since = sinceEl?.value ? new Date(sinceEl.value).toISOString() : null;
+        const until = untilEl?.value ? new Date(untilEl.value).toISOString() : null;
+        const staffId = staffEl?.value || null;
+
+        const payload = {
+            resident_id: currentResidentId || null,
+            staff_id: staffId,
+            since,
+            until
+        };
+
+        const res = await fetch('/api/reports/journal/pdf', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            showMessage(err.error || 'Failed to generate PDF', 'error');
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'journal_report.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        console.error('downloadJournalPdf error:', e);
+        showMessage('Failed to download PDF', 'error');
+    }
+}
+
+async function emailJournalPdf() {
+    try {
+        const toEl = document.getElementById('journalEmailTo');
+        const toEmail = (toEl?.value || '').trim();
+        if (!toEmail) {
+            showMessage('Please enter an email address', 'error');
+            return;
+        }
+
+        const sinceEl = document.getElementById('journalSince');
+        const untilEl = document.getElementById('journalUntil');
+        const staffEl = document.getElementById('journalStaff');
+        const since = sinceEl?.value ? new Date(sinceEl.value).toISOString() : null;
+        const until = untilEl?.value ? new Date(untilEl.value).toISOString() : null;
+        const staffId = staffEl?.value || null;
+
+        const payload = {
+            to_email: toEmail,
+            resident_id: currentResidentId || null,
+            staff_id: staffId,
+            since,
+            until
+        };
+
+        const res = await fetch('/api/reports/journal/email', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            showMessage(err.error || 'Failed to email PDF', 'error');
+            return;
+        }
+        showMessage('Report emailed successfully', 'success');
+    } catch (e) {
+        console.error('emailJournalPdf error:', e);
+        showMessage('Failed to email PDF', 'error');
+    }
 }
 
 function buildSimpleTable(data, columns) {
@@ -8536,6 +8673,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         initApp();
     }
     setupDateDropdowns();
+
+    const reportTypeEl = document.getElementById('reportType');
+    if (reportTypeEl) {
+        reportTypeEl.addEventListener('change', handleReportTypeChange);
+        handleReportTypeChange();
+    }
 });
 
 // ==================== FINANCIAL MANAGEMENT FUNCTIONS (Admin Only) ====================

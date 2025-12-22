@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, Response
 from flask_cors import CORS
 import sqlite3
 import json
@@ -11,6 +11,7 @@ import sys
 import threading
 import time
 import re
+import io
 
 # Import email service
 try:
@@ -18,7 +19,8 @@ try:
         send_medication_alert,
         send_vital_signs_alert,
         send_incident_alert,
-        send_custom_alert
+        send_custom_alert,
+        send_email
     )
     EMAIL_SERVICE_AVAILABLE = True
     # Check email configuration on startup
@@ -35,6 +37,14 @@ try:
 except ImportError:
     EMAIL_SERVICE_AVAILABLE = False
     print("⚠️ Email service not available. Email notifications will be disabled.")
+
+try:
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.units import inch
+    from reportlab.pdfgen import canvas
+    REPORTLAB_AVAILABLE = True
+except Exception:
+    REPORTLAB_AVAILABLE = False
 
 # Import SMS service - supports both ClickSend API and email-to-SMS gateway
 # Priority: ClickSend (if configured) > email-to-SMS (free fallback)
@@ -1941,12 +1951,45 @@ def billing():
             data.get('due_date'),
             data.get('amount'),
             data.get('description', ''),
-            data.get('category', 'Monthly Fee'),
+            data.get('category', 'General'),
             data.get('status', 'pending'),
             data.get('notes', '')
         ))
         conn.commit()
         bill_id = cursor.lastrowid
+
+        try:
+            cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (data.get('resident_id'),))
+            resident_row = cursor.fetchone()
+            resident_name = f"{resident_row['first_name']} {resident_row['last_name']}" if resident_row else f"Resident ID {data.get('resident_id')}"
+            amount = data.get('amount')
+            due = data.get('due_date')
+            category = data.get('category', 'General')
+            desc = (data.get('description') or '').strip()
+            details_parts = [
+                f"{resident_name}",
+                f"Amount: ${float(amount):.2f}" if amount is not None else None,
+                f"Due: {due}" if due else None,
+                f"Category: {category}" if category else None,
+                f"{desc}" if desc else None
+            ]
+            details = ' | '.join([p for p in details_parts if p])
+            create_journal_entry(
+                conn,
+                resident_id=int(data.get('resident_id')),
+                entry_type='billing',
+                title='Bill Created',
+                details=details,
+                occurred_at=(data.get('billing_date') or datetime.utcnow().isoformat() + 'Z'),
+                staff_id=request.current_staff['id'],
+                staff_name=request.current_staff.get('full_name'),
+                source_table='billing',
+                source_id=bill_id
+            )
+            conn.commit()
+        except Exception as e:
+            print(f"⚠️ Warning: Could not journal bill creation: {e}")
+
         conn.close()
         return jsonify({'id': bill_id, 'message': 'Bill created successfully'}), 201
 
@@ -2040,6 +2083,37 @@ def payments():
 
         conn.commit()
         payment_id = cursor.lastrowid
+
+        try:
+            cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (data.get('resident_id'),))
+            resident_row = cursor.fetchone()
+            resident_name = f"{resident_row['first_name']} {resident_row['last_name']}" if resident_row else f"Resident ID {data.get('resident_id')}"
+            amount = data.get('amount')
+            method = (data.get('payment_method') or 'Cash').strip()
+            ref = (data.get('reference_number') or '').strip()
+            details_parts = [
+                f"{resident_name}",
+                f"Amount: ${float(amount):.2f}" if amount is not None else None,
+                f"Method: {method}" if method else None,
+                f"Ref: {ref}" if ref else None,
+                f"Receipt: {receipt_number}" if receipt_number else None
+            ]
+            details = ' | '.join([p for p in details_parts if p])
+            create_journal_entry(
+                conn,
+                resident_id=int(data.get('resident_id')),
+                entry_type='payment',
+                title='Payment Recorded',
+                details=details,
+                occurred_at=(data.get('payment_date') or datetime.utcnow().isoformat() + 'Z'),
+                staff_id=request.current_staff['id'],
+                staff_name=request.current_staff.get('full_name'),
+                source_table='payments',
+                source_id=payment_id
+            )
+            conn.commit()
+        except Exception as e:
+            print(f"⚠️ Warning: Could not journal payment creation: {e}")
 
         # Create transaction record if bank account is specified
         if data.get('bank_account_id'):
@@ -2293,6 +2367,42 @@ def transactions():
 
         conn.commit()
         transaction_id = cursor.lastrowid
+
+        try:
+            cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (resident_id,))
+            resident_row = cursor.fetchone()
+            resident_name = f"{resident_row['first_name']} {resident_row['last_name']}" if resident_row else f"Resident ID {resident_id}"
+            cursor.execute('SELECT account_name FROM bank_accounts WHERE id = ?', (data.get('bank_account_id'),))
+            ba_row = cursor.fetchone()
+            account_name = ba_row['account_name'] if ba_row else 'Bank Account'
+            amount = data.get('amount')
+            tx_type = (data.get('transaction_type') or '').strip()
+            tx_date = data.get('transaction_date')
+            desc = (data.get('description') or '').strip()
+            details_parts = [
+                f"{resident_name}",
+                f"Account: {account_name}" if account_name else None,
+                f"Type: {tx_type}" if tx_type else None,
+                f"Amount: ${float(amount):.2f}" if amount is not None else None,
+                f"{desc}" if desc else None
+            ]
+            details = ' | '.join([p for p in details_parts if p])
+            create_journal_entry(
+                conn,
+                resident_id=resident_id,
+                entry_type='transaction',
+                title='Transaction Recorded',
+                details=details,
+                occurred_at=(tx_date or datetime.utcnow().isoformat() + 'Z'),
+                staff_id=request.current_staff['id'],
+                staff_name=request.current_staff.get('full_name'),
+                source_table='transactions',
+                source_id=transaction_id
+            )
+            conn.commit()
+        except Exception as e:
+            print(f"⚠️ Warning: Could not journal transaction creation: {e}")
+
         conn.close()
         return jsonify({'id': transaction_id, 'message': 'Transaction recorded successfully'}), 201
 
@@ -3637,6 +3747,323 @@ def journal_entries():
     rows = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return jsonify(rows)
+
+
+def _parse_iso_datetime(value):
+    if not value:
+        return None
+    try:
+        s = str(value).strip()
+        if not s:
+            return None
+        if s.endswith('Z'):
+            s = s[:-1]
+        if 'T' in s:
+            return datetime.fromisoformat(s)
+        if len(s) == 10:
+            return datetime.fromisoformat(s + 'T00:00:00')
+        return datetime.fromisoformat(s)
+    except Exception:
+        return None
+
+
+def _build_journal_report_rows(conn, *, resident_id=None, staff_id=None, since=None, until=None, limit=500):
+    cursor = conn.cursor()
+    query = """
+        SELECT
+            je.id,
+            je.resident_id,
+            (r.first_name || ' ' || r.last_name) AS resident_name,
+            je.entry_type,
+            je.title,
+            je.details,
+            COALESCE(je.occurred_at, je.created_at) AS occurred_at,
+            je.staff_id,
+            COALESCE(je.staff_name, s.full_name) AS staff_name
+        FROM journal_entries je
+        JOIN residents r ON je.resident_id = r.id
+        LEFT JOIN staff s ON je.staff_id = s.id
+        WHERE 1=1
+    """
+    params = []
+    if resident_id:
+        query += ' AND je.resident_id = ?'
+        params.append(resident_id)
+    if staff_id:
+        query += ' AND je.staff_id = ?'
+        params.append(staff_id)
+    if since:
+        query += ' AND COALESCE(je.occurred_at, je.created_at) >= ?'
+        params.append(since)
+    if until:
+        query += ' AND COALESCE(je.occurred_at, je.created_at) <= ?'
+        params.append(until)
+    query += ' ORDER BY COALESCE(je.occurred_at, je.created_at) DESC'
+    query += f' LIMIT {int(limit)}'
+
+    cursor.execute(query, params)
+    return [dict(row) for row in cursor.fetchall()]
+
+
+def _generate_journal_report_pdf_bytes(*, title, rows, meta_lines):
+    if not REPORTLAB_AVAILABLE:
+        raise RuntimeError('PDF generation not available')
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    margin_x = 0.6 * inch
+    y = height - 0.75 * inch
+    c.setFont('Helvetica-Bold', 14)
+    c.drawString(margin_x, y, title)
+
+    c.setFont('Helvetica', 9)
+    y -= 0.3 * inch
+    for line in meta_lines:
+        c.drawString(margin_x, y, line)
+        y -= 0.18 * inch
+
+    y -= 0.1 * inch
+    c.setFont('Helvetica-Bold', 9)
+    headers = ['Date/Time', 'Resident', 'Title', 'Staff']
+    col_x = [margin_x, margin_x + 2.0 * inch, margin_x + 4.4 * inch, margin_x + 6.6 * inch]
+    for i, h in enumerate(headers):
+        c.drawString(col_x[i], y, h)
+    y -= 0.15 * inch
+    c.setLineWidth(0.5)
+    c.line(margin_x, y, width - margin_x, y)
+    y -= 0.2 * inch
+
+    c.setFont('Helvetica', 8)
+    for r in rows:
+        dt = str(r.get('occurred_at') or '')
+        resident_name = str(r.get('resident_name') or '')
+        title_text = str(r.get('title') or '')
+        staff_name = str(r.get('staff_name') or '')
+
+        if y < 1.0 * inch:
+            c.showPage()
+            y = height - 0.75 * inch
+            c.setFont('Helvetica-Bold', 10)
+            c.drawString(margin_x, y, title)
+            y -= 0.35 * inch
+            c.setFont('Helvetica', 8)
+
+        c.drawString(col_x[0], y, dt[:19])
+        c.drawString(col_x[1], y, resident_name[:28])
+        c.drawString(col_x[2], y, title_text[:36])
+        c.drawString(col_x[3], y, staff_name[:18])
+        y -= 0.16 * inch
+
+        details = (r.get('details') or '').strip()
+        if details:
+            detail_line = details.replace('\n', ' ')
+            c.drawString(col_x[1], y, ('Details: ' + detail_line)[:95])
+            y -= 0.18 * inch
+
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer.read()
+
+
+@app.route('/api/reports/journal', methods=['GET'])
+@require_auth
+def journal_report_rows():
+    conn = get_db()
+    resident_id = request.args.get('resident_id')
+    staff_id = request.args.get('staff_id')
+    since = request.args.get('since')
+    until = request.args.get('until')
+    limit = request.args.get('limit', '500')
+
+    try:
+        limit_int = int(limit)
+    except Exception:
+        limit_int = 500
+    if limit_int < 1:
+        limit_int = 1
+    if limit_int > 500:
+        limit_int = 500
+
+    try:
+        resident_id_int = int(resident_id) if resident_id else None
+    except Exception:
+        resident_id_int = None
+    try:
+        staff_id_int = int(staff_id) if staff_id else None
+    except Exception:
+        staff_id_int = None
+
+    rows = _build_journal_report_rows(
+        conn,
+        resident_id=resident_id_int,
+        staff_id=staff_id_int,
+        since=since,
+        until=until,
+        limit=limit_int
+    )
+    conn.close()
+    return jsonify(rows)
+
+
+@app.route('/api/reports/journal/pdf', methods=['POST'])
+@require_auth
+def journal_report_pdf():
+    if not REPORTLAB_AVAILABLE:
+        return jsonify({'error': 'PDF generation not available on server'}), 500
+
+    payload = request.json or {}
+    resident_id = payload.get('resident_id')
+    staff_id = payload.get('staff_id')
+    since = payload.get('since')
+    until = payload.get('until')
+
+    try:
+        resident_id_int = int(resident_id) if resident_id else None
+    except Exception:
+        resident_id_int = None
+    try:
+        staff_id_int = int(staff_id) if staff_id else None
+    except Exception:
+        staff_id_int = None
+
+    conn = get_db()
+    rows = _build_journal_report_rows(
+        conn,
+        resident_id=resident_id_int,
+        staff_id=staff_id_int,
+        since=since,
+        until=until,
+        limit=500
+    )
+
+    resident_label = 'All Residents'
+    if resident_id_int:
+        cursor = conn.cursor()
+        cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (resident_id_int,))
+        rr = cursor.fetchone()
+        if rr:
+            resident_label = f"{rr['first_name']} {rr['last_name']}"
+
+    staff_label = 'All Staff'
+    if staff_id_int:
+        cursor = conn.cursor()
+        cursor.execute('SELECT full_name FROM staff WHERE id = ?', (staff_id_int,))
+        sr = cursor.fetchone()
+        if sr and sr['full_name']:
+            staff_label = sr['full_name']
+
+    conn.close()
+
+    title = 'Journal Report'
+    meta_lines = [
+        f"Resident: {resident_label}",
+        f"Staff: {staff_label}",
+        f"From: {since or 'Start'}   To: {until or 'End'}",
+        f"Generated: {datetime.utcnow().isoformat()}Z   Total: {len(rows)}"
+    ]
+
+    pdf_bytes = _generate_journal_report_pdf_bytes(title=title, rows=rows, meta_lines=meta_lines)
+    filename = f"journal_report_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.pdf"
+    return Response(
+        pdf_bytes,
+        mimetype='application/pdf',
+        headers={
+            'Content-Disposition': f'attachment; filename="{filename}"'
+        }
+    )
+
+
+@app.route('/api/reports/journal/email', methods=['POST'])
+@require_auth
+def journal_report_email():
+    if not EMAIL_SERVICE_AVAILABLE:
+        return jsonify({'error': 'Email service not available'}), 500
+    if not REPORTLAB_AVAILABLE:
+        return jsonify({'error': 'PDF generation not available on server'}), 500
+
+    payload = request.json or {}
+    to_email = (payload.get('to_email') or '').strip()
+    if not to_email:
+        return jsonify({'error': 'to_email is required'}), 400
+
+    resident_id = payload.get('resident_id')
+    staff_id = payload.get('staff_id')
+    since = payload.get('since')
+    until = payload.get('until')
+
+    try:
+        resident_id_int = int(resident_id) if resident_id else None
+    except Exception:
+        resident_id_int = None
+    try:
+        staff_id_int = int(staff_id) if staff_id else None
+    except Exception:
+        staff_id_int = None
+
+    conn = get_db()
+    rows = _build_journal_report_rows(
+        conn,
+        resident_id=resident_id_int,
+        staff_id=staff_id_int,
+        since=since,
+        until=until,
+        limit=500
+    )
+
+    resident_label = 'All Residents'
+    if resident_id_int:
+        cursor = conn.cursor()
+        cursor.execute('SELECT first_name, last_name FROM residents WHERE id = ?', (resident_id_int,))
+        rr = cursor.fetchone()
+        if rr:
+            resident_label = f"{rr['first_name']} {rr['last_name']}"
+
+    staff_label = 'All Staff'
+    if staff_id_int:
+        cursor = conn.cursor()
+        cursor.execute('SELECT full_name FROM staff WHERE id = ?', (staff_id_int,))
+        sr = cursor.fetchone()
+        if sr and sr['full_name']:
+            staff_label = sr['full_name']
+
+    conn.close()
+
+    title = 'Journal Report'
+    meta_lines = [
+        f"Resident: {resident_label}",
+        f"Staff: {staff_label}",
+        f"From: {since or 'Start'}   To: {until or 'End'}",
+        f"Generated: {datetime.utcnow().isoformat()}Z   Total: {len(rows)}"
+    ]
+
+    pdf_bytes = _generate_journal_report_pdf_bytes(title=title, rows=rows, meta_lines=meta_lines)
+    filename = f"journal_report_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.pdf"
+
+    subject = f"Journal Report - {resident_label}"
+    html_body = f"""
+    <html>
+      <body style=\"font-family: Arial, sans-serif;\">
+        <h2>Journal Report</h2>
+        <p><strong>Resident:</strong> {resident_label}</p>
+        <p><strong>Staff:</strong> {staff_label}</p>
+        <p><strong>From:</strong> {since or 'Start'}<br><strong>To:</strong> {until or 'End'}</p>
+        <p><strong>Total entries:</strong> {len(rows)}</p>
+        <p>PDF report is attached.</p>
+      </body>
+    </html>
+    """
+
+    ok = send_email(
+        to_email,
+        subject,
+        html_body,
+        attachments=[(filename, pdf_bytes, 'application/pdf')]
+    )
+    if not ok:
+        return jsonify({'error': 'Failed to send email'}), 500
+    return jsonify({'message': 'Report emailed successfully'}), 200
 
 @app.route('/api/notifications/<int:id>/read', methods=['PUT'])
 @require_auth

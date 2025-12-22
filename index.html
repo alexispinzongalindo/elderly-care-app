@@ -1867,6 +1867,7 @@
                                 <label for="reportType" data-translate="reports.type">Report Type *</label>
                                 <select id="reportType" required>
                                     <option value="">-- Select --</option>
+                                    <option value="journal">Journal Report (Resident/Date/Time/Staff)</option>
                                     <option value="incidents" data-translate="reports.type.incidents">Incident Report</option>
                                     <option value="care_notes" data-translate="reports.type.care_notes">Care Notes Summary</option>
                                     <option value="medications" data-translate="reports.type.medications">Medication Report</option>
@@ -1882,6 +1883,39 @@
                             <div class="form-group">
                                 <label for="reportDateTo" data-translate="reports.to">To Date</label>
                                 <input type="date" id="reportDateTo">
+                            </div>
+                        </div>
+
+                        <div id="journalReportExtras" style="display:none; margin-top: 0.5rem;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>From Date &amp; Time</label>
+                                    <input type="datetime-local" id="journalSince">
+                                </div>
+                                <div class="form-group">
+                                    <label>To Date &amp; Time</label>
+                                    <input type="datetime-local" id="journalUntil">
+                                </div>
+                                <div class="form-group">
+                                    <label>Staff</label>
+                                    <select id="journalStaff">
+                                        <option value="">All Staff</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 2;">
+                                    <label>Email PDF To</label>
+                                    <input type="email" id="journalEmailTo" placeholder="name@example.com">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn btn-secondary" onclick="downloadJournalPdf()">Download PDF</button>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn btn-secondary" onclick="emailJournalPdf()">Email PDF</button>
+                                </div>
                             </div>
                         </div>
                         <div class="button-group">
