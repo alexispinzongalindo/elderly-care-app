@@ -6904,6 +6904,14 @@ async function printHistoryJournalPdf() {
         const payload = getHistoryJournalReportPayload();
         if (!payload) return;
 
+        // Open a window synchronously to avoid popup blockers.
+        // Safari often shows a blank print preview if we call print() before the PDF viewer finishes loading.
+        const w = window.open('', '_blank');
+        if (!w) {
+            showMessage('Popup blocked. Please allow popups to print.', 'error');
+            return;
+        }
+
         const res = await fetch('/api/reports/journal/pdf', {
             method: 'POST',
             headers: getAuthHeaders(),
@@ -6912,35 +6920,64 @@ async function printHistoryJournalPdf() {
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             showMessage(err.error || 'Failed to generate PDF', 'error');
+            try { w.close(); } catch { /* ignore */ }
             return;
         }
 
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
-        const w = window.open(url, '_blank');
-        if (!w) {
-            showMessage('Popup blocked. Please allow popups to print.', 'error');
-            return;
-        }
 
         const revoke = () => {
             try { URL.revokeObjectURL(url); } catch { /* ignore */ }
         };
 
-        const onLoaded = () => {
+        // Render into an iframe and print when iframe loads (more reliable on Safari than window load for PDFs).
+        try {
+            w.document.open();
+            w.document.write(`<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Print</title>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; }
+      iframe { width: 100%; height: 100%; border: 0; }
+    </style>
+  </head>
+  <body>
+    <iframe id="pdfFrame" src="${url}"></iframe>
+  </body>
+</html>`);
+            w.document.close();
+        } catch {
+            // Fallback: navigate directly (still works in many browsers).
+            try { w.location.href = url; } catch { /* ignore */ }
+        }
+
+        const cleanup = () => {
+            setTimeout(revoke, 1000);
+        };
+
+        const doPrint = () => {
             try {
                 w.focus();
                 w.print();
             } finally {
-                setTimeout(revoke, 1000);
+                setTimeout(cleanup, 1500);
             }
         };
 
+        // Best-effort: iframe onload; plus a timeout fallback.
         try {
-            w.addEventListener('load', onLoaded, { once: true });
-        } catch {
-            setTimeout(onLoaded, 400);
-        }
+            const frame = w.document.getElementById('pdfFrame');
+            if (frame) {
+                frame.addEventListener('load', () => setTimeout(doPrint, 150), { once: true });
+            }
+        } catch { /* ignore */ }
+
+        setTimeout(() => {
+            try { doPrint(); } catch { /* ignore */ }
+        }, 1500);
     } catch (e) {
         console.error('printHistoryJournalPdf error:', e);
         showMessage('Failed to print PDF', 'error');
