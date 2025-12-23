@@ -3155,10 +3155,25 @@ function showPage(pageName) {
                 }
             } catch (e) {}
 
+            try {
+                if (window.__pageScrollResetTimeoutId) {
+                    clearTimeout(window.__pageScrollResetTimeoutId);
+                }
+            } catch (e) {}
+
+            // Safari can auto-scroll to the last focused input/select on a page (especially forms).
+            // Blur any active element before performing our scroll reset.
+            try {
+                const ae = document.activeElement;
+                if (ae && typeof ae.blur === 'function') {
+                    ae.blur();
+                }
+            } catch (e) {}
+
             const intendedPageName = pageName;
             const scrollResetNonce = (window.__pageScrollResetNonce = (window.__pageScrollResetNonce || 0) + 1);
 
-            window.__pageScrollResetRafId = window.requestAnimationFrame(() => {
+            const doScrollTop = () => {
                 if (window.__pageScrollResetNonce !== scrollResetNonce) return;
                 const active = document.querySelector('.page.active');
                 if (!active || active.id !== intendedPageName) return;
@@ -3173,7 +3188,16 @@ function showPage(pageName) {
                         if (document.body) document.body.scrollTop = 0;
                     }
                 }
+            };
+
+            window.__pageScrollResetRafId = window.requestAnimationFrame(() => {
+                doScrollTop();
             });
+
+            // Second pass: Safari may scroll again after layout/focus restoration.
+            window.__pageScrollResetTimeoutId = setTimeout(() => {
+                doScrollTop();
+            }, 120);
         }
 
         if (pageName === 'financial') {
