@@ -3149,7 +3149,20 @@ function showPage(pageName) {
         }
 
         if (pageName === 'carenotes' || pageName === 'reports') {
-            window.requestAnimationFrame(() => {
+            try {
+                if (window.__pageScrollResetRafId) {
+                    cancelAnimationFrame(window.__pageScrollResetRafId);
+                }
+            } catch (e) {}
+
+            const intendedPageName = pageName;
+            const scrollResetNonce = (window.__pageScrollResetNonce = (window.__pageScrollResetNonce || 0) + 1);
+
+            window.__pageScrollResetRafId = window.requestAnimationFrame(() => {
+                if (window.__pageScrollResetNonce !== scrollResetNonce) return;
+                const active = document.querySelector('.page.active');
+                if (!active || active.id !== intendedPageName) return;
+
                 try {
                     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
                 } catch (e) {
