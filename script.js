@@ -3148,6 +3148,21 @@ function showPage(pageName) {
             window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
         }
 
+        if (pageName === 'carenotes' || pageName === 'reports') {
+            window.requestAnimationFrame(() => {
+                try {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                } catch (e) {
+                    try {
+                        window.scrollTo(0, 0);
+                    } catch (e2) {
+                        if (document.documentElement) document.documentElement.scrollTop = 0;
+                        if (document.body) document.body.scrollTop = 0;
+                    }
+                }
+            });
+        }
+
         if (pageName === 'financial') {
             window.requestAnimationFrame(() => {
                 try {
