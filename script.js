@@ -3790,6 +3790,32 @@ function showPage(pageName) {
 
         // Update all translatable elements (data-translate attributes)
         updateTranslations();
+
+        // Final backstop: ensure Reports title exists and is visible (some DOM/translation flows can remove/blank it)
+        if (pageName === 'reports') {
+            try {
+                const reportsPage = document.getElementById('reports');
+                if (reportsPage) {
+                    let titleEl = reportsPage.querySelector('h2');
+                    if (!titleEl) {
+                        titleEl = document.createElement('h2');
+                        titleEl.setAttribute('data-translate', 'nav.reports');
+                        reportsPage.insertBefore(titleEl, reportsPage.firstChild);
+                    }
+                    const desired = (typeof t === 'function') ? t('nav.reports') : 'Reports';
+                    if (!titleEl.textContent || !titleEl.textContent.trim() || titleEl.textContent.trim() === 'nav.reports') {
+                        titleEl.textContent = desired;
+                    }
+                    titleEl.style.setProperty('display', 'block', 'important');
+                    titleEl.style.setProperty('visibility', 'visible', 'important');
+                    titleEl.style.setProperty('opacity', '1', 'important');
+                    titleEl.style.setProperty('position', 'relative', 'important');
+                    titleEl.style.setProperty('z-index', '11', 'important');
+                }
+            } catch (e) {
+                // ignore
+            }
+        }
     } catch (error) {
         console.error('Error showing page:', error);
     } finally {
