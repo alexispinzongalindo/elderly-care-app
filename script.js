@@ -2950,41 +2950,33 @@ function showPage(pageName) {
                 targetPage.classList.add('active');
                 targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; overflow: visible !important;';
 
+                // Ensure the Reports title exists and is visible
+                try {
+                    let titleEl = reportsPage ? reportsPage.querySelector('h2') : null;
+                    if (!titleEl && reportsPage) {
+                        titleEl = document.createElement('h2');
+                        titleEl.setAttribute('data-translate', 'nav.reports');
+                        titleEl.textContent = 'Reports';
+                        reportsPage.insertBefore(titleEl, reportsPage.firstChild);
+                    }
+                    if (titleEl && (!titleEl.textContent || !titleEl.textContent.trim())) {
+                        titleEl.textContent = 'Reports';
+                    }
+                    if (titleEl) {
+                        titleEl.style.setProperty('display', 'block', 'important');
+                        titleEl.style.setProperty('visibility', 'visible', 'important');
+                        titleEl.style.setProperty('opacity', '1', 'important');
+                        titleEl.style.setProperty('position', 'relative', 'important');
+                        titleEl.style.setProperty('z-index', '11', 'important');
+                    }
+                } catch (e) {
+                    // ignore
+                }
+
                 // Force a reflow so Safari recalculates dimensions
                 void targetPage.offsetHeight;
             }
-
-            // SPECIAL HANDLING FOR HISTORY PAGE - Safari can keep it at 0x0 otherwise
-            if (pageName === 'history') {
-                // History was previously hidden via absolute/offscreen styles; ensure it is fully reset.
-                targetPage.classList.add('active');
-                targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: 0 !important; top: 0 !important; z-index: 10 !important; min-height: 400px !important; height: auto !important; width: 100% !important; background: var(--light-gray) !important; overflow: visible !important;';
-
-			// Ensure key child containers contribute to layout.
-			const historyH2 = targetPage.querySelector('h2');
-			if (historyH2) {
-				historyH2.style.setProperty('display', 'block', 'important');
-				historyH2.style.setProperty('visibility', 'visible', 'important');
-				historyH2.style.setProperty('opacity', '1', 'important');
-			}
-			const historyButtonGroup = targetPage.querySelector('.button-group');
-			if (historyButtonGroup) {
-				historyButtonGroup.style.setProperty('display', 'flex', 'important');
-				historyButtonGroup.style.setProperty('visibility', 'visible', 'important');
-				historyButtonGroup.style.setProperty('opacity', '1', 'important');
-				historyButtonGroup.style.setProperty('position', 'relative', 'important');
-			}
-			const journalList = document.getElementById('journalPageList');
-			if (journalList) {
-				journalList.style.setProperty('display', 'block', 'important');
-				journalList.style.setProperty('visibility', 'visible', 'important');
-				journalList.style.setProperty('opacity', '1', 'important');
-				journalList.style.setProperty('min-height', '200px', 'important');
-			}
-
-            // Force a reflow so Safari recalculates dimensions
-            void targetPage.offsetHeight;
-        }
+       }
 
         targetPage.style.setProperty('visibility', 'visible', 'important');
         targetPage.style.setProperty('display', 'block', 'important');
@@ -3789,7 +3781,7 @@ function showPage(pageName) {
             // nested pages / forced CSS overrides. Keep initialization focused on data + tab state.
             initFinancialPage();
         }
-        } else {
+        else {
             console.error('❌ Page not found:', pageName);
         }
 
