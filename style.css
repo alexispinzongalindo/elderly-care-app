@@ -509,6 +509,11 @@ body {
     background: var(--light-gray) !important;
 }
 
+#carenotes,
+#reports {
+    --page-padding: 0.75rem;
+}
+
 /* CRITICAL: Force ALL children of incidents page to be visible */
 #incidents.page.active > *,
 #incidents.active > *,
