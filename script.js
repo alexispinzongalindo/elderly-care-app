@@ -2927,7 +2927,7 @@ function showPage(pageName) {
 
                 // Force reports page visible using cssText for maximum control (Safari can keep it at 0x0 otherwise)
                 targetPage.classList.add('active');
-                targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+                targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; overflow: visible !important;';
 
                 // Force a reflow so Safari recalculates dimensions
                 void targetPage.offsetHeight;
@@ -2937,7 +2937,7 @@ function showPage(pageName) {
             if (pageName === 'history') {
                 // History was previously hidden via absolute/offscreen styles; ensure it is fully reset.
                 targetPage.classList.add('active');
-                targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: 0 !important; top: 0 !important; z-index: 10 !important; min-height: 400px !important; height: auto !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+                targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: 0 !important; top: 0 !important; z-index: 10 !important; min-height: 400px !important; height: auto !important; width: 100% !important; background: var(--light-gray) !important; overflow: visible !important;';
 
 			// Ensure key child containers contribute to layout.
 			const historyH2 = targetPage.querySelector('h2');
@@ -3095,7 +3095,7 @@ function showPage(pageName) {
                 try {
                     const rect = targetPage.getBoundingClientRect();
                     if (rect.height === 0 || rect.width === 0) {
-                        targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important;';
+                        targetPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; overflow: visible !important;';
                         // Force reflow
                         void targetPage.offsetHeight;
                         const rectAfter = targetPage.getBoundingClientRect();
@@ -3368,7 +3368,7 @@ function showPage(pageName) {
 
             // Force incidents page to be visible using cssText for maximum control
             incidentsPage.classList.add('active');
-            incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+            incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; overflow: visible !important;';
             console.log('✅ Incidents page forced visible with cssText');
 
             // Verify it worked
@@ -3554,7 +3554,7 @@ function showPage(pageName) {
 
             // Force care notes page to be visible using cssText for maximum control
             careNotesPage.classList.add('active');
-            careNotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; padding: 2rem !important; overflow: visible !important;';
+            careNotesPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; overflow: visible !important;';
             console.log('✅ Care notes page forced visible with cssText');
 
             // Verify it worked
@@ -5157,7 +5157,7 @@ async function loadIncidents() {
 
         // ALWAYS ensure the page is visible and active - don't check, just force it
         incidentsPage.classList.add('active');
-        incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important; overflow: visible !important;';
+        incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; overflow: visible !important;';
         console.log('✅ Incidents page forced to be visible');
         console.log('✅ Page display:', window.getComputedStyle(incidentsPage).display);
         console.log('✅ Page visibility:', window.getComputedStyle(incidentsPage).visibility);
@@ -5323,7 +5323,7 @@ async function loadIncidents() {
         // Validate response is an array
         if (!Array.isArray(incidents)) {
             console.error('❌ API did not return an array! Response:', incidents);
-            container.innerHTML = `<div class="empty-state" style="display: block !important; visibility: visible !important; opacity: 1 !important; padding: 2rem !important; background: #fee !important; border: 2px solid #f00 !important; border-radius: 8px !important; color: #c00 !important; font-weight: bold !important;">Error: Server returned invalid data format. Please check console. / Error: El servidor devolvió un formato de datos inválido. Por favor revise la consola.</div>`;
+            container.innerHTML = `<div class="empty-state" style="display: block !important; visibility: visible !important; opacity: 1 !important; padding: var(--page-padding, 2rem) !important; background: #fee !important; border: 2px solid #f00 !important; border-radius: 8px !important; color: #c00 !important; font-weight: bold !important;">Error: Server returned invalid data format. Please check console. / Error: El servidor devolvió un formato de datos inválido. Por favor revise la consola.</div>`;
             container.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 999 !important; min-height: 200px !important; width: 100% !important; margin-top: 2rem !important; padding: 1rem !important; background: var(--white) !important; border-radius: 8px !important;';
             showMessage('Error: Invalid data format from server / Error: Formato de datos inválido del servidor', 'error');
             return;
@@ -9983,7 +9983,7 @@ function initFinancialPage() {
 
         // If container has zero dimensions, force it
         if (containerHeight === 0 || containerWidth === 0) {
-            mainContainer.style.cssText += 'height: 600px !important; padding: 2rem !important;';
+            mainContainer.style.cssText += 'height: 600px !important;';
             console.log('⚠️ Main container had zero dimensions - forced height');
         }
         console.log('✅ main.container forced visible');
@@ -10003,7 +10003,7 @@ function initFinancialPage() {
 
     // Force financial page visible with cssText (same as incidents)
     financialPage.classList.add('active');
-    financialPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 500px !important; width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important;';
+    financialPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 500px !important; width: 100% !important; overflow: visible !important; background: var(--light-gray) !important;';
     console.log('✅ Financial page forced visible with cssText');
 
     // Show ALL direct children using cssText
@@ -10086,7 +10086,7 @@ function initFinancialPage() {
         console.log(`  Tab ${idx}:`, tab.id, 'display:', computedStyle.display, 'visibility:', computedStyle.visibility, 'height:', tab.offsetHeight);
 
         // Force visible with explicit dimensions
-        tab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; padding: 1rem !important; background: white !important; border: 1px solid #ddd !important;';
+        tab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; background: white !important; border: 1px solid #ddd !important;';
 
         // Force ALL children of each tab to be visible
         Array.from(tab.children).forEach((child) => {
@@ -10143,7 +10143,7 @@ function initFinancialPage() {
             // If still hidden, force it
             if (finalStyle.display === 'none' || accountsTab.offsetHeight === 0) {
                 console.error('⚠️ Accounts tab still hidden - forcing visible!');
-                accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; padding: 1rem !important; background: white !important;';
+                accountsTab.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 400px !important; height: auto !important; width: 100% !important; background: white !important;';
             }
         }
     }, 300);
@@ -10158,7 +10158,7 @@ function initFinancialPage() {
             console.error('❌❌❌ FINANCIAL PAGE STILL HAS ZERO DIMENSIONS! Applying LAST RESORT FIX... ❌❌❌');
 
             // LAST RESORT: Force absolute positioning and explicit dimensions
-            financialPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; height: 600px !important; min-height: 600px !important; width: 100% !important; max-width: 100% !important; padding: 2rem !important; overflow: visible !important; background: var(--light-gray) !important; box-sizing: border-box !important;';
+            financialPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; height: 600px !important; min-height: 600px !important; width: 100% !important; max-width: 100% !important; overflow: visible !important; background: var(--light-gray) !important; box-sizing: border-box !important;';
 
             // Force ALL children to have explicit heights
             Array.from(financialPage.children).forEach((child) => {
@@ -10213,7 +10213,7 @@ function initFinancialPage() {
                     console.log('🔄 Attempting to clone and replace element...');
                     const clone = financialPage.cloneNode(true);
                     financialPage.parentElement.replaceChild(clone, financialPage);
-                    clone.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; height: 600px !important; min-height: 600px !important; width: 100% !important; padding: 2rem !important; background: var(--light-gray) !important;';
+                    clone.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; height: 600px !important; min-height: 600px !important; width: 100% !important; background: var(--light-gray) !important;';
                     console.log('✅ Element cloned and replaced');
                 }
             }, 100);

@@ -8,7 +8,7 @@
     /* Primary colors from landing page */
     --primary-color: #2c5aa0;
     --primary-blue: #2c5aa0;
-    --secondary-color: #4ECDC4;
+    --secondary-color: #4ecdc4;
     --accent-color: #FF6B6B;
     
     /* Status colors */
@@ -25,6 +25,7 @@
     --text-color: #2c3e50;
     --text-light: #7f8c8d;
     --white: #ffffff;
+    --page-padding: 2rem;
 }
 
 html {
@@ -476,6 +477,10 @@ body {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
+    
+    :root {
+        --page-padding: 1rem;
+    }
 }
 
 .page {
@@ -492,6 +497,8 @@ body {
     opacity: 1 !important;
     position: relative !important;
     z-index: 1 !important;
+    padding: var(--page-padding) !important;
+    background: var(--light-gray) !important;
 }
 
 /* CRITICAL: Force ALL children of incidents page to be visible */
@@ -3106,11 +3113,6 @@ body:has(#billing.active) #incidents:not(.active) {
     /* Filter row should stay horizontal */
     #financialTransactions .form-row {
         grid-template-columns: repeat(2, 1fr);
-    }
-    
-    /* Ensure financial page container matches desktop spacing */
-    #financial.page {
-        padding: 1.5rem 1rem;
     }
     
     #financial h2 {
