@@ -584,6 +584,23 @@ body:has(.nav-link[data-page="incidents"].active) #incidents {
     height: auto !important;
 }
 
+/* Force reports page h2 to be visible */
+#reports.page.active h2,
+#reports.active h2,
+#reports h2 {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: var(--text-color) !important;
+    margin-bottom: 1.5rem !important;
+    font-size: 1.8rem !important;
+    font-weight: bold !important;
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    height: auto !important;
+}
+
 #incidents.page.active button.btn-primary,
 #incidents.active button.btn-primary,
 #incidents button.btn-primary,
