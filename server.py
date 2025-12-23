@@ -1,13 +1,14 @@
 from flask import Flask, jsonify, request, send_from_directory, Response
 from flask_cors import CORS
 import sqlite3
-import json
+import os
 import hashlib
 import secrets
+import csv
+import math
 from datetime import datetime, timedelta
 from functools import wraps
-import os
-import sys
+from flask import send_file
 import threading
 import time
 import re
@@ -321,6 +322,24 @@ def init_db():
         )
     ''')
 
+    # Add pin_hash column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE staff ADD COLUMN pin_hash TEXT')
+    except sqlite3.OperationalError:
+        pass
+
+    # Add pay_rate column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE staff ADD COLUMN pay_rate REAL')
+    except sqlite3.OperationalError:
+        pass
+
+    # Ensure unique PIN hashes when present
+    try:
+        cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_staff_pin_hash_unique ON staff(pin_hash) WHERE pin_hash IS NOT NULL')
+    except Exception:
+        pass
+
     # Add preferred_language column if it doesn't exist (migration)
     try:
         cursor.execute('ALTER TABLE staff ADD COLUMN preferred_language TEXT DEFAULT "en"')
@@ -567,6 +586,29 @@ def init_db():
         )
     ''')
 
+    # Time clock tables
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS timeclock_shifts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            staff_id INTEGER NOT NULL,
+            clock_in_at TEXT NOT NULL,
+            clock_out_at TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (staff_id) REFERENCES staff (id)
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS timeclock_breaks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            shift_id INTEGER NOT NULL,
+            break_start_at TEXT NOT NULL,
+            break_end_at TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (shift_id) REFERENCES timeclock_shifts (id)
+        )
+    ''')
+
     # Incident Reports table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS incident_reports (
@@ -722,6 +764,91 @@ def hash_password(password):
 def verify_password(password, password_hash):
     return hash_password(password) == password_hash
 
+def _pin_pepper():
+    return os.environ.get('TIME_CLOCK_PIN_PEPPER', 'eldercare')
+
+def hash_pin(pin: str) -> str:
+    pin = (pin or '').strip()
+    return hashlib.sha256(f"{_pin_pepper()}::{pin}".encode()).hexdigest()
+
+def _verify_pin_format(pin: str) -> bool:
+    pin = (pin or '').strip()
+    return len(pin) == 4 and pin.isdigit()
+
+def _get_staff_by_pin(conn, pin: str):
+    if not _verify_pin_format(pin):
+        return None
+    pin_hash = hash_pin(pin)
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM staff WHERE pin_hash = ? AND active = 1', (pin_hash,))
+    row = cur.fetchone()
+    return dict(row) if row else None
+
+def _is_staff_clocked_in(conn, staff_id: int) -> bool:
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT id FROM timeclock_shifts
+        WHERE staff_id = ? AND clock_out_at IS NULL
+        ORDER BY clock_in_at DESC
+        LIMIT 1
+    ''', (staff_id,))
+    return cur.fetchone() is not None
+
+def _get_open_shift(conn, staff_id: int):
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT * FROM timeclock_shifts
+        WHERE staff_id = ? AND clock_out_at IS NULL
+        ORDER BY clock_in_at DESC
+        LIMIT 1
+    ''', (staff_id,))
+    row = cur.fetchone()
+    return dict(row) if row else None
+
+def _get_open_break(conn, shift_id: int):
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT * FROM timeclock_breaks
+        WHERE shift_id = ? AND break_end_at IS NULL
+        ORDER BY break_start_at DESC
+        LIMIT 1
+    ''', (shift_id,))
+    row = cur.fetchone()
+    return dict(row) if row else None
+
+def _utc_now_iso():
+    return datetime.utcnow().isoformat() + 'Z'
+
+def _parse_dt(dt_str: str):
+    if not dt_str:
+        return None
+    s = dt_str.replace('Z', '')
+    try:
+        return datetime.fromisoformat(s)
+    except Exception:
+        return None
+
+def _minutes_between(a: datetime, b: datetime) -> int:
+    if not a or not b:
+        return 0
+    return max(0, int((b - a).total_seconds() // 60))
+
+def _get_shift_break_minutes(conn, shift_id: int, *, up_to: datetime = None) -> int:
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT break_start_at, break_end_at FROM timeclock_breaks
+        WHERE shift_id = ?
+        ORDER BY break_start_at ASC
+    ''', (shift_id,))
+    total = 0
+    for row in cur.fetchall() or []:
+        start = _parse_dt(row['break_start_at'])
+        end = _parse_dt(row['break_end_at'])
+        if not end and up_to:
+            end = up_to
+        total += _minutes_between(start, end)
+    return total
+
 def generate_session_token():
     return secrets.token_urlsafe(32)
 
@@ -840,6 +967,16 @@ def login():
             conn.close()
             print(f'Login failed: Invalid password for user - {username}')
             return jsonify({'error': 'Invalid credentials / Credenciales inválidas'}), 401
+
+        # Enforce: staff can only login if currently clocked in (admin bypass)
+        try:
+            role = staff['role']
+        except Exception:
+            role = 'caregiver'
+        if role != 'admin':
+            if not _is_staff_clocked_in(conn, int(staff['id'])):
+                conn.close()
+                return jsonify({'error': 'Must clock in before login / Debe marcar entrada antes de iniciar sesión'}), 403
 
         # Create session
         session_token = generate_session_token()
@@ -2809,7 +2946,7 @@ def staff():
             return jsonify({'error': 'Authentication required'}), 401
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at FROM staff ORDER BY full_name')
+        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at, pay_rate FROM staff ORDER BY full_name')
         staff_list = []
         for row in cursor.fetchall():
             staff_dict = dict(row)
@@ -2855,7 +2992,7 @@ def staff_detail(id):
     cursor = conn.cursor()
 
     if request.method == 'GET':
-        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at FROM staff WHERE id = ?', (id,))
+        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at, pay_rate FROM staff WHERE id = ?', (id,))
         staff = cursor.fetchone()
         conn.close()
         if not staff:
@@ -2868,6 +3005,14 @@ def staff_detail(id):
 
     elif request.method == 'PUT':
         data = request.json
+        pay_rate = data.get('pay_rate', None)
+        try:
+            if pay_rate is not None and pay_rate != '':
+                pay_rate = float(pay_rate)
+            else:
+                pay_rate = None
+        except Exception:
+            return jsonify({'error': 'Invalid pay rate / Tarifa inválida'}), 400
         # If password is provided, hash it; otherwise keep existing password
         if data.get('password'):
             password_hash = hash_password(data.get('password'))
@@ -2889,7 +3034,7 @@ def staff_detail(id):
         else:
             cursor.execute('''
                 UPDATE staff
-                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, phone_carrier = ?, active = ?
+                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, phone_carrier = ?, active = ?, pay_rate = ?
                 WHERE id = ?
             ''', (
                 data.get('username'),
@@ -2899,6 +3044,7 @@ def staff_detail(id):
                 data.get('phone'),
                 data.get('phone_carrier'),  # Carrier for SMS
                 data.get('active', True),
+                pay_rate,
                 id
         ))
         conn.commit()
@@ -2911,6 +3057,391 @@ def staff_detail(id):
         conn.commit()
         conn.close()
         return jsonify({'message': 'Staff member deactivated successfully'})
+
+
+# Admin-only PIN management
+@app.route('/api/staff/<int:id>/pin', methods=['POST'])
+@require_role('admin')
+def staff_set_pin(id):
+    data = request.json or {}
+    pin = (data.get('pin') or '').strip()
+    if pin:
+        if not _verify_pin_format(pin):
+            return jsonify({'error': 'PIN must be 4 digits / El PIN debe tener 4 dígitos'}), 400
+    else:
+        pin = f"{secrets.randbelow(10000):04d}"
+
+    conn = get_db()
+    cursor = conn.cursor()
+    # Ensure staff exists
+    cursor.execute('SELECT id FROM staff WHERE id = ? AND active = 1', (id,))
+    if not cursor.fetchone():
+        conn.close()
+        return jsonify({'error': 'Staff member not found'}), 404
+
+    try:
+        cursor.execute('UPDATE staff SET pin_hash = ? WHERE id = ?', (hash_pin(pin), id))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({'error': 'PIN already in use. Try again. / PIN ya existe. Intente de nuevo.'}), 409
+    conn.close()
+    # Return the plain PIN ONCE to admin
+    return jsonify({'message': 'PIN set successfully', 'pin': pin})
+
+
+# Time Clock (PIN-based)
+def _create_session_for_staff(conn, staff_id: int) -> str:
+    token = generate_session_token()
+    expires_at = datetime.now() + timedelta(days=1)
+    conn.cursor().execute('''
+        INSERT INTO sessions (staff_id, session_token, expires_at)
+        VALUES (?, ?, ?)
+    ''', (staff_id, token, expires_at))
+    return token
+
+
+@app.route('/api/timeclock/pin/status', methods=['POST'])
+def timeclock_pin_status():
+    payload = request.json or {}
+    pin = (payload.get('pin') or '').strip()
+    conn = get_db()
+    staff = _get_staff_by_pin(conn, pin)
+    if not staff:
+        conn.close()
+        return jsonify({'error': 'Invalid PIN / PIN inválido'}), 401
+
+    clocked_in = _is_staff_clocked_in(conn, int(staff['id']))
+    shift = _get_open_shift(conn, int(staff['id'])) if clocked_in else None
+    on_break = False
+    if shift:
+        on_break = _get_open_break(conn, int(shift['id'])) is not None
+    conn.close()
+    return jsonify({
+        'staff': {
+            'id': staff['id'],
+            'full_name': staff['full_name'],
+            'role': staff['role']
+        },
+        'clocked_in': clocked_in,
+        'on_break': on_break
+    })
+
+
+@app.route('/api/timeclock/pin/clock-in', methods=['POST'])
+def timeclock_pin_clock_in():
+    payload = request.json or {}
+    pin = (payload.get('pin') or '').strip()
+    conn = get_db()
+    staff = _get_staff_by_pin(conn, pin)
+    if not staff:
+        conn.close()
+        return jsonify({'error': 'Invalid PIN / PIN inválido'}), 401
+
+    # If already clocked in, just create a session token (login) and return status
+    open_shift = _get_open_shift(conn, int(staff['id']))
+    if not open_shift:
+        now_iso = _utc_now_iso()
+        conn.cursor().execute('''
+            INSERT INTO timeclock_shifts (staff_id, clock_in_at)
+            VALUES (?, ?)
+        ''', (int(staff['id']), now_iso))
+        open_shift = _get_open_shift(conn, int(staff['id']))
+
+    token = _create_session_for_staff(conn, int(staff['id']))
+    conn.commit()
+    conn.close()
+
+    preferred_lang = staff.get('preferred_language') or 'en'
+    return jsonify({
+        'token': token,
+        'staff': {
+            'id': staff['id'],
+            'username': staff['username'],
+            'full_name': staff['full_name'],
+            'role': staff['role'],
+            'email': staff['email'],
+            'preferred_language': preferred_lang
+        },
+        'shift': open_shift,
+        'message': 'Clocked in / Entrada registrada'
+    })
+
+
+@app.route('/api/timeclock/pin/break-start', methods=['POST'])
+def timeclock_pin_break_start():
+    payload = request.json or {}
+    pin = (payload.get('pin') or '').strip()
+    conn = get_db()
+    staff = _get_staff_by_pin(conn, pin)
+    if not staff:
+        conn.close()
+        return jsonify({'error': 'Invalid PIN / PIN inválido'}), 401
+    shift = _get_open_shift(conn, int(staff['id']))
+    if not shift:
+        conn.close()
+        return jsonify({'error': 'Not clocked in / No está en turno'}), 400
+    if _get_open_break(conn, int(shift['id'])):
+        conn.close()
+        return jsonify({'error': 'Break already started / Descanso ya iniciado'}), 400
+
+    conn.cursor().execute('''
+        INSERT INTO timeclock_breaks (shift_id, break_start_at)
+        VALUES (?, ?)
+    ''', (int(shift['id']), _utc_now_iso()))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Break started / Descanso iniciado'})
+
+
+@app.route('/api/timeclock/pin/break-end', methods=['POST'])
+def timeclock_pin_break_end():
+    payload = request.json or {}
+    pin = (payload.get('pin') or '').strip()
+    conn = get_db()
+    staff = _get_staff_by_pin(conn, pin)
+    if not staff:
+        conn.close()
+        return jsonify({'error': 'Invalid PIN / PIN inválido'}), 401
+    shift = _get_open_shift(conn, int(staff['id']))
+    if not shift:
+        conn.close()
+        return jsonify({'error': 'Not clocked in / No está en turno'}), 400
+    open_break = _get_open_break(conn, int(shift['id']))
+    if not open_break:
+        conn.close()
+        return jsonify({'error': 'No active break / No hay descanso activo'}), 400
+    conn.cursor().execute('''
+        UPDATE timeclock_breaks
+        SET break_end_at = ?
+        WHERE id = ?
+    ''', (_utc_now_iso(), int(open_break['id'])))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Break ended / Descanso terminado'})
+
+
+@app.route('/api/timeclock/pin/clock-out', methods=['POST'])
+def timeclock_pin_clock_out():
+    payload = request.json or {}
+    pin = (payload.get('pin') or '').strip()
+    conn = get_db()
+    staff = _get_staff_by_pin(conn, pin)
+    if not staff:
+        conn.close()
+        return jsonify({'error': 'Invalid PIN / PIN inválido'}), 401
+    shift = _get_open_shift(conn, int(staff['id']))
+    if not shift:
+        conn.close()
+        return jsonify({'error': 'Not clocked in / No está en turno'}), 400
+    if _get_open_break(conn, int(shift['id'])):
+        conn.close()
+        return jsonify({'error': 'End break before clock out / Termine el descanso antes de marcar salida'}), 400
+
+    now_iso = _utc_now_iso()
+    conn.cursor().execute('''
+        UPDATE timeclock_shifts
+        SET clock_out_at = ?
+        WHERE id = ?
+    ''', (now_iso, int(shift['id'])))
+
+    # Force logout: invalidate all sessions for this staff
+    conn.cursor().execute('DELETE FROM sessions WHERE staff_id = ?', (int(staff['id']),))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Clocked out / Salida registrada'})
+
+
+# Staff summary for current logged-in staff (today running + week by day)
+@app.route('/api/timeclock/me/summary', methods=['GET'])
+@require_auth
+def timeclock_me_summary():
+    conn = get_db()
+    staff_id = int(request.current_staff['id'])
+
+    now = datetime.utcnow()
+    start_today = datetime(now.year, now.month, now.day)
+
+    # Current open shift today (if any)
+    open_shift = _get_open_shift(conn, staff_id)
+    today_minutes_worked = 0
+    today_break_minutes = 0
+
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT * FROM timeclock_shifts
+        WHERE staff_id = ? AND clock_in_at >= ?
+        ORDER BY clock_in_at ASC
+    ''', (staff_id, start_today.isoformat() + 'Z'))
+    shifts_today = [dict(r) for r in cur.fetchall() or []]
+    for s in shifts_today:
+        cin = _parse_dt(s.get('clock_in_at'))
+        cout = _parse_dt(s.get('clock_out_at')) or now
+        mins = _minutes_between(cin, cout)
+        brk = _get_shift_break_minutes(conn, int(s['id']), up_to=now)
+        today_minutes_worked += max(0, mins - brk)
+        today_break_minutes += brk
+
+    # Week by day (Mon-Sun)
+    start_of_week = start_today - timedelta(days=(start_today.weekday()))
+    end_of_week = start_of_week + timedelta(days=7)
+
+    cur.execute('''
+        SELECT * FROM timeclock_shifts
+        WHERE staff_id = ? AND clock_in_at >= ? AND clock_in_at < ?
+        ORDER BY clock_in_at ASC
+    ''', (staff_id, start_of_week.isoformat() + 'Z', end_of_week.isoformat() + 'Z'))
+    week_shifts = [dict(r) for r in cur.fetchall() or []]
+
+    day_map = {}
+    for i in range(7):
+        d = (start_of_week + timedelta(days=i)).date().isoformat()
+        day_map[d] = {'date': d, 'work_minutes': 0, 'break_minutes': 0}
+
+    for s in week_shifts:
+        cin = _parse_dt(s.get('clock_in_at'))
+        cout = _parse_dt(s.get('clock_out_at')) or now
+        date_key = (cin.date().isoformat() if cin else None)
+        if not date_key or date_key not in day_map:
+            continue
+        mins = _minutes_between(cin, cout)
+        brk = _get_shift_break_minutes(conn, int(s['id']), up_to=now)
+        day_map[date_key]['work_minutes'] += max(0, mins - brk)
+        day_map[date_key]['break_minutes'] += brk
+
+    conn.close()
+
+    return jsonify({
+        'today': {
+            'work_minutes': today_minutes_worked,
+            'break_minutes': today_break_minutes,
+            'clocked_in': bool(open_shift),
+        },
+        'week': list(day_map.values())
+    })
+
+
+# Admin-only payroll report
+def _admin_payroll_rows(conn, *, since: str, until: str, staff_id: int = None):
+    # since/until are ISO date strings (YYYY-MM-DD)
+    if not since:
+        raise ValueError('since is required')
+    if not until:
+        raise ValueError('until is required')
+
+    start_dt = datetime.fromisoformat(since)
+    end_dt = datetime.fromisoformat(until) + timedelta(days=1)
+
+    params = [start_dt.isoformat() + 'Z', end_dt.isoformat() + 'Z']
+    staff_filter = ''
+    if staff_id:
+        staff_filter = ' AND s.id = ? '
+        params.append(int(staff_id))
+
+    cur = conn.cursor()
+    cur.execute(f'''
+        SELECT sh.id as shift_id, sh.staff_id, sh.clock_in_at, sh.clock_out_at,
+               s.full_name, s.username, s.pay_rate
+        FROM timeclock_shifts sh
+        JOIN staff s ON s.id = sh.staff_id
+        WHERE sh.clock_in_at >= ? AND sh.clock_in_at < ?
+          AND s.active = 1
+          {staff_filter}
+        ORDER BY s.full_name ASC, sh.clock_in_at ASC
+    ''', tuple(params))
+
+    rows = []
+    now = datetime.utcnow()
+    for r in cur.fetchall() or []:
+        shift_id = int(r['shift_id'])
+        cin = _parse_dt(r['clock_in_at'])
+        cout = _parse_dt(r['clock_out_at']) or now
+        total_mins = _minutes_between(cin, cout)
+        break_mins = _get_shift_break_minutes(conn, shift_id, up_to=now)
+        work_mins = max(0, total_mins - break_mins)
+        pay_rate = r['pay_rate']
+        try:
+            pay_rate_val = float(pay_rate) if pay_rate is not None else None
+        except Exception:
+            pay_rate_val = None
+        gross = None
+        if pay_rate_val is not None:
+            gross = round((work_mins / 60.0) * pay_rate_val, 2)
+
+        rows.append({
+            'staff_id': int(r['staff_id']),
+            'username': r['username'],
+            'full_name': r['full_name'],
+            'pay_rate': pay_rate_val,
+            'shift_id': shift_id,
+            'clock_in_at': r['clock_in_at'],
+            'clock_out_at': r['clock_out_at'],
+            'work_minutes': work_mins,
+            'break_minutes': break_mins,
+            'work_hours': round(work_mins / 60.0, 2),
+            'gross_pay': gross,
+        })
+    return rows
+
+
+@app.route('/api/timeclock/payroll', methods=['GET'])
+@require_role('admin')
+def timeclock_payroll_report():
+    since = (request.args.get('since') or '').strip()
+    until = (request.args.get('until') or '').strip()
+    staff_id = request.args.get('staff_id')
+    staff_id = int(staff_id) if staff_id and staff_id.isdigit() else None
+    conn = get_db()
+    try:
+        rows = _admin_payroll_rows(conn, since=since, until=until, staff_id=staff_id)
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': str(e)}), 400
+    conn.close()
+    return jsonify(rows)
+
+
+@app.route('/api/timeclock/payroll/csv', methods=['GET'])
+@require_role('admin')
+def timeclock_payroll_report_csv():
+    since = (request.args.get('since') or '').strip()
+    until = (request.args.get('until') or '').strip()
+    staff_id = request.args.get('staff_id')
+    staff_id = int(staff_id) if staff_id and staff_id.isdigit() else None
+    conn = get_db()
+    try:
+        rows = _admin_payroll_rows(conn, since=since, until=until, staff_id=staff_id)
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': str(e)}), 400
+
+    conn.close()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        'staff_id', 'username', 'full_name',
+        'pay_rate',
+        'shift_id',
+        'clock_in_at', 'clock_out_at',
+        'work_minutes', 'break_minutes', 'work_hours',
+        'gross_pay'
+    ])
+    for r in rows:
+        writer.writerow([
+            r['staff_id'], r['username'], r['full_name'],
+            r['pay_rate'],
+            r['shift_id'],
+            r['clock_in_at'], r['clock_out_at'],
+            r['work_minutes'], r['break_minutes'], r['work_hours'],
+            r['gross_pay']
+        ])
+    csv_bytes = output.getvalue().encode('utf-8')
+    filename = f"payroll_{since}_to_{until}.csv"
+    return Response(
+        csv_bytes,
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+    )
 
 # Incident Reports
 @app.route('/api/incidents', methods=['GET', 'POST'])
