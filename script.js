@@ -2961,22 +2961,16 @@ function showPage(pageName) {
 				journalList.style.setProperty('min-height', '200px', 'important');
 			}
 
-			// Safari sometimes needs scroll/next-ticks to settle layout.
-			const scrollToHistory = (delayMs) => {
-				setTimeout(() => {
+
+			// Avoid delayed force-scrolls that can yank the user back to the top after they start scrolling.
+			if (fromPageName && fromPageName !== 'history' && window.scrollY < 5) {
+				window.requestAnimationFrame(() => {
 					try {
 						targetPage.scrollIntoView({ behavior: 'instant', block: 'start' });
 					} catch (e) {
 						window.scrollTo({ top: 0, behavior: 'instant' });
 					}
-				}, delayMs);
-			};
-			// Only force-scroll when we are actually navigating into History from another page.
-			// Otherwise, re-showing the page (or accidental duplicate routing) can yank the user to the top.
-			if (fromPageName && fromPageName !== 'history') {
-				scrollToHistory(0);
-				scrollToHistory(120);
-				scrollToHistory(350);
+				});
 			}
 
             // Force a reflow so Safari recalculates dimensions
