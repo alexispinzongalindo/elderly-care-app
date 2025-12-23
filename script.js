@@ -9024,8 +9024,15 @@ document.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', async () => {
     window.updateStickyHeaderOffset = function updateStickyHeaderOffset() {
         const navbar = document.querySelector('.navbar');
-        const navbarHeight = navbar ? navbar.getBoundingClientRect().height : 0;
-        document.documentElement.style.setProperty('--sticky-offset', `${Math.ceil(navbarHeight)}px`);
+        let navbarHeight = 0;
+        if (navbar) {
+            // Safari can over-report getBoundingClientRect() height during layout transitions.
+            // offsetHeight is more stable for fixed-position elements.
+            navbarHeight = navbar.offsetHeight || 0;
+        }
+        // Safety clamp: prevent accidental huge offsets (which look like a big blank gap).
+        const clamped = Math.max(0, Math.min(240, Math.ceil(navbarHeight)));
+        document.documentElement.style.setProperty('--sticky-offset', `${clamped}px`);
     };
 
     window.updateStickyHeaderOffset();
