@@ -418,7 +418,7 @@ body {
 }
 
 #mainApp > main.container {
-    margin-top: calc(1.5rem + var(--sticky-offset, 0px));
+    margin-top: var(--sticky-offset, 0px);
 }
 
 /* Sticky page headers (Care Notes + Financial) */
