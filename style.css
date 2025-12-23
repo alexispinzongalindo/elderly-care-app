@@ -595,8 +595,12 @@ body:has(.nav-link[data-page="incidents"].active) #incidents {
     margin-bottom: 1.5rem !important;
     font-size: 1.8rem !important;
     font-weight: bold !important;
-    position: relative !important;
-    z-index: 1 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2000 !important;
+    background: var(--light-gray) !important;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.5rem !important;
     width: 100% !important;
     height: auto !important;
 }
