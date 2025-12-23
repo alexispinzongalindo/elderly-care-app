@@ -418,6 +418,7 @@ body {
 }
 
 #mainApp > main.container {
+    margin: 0 auto;
     margin-top: var(--sticky-offset, 0px);
 }
 

@@ -4667,14 +4667,6 @@ async function loadStaff() {
 
 async function editStaff(id) {
     try {
-        // Ensure staff page is visible first
-        const staffPage = document.getElementById('staff');
-        if (staffPage) {
-            showPage('staff');
-            // Wait a moment for page to render
-            await new Promise(resolve => setTimeout(resolve, 100));
-        }
-
         editingStaffId = id;
         const response = await fetch(`/api/staff/${id}`, {
             headers: getAuthHeaders()
@@ -8995,6 +8987,13 @@ function setDateTimeToDropdowns(dateTimeString, yearId, monthId, dayId, timeId) 
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('click', (e) => {
+        const a = e.target && e.target.closest ? e.target.closest('a[href="#"].nav-link') : null;
+        if (a) {
+            e.preventDefault();
+        }
+    }, true);
+
     window.updateStickyHeaderOffset = function updateStickyHeaderOffset() {
         const navbar = document.querySelector('.navbar');
         const navbarHeight = navbar ? navbar.getBoundingClientRect().height : 0;
