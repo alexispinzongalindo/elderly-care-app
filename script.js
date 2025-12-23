@@ -3161,6 +3161,12 @@ function showPage(pageName) {
                 }
             } catch (e) {}
 
+            try {
+                if (window.__pageScrollResetTimeoutId2) {
+                    clearTimeout(window.__pageScrollResetTimeoutId2);
+                }
+            } catch (e) {}
+
             // Safari can auto-scroll to the last focused input/select on a page (especially forms).
             // Blur any active element before performing our scroll reset.
             try {
@@ -3184,10 +3190,23 @@ function showPage(pageName) {
                     try {
                         window.scrollTo(0, 0);
                     } catch (e2) {
-                        if (document.documentElement) document.documentElement.scrollTop = 0;
-                        if (document.body) document.body.scrollTop = 0;
+                        // ignore
                     }
                 }
+
+                // Ensure scrollTop is reset even if window.scrollTo is ignored.
+                try {
+                    if (document.documentElement) document.documentElement.scrollTop = 0;
+                    if (document.body) document.body.scrollTop = 0;
+                } catch (e) {}
+                try {
+                    const main = document.querySelector('#mainApp > main.container') || document.querySelector('main.container');
+                    if (main) main.scrollTop = 0;
+                } catch (e) {}
+                try {
+                    const pageEl = document.getElementById(intendedPageName);
+                    if (pageEl) pageEl.scrollTop = 0;
+                } catch (e) {}
             };
 
             window.__pageScrollResetRafId = window.requestAnimationFrame(() => {
@@ -3198,6 +3217,13 @@ function showPage(pageName) {
             window.__pageScrollResetTimeoutId = setTimeout(() => {
                 doScrollTop();
             }, 120);
+
+            // Third pass (Reports only): Safari sometimes restores scroll later on form-heavy pages.
+            if (pageName === 'reports') {
+                window.__pageScrollResetTimeoutId2 = setTimeout(() => {
+                    doScrollTop();
+                }, 380);
+            }
         }
 
         if (pageName === 'financial') {
@@ -9046,6 +9072,12 @@ document.addEventListener('click', (e) => {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        if (window.history && 'scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+    } catch (e) {}
+
     window.updateStickyHeaderOffset = function updateStickyHeaderOffset() {
         const navbar = document.querySelector('.navbar');
         let navbarHeight = 0;
