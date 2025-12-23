@@ -2961,18 +2961,6 @@ function showPage(pageName) {
 				journalList.style.setProperty('min-height', '200px', 'important');
 			}
 
-
-			// Avoid delayed force-scrolls that can yank the user back to the top after they start scrolling.
-			if (fromPageName && fromPageName !== 'history' && window.scrollY < 5) {
-				window.requestAnimationFrame(() => {
-					try {
-						targetPage.scrollIntoView({ behavior: 'instant', block: 'start' });
-					} catch (e) {
-						window.scrollTo({ top: 0, behavior: 'instant' });
-					}
-				});
-			}
-
             // Force a reflow so Safari recalculates dimensions
             void targetPage.offsetHeight;
         }
