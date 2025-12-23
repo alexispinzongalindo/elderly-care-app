@@ -596,7 +596,7 @@ body:has(.nav-link[data-page="incidents"].active) #incidents {
     font-size: 1.8rem !important;
     font-weight: bold !important;
     position: sticky !important;
-    top: 0 !important;
+    top: var(--sticky-offset, 0px) !important;
     z-index: 2000 !important;
     background: var(--light-gray) !important;
     padding-top: 0.25rem !important;

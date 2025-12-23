@@ -9151,7 +9151,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             navbarHeight = navbar.offsetHeight || 0;
         }
         // Safety clamp: prevent accidental huge offsets (which look like a big blank gap).
-        const clamped = Math.max(0, Math.min(240, Math.ceil(navbarHeight)));
+        // Navbar can legitimately be taller than 240px on desktop (two-row nav), so allow a higher ceiling.
+        const clamped = Math.max(0, Math.min(420, Math.ceil(navbarHeight)));
         document.documentElement.style.setProperty('--sticky-offset', `${clamped}px`);
     };
 
