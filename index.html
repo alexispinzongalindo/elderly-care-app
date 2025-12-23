@@ -34,6 +34,31 @@
         <div class="form-card login-card">
             <h2 class="login-title" data-translate="login.title">🏥 Elder Care Management</h2>
             <h3 class="login-subtitle" data-translate="login.subtitle">Login</h3>
+
+            <div class="login-tabs" style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
+                <button type="button" id="loginTabStaff" class="btn btn-primary" style="flex: 1;" onclick="showLoginTab('staff')" data-translate="timeclock.tab.staff">Staff Clock In</button>
+                <button type="button" id="loginTabAdmin" class="btn btn-secondary" style="flex: 1;" onclick="showLoginTab('admin')" data-translate="timeclock.tab.admin">Admin Login</button>
+            </div>
+
+            <!-- Staff Time Clock (PIN) -->
+            <div id="staffClockInPanel" style="display: block;">
+                <div class="form-group">
+                    <label for="timeclockPin" data-translate="timeclock.pin">4-Digit Code (PIN)</label>
+                    <input type="password" id="timeclockPin" inputmode="numeric" autocomplete="one-time-code" maxlength="4" placeholder="0000">
+                    <div class="button-group" style="margin-top: 0.75rem;">
+                        <button type="button" class="btn btn-success" style="width: 100%;" onclick="handlePinClockIn()" data-translate="timeclock.clockInAndLogin">Clock In & Login</button>
+                    </div>
+                    <div class="button-group" style="margin-top: 0.5rem;">
+                        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="handlePinBreakStart()" data-translate="timeclock.breakStart">Start Break</button>
+                        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="handlePinBreakEnd()" data-translate="timeclock.breakEnd">End Break</button>
+                    </div>
+                    <div class="button-group" style="margin-top: 0.5rem;">
+                        <button type="button" class="btn btn-danger" style="width: 100%;" onclick="handlePinClockOut()" data-translate="timeclock.clockOut">Clock Out</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Login (Username/Password) -->
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="loginUsername" data-translate="login.username">Username *</label>
@@ -292,8 +317,10 @@
                     <!-- System Group -->
                     <li class="nav-group-header"><span data-translate="nav.group.system">System</span></li>
                     <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon"><i class="fas fa-bell"></i></span><span data-translate="nav.notifications">Notifications</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="timeclock"><span class="nav-icon"><i class="fas fa-clock"></i></span><span data-translate="nav.timeclock">Time Clock</span></a></li>
                     <li><a href="#" class="nav-link" data-page="history"><span class="nav-icon"><i class="fas fa-book"></i></span><span>History</span></a></li>
                     <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-user-shield"></i></span><span data-translate="nav.staff">Staff</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="payroll" id="payrollNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-invoice"></i></span><span data-translate="nav.payroll">Payroll</span></a></li>
                     <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span data-translate="nav.logout">Logout</span></a></li>
                 </ul>
             </div>
@@ -687,6 +714,21 @@
                                 <option value="metro">MetroPCS</option>
                             </select>
                         </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="staffPayRate" data-translate="staff.payRate">Pay Rate (per hour)</label>
+                                <input type="number" id="staffPayRate" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="staff.pin">4-Digit PIN</label>
+                                <div class="button-group" style="gap: 0.5rem;">
+                                    <button type="button" class="btn btn-secondary" id="generateStaffPinBtn" onclick="generateStaffPin()" data-translate="staff.generatePin">Generate PIN</button>
+                                    <input type="text" id="generatedStaffPin" readonly style="flex: 1;" placeholder="----">
+                                </div>
+                                <div style="font-size: 0.85rem; color: var(--dark-gray);" data-translate="staff.pinHint">Admin only. PIN is shown once when generated.</div>
+                            </div>
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label data-translate="staff.role">Role *</label>
@@ -717,6 +759,65 @@
                 </div>
 
                 <div id="staffList" class="item-list"></div>
+            </div>
+
+            <!-- Time Clock Page -->
+            <div id="timeclock" class="page">
+                <div class="page-header">
+                    <h2 data-translate="nav.timeclock">Time Clock</h2>
+                    <p style="color: var(--dark-gray);" data-translate="timeclock.subtitle">Clock actions require your 4-digit PIN.</p>
+                </div>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="timeclockPinInApp" data-translate="timeclock.pin">4-Digit Code (PIN)</label>
+                            <input type="password" id="timeclockPinInApp" inputmode="numeric" maxlength="4" placeholder="0000">
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-top: 0.5rem;">
+                        <button class="btn btn-success" onclick="handlePinBreakStart(true)" data-translate="timeclock.breakStart">Start Break</button>
+                        <button class="btn btn-secondary" onclick="handlePinBreakEnd(true)" data-translate="timeclock.breakEnd">End Break</button>
+                        <button class="btn btn-danger" onclick="handlePinClockOut(true)" data-translate="timeclock.clockOut">Clock Out</button>
+                    </div>
+                </div>
+                <div class="form-card">
+                    <h3 data-translate="timeclock.myHours">My Hours</h3>
+                    <div id="myHoursToday" style="margin-top: 0.75rem;"></div>
+                    <div id="myHoursWeek" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+
+            <!-- Payroll Page (Admin Only) -->
+            <div id="payroll" class="page">
+                <div class="page-header">
+                    <h2 data-translate="nav.payroll">Payroll</h2>
+                    <p style="color: var(--dark-gray);" data-translate="payroll.subtitle">Generate payroll reports by date range. Admin only.</p>
+                </div>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="payrollSince" data-translate="payroll.since">From</label>
+                            <input type="date" id="payrollSince">
+                        </div>
+                        <div class="form-group">
+                            <label for="payrollUntil" data-translate="payroll.until">To</label>
+                            <input type="date" id="payrollUntil">
+                        </div>
+                        <div class="form-group">
+                            <label for="payrollStaff" data-translate="payroll.staff">Staff</label>
+                            <select id="payrollStaff" class="form-control">
+                                <option value="" data-translate="payroll.staffAll">All Staff</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-top: 0.5rem;">
+                        <button class="btn btn-primary" onclick="loadPayrollReport()" data-translate="payroll.run">Run Report</button>
+                        <button class="btn btn-secondary" onclick="downloadPayrollCsv()" data-translate="payroll.exportCsv">Export CSV</button>
+                    </div>
+                </div>
+                <div class="form-card">
+                    <div id="payrollTable"></div>
+                </div>
             </div>
 
             <!-- Medications Page -->

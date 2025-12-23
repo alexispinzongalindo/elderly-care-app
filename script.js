@@ -457,6 +457,31 @@ const translations = {
         'staff.role.admin': 'Administrator',
         'staff.role.doctor': 'Doctor',
         'staff.role.therapist': 'Therapist',
+
+        'staff.payRate': 'Pay Rate (per hour)',
+        'staff.pin': '4-Digit PIN',
+        'staff.generatePin': 'Generate PIN',
+        'staff.pinHint': 'Admin only. PIN is shown once when generated.',
+
+        'nav.timeclock': 'Time Clock',
+        'nav.payroll': 'Payroll',
+        'timeclock.tab.staff': 'Staff Clock In',
+        'timeclock.tab.admin': 'Admin Login',
+        'timeclock.pin': '4-Digit Code (PIN)',
+        'timeclock.clockInAndLogin': 'Clock In & Login',
+        'timeclock.breakStart': 'Start Break',
+        'timeclock.breakEnd': 'End Break',
+        'timeclock.clockOut': 'Clock Out',
+        'timeclock.subtitle': 'Clock actions require your 4-digit PIN.',
+        'timeclock.myHours': 'My Hours',
+
+        'payroll.subtitle': 'Generate payroll reports by date range. Admin only.',
+        'payroll.since': 'From',
+        'payroll.until': 'To',
+        'payroll.staff': 'Staff',
+        'payroll.staffAll': 'All Staff',
+        'payroll.run': 'Run Report',
+        'payroll.exportCsv': 'Export CSV',
     },
     es: {
         // Navigation
@@ -810,8 +835,333 @@ const translations = {
         'staff.role.admin': 'Administrador',
         'staff.role.doctor': 'Médico',
         'staff.role.therapist': 'Terapeuta',
+
+        'staff.payRate': 'Tarifa (por hora)',
+        'staff.pin': 'PIN de 4 dígitos',
+        'staff.generatePin': 'Generar PIN',
+        'staff.pinHint': 'Solo admin. El PIN se muestra una sola vez al generarse.',
+
+        'nav.timeclock': 'Reloj Ponche',
+        'nav.payroll': 'Nómina',
+        'timeclock.tab.staff': 'Ponche del Personal',
+        'timeclock.tab.admin': 'Acceso Admin',
+        'timeclock.pin': 'Código de 4 dígitos (PIN)',
+        'timeclock.clockInAndLogin': 'Marcar Entrada y Entrar',
+        'timeclock.breakStart': 'Iniciar Descanso',
+        'timeclock.breakEnd': 'Terminar Descanso',
+        'timeclock.clockOut': 'Marcar Salida',
+        'timeclock.subtitle': 'Las acciones requieren su PIN de 4 dígitos.',
+        'timeclock.myHours': 'Mis Horas',
+
+        'payroll.subtitle': 'Genere reportes de nómina por rango de fechas. Solo admin.',
+        'payroll.since': 'Desde',
+        'payroll.until': 'Hasta',
+        'payroll.staff': 'Personal',
+        'payroll.staffAll': 'Todo el Personal',
+        'payroll.run': 'Generar',
+        'payroll.exportCsv': 'Exportar CSV',
     }
 };
+
+function showLoginTab(tab) {
+    const staffPanel = document.getElementById('staffClockInPanel');
+    const adminForm = document.getElementById('loginForm');
+    const staffBtn = document.getElementById('loginTabStaff');
+    const adminBtn = document.getElementById('loginTabAdmin');
+
+    if (!staffPanel || !adminForm || !staffBtn || !adminBtn) return;
+    if (tab === 'admin') {
+        staffPanel.style.display = 'none';
+        adminForm.style.display = 'block';
+        adminBtn.classList.remove('btn-secondary');
+        adminBtn.classList.add('btn-primary');
+        staffBtn.classList.remove('btn-primary');
+        staffBtn.classList.add('btn-secondary');
+    } else {
+        staffPanel.style.display = 'block';
+        adminForm.style.display = 'none';
+        staffBtn.classList.remove('btn-secondary');
+        staffBtn.classList.add('btn-primary');
+        adminBtn.classList.remove('btn-primary');
+        adminBtn.classList.add('btn-secondary');
+    }
+    replaceDualLanguageText();
+}
+
+function _getPinFromDom(inApp) {
+    const el = document.getElementById(inApp ? 'timeclockPinInApp' : 'timeclockPin');
+    return (el?.value || '').trim();
+}
+
+function _setPinDom(inApp, value) {
+    const el = document.getElementById(inApp ? 'timeclockPinInApp' : 'timeclockPin');
+    if (el) el.value = value;
+}
+
+function _applyAuthSuccess(data) {
+    authToken = data.token;
+    currentStaff = data.staff;
+    currentUser = data.staff;
+    localStorage.setItem('authToken', authToken);
+    localStorage.setItem('currentStaff', JSON.stringify(currentStaff));
+
+    const userLanguage = currentStaff.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
+    setLanguage(userLanguage);
+
+    document.getElementById('userName').textContent = currentStaff.full_name;
+    const userRoleEl = document.getElementById('userRole');
+    if (userRoleEl) {
+        userRoleEl.textContent = currentStaff.role === 'admin' ? 'Administrator' : 'Caregiver';
+        userRoleEl.style.display = 'inline-block';
+    }
+    document.getElementById('userInfo').style.display = 'flex';
+
+    const staffNavLink = document.getElementById('staffNavLink');
+    if (staffNavLink && currentStaff.role === 'admin') {
+        staffNavLink.style.display = 'block';
+    } else if (staffNavLink) {
+        staffNavLink.style.display = 'none';
+    }
+
+    const financialNavLink = document.getElementById('financialNavLink');
+    if (financialNavLink) {
+        financialNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
+    }
+
+    const payrollNavLink = document.getElementById('payrollNavLink');
+    if (payrollNavLink) {
+        payrollNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
+    }
+
+    hideLoginModal();
+    checkAuth();
+}
+
+async function handlePinClockIn() {
+    const pin = _getPinFromDom(false);
+    if (!pin || pin.length !== 4) {
+        showMessage('Please enter your 4-digit code / Por favor ingrese su código de 4 dígitos', 'error');
+        return;
+    }
+    try {
+        const res = await fetch('/api/timeclock/pin/clock-in', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ pin }),
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            showMessage((data && (data.error || data.message)) || 'Clock in failed / Error al marcar entrada', 'error');
+            return;
+        }
+        _applyAuthSuccess(data);
+        showMessage('Clocked in / Entrada registrada', 'success');
+        _setPinDom(false, '');
+    } catch (e) {
+        showMessage(`Error: ${e.message}`, 'error');
+    }
+}
+
+async function handlePinBreakStart(inApp = false) {
+    const pin = _getPinFromDom(inApp);
+    if (!pin || pin.length !== 4) {
+        showMessage('Please enter your 4-digit code / Por favor ingrese su código de 4 dígitos', 'error');
+        return;
+    }
+    try {
+        const res = await fetch('/api/timeclock/pin/break-start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ pin }),
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            showMessage((data && (data.error || data.message)) || 'Break start failed / Error al iniciar descanso', 'error');
+            return;
+        }
+        showMessage('Break started / Descanso iniciado', 'success');
+    } catch (e) {
+        showMessage(`Error: ${e.message}`, 'error');
+    }
+}
+
+async function handlePinBreakEnd(inApp = false) {
+    const pin = _getPinFromDom(inApp);
+    if (!pin || pin.length !== 4) {
+        showMessage('Please enter your 4-digit code / Por favor ingrese su código de 4 dígitos', 'error');
+        return;
+    }
+    try {
+        const res = await fetch('/api/timeclock/pin/break-end', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ pin }),
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            showMessage((data && (data.error || data.message)) || 'Break end failed / Error al terminar descanso', 'error');
+            return;
+        }
+        showMessage('Break ended / Descanso terminado', 'success');
+    } catch (e) {
+        showMessage(`Error: ${e.message}`, 'error');
+    }
+}
+
+async function handlePinClockOut(inApp = false) {
+    const pin = _getPinFromDom(inApp);
+    if (!pin || pin.length !== 4) {
+        showMessage('Please enter your 4-digit code / Por favor ingrese su código de 4 dígitos', 'error');
+        return;
+    }
+    try {
+        const res = await fetch('/api/timeclock/pin/clock-out', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ pin }),
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            showMessage((data && (data.error || data.message)) || 'Clock out failed / Error al marcar salida', 'error');
+            return;
+        }
+        showMessage('Clocked out / Salida registrada', 'success');
+        if (inApp) {
+            handleLogout();
+        } else {
+            _setPinDom(false, '');
+        }
+    } catch (e) {
+        showMessage(`Error: ${e.message}`, 'error');
+    }
+}
+
+function _fmtHoursFromMinutes(mins) {
+    const h = Math.floor((mins || 0) / 60);
+    const m = (mins || 0) % 60;
+    return `${h}h ${m}m`;
+}
+
+async function loadMyHoursSummary() {
+    if (!authToken) return;
+    try {
+        const res = await fetch('/api/timeclock/me/summary', { headers: getAuthHeaders(), cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const todayEl = document.getElementById('myHoursToday');
+        const weekEl = document.getElementById('myHoursWeek');
+        if (todayEl) {
+            todayEl.innerHTML = `
+                <div><strong>Today / Hoy:</strong> ${_fmtHoursFromMinutes(data?.today?.work_minutes || 0)}</div>
+                <div style="color: var(--dark-gray); margin-top: 0.25rem;"><strong>Breaks / Descansos:</strong> ${_fmtHoursFromMinutes(data?.today?.break_minutes || 0)}</div>
+            `;
+        }
+        if (weekEl) {
+            const rows = (data?.week || []).map(d => {
+                return `<div style="display:flex; justify-content:space-between; gap:1rem; padding:0.25rem 0; border-bottom:1px solid #eee;">
+                    <div>${d.date}</div>
+                    <div>${_fmtHoursFromMinutes(d.work_minutes || 0)}</div>
+                </div>`;
+            }).join('');
+            weekEl.innerHTML = `<div style="margin-top:0.5rem;"><strong>Week / Semana:</strong></div>${rows || ''}`;
+        }
+    } catch (e) {
+        console.error('loadMyHoursSummary error', e);
+    }
+}
+
+async function loadPayrollStaffOptions() {
+    try {
+        const res = await fetch('/api/staff', { headers: getAuthHeaders(), cache: 'no-store' });
+        if (!res.ok) return;
+        const staffList = await res.json();
+        const sel = document.getElementById('payrollStaff');
+        if (!sel) return;
+        const current = sel.value;
+        sel.innerHTML = `<option value="" data-translate="payroll.staffAll">${t('payroll.staffAll')}</option>` +
+            staffList.map(s => `<option value="${s.id}">${(s.full_name || s.username || s.id)}</option>`).join('');
+        sel.value = current;
+        replaceDualLanguageText();
+        updateTranslations();
+    } catch (e) {
+        console.error('loadPayrollStaffOptions error', e);
+    }
+}
+
+async function loadPayrollReport() {
+    const since = document.getElementById('payrollSince')?.value;
+    const until = document.getElementById('payrollUntil')?.value;
+    const staffId = document.getElementById('payrollStaff')?.value;
+    if (!since || !until) {
+        showMessage('Please select a date range / Por favor seleccione un rango de fechas', 'error');
+        return;
+    }
+    try {
+        const params = new URLSearchParams({ since, until });
+        if (staffId) params.set('staff_id', staffId);
+        const res = await fetch(`/api/timeclock/payroll?${params.toString()}`, { headers: getAuthHeaders(), cache: 'no-store' });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            showMessage((data && (data.error || data.message)) || 'Failed to load payroll / Error al cargar nómina', 'error');
+            return;
+        }
+        const container = document.getElementById('payrollTable');
+        if (!container) return;
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty-state">No records / Sin registros</div>';
+            return;
+        }
+        const rowsHtml = data.map(r => {
+            const rate = (r.pay_rate === null || r.pay_rate === undefined) ? '' : `$${Number(r.pay_rate).toFixed(2)}`;
+            const gross = (r.gross_pay === null || r.gross_pay === undefined) ? '' : `$${Number(r.gross_pay).toFixed(2)}`;
+            return `<tr>
+                <td>${r.full_name || ''}</td>
+                <td>${r.clock_in_at || ''}</td>
+                <td>${r.clock_out_at || ''}</td>
+                <td>${r.work_hours || 0}</td>
+                <td>${rate}</td>
+                <td>${gross}</td>
+            </tr>`;
+        }).join('');
+
+        container.innerHTML = `
+            <div style="overflow:auto;">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Staff</th>
+                            <th>In</th>
+                            <th>Out</th>
+                            <th>Hours</th>
+                            <th>Rate</th>
+                            <th>Gross</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+            </div>
+        `;
+    } catch (e) {
+        showMessage(`Error: ${e.message}`, 'error');
+    }
+}
+
+function downloadPayrollCsv() {
+    const since = document.getElementById('payrollSince')?.value;
+    const until = document.getElementById('payrollUntil')?.value;
+    const staffId = document.getElementById('payrollStaff')?.value;
+    if (!since || !until) {
+        showMessage('Please select a date range / Por favor seleccione un rango de fechas', 'error');
+        return;
+    }
+    const params = new URLSearchParams({ since, until });
+    if (staffId) params.set('staff_id', staffId);
+    window.open(`/api/timeclock/payroll/csv?${params.toString()}`, '_blank');
+}
 
 // Translation function
 function t(key) {
@@ -1335,6 +1685,11 @@ function showLoginModal() {
     document.getElementById('loginModal').style.display = 'block';
     document.getElementById('residentSelector').style.display = 'none';
     document.getElementById('mainApp').style.display = 'none';
+
+    // Default to staff clock-in flow
+    if (typeof showLoginTab === 'function') {
+        showLoginTab('staff');
+    }
 }
 
 function hideLoginModal() {
@@ -3145,23 +3500,9 @@ function showPage(pageName) {
                     } catch (e) {
                         console.error('Error in reports retry visibility fix:', e);
                     }
-                }, 0);
+                }, 150);
             }
-        }
 
-        // Update nav links
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('data-page') === pageName) {
-                link.classList.add('active');
-            }
-        });
-
-        if (typeof window.updateStickyHeaderOffset === 'function') {
-            window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
-        }
-
-        if (pageName === 'carenotes' || pageName === 'reports') {
             try {
                 if (window.__pageScrollResetRafId) {
                     cancelAnimationFrame(window.__pageScrollResetRafId);
@@ -3790,6 +4131,14 @@ function showPage(pageName) {
 
         // Update all translatable elements (data-translate attributes)
         updateTranslations();
+
+        // Page-specific loaders
+        if (pageName === 'timeclock') {
+            loadMyHoursSummary();
+        }
+        if (pageName === 'payroll') {
+            loadPayrollStaffOptions();
+        }
 
         // Final backstop: ensure Reports title exists and is visible (some DOM/translation flows can remove/blank it)
         if (pageName === 'reports') {
@@ -4731,6 +5080,10 @@ function showAddStaffForm() {
     document.getElementById('staffPasswordHint').textContent = t('staff.passwordHint.new');
     document.getElementById('staffActiveGroup').style.display = 'none';
     document.getElementById('newStaffForm').reset();
+    const staffPayRateEl = document.getElementById('staffPayRate');
+    if (staffPayRateEl) staffPayRateEl.value = '';
+    const generatedPinEl = document.getElementById('generatedStaffPin');
+    if (generatedPinEl) generatedPinEl.value = '';
     // Process dual-language text for form header
     replaceDualLanguageText();
     // Scroll to form
@@ -4857,6 +5210,10 @@ async function editStaff(id) {
         elements.staffPhone.value = staff.phone || '';
         const staffPhoneCarrierEl = document.getElementById('staffPhoneCarrier');
         if (staffPhoneCarrierEl) staffPhoneCarrierEl.value = staff.phone_carrier || '';
+        const staffPayRateEl = document.getElementById('staffPayRate');
+        if (staffPayRateEl) staffPayRateEl.value = (staff.pay_rate === null || staff.pay_rate === undefined) ? '' : staff.pay_rate;
+        const generatedPinEl = document.getElementById('generatedStaffPin');
+        if (generatedPinEl) generatedPinEl.value = '';
         elements.staffRole.value = staff.role || 'caregiver';
         elements.staffActive.checked = staff.active !== 0;
         elements.staffPassword.value = '';
@@ -4886,7 +5243,8 @@ async function saveStaff(event) {
         phone: document.getElementById('staffPhone').value,
         phone_carrier: document.getElementById('staffPhoneCarrier')?.value || '',
         role: document.getElementById('staffRole').value,
-        active: document.getElementById('staffActive').checked ? 1 : 0
+        active: document.getElementById('staffActive').checked ? 1 : 0,
+        pay_rate: document.getElementById('staffPayRate')?.value || ''
     };
 
     const password = document.getElementById('staffPassword').value;
@@ -4943,6 +5301,45 @@ async function saveStaff(event) {
     } catch (error) {
         console.error('Error saving staff:', error);
         showMessage('Error saving staff / Error al guardar personal', 'error');
+    }
+}
+
+async function generateStaffPin() {
+    if (!editingStaffId) {
+        showMessage('Save staff first, then generate PIN / Guarde el personal primero, luego genere el PIN', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/staff/${editingStaffId}/pin`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({})
+        });
+
+        if (response.status === 401) {
+            showMessage('Session expired. Please login again. / Sesión expirada. Por favor inicie sesión nuevamente.', 'error');
+            handleLogout();
+            return;
+        }
+
+        if (response.status === 403) {
+            showMessage('Access denied. Admin role required. / Acceso denegado. Se requiere rol de administrador.', 'error');
+            return;
+        }
+
+        const data = await response.json().catch(() => null);
+        if (!response.ok) {
+            showMessage((data && (data.error || data.message)) || 'Failed to generate PIN / Error al generar PIN', 'error');
+            return;
+        }
+
+        const pinEl = document.getElementById('generatedStaffPin');
+        if (pinEl) pinEl.value = (data && data.pin) ? data.pin : '';
+        showMessage('PIN generated (shown once) / PIN generado (se muestra una vez)', 'success');
+    } catch (error) {
+        console.error('Error generating staff PIN:', error);
+        showMessage('Failed to generate PIN / Error al generar PIN', 'error');
     }
 }
 
