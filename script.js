@@ -2915,6 +2915,17 @@ function showPage(pageName) {
                 // If reports is nested under a page that can be hidden (e.g., billing/financial), move it out.
                 const reportsPage = document.getElementById('reports');
                 const billingPage = document.getElementById('billing');
+                const mainContainerForPages = document.querySelector('#mainApp > main.container') || document.querySelector('main.container');
+
+                // Force reports to be a direct child of main.container.
+                // If it isn't, it can end up far below due to intervening layout/containers.
+                try {
+                    if (mainContainerForPages && reportsPage && reportsPage.parentElement !== mainContainerForPages) {
+                        mainContainerForPages.appendChild(reportsPage);
+                    }
+                } catch (e) {
+                    // ignore
+                }
                 if (reportsPage && billingPage && reportsPage.parentElement && reportsPage.parentElement.id === 'billing') {
                     console.log('⚠️⚠️⚠️ CRITICAL: Reports page is INSIDE billing page! Moving it out...');
                     const mainContainer = billingPage.parentElement; // Should be main.container
@@ -2923,6 +2934,16 @@ function showPage(pageName) {
                         console.log('✅ Reports page moved out of billing page');
                         console.log('✅ New parent:', reportsPage.parentElement?.tagName, reportsPage.parentElement?.id);
                     }
+                }
+
+                // Ensure reports is at the top of the page stack inside main.container.
+                // This prevents any preceding sibling from creating a large layout offset above reports.
+                try {
+                    if (mainContainerForPages && reportsPage && mainContainerForPages.contains(reportsPage)) {
+                        mainContainerForPages.insertBefore(reportsPage, mainContainerForPages.firstChild);
+                    }
+                } catch (e) {
+                    // ignore
                 }
 
                 // Force reports page visible using cssText for maximum control (Safari can keep it at 0x0 otherwise)
