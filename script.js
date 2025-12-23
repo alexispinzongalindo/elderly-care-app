@@ -3167,6 +3167,12 @@ function showPage(pageName) {
                 }
             } catch (e) {}
 
+            try {
+                if (window.__pageScrollResetIntervalId) {
+                    clearInterval(window.__pageScrollResetIntervalId);
+                }
+            } catch (e) {}
+
             // Safari can auto-scroll to the last focused input/select on a page (especially forms).
             // Blur any active element before performing our scroll reset.
             try {
@@ -3223,6 +3229,25 @@ function showPage(pageName) {
                 window.__pageScrollResetTimeoutId2 = setTimeout(() => {
                     doScrollTop();
                 }, 380);
+
+                // Final backstop (Reports only): keep forcing scrollTop to 0 for a short window.
+                // Some Safari builds restore scroll multiple times over ~1s.
+                const startedAt = Date.now();
+                window.__pageScrollResetIntervalId = setInterval(() => {
+                    if (window.__pageScrollResetNonce !== scrollResetNonce) {
+                        try { clearInterval(window.__pageScrollResetIntervalId); } catch (e) {}
+                        return;
+                    }
+                    const active = document.querySelector('.page.active');
+                    if (!active || active.id !== intendedPageName) {
+                        try { clearInterval(window.__pageScrollResetIntervalId); } catch (e) {}
+                        return;
+                    }
+                    doScrollTop();
+                    if (Date.now() - startedAt > 1100) {
+                        try { clearInterval(window.__pageScrollResetIntervalId); } catch (e) {}
+                    }
+                }, 60);
             }
         }
 
