@@ -25,7 +25,7 @@
     --text-color: #2c3e50;
     --text-light: #7f8c8d;
     --white: #ffffff;
-    --page-padding: 2rem;
+    --page-padding: 1.25rem;
 }
 
 html {
@@ -429,9 +429,16 @@ body {
     top: var(--sticky-offset, 0px);
     z-index: 50;
     background: var(--light-gray);
-    padding-top: 0.5rem;
+    padding-top: var(--page-padding);
+    padding-left: var(--page-padding);
+    padding-right: var(--page-padding);
     padding-bottom: 0.75rem;
     margin-bottom: 1.5rem;
+}
+
+#carenotes.page.active,
+#financial.page.active {
+    padding-top: 0 !important;
 }
 
 #carenotes .page-header h2,

@@ -8985,15 +8985,15 @@ function setDateTimeToDropdowns(dateTimeString, yearId, monthId, dayId, timeId) 
     }
 }
 
+document.addEventListener('click', (e) => {
+    const a = e.target && e.target.closest ? e.target.closest('a[href="#"].nav-link') : null;
+    if (a) {
+        e.preventDefault();
+    }
+}, true);
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
-    document.addEventListener('click', (e) => {
-        const a = e.target && e.target.closest ? e.target.closest('a[href="#"].nav-link') : null;
-        if (a) {
-            e.preventDefault();
-        }
-    }, true);
-
     window.updateStickyHeaderOffset = function updateStickyHeaderOffset() {
         const navbar = document.querySelector('.navbar');
         const navbarHeight = navbar ? navbar.getBoundingClientRect().height : 0;
