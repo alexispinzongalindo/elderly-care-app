@@ -2572,7 +2572,21 @@ async function saveNewResident(event) {
 }
 
 function initApp() {
+    // Always re-show the app shell after login. Login flow hides #mainApp.
+    const mainAppEl = document.getElementById('mainApp');
+    if (mainAppEl) mainAppEl.style.display = 'block';
+
+    // If already initialized, avoid re-registering handlers/intervals.
     if (appInitialized) {
+        // Ensure the user sees an active page instead of a blank container
+        try {
+            const activePage = document.querySelector('.page.active');
+            if (!activePage) {
+                showPage('dashboard');
+            }
+        } catch (e) {
+            // ignore
+        }
         return;
     }
 
@@ -2592,7 +2606,7 @@ function initApp() {
             showMessage('Warning: Cannot connect to server / Advertencia: No se puede conectar al servidor', 'error');
         });
 
-    document.getElementById('mainApp').style.display = 'block';
+    // #mainApp already set above; keep it visible
     if (typeof window.updateStickyHeaderOffset === 'function') {
         window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
     }
@@ -4116,6 +4130,12 @@ function showPage(pageName) {
         }
         else if (pageName === 'reports') {
             loadReportsAnalytics();
+        }
+        else if (pageName === 'timeclock') {
+            // Data loading handled by page-specific loaders below
+        }
+        else if (pageName === 'payroll') {
+            // Data loading handled by page-specific loaders below
         }
         else if (pageName === 'financial') {
             // Financial page should behave like any other page. The layout issues were caused by
