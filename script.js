@@ -9286,12 +9286,12 @@ async function loadBankAccounts() {
                 formCard.style.setProperty('padding', '1.5rem', 'important');
                 formCard.style.setProperty('margin-bottom', '1rem', 'important');
 
-                // Also ensure the button inside is visible - SUPER VISIBLE FOR DEBUGGING
+                // Also ensure the button inside is visible
                 const addButton = formCard.querySelector('button');
                 if (addButton) {
-                    // Make button SUPER visible with bright red background and yellow border
-                    addButton.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 99999 !important; background: #FF0000 !important; color: white !important; padding: 1rem 2rem !important; border: 5px solid #FFFF00 !important; border-radius: 8px !important; cursor: pointer !important; font-size: 1.2rem !important; font-weight: bold !important; margin: 1rem 0 !important; width: auto !important; height: auto !important; min-height: 50px !important; box-shadow: 0 0 30px rgba(255,0,0,1) !important;';
-
+                    addButton.style.setProperty('display', 'inline-block', 'important');
+                    addButton.style.setProperty('visibility', 'visible', 'important');
+                    addButton.style.setProperty('opacity', '1', 'important');
                     // Force button to be positioned correctly (fix negative x position)
                     addButton.style.setProperty('position', 'relative', 'important');
                     addButton.style.setProperty('left', '0', 'important');
@@ -9299,24 +9299,6 @@ async function loadBankAccounts() {
                     addButton.style.setProperty('transform', 'none', 'important');
                     addButton.style.setProperty('margin-left', '0', 'important');
                     addButton.style.setProperty('margin-right', 'auto', 'important');
-
-                    // Ensure ALL parent containers have overflow: visible
-                    let parent = addButton.parentElement;
-                    let level = 0;
-                    while (parent && parent !== document.body && level < 15) {
-                        parent.style.setProperty('overflow', 'visible', 'important');
-                        parent.style.setProperty('overflow-x', 'visible', 'important');
-                        parent.style.setProperty('overflow-y', 'visible', 'important');
-                        parent.style.setProperty('height', 'auto', 'important');
-                        parent.style.setProperty('min-height', 'auto', 'important');
-                        if (parent.id === 'financialAccounts' || parent.classList.contains('form-card') || parent.classList.contains('financial-tab') || parent.classList.contains('page') || parent.id === 'financial') {
-                            parent.style.setProperty('display', 'block', 'important');
-                            parent.style.setProperty('visibility', 'visible', 'important');
-                            parent.style.setProperty('opacity', '1', 'important');
-                        }
-                        parent = parent.parentElement;
-                        level++;
-                    }
 
                     const rect = addButton.getBoundingClientRect();
                     console.log('✅✅✅ Add Bank Account button FORCED VISIBLE WITH NORMAL STYLING ✅✅✅');
