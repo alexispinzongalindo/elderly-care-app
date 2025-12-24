@@ -101,7 +101,15 @@ if not USE_CLICKSEND:
 app = Flask(__name__, static_folder='.')
 CORS(app)
 
-DATABASE = os.getenv('DB_PATH', 'elder_care.db')
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+_DB_PATH_ENV = os.getenv('DB_PATH', '').strip()
+if _DB_PATH_ENV:
+    # If DB_PATH is relative, anchor it to the repo folder so working directory differences
+    # (e.g., different launch scripts) don't create multiple SQLite files.
+    DATABASE = _DB_PATH_ENV if os.path.isabs(_DB_PATH_ENV) else os.path.join(_BASE_DIR, _DB_PATH_ENV)
+else:
+    DATABASE = os.path.join(_BASE_DIR, 'elder_care.db')
+print(f"🗄️ Using DATABASE={DATABASE}", flush=True)
 
 def get_db():
     db_dir = os.path.dirname(DATABASE)
@@ -376,6 +384,8 @@ def init_db():
             gender TEXT,
             emergency_contact_name TEXT,
             emergency_contact_phone TEXT,
+            emergency_contact_email TEXT,
+            emergency_contact_carrier TEXT,
             emergency_contact_relation TEXT,
             insurance_provider TEXT,
             insurance_number TEXT,
@@ -389,6 +399,12 @@ def init_db():
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    # Backfill legacy rows where active is NULL (treat as active)
+    try:
+        cursor.execute('UPDATE residents SET active = 1 WHERE active IS NULL')
+    except Exception:
+        pass
 
     # Medications table (linked to residents)
     cursor.execute('''
@@ -1073,9 +1089,23 @@ def residents():
 
     if request.method == 'GET':
         active_only = request.args.get('active_only', 'true').lower() == 'true'
+        try:
+            cursor.execute('SELECT COUNT(1) as cnt FROM residents')
+            total_cnt = (cursor.fetchone() or {'cnt': 0})['cnt']
+        except Exception:
+            total_cnt = None
+        try:
+            cursor.execute('SELECT COUNT(1) as cnt FROM residents WHERE active = 1')
+            active_cnt = (cursor.fetchone() or {'cnt': 0})['cnt']
+        except Exception:
+            active_cnt = None
+        print(
+            f"🧾 /api/residents GET host={request.host} remote={request.remote_addr} active_only={active_only} db={DATABASE} total={total_cnt} active={active_cnt}",
+            flush=True
+        )
         query = 'SELECT * FROM residents'
         if active_only:
-            query += ' WHERE active = 1'
+            query += ' WHERE (active = 1 OR active IS NULL)'
         query += ' ORDER BY last_name, first_name'
 
         cursor.execute(query)

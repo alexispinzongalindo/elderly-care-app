@@ -4767,6 +4767,15 @@ async function loadResidents() {
             return;
         }
 
+        // Mobile/responsive safety: ensure the list container cannot be collapsed/hidden by layout rules.
+        // Some mobile browsers (especially Safari) can end up with 0-height grids when parent containers
+        // get style overrides during page routing.
+        listContainer.style.setProperty('display', 'grid', 'important');
+        listContainer.style.setProperty('visibility', 'visible', 'important');
+        listContainer.style.setProperty('opacity', '1', 'important');
+        listContainer.style.setProperty('min-height', '120px', 'important');
+        listContainer.style.setProperty('width', '100%', 'important');
+
         listContainer.innerHTML = '';
 
         if (!residents || residents.length === 0) {
