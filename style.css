@@ -1512,9 +1512,10 @@ h3 {
 
 .item-card {
     background: var(--white);
-    padding: 1rem;
-    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.06);
     border-left: 3px solid var(--primary-color);
 }
 
