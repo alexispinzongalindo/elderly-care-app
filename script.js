@@ -7436,6 +7436,90 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
+function closeCareNotePreviewModal() {
+    const existing = document.getElementById('careNotePreviewModal');
+    if (existing) existing.remove();
+}
+
+async function openCareNotePreviewModal(noteId) {
+    closeCareNotePreviewModal();
+    const modal = document.createElement('div');
+    modal.id = 'careNotePreviewModal';
+    modal.className = 'modal';
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeCareNotePreviewModal();
+    });
+
+    const card = document.createElement('div');
+    card.className = 'login-card';
+    card.innerHTML = `
+        <div class="form-card" style="max-width: 720px; margin: 0 auto;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap: 0.75rem;">
+                <h3 style="margin:0;">Care Note</h3>
+                <button type="button" class="btn btn-secondary" id="closeCareNotePreviewBtn">Close</button>
+            </div>
+            <div id="careNotePreviewBody" style="margin-top: 0.85rem;">
+                <div class="empty-state">Loading…</div>
+            </div>
+        </div>
+    `;
+    modal.appendChild(card);
+    document.body.appendChild(modal);
+
+    const closeBtn = document.getElementById('closeCareNotePreviewBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeCareNotePreviewModal);
+
+    const bodyEl = document.getElementById('careNotePreviewBody');
+    if (!bodyEl) return;
+
+    try {
+        const res = await fetch(`/api/care-notes/${noteId}`, { headers: getAuthHeaders() });
+        if (!res.ok) {
+            bodyEl.innerHTML = '<div class="empty-state">Unable to load care note.</div>';
+            return;
+        }
+        const note = await res.json();
+
+        const noteDate = note.note_date || '';
+        const noteTime = note.note_time || '';
+        const when = (noteDate && noteTime) ? `${noteDate} ${noteTime}` : (noteDate || note.created_at || '');
+        const shift = (note.shift || '').trim();
+        const staff = note.staff_name || '';
+        const resident = note.resident_name || '';
+        const general = (note.general_notes || '').trim();
+
+        bodyEl.innerHTML = `
+            ${resident ? `<div class="history-entry-details"><strong>Resident:</strong> ${escapeHtml(resident)}</div>` : ''}
+            ${when ? `<div class="history-entry-details"><strong>Date/Time:</strong> ${escapeHtml(when)}</div>` : ''}
+            ${shift ? `<div class="history-entry-details"><strong>Shift:</strong> ${escapeHtml(shift)}</div>` : ''}
+            ${staff ? `<div class="history-entry-details"><strong>Staff:</strong> ${escapeHtml(staff)}</div>` : ''}
+            <div style="margin-top: 0.75rem; white-space: pre-wrap;">${escapeHtml(general || '(No notes)')}</div>
+        `;
+    } catch (e) {
+        console.error('openCareNotePreviewModal error:', e);
+        bodyEl.innerHTML = '<div class="empty-state">Unable to load care note.</div>';
+    }
+}
+
+function bindHistoryCareNotePreview(container) {
+    if (!container) return;
+    if (container.dataset.careNotePreviewBound === 'true') return;
+
+    container.addEventListener('click', (e) => {
+        const btn = e.target?.closest?.('[data-care-note-id]');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const idRaw = btn.getAttribute('data-care-note-id');
+        if (!idRaw) return;
+        const id = parseInt(idRaw, 10);
+        if (!id) return;
+        openCareNotePreviewModal(id);
+    });
+
+    container.dataset.careNotePreviewBound = 'true';
+}
+
 async function ensureHistoryResidentOptionsLoaded() {
     const residentSelect = document.getElementById('historyResidentFilter');
     if (!residentSelect) return;
@@ -7665,10 +7749,15 @@ async function loadJournalPage() {
                 const title = entry.title || typeLabel;
                 const details = entry.details || '';
                 const residentName = entry.resident_name || entry.resident || '';
+                const isCareNote = String(entry.entry_type || '') === 'care_note';
+                const careNoteId = entry.source_id || entry.sourceId || '';
 
                 html += `
                     <div class="history-entry-card">
-                        <div class="history-entry-time">${escapeHtml(timeText)}</div>
+                        <div class="history-entry-time">
+                            <div>${escapeHtml(timeText)}</div>
+                            ${isCareNote && careNoteId ? `<button type="button" class="btn btn-secondary history-care-note-thumb" data-care-note-id="${escapeHtml(careNoteId)}">View</button>` : ''}
+                        </div>
                         <div class="history-entry-body">
                             <div class="history-entry-main">
                                 <div class="history-entry-title">${escapeHtml(title)}</div>
@@ -7686,6 +7775,7 @@ async function loadJournalPage() {
         }
 
         container.innerHTML = html;
+        bindHistoryCareNotePreview(container);
     } catch (error) {
         console.error('Error loading journal page:', error);
         showMessage('Error loading history / Error al cargar historial', 'error');
