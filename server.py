@@ -14,6 +14,7 @@ import threading
 import time
 import re
 import io
+from werkzeug.utils import secure_filename
 
 # Import email service
 try:
@@ -535,6 +536,41 @@ def init_db():
             FOREIGN KEY (staff_id) REFERENCES staff (id)
         )
     ''')
+
+    # Documents table (linked to residents)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS documents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resident_id INTEGER NOT NULL,
+            title TEXT,
+            category TEXT,
+            original_filename TEXT NOT NULL,
+            stored_filename TEXT NOT NULL,
+            mime_type TEXT,
+            file_size INTEGER,
+            source TEXT DEFAULT 'upload',
+            uploaded_by_staff_id INTEGER,
+            active BOOLEAN DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (resident_id) REFERENCES residents (id),
+            FOREIGN KEY (uploaded_by_staff_id) REFERENCES staff (id)
+        )
+    ''')
+
+    # Documents migrations
+    for col_def in [
+        ('title', 'TEXT'),
+        ('category', 'TEXT'),
+        ('mime_type', 'TEXT'),
+        ('file_size', 'INTEGER'),
+        ('source', "TEXT DEFAULT 'upload'"),
+        ('uploaded_by_staff_id', 'INTEGER'),
+        ('active', 'BOOLEAN DEFAULT 1')
+    ]:
+        try:
+            cursor.execute(f"ALTER TABLE documents ADD COLUMN {col_def[0]} {col_def[1]}")
+        except sqlite3.OperationalError:
+            pass
 
     # Add receipt_number column if it doesn't exist (migration)
     try:
@@ -1181,7 +1217,7 @@ def residents():
                 data.get('gender'),
                 data.get('emergency_contact_name'),
                 data.get('emergency_contact_phone'),
-                carrier_value,  # Carrier for SMS (None if empty)
+                carrier_value,
                 data.get('emergency_contact_relation'),
                 data.get('emergency_contact_email'),
                 data.get('insurance_provider'),
@@ -1206,6 +1242,137 @@ def residents():
             conn.close()
             print(f"Error adding resident: {e}")
             return jsonify({'error': f'Error adding resident: {str(e)}'}), 500
+
+
+def _documents_storage_dir():
+    base_dir = os.path.dirname(DATABASE)
+    return os.path.join(base_dir, 'uploads', 'documents')
+
+
+@app.route('/api/documents', methods=['GET', 'POST'])
+@require_role('admin')
+def documents():
+    if request.method == 'GET':
+        resident_id = (request.args.get('resident_id') or '').strip()
+        conn = get_db()
+        cursor = conn.cursor()
+        query = 'SELECT * FROM documents WHERE active = 1'
+        params = []
+        if resident_id:
+            query += ' AND resident_id = ?'
+            params.append(resident_id)
+        query += ' ORDER BY created_at DESC'
+        cursor.execute(query, params)
+        rows = [dict(r) for r in cursor.fetchall()]
+        conn.close()
+        return jsonify(rows)
+
+    try:
+        resident_id = (request.form.get('resident_id') or '').strip()
+        title = (request.form.get('title') or '').strip()
+        category = (request.form.get('category') or '').strip()
+        file = request.files.get('file')
+
+        if not resident_id:
+            return jsonify({'error': 'Resident is required / Residente requerido'}), 400
+        if not file or not getattr(file, 'filename', ''):
+            return jsonify({'error': 'File is required / Archivo requerido'}), 400
+
+        original_filename = secure_filename(file.filename)
+        if not original_filename:
+            return jsonify({'error': 'Invalid filename / Nombre de archivo inválido'}), 400
+
+        storage_dir = _documents_storage_dir()
+        os.makedirs(storage_dir, exist_ok=True)
+
+        ext = os.path.splitext(original_filename)[1].lower()
+        stored_filename = f"{secrets.token_urlsafe(16)}{ext}"
+        abs_path = os.path.join(storage_dir, stored_filename)
+        file.save(abs_path)
+
+        file_size = None
+        try:
+            file_size = os.path.getsize(abs_path)
+        except Exception:
+            pass
+
+        mime_type = getattr(file, 'mimetype', None)
+
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO documents (
+                resident_id, title, category,
+                original_filename, stored_filename, mime_type, file_size,
+                source, uploaded_by_staff_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            resident_id,
+            title or None,
+            category or None,
+            original_filename,
+            stored_filename,
+            mime_type,
+            file_size,
+            'upload',
+            request.current_staff.get('id')
+        ))
+        conn.commit()
+        doc_id = cursor.lastrowid
+        conn.close()
+        return jsonify({'id': doc_id, 'message': 'Document uploaded successfully'}), 201
+    except sqlite3.Error as e:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        try:
+            conn.close()
+        except Exception:
+            pass
+        print(f"Database error saving document: {e}", flush=True)
+        return jsonify({'error': f'Database error: {str(e)}'}), 500
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        print(f"Error saving document: {e}", flush=True)
+        return jsonify({'error': f'Error saving document: {str(e)}'}), 500
+
+
+@app.route('/api/documents/<int:id>/download', methods=['GET'])
+@require_role('admin')
+def download_document(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM documents WHERE id = ? AND active = 1', (id,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return jsonify({'error': 'Document not found'}), 404
+
+    doc = dict(row)
+    abs_path = os.path.join(_documents_storage_dir(), doc['stored_filename'])
+    if not os.path.exists(abs_path):
+        return jsonify({'error': 'File not found on server'}), 404
+
+    return send_file(
+        abs_path,
+        as_attachment=True,
+        download_name=doc.get('original_filename') or 'document'
+    )
+
+
+@app.route('/api/documents/<int:id>', methods=['DELETE'])
+@require_role('admin')
+def delete_document(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE documents SET active = 0 WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Document deleted successfully'})
 
 
 @app.route('/api/residents/archived', methods=['GET'])

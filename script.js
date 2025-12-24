@@ -17,6 +17,222 @@ function safeStorageGet(key) {
     }
 }
 
+async function loadDocumentsPage() {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+        if (currentStaff.role !== 'admin') {
+            showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+            showPage('dashboard');
+            return;
+        }
+
+        const residentSelect = document.getElementById('documentsResidentSelect');
+        if (!residentSelect) return;
+
+        const res = await fetch('/api/residents?active_only=true', { headers: getAuthHeaders(), cache: 'no-store' });
+        if (!res.ok) throw new Error(`Failed to load residents: ${res.status}`);
+        const residents = await res.json();
+
+        residentSelect.innerHTML = '';
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = '-- Select Resident --';
+        residentSelect.appendChild(placeholder);
+
+        (residents || []).forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = String(r.id);
+            opt.textContent = r.display_name || `${r.first_name || ''} ${r.last_name || ''}`.trim();
+            residentSelect.appendChild(opt);
+        });
+
+        const defaultId = (currentResidentId ? String(currentResidentId) : '');
+        if (defaultId && residentSelect.querySelector(`option[value="${defaultId}"]`)) {
+            residentSelect.value = defaultId;
+        } else if (residentSelect.options.length > 1) {
+            residentSelect.selectedIndex = 1;
+        }
+
+        residentSelect.onchange = () => loadDocumentsList();
+        await loadDocumentsList();
+    } catch (error) {
+        console.error('Error loading documents page:', error);
+        showMessage(`Error loading documents: ${error.message}`, 'error');
+    }
+}
+
+async function loadDocumentsList() {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+        if (currentStaff.role !== 'admin') return;
+
+        const residentSelect = document.getElementById('documentsResidentSelect');
+        const listContainer = document.getElementById('documentsList');
+        if (!residentSelect || !listContainer) return;
+
+        const residentId = (residentSelect.value || '').trim();
+        if (!residentId) {
+            listContainer.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 1rem;">Please select a resident.</p>';
+            return;
+        }
+
+        const response = await fetch(`/api/documents?resident_id=${encodeURIComponent(residentId)}`, { headers: getAuthHeaders(), cache: 'no-store' });
+        if (!response.ok) {
+            const txt = await response.text();
+            throw new Error(txt || `HTTP ${response.status}`);
+        }
+        const docs = await response.json();
+
+        listContainer.innerHTML = '';
+        if (!docs || docs.length === 0) {
+            listContainer.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 1rem;">No documents yet.</p>';
+            return;
+        }
+
+        docs.forEach(doc => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+
+            const header = document.createElement('div');
+            header.className = 'item-header';
+
+            const details = document.createElement('div');
+            const title = document.createElement('div');
+            title.className = 'item-title';
+            title.textContent = doc.title || doc.original_filename || 'Document';
+            details.appendChild(title);
+
+            const meta = document.createElement('div');
+            meta.className = 'item-details';
+            const cat = doc.category ? `Category: ${doc.category}` : '';
+            const fn = doc.original_filename ? `File: ${doc.original_filename}` : '';
+            meta.innerHTML = [cat, fn].filter(Boolean).map(x => `<p>${escapeHtml(x)}</p>`).join('');
+            details.appendChild(meta);
+
+            header.appendChild(details);
+
+            const actions = document.createElement('div');
+            actions.className = 'item-actions';
+
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'btn btn-primary btn-sm';
+            downloadBtn.textContent = 'Download';
+            downloadBtn.onclick = () => window.open(`/api/documents/${doc.id}/download`, '_blank');
+            actions.appendChild(downloadBtn);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-danger btn-sm';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.onclick = () => deleteDocument(doc.id);
+            actions.appendChild(deleteBtn);
+
+            header.appendChild(actions);
+            card.appendChild(header);
+            listContainer.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Error loading documents list:', error);
+        showMessage(`Error loading documents: ${error.message}`, 'error');
+    }
+}
+
+async function uploadDocument(event) {
+    event.preventDefault();
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+        if (currentStaff.role !== 'admin') {
+            showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+            return;
+        }
+
+        const residentId = (document.getElementById('documentsResidentSelect')?.value || '').trim();
+        const title = (document.getElementById('documentTitle')?.value || '').trim();
+        const category = (document.getElementById('documentCategory')?.value || '').trim();
+        const fileInput = document.getElementById('documentFile');
+        const file = fileInput?.files?.[0];
+
+        if (!residentId) {
+            showMessage('Please select a resident / Por favor seleccione un residente', 'error');
+            return;
+        }
+        if (!file) {
+            showMessage('Please choose a file / Por favor seleccione un archivo', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('resident_id', residentId);
+        formData.append('title', title);
+        formData.append('category', category);
+        formData.append('file', file);
+
+        const headers = {};
+        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+        const response = await fetch('/api/documents', {
+            method: 'POST',
+            headers,
+            body: formData,
+            cache: 'no-store'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            const msg = errorData.error || errorData.message || `Upload failed (${response.status})`;
+            throw new Error(msg);
+        }
+
+        showMessage('Document uploaded successfully / Documento subido exitosamente', 'success');
+        if (fileInput) fileInput.value = '';
+        const titleEl = document.getElementById('documentTitle');
+        if (titleEl) titleEl.value = '';
+        const catEl = document.getElementById('documentCategory');
+        if (catEl) catEl.value = '';
+        await loadDocumentsList();
+    } catch (error) {
+        console.error('Error uploading document:', error);
+        showMessage(`Error uploading document: ${error.message}`, 'error');
+    }
+}
+
+async function deleteDocument(documentId) {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+        if (currentStaff.role !== 'admin') return;
+
+        if (!confirm('Delete this document?')) return;
+
+        const response = await fetch(`/api/documents/${documentId}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+            cache: 'no-store'
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            const msg = errorData.error || errorData.message || `Delete failed (${response.status})`;
+            throw new Error(msg);
+        }
+
+        showMessage('Document deleted / Documento eliminado', 'success');
+        await loadDocumentsList();
+    } catch (error) {
+        console.error('Error deleting document:', error);
+        showMessage(`Error deleting document: ${error.message}`, 'error');
+    }
+}
+
 async function loadArchivedResidents() {
     try {
         if (!authToken || !currentStaff) {
@@ -1822,6 +2038,14 @@ function checkAuth() {
         if (quickActions) quickActions.style.display = 'none';
     } else {
         hideLoginModal();
+        const documentsNavLink = document.getElementById('documentsNavLink');
+        if (documentsNavLink) {
+            if (currentStaff.role === 'admin') {
+                documentsNavLink.style.display = 'block';
+            } else {
+                documentsNavLink.style.display = 'none';
+            }
+        }
         const archivedResidentsNavLink = document.getElementById('archivedResidentsNavLink');
         if (archivedResidentsNavLink) {
             if (currentStaff.role === 'admin') {
@@ -3817,6 +4041,7 @@ function showPage(pageName) {
         }
         else if (pageName === 'residents') loadResidents();
         else if (pageName === 'archivedResidents') loadArchivedResidents();
+        else if (pageName === 'documents') loadDocumentsPage();
         else if (pageName === 'medications') loadMedications();
         else if (pageName === 'appointments') loadAppointments();
         else if (pageName === 'history') {

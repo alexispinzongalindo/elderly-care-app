@@ -319,6 +319,7 @@
                     <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon"><i class="fas fa-bell"></i></span><span data-translate="nav.notifications">Notifications</span></a></li>
                     <li><a href="#" class="nav-link" data-page="timeclock"><span class="nav-icon"><i class="fas fa-clock"></i></span><span data-translate="nav.timeclock">Time Clock</span></a></li>
                     <li><a href="#" class="nav-link" data-page="history"><span class="nav-icon"><i class="fas fa-book"></i></span><span>History</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="documents" id="documentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-alt"></i></span><span>Documents</span></a></li>
                     <li><a href="#" class="nav-link" data-page="archivedResidents" id="archivedResidentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-archive"></i></span><span>Archived Residents</span></a></li>
                     <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-user-shield"></i></span><span data-translate="nav.staff">Staff</span></a></li>
                     <li><a href="#" class="nav-link" data-page="payroll" id="payrollNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-invoice"></i></span><span data-translate="nav.payroll">Payroll</span></a></li>
@@ -675,6 +676,50 @@
                 <h2>Archived Residents</h2>
                 <p style="color: var(--dark-gray);">Restore previously deleted (archived) residents.</p>
                 <div id="archivedResidentsList" class="item-list"></div>
+            </div>
+
+            <!-- Documents Page (Admin Only) -->
+            <div id="documents" class="page">
+                <h2>Documents</h2>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <form id="documentsUploadForm" onsubmit="uploadDocument(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="documentsResidentSelect">Resident</label>
+                                <select id="documentsResidentSelect" class="form-control" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="documentCategory">Category</label>
+                                <select id="documentCategory" class="form-control">
+                                    <option value="">-- Select --</option>
+                                    <option value="Insurance">Insurance</option>
+                                    <option value="ID">ID</option>
+                                    <option value="POA">POA</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Billing">Billing</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 2;">
+                                <label for="documentTitle">Title</label>
+                                <input type="text" id="documentTitle" placeholder="e.g., Insurance Card, POA">
+                            </div>
+                            <div class="form-group" style="flex: 2;">
+                                <label for="documentFile">File (PDF or Photo)</label>
+                                <input type="file" id="documentFile" accept="application/pdf,image/*" capture="environment" required>
+                            </div>
+                        </div>
+                        <div class="button-group" style="margin-bottom: 0;">
+                            <button type="submit" class="btn btn-success">Upload</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="button-group" style="margin-bottom: 1rem;">
+                    <button class="btn btn-primary" type="button" onclick="loadDocumentsList()">Refresh</button>
+                </div>
+                <div id="documentsList" class="item-list"></div>
             </div>
 
             <!-- Staff Page -->
