@@ -319,6 +319,7 @@
                     <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon"><i class="fas fa-bell"></i></span><span data-translate="nav.notifications">Notifications</span></a></li>
                     <li><a href="#" class="nav-link" data-page="timeclock"><span class="nav-icon"><i class="fas fa-clock"></i></span><span data-translate="nav.timeclock">Time Clock</span></a></li>
                     <li><a href="#" class="nav-link" data-page="history"><span class="nav-icon"><i class="fas fa-book"></i></span><span>History</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="archivedResidents" id="archivedResidentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-archive"></i></span><span>Archived Residents</span></a></li>
                     <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-user-shield"></i></span><span data-translate="nav.staff">Staff</span></a></li>
                     <li><a href="#" class="nav-link" data-page="payroll" id="payrollNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-invoice"></i></span><span data-translate="nav.payroll">Payroll</span></a></li>
                     <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span data-translate="nav.logout">Logout</span></a></li>
@@ -667,6 +668,13 @@
                 </div>
 
                 <div id="residentsList" class="item-list"></div>
+            </div>
+
+            <!-- Archived Residents Page (Admin Only) -->
+            <div id="archivedResidents" class="page">
+                <h2>Archived Residents</h2>
+                <p style="color: var(--dark-gray);">Restore previously deleted (archived) residents.</p>
+                <div id="archivedResidentsList" class="item-list"></div>
             </div>
 
             <!-- Staff Page -->

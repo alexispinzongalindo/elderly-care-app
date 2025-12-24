@@ -17,6 +17,140 @@ function safeStorageGet(key) {
     }
 }
 
+async function loadArchivedResidents() {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+
+        if (currentStaff.role !== 'admin') {
+            showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+            showPage('dashboard');
+            return;
+        }
+
+        const response = await fetch('/api/residents/archived', { headers: getAuthHeaders(), cache: 'no-store' });
+        if (!response.ok) {
+            if (response.status === 401) {
+                safeStorageRemove('authToken');
+                safeStorageRemove('currentStaff');
+                safeStorageRemove('currentResidentId');
+                authToken = null;
+                currentStaff = null;
+                currentResidentId = null;
+                checkAuth();
+                return;
+            }
+            const errorText = await response.text();
+            throw new Error(`Archived residents API returned ${response.status}: ${errorText}`);
+        }
+
+        const residents = await response.json();
+        const listContainer = document.getElementById('archivedResidentsList');
+        if (!listContainer) return;
+
+        listContainer.innerHTML = '';
+
+        if (!residents || residents.length === 0) {
+            listContainer.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 2rem;">No archived residents. / No hay residentes archivados.</p>';
+            return;
+        }
+
+        residents.forEach(resident => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+
+            const residentName = `${resident.first_name || ''}\u00A0${resident.last_name || ''}`.trim() || 'Unnamed Resident / Residente Sin Nombre';
+
+            const header = document.createElement('div');
+            header.className = 'item-header';
+
+            const detailsContainer = document.createElement('div');
+            detailsContainer.style.flex = '1';
+
+            const title = document.createElement('div');
+            title.className = 'item-title';
+            title.style.cssText = 'font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem; color: var(--text-color);';
+            title.textContent = residentName;
+            detailsContainer.appendChild(title);
+
+            const details = document.createElement('div');
+            details.className = 'item-details';
+            if (resident.room_number) {
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>Room / Habitación:</strong>&nbsp;${resident.room_number}`;
+                details.appendChild(p);
+            }
+            if (resident.bed_number) {
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>Bed / Cama:</strong>&nbsp;${resident.bed_number}`;
+                details.appendChild(p);
+            }
+            if (resident.date_of_birth) {
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>Date of Birth / Fecha de Nacimiento:</strong>&nbsp;${new Date(resident.date_of_birth).toLocaleDateString()}`;
+                details.appendChild(p);
+            }
+            detailsContainer.appendChild(details);
+            header.appendChild(detailsContainer);
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'item-actions';
+
+            const restoreBtn = document.createElement('button');
+            restoreBtn.className = 'btn btn-success btn-sm';
+            restoreBtn.textContent = 'Restore';
+            restoreBtn.onclick = () => restoreArchivedResident(resident.id, residentName);
+            actionsDiv.appendChild(restoreBtn);
+
+            card.appendChild(header);
+            card.appendChild(actionsDiv);
+            listContainer.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Error loading archived residents:', error);
+        showMessage(`Error loading archived residents: ${error.message}`, 'error');
+    }
+}
+
+async function restoreArchivedResident(residentId, residentName) {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+        if (currentStaff.role !== 'admin') {
+            showMessage('Access denied. Admin privileges required. / Acceso denegado. Se requieren privilegios de administrador.', 'error');
+            return;
+        }
+
+        const confirmText = `Restore resident ${residentName}?`;
+        if (!confirm(confirmText)) return;
+
+        const response = await fetch(`/api/residents/${residentId}/restore`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            cache: 'no-store'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || `HTTP ${response.status}`);
+        }
+
+        showMessage('Resident restored successfully / Residente restaurado exitosamente', 'success');
+        loadArchivedResidents();
+        loadResidentsForSelector();
+        if (document.getElementById('residents')?.classList.contains('active')) {
+            loadResidents();
+        }
+    } catch (error) {
+        console.error('Error restoring resident:', error);
+        showMessage(`Error restoring resident: ${error.message}`, 'error');
+    }
+}
+
 function safeStorageSet(key, value) {
     try {
         localStorage.setItem(key, value);
@@ -1688,6 +1822,14 @@ function checkAuth() {
         if (quickActions) quickActions.style.display = 'none';
     } else {
         hideLoginModal();
+        const archivedResidentsNavLink = document.getElementById('archivedResidentsNavLink');
+        if (archivedResidentsNavLink) {
+            if (currentStaff.role === 'admin') {
+                archivedResidentsNavLink.style.display = 'block';
+            } else {
+                archivedResidentsNavLink.style.display = 'none';
+            }
+        }
         // Show Staff nav link if user is admin
         const staffNavLink = document.getElementById('staffNavLink');
         if (staffNavLink && currentStaff.role === 'admin') {
@@ -3674,6 +3816,7 @@ function showPage(pageName) {
             loadDashboard();
         }
         else if (pageName === 'residents') loadResidents();
+        else if (pageName === 'archivedResidents') loadArchivedResidents();
         else if (pageName === 'medications') loadMedications();
         else if (pageName === 'appointments') loadAppointments();
         else if (pageName === 'history') {

@@ -1188,6 +1188,39 @@ def residents():
             print(f"Error adding resident: {e}")
             return jsonify({'error': f'Error adding resident: {str(e)}'}), 500
 
+
+@app.route('/api/residents/archived', methods=['GET'])
+@require_role('admin')
+def archived_residents():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM residents WHERE active = 0 ORDER BY last_name, first_name')
+    residents_list = []
+    for row in cursor.fetchall():
+        resident_dict = dict(row)
+        resident_dict['full_name'] = _resident_display_name(resident_dict.get('first_name'), resident_dict.get('last_name'))
+        resident_dict['display_name'] = resident_dict['full_name']
+        if resident_dict.get('emergency_contact_phone'):
+            resident_dict['emergency_contact_phone_formatted'] = format_phone_number(resident_dict['emergency_contact_phone'])
+        residents_list.append(resident_dict)
+    conn.close()
+    return jsonify(residents_list)
+
+
+@app.route('/api/residents/<int:id>/restore', methods=['POST'])
+@require_role('admin')
+def restore_resident(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM residents WHERE id = ?', (id,))
+    if not cursor.fetchone():
+        conn.close()
+        return jsonify({'error': 'Resident not found'}), 404
+    cursor.execute('UPDATE residents SET active = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Resident restored successfully'})
+
 @app.route('/api/residents/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @require_auth
 def resident_detail(id):
