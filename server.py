@@ -1151,6 +1151,7 @@ def residents():
 
     if request.method == 'GET':
         active_only = request.args.get('active_only', 'true').lower() == 'true'
+        include_training = (request.args.get('include_training', 'false') or 'false').lower() == 'true'
         try:
             cursor.execute('SELECT COUNT(1) as cnt FROM residents')
             total_cnt = (cursor.fetchone() or {'cnt': 0})['cnt']
@@ -1162,11 +1163,13 @@ def residents():
         except Exception:
             active_cnt = None
         print(
-            f"🧾 /api/residents GET host={request.host} remote={request.remote_addr} active_only={active_only} db={DATABASE} total={total_cnt} active={active_cnt}",
+            f"🧾 /api/residents GET host={request.host} remote={request.remote_addr} active_only={active_only} include_training={include_training} db={DATABASE} total={total_cnt} active={active_cnt}",
             flush=True
         )
         query = 'SELECT * FROM residents'
-        where_clauses = ['(is_training = 0 OR is_training IS NULL)']
+        where_clauses = []
+        if not include_training:
+            where_clauses.append('(is_training = 0 OR is_training IS NULL)')
         if active_only:
             where_clauses.append('(active = 1 OR active IS NULL)')
         if where_clauses:

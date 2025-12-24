@@ -2506,12 +2506,22 @@ async function handleLogout() {
 
 async function loadResidentsForSelector() {
     try {
-        const response = await fetch('/api/residents?active_only=true', {
-            headers: getAuthHeaders()
+        const response = await fetch('/api/residents?active_only=true&include_training=true', {
+            headers: getAuthHeaders(),
+            cache: 'no-store'
         });
 
         if (!response.ok) {
             console.error('Residents selector API error:', response.status);
+            if (response.status === 401) {
+                safeStorageRemove('authToken');
+                safeStorageRemove('currentStaff');
+                safeStorageRemove('currentResidentId');
+                authToken = null;
+                currentStaff = null;
+                currentResidentId = null;
+                checkAuth();
+            }
             return;
         }
 
@@ -2521,6 +2531,11 @@ async function loadResidentsForSelector() {
         if (!select) return;
 
         select.innerHTML = '<option value="">-- Select a resident --</option>';
+
+        if (!Array.isArray(residents) || residents.length === 0) {
+            showMessage('No residents found. Add a resident or create Training Demo Data. / No se encontraron residentes. Agregue un residente o cree datos de entrenamiento.', 'error');
+            return;
+        }
 
         residents.forEach(resident => {
             const option = document.createElement('option');
