@@ -612,15 +612,14 @@ function safeStorageRemove(key) {
 let authToken = safeStorageGet('authToken');
 let currentStaff = JSON.parse(safeStorageGet('currentStaff') || 'null');
 let currentResidentId = safeStorageGet('currentResidentId');
+let isTrainingMode = false;
+let currentResidentIsTraining = false;
 
 function normalizeAuthState() {
     // iOS/Safari can sometimes persist unexpected string values; treat them as logged-out.
-    if (typeof authToken === 'string') {
-        const normalized = authToken.trim();
-        if (!normalized || normalized === 'null' || normalized === 'undefined') {
-            authToken = null;
-        }
-    }
+    const badStrings = new Set(['undefined', 'null', 'NaN', '[object Object]']);
+    if (badStrings.has(String(authToken))) authToken = null;
+    if (badStrings.has(String(currentResidentId))) currentResidentId = null;
 
     if (currentStaff && (typeof currentStaff !== 'object' || !currentStaff.id)) {
         currentStaff = null;
@@ -629,6 +628,13 @@ function normalizeAuthState() {
     if (!authToken || !currentStaff) {
         currentUser = null;
     }
+}
+
+function setTrainingModeIndicator(on) {
+    isTrainingMode = !!on;
+    const el = document.getElementById('trainingModeIndicator');
+    if (!el) return;
+    el.style.display = isTrainingMode ? 'inline-flex' : 'none';
 }
 
 // Edit state tracking
@@ -2562,6 +2568,10 @@ async function loadCurrentResidentInfo(residentId) {
         const response = await fetch(`/api/residents/${residentId}`);
         const resident = await response.json();
 
+        currentResidentIsTraining = !!(resident && (resident.is_training === 1 || resident.is_training === true || resident.is_training === '1'));
+        const activePageId = document.querySelector('.page.active')?.id || '';
+        setTrainingModeIndicator(activePageId === 'training' || currentResidentIsTraining);
+
         document.getElementById('currentResidentName').textContent =
             `${resident.first_name} ${resident.last_name}${resident.room_number ? ' - Room ' + resident.room_number : ''}`;
         document.getElementById('currentResidentInfo').style.display = 'block';
@@ -3680,6 +3690,7 @@ function showPage(pageName) {
 	showPageInProgress = true;
 	lastShowPageName = pageName;
 	lastShowPageAt = now;
+	setTrainingModeIndicator(pageName === 'training' || currentResidentIsTraining);
 
 	try {
 		if (pageName === 'history') {
@@ -10969,6 +10980,7 @@ async function loadTransactions() {
                         </p>
                         ${trans.check_number ? `<p class="item-details">Check #: ${trans.check_number}</p>` : ''}
                         ${trans.reconciled ? '<span class="badge badge-success">Reconciled</span>' : '<span class="badge badge-warning">Unreconciled</span>'}
+                        ${(trans.resident_is_training === 1 || trans.resident_is_training === true || trans.resident_is_training === '1') ? '<span class="badge badge-danger">TRAINING</span>' : ''}
                     </div>
                     <div class="item-actions">
                         <button class="btn btn-sm btn-primary" onclick="editTransaction(${trans.id})">Edit</button>

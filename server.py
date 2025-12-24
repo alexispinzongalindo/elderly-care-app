@@ -2821,7 +2821,8 @@ def transactions():
             SELECT
                 t.*,
                 ba.account_name,
-                (r.first_name || ' ' || r.last_name) AS resident_name
+                (r.first_name || ' ' || r.last_name) AS resident_name,
+                COALESCE(r.is_training, 0) AS resident_is_training
             FROM transactions t
             JOIN bank_accounts ba ON t.bank_account_id = ba.id
             LEFT JOIN residents r ON t.resident_id = r.id
@@ -4863,6 +4864,22 @@ def training_clear_demo_data():
         cursor.execute(f'DELETE FROM payments WHERE resident_id IN ({placeholders})', training_ids)
         cursor.execute(f'DELETE FROM billing WHERE resident_id IN ({placeholders})', training_ids)
         try:
+            # Reverse bank account balances impacted by training transactions, then delete them.
+            # Transactions update balances on creation; clearing training must undo that.
+            cursor.execute(f'''
+                UPDATE bank_accounts
+                SET current_balance = current_balance - (
+                    SELECT COALESCE(SUM(
+                        CASE
+                            WHEN transaction_type = 'deposit' THEN amount
+                            ELSE -amount
+                        END
+                    ), 0)
+                    FROM transactions
+                    WHERE transactions.bank_account_id = bank_accounts.id
+                      AND transactions.resident_id IN ({placeholders})
+                )
+            ''', training_ids)
             cursor.execute(f'DELETE FROM transactions WHERE resident_id IN ({placeholders})', training_ids)
         except Exception:
             pass
