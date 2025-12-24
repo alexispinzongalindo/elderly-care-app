@@ -96,6 +96,34 @@ async function createTrainingDemoData() {
     }
 }
 
+async function clearTrainingDemoData() {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+
+        const ok = confirm('Delete ALL training demo residents and practice data? This cannot be undone.');
+        if (!ok) return;
+
+        const response = await fetch('/api/training/clear-data', {
+            method: 'POST',
+            headers: getAuthHeaders()
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(payload.error || `Failed to delete training data (${response.status})`);
+        }
+
+        showMessage(payload.message || 'Training data deleted', 'success');
+        await loadTrainingResidents();
+        loadResidentsForSelector();
+    } catch (error) {
+        console.error('Error deleting training demo data:', error);
+        showMessage(`Error deleting training demo data: ${error.message}`, 'error');
+    }
+}
+
 async function downloadTrainingJournalPdf() {
     try {
         const payload = getTrainingJournalReportPayload();

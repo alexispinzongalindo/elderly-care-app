@@ -4833,6 +4833,58 @@ def training_create_demo_data():
         return jsonify({'error': f'Error creating training demo data: {str(e)}'}), 500
 
 
+@app.route('/api/training/clear-data', methods=['POST'])
+@require_auth
+def training_clear_demo_data():
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('SELECT id FROM residents WHERE is_training = 1')
+        training_ids = [int(r['id']) for r in cursor.fetchall() or []]
+        if not training_ids:
+            conn.close()
+            return jsonify({'message': 'No training data to delete', 'deleted_residents': 0}), 200
+
+        placeholders = ','.join(['?'] * len(training_ids))
+
+        cursor.execute(f'SELECT id FROM medications WHERE resident_id IN ({placeholders})', training_ids)
+        med_ids = [int(r['id']) for r in cursor.fetchall() or []]
+        if med_ids:
+            med_ph = ','.join(['?'] * len(med_ids))
+            cursor.execute(f'DELETE FROM medication_logs WHERE medication_id IN ({med_ph})', med_ids)
+            cursor.execute(f'DELETE FROM medications WHERE id IN ({med_ph})', med_ids)
+
+        cursor.execute(f'DELETE FROM vital_signs WHERE resident_id IN ({placeholders})', training_ids)
+        cursor.execute(f'DELETE FROM appointments WHERE resident_id IN ({placeholders})', training_ids)
+        cursor.execute(f'DELETE FROM incident_reports WHERE resident_id IN ({placeholders})', training_ids)
+        cursor.execute(f'DELETE FROM daily_care_notes WHERE resident_id IN ({placeholders})', training_ids)
+        cursor.execute(f'DELETE FROM documents WHERE resident_id IN ({placeholders})', training_ids)
+        cursor.execute(f'DELETE FROM notifications WHERE resident_id IN ({placeholders})', training_ids)
+        cursor.execute(f'DELETE FROM payments WHERE resident_id IN ({placeholders})', training_ids)
+        cursor.execute(f'DELETE FROM billing WHERE resident_id IN ({placeholders})', training_ids)
+        try:
+            cursor.execute(f'DELETE FROM transactions WHERE resident_id IN ({placeholders})', training_ids)
+        except Exception:
+            pass
+        cursor.execute(f'DELETE FROM journal_entries WHERE resident_id IN ({placeholders})', training_ids)
+
+        cursor.execute(f'DELETE FROM residents WHERE id IN ({placeholders})', training_ids)
+
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Training data deleted', 'deleted_residents': len(training_ids)}), 200
+    except Exception as e:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return jsonify({'error': f'Error deleting training data: {str(e)}'}), 500
+
+
 @app.route('/api/training/residents', methods=['GET'])
 @require_auth
 def training_residents():
