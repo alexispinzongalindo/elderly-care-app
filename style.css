@@ -1990,6 +1990,7 @@ h3 {
     .nav-center {
         justify-content: center;
         width: 100%;
+        overflow: visible;
     }
     
     .nav-right {
@@ -2032,16 +2033,19 @@ h3 {
         padding: 0.3rem 0.5rem;
         font-size: 0.75rem;
     }
-    
-    .nav-center {
-        order: 2;
-    }
-    
+
     .nav-right {
         order: 3;
         justify-content: center;
         gap: 0.3rem;
         flex-wrap: wrap;
+    }
+
+    .training-mode-indicator {
+        max-width: 100%;
+        overflow: visible;
+        white-space: normal;
+        text-align: center;
     }
     
     .nav-link {

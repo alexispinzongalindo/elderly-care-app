@@ -2301,6 +2301,17 @@ function checkAuth() {
             console.error('❌ Financial Management nav link element not found!');
         }
 
+        const isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+        const hasShownPickerThisSession = safeStorageGet('residentPickerShownThisSession') === '1';
+
+        // On mobile, always force the resident picker ONCE per session so staff can choose/change resident.
+        // This prevents auto-jumping to dashboard due to a stale saved currentResidentId.
+        if (isMobile && !hasShownPickerThisSession) {
+            safeStorageSet('residentPickerShownThisSession', '1');
+            showResidentSelector();
+            return;
+        }
+
         if (!currentResidentId) {
             showResidentSelector();
         } else {
@@ -2308,6 +2319,13 @@ function checkAuth() {
             initApp();
         }
     }
+}
+
+function forceResidentPicker() {
+    // Allow the user to re-pick a resident at any time (mobile-friendly).
+    currentResidentId = null;
+    localStorage.removeItem('currentResidentId');
+    showResidentSelector();
 }
 
 function showLoginModal() {
@@ -2580,7 +2598,14 @@ function selectResident() {
 
 async function loadCurrentResidentInfo(residentId) {
     try {
-        const response = await fetch(`/api/residents/${residentId}`);
+        const response = await fetch(`/api/residents/${residentId}`, { headers: getAuthHeaders(), cache: 'no-store' });
+        if (!response.ok) {
+            if (response.status === 401) {
+                handleLogout();
+                return;
+            }
+            throw new Error(`Failed to load resident info (${response.status})`);
+        }
         const resident = await response.json();
 
         currentResidentIsTraining = !!(resident && (resident.is_training === 1 || resident.is_training === true || resident.is_training === '1'));
