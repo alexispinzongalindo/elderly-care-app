@@ -467,6 +467,8 @@ body {
 #mainApp {
     width: 100%;
     min-height: 100vh;
+    padding-top: calc(var(--sticky-offset, 0px) + env(safe-area-inset-top, 0px));
+    box-sizing: border-box;
 }
 
 #mainApp > main.container {
@@ -475,8 +477,7 @@ body {
 }
 
 #mainApp > main.container {
-    margin: 0 auto;
-    margin-top: var(--sticky-offset, 0px);
+    margin: 1.5rem auto;
 }
 
 /* Sticky page headers (Care Notes + Financial) */
