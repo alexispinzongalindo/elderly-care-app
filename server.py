@@ -396,11 +396,18 @@ def init_db():
             dietary_restrictions TEXT,
             notes TEXT,
             photo_path TEXT,
+            is_training BOOLEAN DEFAULT 0,
             active BOOLEAN DEFAULT 1,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    # Add is_training column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE residents ADD COLUMN is_training BOOLEAN DEFAULT 0')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
 
     # Backfill legacy rows where active is NULL (treat as active)
     try:
@@ -1159,8 +1166,11 @@ def residents():
             flush=True
         )
         query = 'SELECT * FROM residents'
+        where_clauses = ['(is_training = 0 OR is_training IS NULL)']
         if active_only:
-            query += ' WHERE (active = 1 OR active IS NULL)'
+            where_clauses.append('(active = 1 OR active IS NULL)')
+        if where_clauses:
+            query += ' WHERE ' + ' AND '.join(where_clauses)
         query += ' ORDER BY last_name, first_name'
 
         cursor.execute(query)
@@ -1256,10 +1266,10 @@ def documents():
         resident_id = (request.args.get('resident_id') or '').strip()
         conn = get_db()
         cursor = conn.cursor()
-        query = 'SELECT * FROM documents WHERE active = 1'
+        query = 'SELECT d.* FROM documents d JOIN residents r ON d.resident_id = r.id WHERE d.active = 1 AND (r.is_training = 0 OR r.is_training IS NULL)'
         params = []
         if resident_id:
-            query += ' AND resident_id = ?'
+            query += ' AND d.resident_id = ?'
             params.append(resident_id)
         query += ' ORDER BY created_at DESC'
         cursor.execute(query, params)
@@ -4613,6 +4623,9 @@ def journal_entries():
     """
     params = []
 
+    # Hide training residents from the normal History/Journal feed.
+    query += ' AND (r.is_training = 0 OR r.is_training IS NULL)'
+
     if resident_id:
         query += ' AND je.resident_id = ?'
         params.append(resident_id)
@@ -4675,6 +4688,9 @@ def _build_journal_report_rows(conn, *, resident_id=None, staff_id=None, since=N
         WHERE 1=1
     """
     params = []
+
+    # Hide training residents from normal report generation.
+    query += ' AND (r.is_training = 0 OR r.is_training IS NULL)'
     if resident_id:
         query += ' AND je.resident_id = ?'
         params.append(resident_id)
@@ -4692,6 +4708,146 @@ def _build_journal_report_rows(conn, *, resident_id=None, staff_id=None, since=N
 
     cursor.execute(query, params)
     return [dict(row) for row in cursor.fetchall()]
+
+
+def _build_training_journal_report_rows(conn, *, since=None, until=None, limit=500):
+    cursor = conn.cursor()
+    query = """
+        SELECT
+            je.id,
+            je.resident_id,
+            (r.first_name || ' ' || r.last_name) AS resident_name,
+            je.entry_type,
+            je.title,
+            je.details,
+            COALESCE(je.occurred_at, je.created_at) AS occurred_at,
+            je.staff_id,
+            COALESCE(je.staff_name, s.full_name) AS staff_name
+        FROM journal_entries je
+        JOIN residents r ON je.resident_id = r.id
+        LEFT JOIN staff s ON je.staff_id = s.id
+        WHERE (r.is_training = 1)
+    """
+    params = []
+    if since:
+        query += ' AND COALESCE(je.occurred_at, je.created_at) >= ?'
+        params.append(since)
+    if until:
+        query += ' AND COALESCE(je.occurred_at, je.created_at) <= ?'
+        params.append(until)
+    query += ' ORDER BY COALESCE(je.occurred_at, je.created_at) DESC'
+    query += f' LIMIT {int(limit)}'
+    cursor.execute(query, params)
+    return [dict(row) for row in cursor.fetchall()]
+
+
+@app.route('/api/training/demo-data', methods=['POST'])
+@require_auth
+def training_create_demo_data():
+    """Create demo residents + sample journal entries for practice/training."""
+    payload = request.json or {}
+    try:
+        count = int(payload.get('count', 3))
+    except Exception:
+        count = 3
+    if count < 1:
+        count = 1
+    if count > 10:
+        count = 10
+
+    conn = get_db()
+    cursor = conn.cursor()
+    created_ids = []
+    try:
+        for i in range(count):
+            first = f"TRAINING"
+            last = f"DEMO {i + 1}"
+            cursor.execute('''
+                INSERT INTO residents (
+                    first_name, last_name, room_number, notes, active, is_training
+                ) VALUES (?, ?, ?, ?, 1, 1)
+            ''', (
+                first,
+                last,
+                f"T-{100 + i}",
+                'Training resident (practice data)'
+            ))
+            rid = cursor.lastrowid
+            created_ids.append(rid)
+
+            now_iso = datetime.utcnow().isoformat() + 'Z'
+            create_journal_entry(
+                conn,
+                resident_id=rid,
+                entry_type='training',
+                title='Training Started',
+                details='Demo data created for staff training.',
+                occurred_at=now_iso,
+                staff_id=request.current_staff.get('id'),
+                staff_name=request.current_staff.get('full_name'),
+                source_table='training',
+                source_id=rid
+            )
+
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Training demo data created', 'resident_ids': created_ids}), 201
+    except Exception as e:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return jsonify({'error': f'Error creating training demo data: {str(e)}'}), 500
+
+
+@app.route('/api/training/residents', methods=['GET'])
+@require_auth
+def training_residents():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM residents WHERE is_training = 1 AND (active = 1 OR active IS NULL) ORDER BY last_name, first_name')
+    rows = []
+    for r in cursor.fetchall():
+        d = dict(r)
+        d['full_name'] = _resident_display_name(d.get('first_name'), d.get('last_name'))
+        d['display_name'] = d['full_name']
+        rows.append(d)
+    conn.close()
+    return jsonify(rows)
+
+
+@app.route('/api/training/reports/journal/pdf', methods=['POST'])
+@require_auth
+def training_journal_report_pdf():
+    """Generate a practice Journal PDF for ALL training residents (date range supported)."""
+    if not REPORTLAB_AVAILABLE:
+        return jsonify({'error': 'PDF generation not available on server'}), 500
+
+    payload = request.json or {}
+    since = payload.get('since')
+    until = payload.get('until')
+
+    conn = get_db()
+    rows = _build_training_journal_report_rows(conn, since=since, until=until, limit=500)
+    conn.close()
+
+    title = 'Practice Journal Report (Training)'
+    meta_lines = [
+        'Resident: ALL TRAINING RESIDENTS',
+        f"From: {since or 'Start'}   To: {until or 'End'}",
+        f"Generated: {datetime.utcnow().isoformat()}Z   Total: {len(rows)}"
+    ]
+    pdf_bytes = _generate_journal_report_pdf_bytes(title=title, rows=rows, meta_lines=meta_lines)
+    filename = f"practice_journal_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.pdf"
+    return Response(
+        pdf_bytes,
+        mimetype='application/pdf',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+    )
 
 
 def _generate_journal_report_pdf_bytes(*, title, rows, meta_lines):

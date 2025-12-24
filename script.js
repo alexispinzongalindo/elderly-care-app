@@ -17,6 +17,193 @@ function safeStorageGet(key) {
     }
 }
 
+function getTrainingJournalReportPayload() {
+    const sinceEl = document.getElementById('trainingReportSince');
+    const untilEl = document.getElementById('trainingReportUntil');
+    const since = sinceEl?.value ? new Date(sinceEl.value).toISOString() : null;
+    const until = untilEl?.value ? new Date(untilEl.value).toISOString() : null;
+    return { since, until };
+}
+
+async function loadTrainingPage() {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+        await loadTrainingResidents();
+    } catch (error) {
+        console.error('Error loading training page:', error);
+        showMessage(`Error loading training: ${error.message}`, 'error');
+    }
+}
+
+async function loadTrainingResidents() {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+        const select = document.getElementById('trainingResidentSelect');
+        if (!select) return;
+
+        const res = await fetch('/api/training/residents', { headers: getAuthHeaders(), cache: 'no-store' });
+        if (!res.ok) throw new Error(`Failed to load training residents: ${res.status}`);
+        const residents = await res.json();
+
+        select.innerHTML = '';
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = '-- Select Training Resident --';
+        select.appendChild(placeholder);
+
+        (residents || []).forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = String(r.id);
+            opt.textContent = r.display_name || `${r.first_name || ''} ${r.last_name || ''}`.trim();
+            select.appendChild(opt);
+        });
+    } catch (error) {
+        console.error('Error loading training residents:', error);
+        showMessage(`Error loading training residents: ${error.message}`, 'error');
+    }
+}
+
+async function createTrainingDemoData() {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+        const countEl = document.getElementById('trainingDemoCount');
+        const count = countEl ? Number(countEl.value) : 3;
+
+        const response = await fetch('/api/training/demo-data', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ count })
+        });
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.error || `Failed to create demo data (${response.status})`);
+        }
+        showMessage('Training demo data created / Datos de entrenamiento creados', 'success');
+        await loadTrainingResidents();
+        loadResidentsForSelector();
+    } catch (error) {
+        console.error('Error creating training demo data:', error);
+        showMessage(`Error creating training demo data: ${error.message}`, 'error');
+    }
+}
+
+async function downloadTrainingJournalPdf() {
+    try {
+        const payload = getTrainingJournalReportPayload();
+        const res = await fetch('/api/training/reports/journal/pdf', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            showMessage(err.error || 'Failed to generate practice PDF', 'error');
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'practice_journal_report.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        console.error('downloadTrainingJournalPdf error:', e);
+        showMessage('Failed to download practice PDF', 'error');
+    }
+}
+
+async function printTrainingJournalPdf() {
+    try {
+        const payload = getTrainingJournalReportPayload();
+
+        const w = window.open('', '_blank');
+        if (!w) {
+            showMessage('Popup blocked. Please allow popups to print.', 'error');
+            return;
+        }
+
+        const res = await fetch('/api/training/reports/journal/pdf', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            showMessage(err.error || 'Failed to generate practice PDF', 'error');
+            try { w.close(); } catch { /* ignore */ }
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const revoke = () => {
+            try { URL.revokeObjectURL(url); } catch { /* ignore */ }
+        };
+
+        try {
+            w.document.open();
+            w.document.write(`<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Print</title>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; }
+      iframe { width: 100%; height: 100%; border: 0; }
+    </style>
+  </head>
+  <body>
+    <iframe id="pdfFrame" src="${url}"></iframe>
+  </body>
+</html>`);
+            w.document.close();
+        } catch {
+            try { w.location.href = url; } catch { /* ignore */ }
+        }
+
+        const cleanup = () => {
+            setTimeout(revoke, 1000);
+        };
+
+        const doPrint = () => {
+            try {
+                w.focus();
+                w.print();
+            } finally {
+                setTimeout(cleanup, 1500);
+            }
+        };
+
+        try {
+            const frame = w.document.getElementById('pdfFrame');
+            if (frame) {
+                frame.addEventListener('load', () => setTimeout(doPrint, 150), { once: true });
+            }
+        } catch { /* ignore */ }
+
+        setTimeout(() => {
+            try { doPrint(); } catch { /* ignore */ }
+        }, 1500);
+    } catch (e) {
+        console.error('printTrainingJournalPdf error:', e);
+        showMessage('Failed to print practice PDF', 'error');
+    }
+}
+
 async function loadDocumentsPage() {
     try {
         if (!authToken || !currentStaff) {
@@ -2038,6 +2225,10 @@ function checkAuth() {
         if (quickActions) quickActions.style.display = 'none';
     } else {
         hideLoginModal();
+        const trainingNavLink = document.getElementById('trainingNavLink');
+        if (trainingNavLink) {
+            trainingNavLink.style.display = 'block';
+        }
         const documentsNavLink = document.getElementById('documentsNavLink');
         if (documentsNavLink) {
             if (currentStaff.role === 'admin') {
@@ -4042,6 +4233,7 @@ function showPage(pageName) {
         else if (pageName === 'residents') loadResidents();
         else if (pageName === 'archivedResidents') loadArchivedResidents();
         else if (pageName === 'documents') loadDocumentsPage();
+        else if (pageName === 'training') loadTrainingPage();
         else if (pageName === 'medications') loadMedications();
         else if (pageName === 'appointments') loadAppointments();
         else if (pageName === 'history') {
