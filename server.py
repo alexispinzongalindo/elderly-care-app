@@ -424,9 +424,27 @@ def init_db():
         )
     ''')
 
+    # Add time_slots column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE medications ADD COLUMN time_slots TEXT')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+
     # Add hours_interval column if it doesn't exist (migration)
     try:
         cursor.execute('ALTER TABLE medications ADD COLUMN hours_interval INTEGER')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+
+    # Add start_date column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE medications ADD COLUMN start_date DATETIME')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+
+    # Add end_date column if it doesn't exist (migration)
+    try:
+        cursor.execute('ALTER TABLE medications ADD COLUMN end_date DATETIME')
     except sqlite3.OperationalError:
         pass  # Column already exists
 
@@ -1360,24 +1378,74 @@ def medications():
         return jsonify(meds)
 
     elif request.method == 'POST':
-        data = request.json
-        cursor.execute('''
-            INSERT INTO medications (resident_id, name, dosage, frequency, time_slots, hours_interval, start_date, end_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            data.get('resident_id'),
-            data['name'],
-            data['dosage'],
-            data['frequency'],
-            json.dumps(data['time_slots']),
-            data.get('hours_interval'),
-            data.get('start_date'),
-            data.get('end_date')
-        ))
-        conn.commit()
-        med_id = cursor.lastrowid
-        conn.close()
-        return jsonify({'id': med_id, 'message': 'Medication added successfully'}), 201
+        try:
+            data = request.json or {}
+
+            resident_id = data.get('resident_id')
+            name = (data.get('name') or '').strip()
+            dosage = (data.get('dosage') or '').strip()
+            frequency = (data.get('frequency') or '').strip()
+            time_slots = data.get('time_slots')
+
+            if not resident_id:
+                conn.close()
+                return jsonify({'error': 'Resident is required / Residente requerido'}), 400
+            if not name:
+                conn.close()
+                return jsonify({'error': 'Medication name is required / Nombre del medicamento requerido'}), 400
+            if not dosage:
+                conn.close()
+                return jsonify({'error': 'Dosage is required / Dosis requerida'}), 400
+            if not frequency:
+                conn.close()
+                return jsonify({'error': 'Frequency is required / Frecuencia requerida'}), 400
+
+            if isinstance(time_slots, str):
+                time_slots = [t.strip() for t in time_slots.split(',')]
+            if not isinstance(time_slots, list):
+                time_slots = []
+            time_slots = [t for t in [str(t).strip() for t in time_slots] if t]
+            if len(time_slots) == 0:
+                conn.close()
+                return jsonify({'error': 'At least one time is required / Se requiere al menos una hora'}), 400
+
+            hours_interval = data.get('hours_interval')
+            start_date = data.get('start_date')
+            end_date = data.get('end_date')
+
+            cursor.execute('''
+                INSERT INTO medications (resident_id, name, dosage, frequency, time_slots, hours_interval, start_date, end_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                resident_id,
+                name,
+                dosage,
+                frequency,
+                json.dumps(time_slots),
+                hours_interval,
+                start_date,
+                end_date
+            ))
+            conn.commit()
+            med_id = cursor.lastrowid
+            conn.close()
+            return jsonify({'id': med_id, 'message': 'Medication added successfully'}), 201
+        except sqlite3.Error as e:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            conn.close()
+            print(f"Database error saving medication: {e}", flush=True)
+            return jsonify({'error': f'Database error: {str(e)}'}), 500
+        except Exception as e:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            conn.close()
+            print(f"Error saving medication: {e}", flush=True)
+            return jsonify({'error': f'Error saving medication: {str(e)}'}), 500
 
 @app.route('/api/medications/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @require_auth
@@ -1394,24 +1462,59 @@ def medication_detail(id):
         return jsonify(dict(med))
 
     elif request.method == 'PUT':
-        data = request.json
-        cursor.execute('''
-            UPDATE medications
-            SET name = ?, dosage = ?, frequency = ?, time_slots = ?, hours_interval = ?, start_date = ?, end_date = ?
-            WHERE id = ?
-        ''', (
-            data['name'],
-            data['dosage'],
-            data['frequency'],
-            json.dumps(data['time_slots']),
-            data.get('hours_interval'),
-            data.get('start_date'),
-            data.get('end_date'),
-            id
-        ))
-        conn.commit()
-        conn.close()
-        return jsonify({'message': 'Medication updated successfully'})
+        try:
+            data = request.json or {}
+            name = (data.get('name') or '').strip()
+            dosage = (data.get('dosage') or '').strip()
+            frequency = (data.get('frequency') or '').strip()
+            time_slots = data.get('time_slots')
+
+            if not name or not dosage or not frequency:
+                conn.close()
+                return jsonify({'error': 'Invalid medication data / Datos de medicamento inválidos'}), 400
+
+            if isinstance(time_slots, str):
+                time_slots = [t.strip() for t in time_slots.split(',')]
+            if not isinstance(time_slots, list):
+                time_slots = []
+            time_slots = [t for t in [str(t).strip() for t in time_slots] if t]
+            if len(time_slots) == 0:
+                conn.close()
+                return jsonify({'error': 'At least one time is required / Se requiere al menos una hora'}), 400
+
+            cursor.execute('''
+                UPDATE medications
+                SET name = ?, dosage = ?, frequency = ?, time_slots = ?, hours_interval = ?, start_date = ?, end_date = ?
+                WHERE id = ?
+            ''', (
+                name,
+                dosage,
+                frequency,
+                json.dumps(time_slots),
+                data.get('hours_interval'),
+                data.get('start_date'),
+                data.get('end_date'),
+                id
+            ))
+            conn.commit()
+            conn.close()
+            return jsonify({'message': 'Medication updated successfully'})
+        except sqlite3.Error as e:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            conn.close()
+            print(f"Database error updating medication: {e}", flush=True)
+            return jsonify({'error': f'Database error: {str(e)}'}), 500
+        except Exception as e:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            conn.close()
+            print(f"Error updating medication: {e}", flush=True)
+            return jsonify({'error': f'Error updating medication: {str(e)}'}), 500
 
     elif request.method == 'DELETE':
         cursor.execute('UPDATE medications SET active = 0 WHERE id = ?', (id,))
