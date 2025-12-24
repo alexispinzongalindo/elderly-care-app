@@ -1,0 +1,2383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c5aa0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Elder Care Management - Puerto Rico</title>
+
+    <!-- Favicon / App Icons -->
+    <link rel="icon" type="image/png" href="attached_assets/generated_images/medical_cross_heart_logo.png">
+    <link rel="shortcut icon" type="image/png" href="attached_assets/generated_images/medical_cross_heart_logo.png">
+    <link rel="apple-touch-icon" href="attached_assets/generated_images/medical_cross_heart_logo.png">
+    <!-- When you create favicon.ico, uncomment the line below and place favicon.ico in the root directory -->
+    <!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css?v=20251224-1">
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display: block;">
+        <div class="form-card login-card">
+            <h2 class="login-title" data-translate="login.title">🏥 Elder Care Management</h2>
+            <h3 class="login-subtitle" data-translate="login.subtitle">Login</h3>
+
+            <div class="login-tabs" style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
+                <button type="button" id="loginTabStaff" class="btn btn-primary" style="flex: 1;" onclick="showLoginTab('staff')" data-translate="timeclock.tab.staff">Staff Clock In</button>
+                <button type="button" id="loginTabAdmin" class="btn btn-secondary" style="flex: 1;" onclick="showLoginTab('admin')" data-translate="timeclock.tab.admin">Admin Login</button>
+            </div>
+
+            <!-- Staff Time Clock (PIN) -->
+            <div id="staffClockInPanel" style="display: block;">
+                <div class="form-group">
+                    <label for="timeclockPin" data-translate="timeclock.pin">4-Digit Code (PIN)</label>
+                    <input type="password" id="timeclockPin" inputmode="numeric" autocomplete="one-time-code" maxlength="4" placeholder="0000">
+                    <div class="button-group" style="margin-top: 0.75rem;">
+                        <button type="button" class="btn btn-success" style="width: 100%;" onclick="handlePinClockIn()" data-translate="timeclock.clockInAndLogin">Clock In & Login</button>
+                    </div>
+                    <div class="button-group" style="margin-top: 0.5rem;">
+                        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="handlePinBreakStart()" data-translate="timeclock.breakStart">Start Break</button>
+                        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="handlePinBreakEnd()" data-translate="timeclock.breakEnd">End Break</button>
+                    </div>
+                    <div class="button-group" style="margin-top: 0.5rem;">
+                        <button type="button" class="btn btn-danger" style="width: 100%;" onclick="handlePinClockOut()" data-translate="timeclock.clockOut">Clock Out</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Login (Username/Password) -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginUsername" data-translate="login.username">Username *</label>
+                    <input type="text" id="loginUsername" required autocomplete="username" data-translate-placeholder="login.placeholder.username" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword" data-translate="login.password">Password *</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password" data-translate-placeholder="login.placeholder.password" placeholder="Enter password">
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" data-translate="login.submit">Login</button>
+                </div>
+            </form>
+            <p class="login-hint" data-translate="login.hint">Default credentials: admin (password: admin123)</p>
+        </div>
+    </div>
+
+    <!-- Resident Selector -->
+    <div id="residentSelector" class="modal" style="display: none;">
+        <div class="form-card">
+            <h2 data-translate="resident.select">Select Resident</h2>
+            <div class="form-group">
+                <label for="residentSelect" data-translate="resident.choose">Choose Resident *</label>
+                <select id="residentSelect" class="form-control" required>
+                    <option value="" data-translate="resident.selectOption">-- Select a resident --</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="selectResident()" data-translate="common.continue">Continue</button>
+                <button class="btn btn-secondary" onclick="showAddResidentForm(true)" data-translate="resident.addNew">+ Add New Resident</button>
+            </div>
+
+            <!-- Add Resident Form -->
+            <div id="addResidentForm" class="form-card" style="display: none; margin-top: 2rem; background: var(--light-gray);">
+                <h3 data-translate="resident.add">Add New Resident</h3>
+                <form id="newResidentForm" onsubmit="saveNewResident(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-translate="resident.firstName">First Name *</label>
+                            <input type="text" id="newFirstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="resident.lastName">Last Name *</label>
+                            <input type="text" id="newLastName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-translate="resident.dateOfBirth">Date of Birth</label>
+                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="newBirthYear" class="form-control">
+                                        <option value="">Year</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="newBirthMonth" class="form-control">
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="newBirthDay" class="form-control">
+                                        <option value="">Day</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="resident.gender">Gender</label>
+                            <select id="newGender">
+                                <option value="">-- Select --</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="resident.photo">Photo</label>
+                        <div class="photo-upload-area">
+                            <div id="newPhotoPreview" class="photo-preview" style="display: none;">
+                                <img id="newPhotoPreviewImg" src="" alt="Preview">
+                                <button type="button" class="photo-remove-btn" onclick="removeResidentPhoto()">×</button>
+                            </div>
+                            <div id="newPhotoUploadPlaceholder" class="photo-upload-placeholder">
+                                <input type="file" id="newPhotoInput" accept="image/*" capture="environment" onchange="handleResidentPhotoUpload(event)" style="display: none;">
+                                <label for="newPhotoInput" class="photo-upload-label">
+                                    <span class="photo-upload-icon">📷</span>
+                                    <span class="photo-upload-text" data-translate="resident.uploadPhoto">Tap to take photo</span>
+                                    <span class="photo-upload-hint" data-translate="resident.uploadPhoto">Camera will open automatically</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-translate="resident.roomNumber">Room Number</label>
+                            <input type="text" id="newRoomNumber">
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="resident.bedNumber">Bed Number</label>
+                            <input type="text" id="newBedNumber">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="resident.emergencyContact">Emergency Contact Name</label>
+                        <input type="text" id="newEmergencyContact">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-translate="resident.emergencyPhone">Emergency Contact Phone</label>
+                            <input type="tel" id="newEmergencyPhone" placeholder="(787) 555-1234">
+                        </div>
+                        <div class="form-group">
+                            <label for="newEmergencyCarrier">Phone Carrier (for SMS)</label>
+                            <select id="newEmergencyCarrier" class="form-control">
+                                <option value="">-- Select Carrier --</option>
+                                <option value="verizon">Verizon</option>
+                                <option value="claro">Claro</option>
+                                <option value="att">AT&T</option>
+                                <option value="t-mobile">T-Mobile</option>
+                                <option value="sprint">Sprint</option>
+                                <option value="us cellular">US Cellular</option>
+                                <option value="cricket">Cricket</option>
+                                <option value="boost">Boost Mobile</option>
+                                <option value="virgin">Virgin Mobile</option>
+                                <option value="metro">MetroPCS</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newEmergencyRelation" data-translate="resident.emergencyRelation">Relation</label>
+                        <input type="text" id="newEmergencyRelation" data-translate-placeholder="resident.relation.placeholder" placeholder="e.g., Son, Daughter">
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="resident.emergencyEmail">Emergency Contact Email</label>
+                        <input type="email" id="newEmergencyEmail" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="resident.medicalConditions">Medical Conditions</label>
+                        <textarea id="newMedicalConditions" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="resident.allergies">Allergies</label>
+                        <textarea id="newAllergies" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="resident.dietaryRestrictions">Dietary Restrictions</label>
+                        <textarea id="newDietaryRestrictions" rows="2"></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-success" data-translate="resident.save">Save Resident</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddResidentForm()" data-translate="common.cancel">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App (hidden until login and resident selected) -->
+    <div id="mainApp" style="display: none;">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-top">
+                    <!-- Left: Logo, Title, and Quick Actions -->
+                    <div class="nav-left">
+                        <h1 class="nav-title">
+                            <img src="attached_assets/generated_images/medical_cross_heart_logo.png" alt="Logo" class="nav-logo">
+                            <span class="nav-title-text">Elder Care Tracker</span>
+                        </h1>
+                        <div class="quick-actions-nav" style="display: none;">
+                            <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeToggle" data-translate-title="common.darkMode" title="Dark Mode"><i class="fas fa-moon"></i></button>
+                            <button class="btn-icon" onclick="printCurrentPage()" data-translate-title="common.print" title="Print"><i class="fas fa-print"></i></button>
+                            <button class="btn-icon" onclick="showKeyboardShortcuts()" data-translate-title="common.keyboardShortcuts" title="Keyboard Shortcuts"><i class="fas fa-keyboard"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Center: Search and Resident Info -->
+                    <div class="nav-center">
+                        <div id="searchContainer" class="search-container" style="display: none;">
+                            <input type="text" id="globalSearch" class="search-input" data-translate-placeholder="common.search" placeholder="🔍 Search" autocomplete="off">
+                            <button class="btn-icon-small" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">✕</button>
+                        </div>
+                        <div id="currentResidentInfo" class="resident-badge" style="display: none;">
+                            <strong id="currentResidentName">No resident selected</strong>
+                        </div>
+                        <div id="trainingModeIndicator" class="training-mode-indicator" style="display: none;" role="status" aria-live="polite">
+                            <span class="training-mode-light" aria-hidden="true"></span>
+                            <span class="training-mode-text">TRAINING MODE</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Language Selector, Clock, Notifications, User Info -->
+                    <div class="nav-right">
+                        <select id="languageSelector" class="language-selector" onchange="setLanguage(this.value)" style="padding: 0.5rem; border: 1px solid var(--medium-gray); border-radius: 4px; background: var(--white); cursor: pointer; font-size: 0.9rem;">
+                            <option value="en">🇺🇸 English</option>
+                            <option value="es">🇪🇸 Español</option>
+                        </select>
+                        <div id="liveClock" class="live-clock"></div>
+                        <div id="notificationsContainer" class="notifications-container" style="display: none;">
+                            <button class="btn-icon notifications-bell" onclick="toggleNotifications()" id="notificationsBell" data-translate-title="nav.notifications">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                            </button>
+                            <div id="notificationsDropdown" class="notifications-dropdown" style="display: none;">
+                                <div class="notifications-header">
+                                    <h4 data-translate="nav.notifications">Notifications</h4>
+                                    <button class="btn btn-sm btn-secondary" onclick="markAllNotificationsRead()" data-translate="common.markAllRead">Mark All Read</button>
+                                </div>
+                                <div id="notificationsList" class="notifications-list"></div>
+                                <div class="notifications-footer">
+                                    <a href="#" onclick="showPage('notifications'); return false;" data-translate="common.viewAll">View All</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="userInfo" class="user-info" style="display: none;">
+                            <span id="userName"></span>
+                            <span class="user-role" id="userRole" style="display: none;"></span>
+                            <button class="btn btn-sm btn-secondary" type="button" onclick="forceResidentPicker()">Change Resident</button>
+                            <button class="btn btn-sm btn-secondary" onclick="handleLogout()" data-translate="nav.logout" data-translate-title="nav.logout">Logout</button>
+                        </div>
+                        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+                    </div>
+                </div>
+                <!-- Navigation Menu -->
+                <ul class="nav-menu" id="navMenu">
+                    <!-- Main Navigation -->
+                    <li><a href="#" class="nav-link active" data-page="dashboard"><span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span><span data-translate="nav.dashboard">Dashboard</span></a></li>
+
+                    <!-- Care Management Group -->
+                    <li class="nav-group-header"><span data-translate="nav.group.care">Care Management</span></li>
+                    <li><a href="#" class="nav-link" data-page="residents"><span class="nav-icon"><i class="fas fa-users"></i></span><span data-translate="nav.residents">Residents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="medications"><span class="nav-icon"><i class="fas fa-pills"></i></span><span data-translate="nav.medications">Medications</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="appointments"><span class="nav-icon"><i class="fas fa-calendar-check"></i></span><span data-translate="nav.appointments">Appointments</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="vitalsigns"><span class="nav-icon"><i class="fas fa-heartbeat"></i></span><span data-translate="nav.vitalSigns">Vital Signs</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="carenotes"><span class="nav-icon"><i class="fas fa-sticky-note"></i></span><span data-translate="nav.careNotes">Care Notes</span></a></li>
+
+                    <!-- Records & Reports Group -->
+                    <li class="nav-group-header"><span data-translate="nav.group.records">Records & Reports</span></li>
+                    <li><a href="#" class="nav-link" data-page="incidents" onclick="event.preventDefault(); console.log('🔴 INCIDENTS LINK CLICKED'); if(typeof showPage === 'function') { showPage('incidents'); } else { console.error('❌ showPage not defined!'); alert('Error: showPage function not found. Check console.'); } return false;"><span class="nav-icon"><i class="fas fa-exclamation-triangle"></i></span><span data-translate="nav.incidents">Incidents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="calendar"><span class="nav-icon"><i class="fas fa-calendar-alt"></i></span><span data-translate="nav.calendar">Calendar</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="reports"><span class="nav-icon"><i class="fas fa-chart-bar"></i></span><span data-translate="nav.reports">Reports</span></a></li>
+
+                    <!-- Financial Group -->
+                    <li class="nav-group-header"><span data-translate="nav.group.financial">Financial</span></li>
+                    <li><a href="#" class="nav-link" data-page="billing"><span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span><span data-translate="nav.billing">Billing</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="financial" id="financialNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-credit-card"></i></span><span data-translate="nav.financial">Financial Management</span></a></li>
+
+                    <!-- System Group -->
+                    <li class="nav-group-header"><span data-translate="nav.group.system">System</span></li>
+                    <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon"><i class="fas fa-bell"></i></span><span data-translate="nav.notifications">Notifications</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="timeclock"><span class="nav-icon"><i class="fas fa-clock"></i></span><span data-translate="nav.timeclock">Time Clock</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="history"><span class="nav-icon"><i class="fas fa-book"></i></span><span>History</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="training" id="trainingNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-graduation-cap"></i></span><span>Training</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="documents" id="documentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-alt"></i></span><span>Documents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="archivedResidents" id="archivedResidentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-archive"></i></span><span>Archived Residents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-user-shield"></i></span><span data-translate="nav.staff">Staff</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="payroll" id="payrollNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-invoice"></i></span><span data-translate="nav.payroll">Payroll</span></a></li>
+                    <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span data-translate="nav.logout">Logout</span></a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="container">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="dashboard-shell">
+                    <div class="dashboard-header">
+                        <div class="dashboard-title-block">
+                            <h2 data-translate="dashboard.title">Dashboard</h2>
+                            <p id="dashboardDate" class="dashboard-subtitle"></p>
+                        </div>
+                        <div class="dashboard-context">
+                            <div class="dashboard-context-pill" id="dashboardContextPill" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-grid" id="dashboardKpiGrid">
+                        <div class="kpi-card kpi-card-primary" data-kpi="med-adherence">
+                            <div class="kpi-icon kpi-icon-med"><i class="fas fa-pills"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.kpi.medAdherence">Medication Adherence</div>
+                                <div class="kpi-value" id="medsTakenStat">0/0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-chip" id="medsAdherenceChip">0%</span>
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.takenToday">Taken today</span>
+                                </div>
+                                <div class="kpi-progress" id="medsProgress" style="display: none;">
+                                    <div class="kpi-progress-bar" id="medsProgressBar"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="med-due">
+                            <div class="kpi-icon kpi-icon-warning"><i class="fas fa-clock"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.kpi.medsDueNextHour">Medications Due (Next Hour)</div>
+                                <div class="kpi-value" id="medsDueNow">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.needsAction">Needs action</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="med-today">
+                            <div class="kpi-icon kpi-icon-teal"><i class="fas fa-calendar-day"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.kpi.medsScheduledToday">Medications Scheduled Today</div>
+                                <div class="kpi-value" id="medsDueToday">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.activeMeds">Active meds</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="vitals-today" id="vitalsCard" style="display: none;">
+                            <div class="kpi-icon kpi-icon-vitals"><i class="fas fa-heartbeat"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.kpi.vitalsRecordedToday">Vital Signs Recorded Today</div>
+                                <div class="kpi-value" id="vitalsToday">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-chip kpi-chip-muted" id="vitalsMissingToday">0 missing</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="staff">
+                            <div class="kpi-icon kpi-icon-staff"><i class="fas fa-user-nurse"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.kpi.activeStaff">Active Staff</div>
+                                <div class="kpi-value" id="activeStaffCount">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.availableToday">Available today</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="incidents">
+                            <div class="kpi-icon kpi-icon-danger"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.kpi.incidents7d">Incidents (Last 7 Days)</div>
+                                <div class="kpi-value" id="incidents7d">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.safetyFollowups">Safety &amp; follow-ups</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="notes">
+                            <div class="kpi-icon kpi-icon-blue"><i class="fas fa-sticky-note"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.kpi.careNotes24h">Care Notes (Last 24 Hours)</div>
+                                <div class="kpi-value" id="notes24h">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.documentationActivity">Documentation activity</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="residents">
+                            <div class="kpi-icon kpi-icon-muted"><i class="fas fa-users"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.kpi.activeResidents">Active Residents</div>
+                                <div class="kpi-value" id="totalResidents">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.currentlyInCare">Currently in care</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="appointments" style="display: none;">
+                            <div class="kpi-icon kpi-icon-muted"><i class="fas fa-calendar-check"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.kpi.appointmentsToday">Appointments Today</div>
+                                <div class="kpi-value" id="apptsToday">0</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub" data-translate="dashboard.kpi.scheduled">Scheduled</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card" data-kpi="billing" id="billingCard" style="display: none;">
+                            <div class="kpi-icon kpi-icon-muted"><i class="fas fa-file-invoice-dollar"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label" data-translate="dashboard.accountBalance">Account Balance</div>
+                                <div class="kpi-value" id="accountBalance">$0.00</div>
+                                <div class="kpi-meta">
+                                    <span class="kpi-sub" id="balanceLabel" data-translate="dashboard.balance">Balance</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-column">
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-bell"></i></span> <span data-translate="dashboard.widget.needsAttention">Needs Attention</span></h3>
+                                </div>
+                                <div class="attention-list" id="dashboardAttentionList"></div>
+                            </div>
+
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-clock"></i></span> <span data-translate="dashboard.widget.upcomingAppointments">Upcoming Appointments</span></h3>
+                                </div>
+                                <div class="upcoming-list" id="upcomingAppointmentsList"></div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-column">
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-pills"></i></span> <span data-translate="dashboard.widget.medicationSchedule">Medication Schedule</span></h3>
+                                </div>
+                                <div class="reminders-list" id="medicationRemindersList"></div>
+                            </div>
+
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-stream"></i></span> <span data-translate="dashboard.widget.recentActivity">Recent Activity</span></h3>
+                                </div>
+                                <div class="activity-list" id="recentActivityList"></div>
+                            </div>
+
+                            <div class="dashboard-widget">
+                                <div class="widget-header">
+                                    <h3><span class="widget-title-icon"><i class="fas fa-bolt"></i></span> <span data-translate="dashboard.widget.quickActions">Quick Actions</span></h3>
+                                </div>
+                                <div class="quick-actions-grid" style="margin-top: 1rem;">
+                                    <button class="quick-action-btn" onclick="showPage('medications'); setTimeout(() => showMedicationForm(), 100);" data-translate-title="medication.add">
+                                        <span class="quick-action-icon">💊</span>
+                                        <span data-translate="medication.add">Add Medication</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('vitalsigns'); setTimeout(() => showVitalSignForm(), 100);" data-translate-title="vitals.add">
+                                        <span class="quick-action-icon">❤️</span>
+                                        <span data-translate="vitals.add">Add Vital Signs</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('staff');" data-translate-title="nav.staff">
+                                        <span class="quick-action-icon">🧑‍⚕️</span>
+                                        <span data-translate="nav.staff">Staff</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('incidents'); setTimeout(() => showIncidentForm(), 100);" data-translate-title="incident.add">
+                                        <span class="quick-action-icon">⚠️</span>
+                                        <span data-translate="incident.add">Report Incident</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('carenotes'); setTimeout(() => showCareNoteForm(), 100);" data-translate-title="carenote.add">
+                                        <span class="quick-action-icon">📝</span>
+                                        <span data-translate="carenote.add">Add Care Note</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="showPage('appointments'); setTimeout(() => showAppointmentForm(), 100);" data-translate-title="appointment.add">
+                                        <span class="quick-action-icon">📅</span>
+                                        <span data-translate="appointment.add">Add Appointment</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Residents Page -->
+            <div id="residents" class="page">
+                <h2 data-translate="resident.title">Residents Management</h2>
+                <button class="btn btn-primary" onclick="showAddResidentForm()" data-translate="resident.addNew">+ Add New Resident</button>
+
+                <!-- Add/Edit Resident Form (for Residents page) -->
+                <div id="addResidentFormPage" class="form-card" style="display: none; margin-top: 2rem;">
+                    <h3 data-translate="resident.add">Add New Resident</h3>
+                    <form id="newResidentFormPage" onsubmit="saveNewResident(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="resident.firstName">First Name *</label>
+                                <input type="text" id="newFirstNamePage" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="resident.lastName">Last Name *</label>
+                                <input type="text" id="newLastNamePage" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="resident.dateOfBirth">Date of Birth</label>
+                                <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="newBirthYearPage" class="form-control">
+                                            <option value="">Year</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="newBirthMonthPage" class="form-control">
+                                            <option value="">Month</option>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="newBirthDayPage" class="form-control">
+                                            <option value="">Day</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="resident.gender">Gender</label>
+                                <select id="newGenderPage">
+                                    <option value="">-- Select --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="resident.photo">Photo</label>
+                            <div class="photo-upload-area">
+                                <div id="newPhotoPreviewPage" class="photo-preview" style="display: none;">
+                                    <img id="newPhotoPreviewImgPage" src="" alt="Preview">
+                                    <button type="button" class="photo-remove-btn" onclick="removeResidentPhotoPage()">×</button>
+                                </div>
+                                <div id="newPhotoUploadPlaceholderPage" class="photo-upload-placeholder">
+                                    <input type="file" id="newPhotoInputPage" accept="image/*" capture="environment" onchange="handleResidentPhotoUploadPage(event)" style="display: none;">
+                                    <label for="newPhotoInputPage" class="photo-upload-label">
+                                        <span class="photo-upload-icon">📷</span>
+                                        <span class="photo-upload-text" data-translate="common.tapToTakePhoto">Tap to take photo</span>
+                                        <span class="photo-upload-hint" data-translate="common.cameraAutoOpen">Camera will open automatically</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="resident.roomNumber">Room Number</label>
+                                <input type="text" id="newRoomNumberPage">
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="resident.bedNumber">Bed Number</label>
+                                <input type="text" id="newBedNumberPage">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="resident.emergencyContact">Emergency Contact Name</label>
+                            <input type="text" id="newEmergencyContactPage">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="resident.emergencyPhone">Emergency Contact Phone</label>
+                                <input type="tel" id="newEmergencyPhonePage" placeholder="(787) 555-1234">
+                            </div>
+                            <div class="form-group">
+                                <label for="newEmergencyCarrierPage">Phone Carrier (for SMS)</label>
+                                <select id="newEmergencyCarrierPage" class="form-control">
+                                    <option value="">-- Select Carrier --</option>
+                                    <option value="verizon">Verizon</option>
+                                    <option value="claro">Claro</option>
+                                    <option value="att">AT&T</option>
+                                    <option value="t-mobile">T-Mobile</option>
+                                    <option value="sprint">Sprint</option>
+                                    <option value="us cellular">US Cellular</option>
+                                    <option value="cricket">Cricket</option>
+                                    <option value="boost">Boost Mobile</option>
+                                    <option value="virgin">Virgin Mobile</option>
+                                    <option value="metro">MetroPCS</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newEmergencyRelationPage" data-translate="resident.emergencyRelation">Relation</label>
+                            <input type="text" id="newEmergencyRelationPage" data-translate-placeholder="resident.relation.placeholder" placeholder="e.g., Son, Daughter">
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="resident.emergencyEmail">Emergency Contact Email</label>
+                            <input type="email" id="newEmergencyEmailPage" placeholder="email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="resident.medicalConditions">Medical Conditions</label>
+                            <textarea id="newMedicalConditionsPage" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="resident.allergies">Allergies</label>
+                            <textarea id="newAllergiesPage" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="resident.dietaryRestrictions">Dietary Restrictions</label>
+                            <textarea id="newDietaryRestrictionsPage" rows="2"></textarea>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success" data-translate="resident.save">Save Resident</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideAddResidentForm()" data-translate="common.cancel">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="residentsList" class="item-list"></div>
+            </div>
+
+            <!-- Archived Residents Page (Admin Only) -->
+            <div id="archivedResidents" class="page">
+                <h2>Archived Residents</h2>
+                <p style="color: var(--dark-gray);">Restore previously deleted (archived) residents.</p>
+                <div id="archivedResidentsList" class="item-list"></div>
+            </div>
+
+            <!-- Documents Page (Admin Only) -->
+            <div id="documents" class="page">
+                <h2>Documents</h2>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <form id="documentsUploadForm" onsubmit="uploadDocument(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="documentsResidentSelect">Resident</label>
+                                <select id="documentsResidentSelect" class="form-control" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="documentCategory">Category</label>
+                                <select id="documentCategory" class="form-control">
+                                    <option value="">-- Select --</option>
+                                    <option value="Insurance">Insurance</option>
+                                    <option value="ID">ID</option>
+                                    <option value="POA">POA</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Billing">Billing</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 2;">
+                                <label for="documentTitle">Title</label>
+                                <input type="text" id="documentTitle" placeholder="e.g., Insurance Card, POA">
+                            </div>
+                            <div class="form-group" style="flex: 2;">
+                                <label for="documentFile">File (PDF or Photo)</label>
+                                <input type="file" id="documentFile" accept="application/pdf,image/*" capture="environment" required>
+                            </div>
+                        </div>
+                        <div class="button-group" style="margin-bottom: 0;">
+                            <button type="submit" class="btn btn-success">Upload</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="button-group" style="margin-bottom: 1rem;">
+                    <button class="btn btn-primary" type="button" onclick="loadDocumentsList()">Refresh</button>
+                </div>
+                <div id="documentsList" class="item-list"></div>
+            </div>
+
+            <!-- Training Page (Practice Mode) -->
+            <div id="training" class="page">
+                <h2>Training (Practice Mode)</h2>
+
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <h3>Create Demo Training Residents</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="trainingDemoCount">How many demo residents?</label>
+                            <input type="number" id="trainingDemoCount" value="3" min="1" max="10">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button class="btn btn-success" type="button" onclick="createTrainingDemoData()">Create Demo Data</button>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-bottom: 0;">
+                        <button class="btn btn-danger" type="button" onclick="clearTrainingDemoData()">Delete All Training Data</button>
+                    </div>
+                    <p style="color: var(--dark-gray); margin: 0;">Training data is hidden from normal Residents/History/Reports.</p>
+                </div>
+
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <h3>Training Resident Selector</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="trainingResidentSelect">Training Resident</label>
+                            <select id="trainingResidentSelect" class="form-control"></select>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button class="btn btn-secondary" type="button" onclick="loadTrainingResidents()">Refresh</button>
+                        </div>
+                    </div>
+                    <p style="color: var(--dark-gray); margin: 0;">Staff should practice selecting a resident using the normal resident selector too.</p>
+                </div>
+
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <h3>Practice Reports (All Training Residents)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="trainingReportSince">From (date/time)</label>
+                            <input type="datetime-local" id="trainingReportSince" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="trainingReportUntil">To (date/time)</label>
+                            <input type="datetime-local" id="trainingReportUntil" class="form-control">
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-bottom: 0;">
+                        <button class="btn btn-secondary" type="button" onclick="downloadTrainingJournalPdf()">Download Practice PDF</button>
+                        <button class="btn btn-secondary" type="button" onclick="printTrainingJournalPdf()">Print Practice PDF</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Page -->
+            <div id="staff" class="page">
+                <h2 data-translate="staff.title">Staff Management</h2>
+                <button class="btn btn-primary" onclick="showAddStaffForm()" data-translate="staff.addNew">+ Add New Staff</button>
+
+                <!-- Add/Edit Staff Form -->
+                <div id="addStaffForm" class="form-card" style="display: none; margin-top: 2rem;">
+                    <h3 id="staffFormTitle" data-translate="staff.add">Add New Staff Member</h3>
+                    <form id="newStaffForm" onsubmit="saveStaff(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="staff.fullName">Full Name *</label>
+                                <input type="text" id="staffFullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="staffUsername" data-translate="staff.username">Username *</label>
+                                <input type="text" id="staffUsername" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="staff.email">Email</label>
+                                <input type="email" id="staffEmail">
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="staff.phone">Phone</label>
+                                <input type="tel" id="staffPhone" placeholder="(787) 555-1234">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="staffPhoneCarrier">Phone Carrier (for SMS)</label>
+                            <select id="staffPhoneCarrier" class="form-control">
+                                <option value="">-- Select Carrier --</option>
+                                <option value="verizon">Verizon</option>
+                                <option value="claro">Claro</option>
+                                <option value="att">AT&T</option>
+                                <option value="t-mobile">T-Mobile</option>
+                                <option value="sprint">Sprint</option>
+                                <option value="us cellular">US Cellular</option>
+                                <option value="cricket">Cricket</option>
+                                <option value="boost">Boost Mobile</option>
+                                <option value="virgin">Virgin Mobile</option>
+                                <option value="metro">MetroPCS</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="staffPayRate" data-translate="staff.payRate">Pay Rate (per hour)</label>
+                                <input type="number" id="staffPayRate" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="staff.pin">4-Digit PIN</label>
+                                <div class="button-group" style="gap: 0.5rem;">
+                                    <button type="button" class="btn btn-secondary" id="generateStaffPinBtn" onclick="generateStaffPin()" data-translate="staff.generatePin">Generate PIN</button>
+                                    <input type="text" id="generatedStaffPin" readonly style="flex: 1;" placeholder="----">
+                                </div>
+                                <div style="font-size: 0.85rem; color: var(--dark-gray);" data-translate="staff.pinHint">Admin only. PIN is shown once when generated.</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="staff.role">Role *</label>
+                                <select id="staffRole" required>
+                                    <option value="caregiver" data-translate="staff.role.caregiver">Caregiver</option>
+                                    <option value="nurse" data-translate="staff.role.nurse">Nurse</option>
+                                    <option value="admin" data-translate="staff.role.admin">Administrator</option>
+                                    <option value="doctor" data-translate="staff.role.doctor">Doctor</option>
+                                    <option value="therapist" data-translate="staff.role.therapist">Therapist</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="staffPassword" data-translate="staff.password">Password <span id="staffPasswordHint">(Leave blank to keep current)</span></label>
+                                <input type="password" id="staffPassword" data-translate-placeholder="staff.password.placeholder" placeholder="Enter new password">
+                            </div>
+                        </div>
+                        <div class="form-group" id="staffActiveGroup">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                                <input type="checkbox" id="staffActive" checked>
+                                <span data-translate="staff.active">Active</span>
+                            </label>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success" data-translate="staff.save">Save Staff</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideAddStaffForm()" data-translate="common.cancel">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="staffList" class="item-list"></div>
+            </div>
+
+            <!-- Time Clock Page -->
+            <div id="timeclock" class="page">
+                <div class="page-header">
+                    <h2 data-translate="nav.timeclock">Time Clock</h2>
+                    <p style="color: var(--dark-gray);" data-translate="timeclock.subtitle">Clock actions require your 4-digit PIN.</p>
+                </div>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="timeclockPinInApp" data-translate="timeclock.pin">4-Digit Code (PIN)</label>
+                            <input type="password" id="timeclockPinInApp" inputmode="numeric" maxlength="4" placeholder="0000">
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-top: 0.5rem;">
+                        <button class="btn btn-success" onclick="handlePinBreakStart(true)" data-translate="timeclock.breakStart">Start Break</button>
+                        <button class="btn btn-secondary" onclick="handlePinBreakEnd(true)" data-translate="timeclock.breakEnd">End Break</button>
+                        <button class="btn btn-danger" onclick="handlePinClockOut(true)" data-translate="timeclock.clockOut">Clock Out</button>
+                    </div>
+                </div>
+                <div class="form-card">
+                    <h3 data-translate="timeclock.myHours">My Hours</h3>
+                    <div id="myHoursToday" style="margin-top: 0.75rem;"></div>
+                    <div id="myHoursWeek" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+
+            <!-- Payroll Page (Admin Only) -->
+            <div id="payroll" class="page">
+                <div class="page-header">
+                    <h2 data-translate="nav.payroll">Payroll</h2>
+                    <p style="color: var(--dark-gray);" data-translate="payroll.subtitle">Generate payroll reports by date range. Admin only.</p>
+                </div>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="payrollSince" data-translate="payroll.since">From</label>
+                            <input type="date" id="payrollSince">
+                        </div>
+                        <div class="form-group">
+                            <label for="payrollUntil" data-translate="payroll.until">To</label>
+                            <input type="date" id="payrollUntil">
+                        </div>
+                        <div class="form-group">
+                            <label for="payrollStaff" data-translate="payroll.staff">Staff</label>
+                            <select id="payrollStaff" class="form-control">
+                                <option value="" data-translate="payroll.staffAll">All Staff</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-top: 0.5rem;">
+                        <button class="btn btn-primary" onclick="loadPayrollReport()" data-translate="payroll.run">Run Report</button>
+                        <button class="btn btn-secondary" onclick="downloadPayrollCsv()" data-translate="payroll.exportCsv">Export CSV</button>
+                    </div>
+                </div>
+                <div class="form-card">
+                    <div id="payrollTable"></div>
+                </div>
+            </div>
+
+            <!-- Medications Page -->
+            <div id="medications" class="page">
+                <h2 data-translate="medication.title">Medication Management</h2>
+                <button class="btn btn-primary" onclick="showMedicationForm()" data-translate="medication.addNew">+ Add New Medication</button>
+
+                <div id="medicationForm" class="form-card" style="display: none;">
+                    <h3 data-translate="medication.add">Add Medication</h3>
+                    <form id="medForm" onsubmit="saveMedication(event)">
+                        <div class="form-group">
+                            <label for="medName" data-translate="medication.name">Medication Name *</label>
+                            <input type="text" id="medName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="medDosage" data-translate="medication.dosage">Dosage *</label>
+                            <input type="text" id="medDosage" placeholder="e.g., 10mg" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="medFrequency" data-translate="medication.frequency">Frequency *</label>
+                            <select id="medFrequency" required onchange="handleFrequencyChange()">
+                                <option value="Once daily" data-translate="medication.frequency.onceDaily">Once daily</option>
+                                <option value="Twice daily" data-translate="medication.frequency.twiceDaily">Twice daily</option>
+                                <option value="Three times daily" data-translate="medication.frequency.threeTimesDaily">Three times daily</option>
+                                <option value="Every 4 hours" data-translate="medication.frequency.every4Hours">Every 4 hours</option>
+                                <option value="Every 6 hours" data-translate="medication.frequency.every6Hours">Every 6 hours</option>
+                                <option value="Every 8 hours" data-translate="medication.frequency.every8Hours">Every 8 hours</option>
+                                <option value="At intervals" data-translate="medication.frequency.atIntervals">At intervals</option>
+                                <option value="As needed" data-translate="medication.frequency.asNeeded">As needed</option>
+                            </select>
+                        </div>
+                        <div id="hoursIntervalGroup" class="form-group" style="display: none;">
+                            <label data-translate="medication.hoursBetween">Hours Between Doses</label>
+                            <div class="hours-selector-compact">
+                                <input type="number" id="hoursIntervalInput" min="1" max="24" value="8" class="hours-number-input" onchange="selectHourFromInput()">
+                                <div class="hours-quick-select">
+                                    <button type="button" class="hours-quick-btn" onclick="selectHour(1)">1h</button>
+                                    <button type="button" class="hours-quick-btn" onclick="selectHour(2)">2h</button>
+                                    <button type="button" class="hours-quick-btn" onclick="selectHour(4)">4h</button>
+                                    <button type="button" class="hours-quick-btn" onclick="selectHour(6)">6h</button>
+                                    <button type="button" class="hours-quick-btn" onclick="selectHour(8)">8h</button>
+                                    <button type="button" class="hours-quick-btn" onclick="selectHour(12)">12h</button>
+                                    <button type="button" class="hours-quick-btn" onclick="selectHour(24)">24h</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="medTimesGroup">
+                            <label for="medTimes" data-translate="medication.times">Time(s) *</label>
+                            <input type="text" id="medTimes" placeholder="e.g., 08:00, 20:00" required>
+                            <small data-translate="medication.timesHint">Enter times separated by commas</small>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="medication.startDate">Start Date</label>
+                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medStartYear" class="form-control">
+                                        <option value="">Year</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medStartMonth" class="form-control">
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medStartDay" class="form-control">
+                                        <option value="">Day</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <input type="time" id="medStartTime" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="medication.endDate">End Date</label>
+                            <div class="form-group" style="margin-bottom: 0.75rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                                    <input type="checkbox" id="medNoEndDate" onchange="handleNoEndDateChange()">
+                                    <span data-translate="medication.noEndDate">No end date (Ongoing)</span>
+                                </label>
+                            </div>
+                            <div id="medEndDateGroup" class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medEndYear" class="form-control">
+                                        <option value="">Year</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medEndMonth" class="form-control">
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="medEndDay" class="form-control">
+                                        <option value="">Day</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <input type="time" id="medEndTime" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success" data-translate="common.save">Save</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideMedicationForm()" data-translate="common.cancel">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="medicationList" class="item-list"></div>
+            </div>
+
+            <!-- Appointments Page -->
+            <div id="appointments" class="page">
+                <h2 data-translate="appointment.title">Appointment Tracking</h2>
+                <button class="btn btn-primary" onclick="showAppointmentForm()" data-translate="appointment.addNew">+ Add New Appointment</button>
+
+                <div id="appointmentForm" class="form-card" style="display: none;">
+                    <h3 data-translate="appointment.add">Add Appointment</h3>
+                    <form id="apptForm" onsubmit="saveAppointment(event)">
+                        <div class="form-group">
+                            <label data-translate="appointment.date">Date *</label>
+                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="apptYear" class="form-control" required>
+                                        <option value="">Year</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="apptMonth" class="form-control" required>
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="apptDay" class="form-control" required>
+                                        <option value="">Day</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="appointment.time">Time *</label>
+                            <input type="time" id="apptTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apptDoctor" data-translate="appointment.provider">Doctor/Provider *</label>
+                            <input type="text" id="apptDoctor" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apptFacility" data-translate="appointment.facility">Facility</label>
+                            <input type="text" id="apptFacility">
+                        </div>
+                        <div class="form-group">
+                            <label for="apptPurpose" data-translate="appointment.purpose">Purpose</label>
+                            <input type="text" id="apptPurpose">
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="appointment.notes">Notes</label>
+                            <textarea id="apptNotes" rows="3"></textarea>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success" data-translate="appointment.save">Save</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideAppointmentForm()" data-translate="common.cancel">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="appointmentList" class="item-list"></div>
+            </div>
+
+            <!-- Vital Signs Page -->
+            <div id="vitalsigns" class="page">
+                <h2 data-translate="vitals.title">Vital Signs Tracker</h2>
+
+                <div class="form-card">
+                    <h3 data-translate="vitals.add">Record Vital Signs</h3>
+                    <form id="vitalSignsForm" onsubmit="saveVitalSign(event)">
+                        <div class="form-group">
+                            <label data-translate="vitals.dateTime">Date & Time *</label>
+                            <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="vsYear" class="form-control" required>
+                                        <option value="">Year</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="vsMonth" class="form-control" required>
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <select id="vsDay" class="form-control" required>
+                                        <option value="">Day</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <input type="time" id="vsTime" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4>🩸 <span data-translate="vitals.section.bloodPressure">Blood Pressure</span></h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="vsSystolic">Systolic (mmHg)</label>
+                                    <input type="number" id="vsSystolic" min="0" max="300" placeholder="120">
+                                </div>
+                                <div class="form-group">
+                                    <label for="vsDiastolic">Diastolic (mmHg)</label>
+                                    <input type="number" id="vsDiastolic" min="0" max="200" placeholder="80">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4>🩹 <span data-translate="vitals.section.bloodGlucose">Blood Glucose</span></h4>
+                            <div class="form-group">
+                                <label for="vsGlucose">Glucose Level (mg/dL)</label>
+                                <input type="number" id="vsGlucose" min="0" max="600" step="0.1" placeholder="100">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4>🌡️ <span data-translate="vitals.section.temperature">Temperature</span></h4>
+                            <div class="form-group">
+                                <label for="vsTemperature">Temperature (°F)</label>
+                                <input type="number" id="vsTemperature" min="90" max="110" step="0.1" placeholder="98.6">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4>❤️ <span data-translate="vitals.section.heartRate">Heart Rate</span></h4>
+                            <div class="form-group">
+                                <label for="vsHeartRate">Heart Rate (bpm)</label>
+                                <input type="number" id="vsHeartRate" min="30" max="200" placeholder="72">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4>⚖️ <span data-translate="vitals.section.weight">Weight</span></h4>
+                            <div class="form-group">
+                                <label for="vsWeight">Weight (lbs)</label>
+                                <input type="number" id="vsWeight" min="0" max="1000" step="0.1" placeholder="150">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label data-translate="appointment.notes">Notes</label>
+                            <textarea id="vsNotes" rows="2" placeholder="Any observations..."></textarea>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success" data-translate="vitals.save">💾 Save Vital Signs</button>
+                            <button type="button" class="btn btn-secondary" onclick="clearVitalSignsForm()" data-translate="common.clear">Clear</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 data-translate="vitals.history">Vital Signs History</h3>
+                    <div id="vitalSignsList" class="item-list"></div>
+                </div>
+            </div>
+
+            <!-- Calendar Page -->
+            <div id="calendar" class="page">
+                <h2 data-translate="calendar.title">Activity Calendar</h2>
+
+                <div class="form-card">
+                    <div class="calendar-controls" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                        <div class="form-group" style="margin: 0; flex: 1; min-width: 120px;">
+                            <label for="calendarYear" style="font-size: 0.9rem; margin-bottom: 0.25rem;" data-translate="resident.year">Year</label>
+                            <select id="calendarYear" class="form-control" style="padding: 0.5rem;">
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin: 0; flex: 1; min-width: 150px;">
+                            <label for="calendarMonth" style="font-size: 0.9rem; margin-bottom: 0.25rem;" data-translate="resident.month">Month</label>
+                            <select id="calendarMonth" class="form-control" style="padding: 0.5rem;">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                            <button class="btn btn-secondary" onclick="changeCalendarMonth(-1)" data-translate="calendar.previous">← Previous</button>
+                            <button class="btn btn-secondary" onclick="changeCalendarMonth(1)" data-translate="calendar.next">Next →</button>
+                            <button class="btn btn-primary" onclick="goToToday()" data-translate="calendar.today">Today</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="calendarSearch" style="font-size: 0.9rem; margin-bottom: 0.25rem;" data-translate="calendar.search">Search Activities</label>
+                        <input type="text" id="calendarSearch" class="form-control" data-translate-placeholder="calendar.searchPlaceholder" placeholder="Search by name, doctor, medication..." style="padding: 0.5rem;">
+                    </div>
+                </div>
+
+                <div id="calendarDisplay" class="calendar-container"></div>
+            </div>
+
+            <!-- Billing Page -->
+            <div id="billing" class="page">
+                <h2 data-translate="billing.title">Billing & Payments</h2>
+
+                <!-- Account Balance Summary -->
+                <div id="accountBalanceCard" class="form-card" style="display: none;">
+                    <h3 data-translate="billing.accountBalance">Account Balance</h3>
+                    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 1rem;">
+                        <div class="stat-card">
+                            <h4 data-translate="billing.totalBilled">Total Billed</h4>
+                            <p class="stat-number" id="totalBilled">$0.00</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4 data-translate="billing.totalPaid">Total Paid</h4>
+                            <p class="stat-number" style="color: var(--success-green);" id="totalPaid">$0.00</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4 data-translate="billing.balance">Balance</h4>
+                            <p class="stat-number" id="currentBalance">$0.00</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4 data-translate="billing.pending">Pending</h4>
+                            <p class="stat-number" style="color: var(--warning-color);" id="pendingAmount">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Bill Form -->
+                <div class="form-card">
+                    <h3 data-translate="billing.create">Create Bill</h3>
+                    <button class="btn btn-primary" onclick="showBillForm()" data-translate="billing.add">+ Add New Bill</button>
+
+                    <div id="billForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
+                        <h3 id="billFormTitle" data-translate="billing.add">Add New Bill</h3>
+                        <form id="newBillForm" onsubmit="saveBill(event)">
+                            <div class="form-group">
+                                <label data-translate="billing.date">Billing Date *</label>
+                                <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billYear" class="form-control" required>
+                                            <option value="">Year</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billMonth" class="form-control" required>
+                                            <option value="">Month</option>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billDay" class="form-control" required>
+                                            <option value="">Day</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="billing.dueDate">Due Date *</label>
+                                <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billDueYear" class="form-control" required>
+                                            <option value="">Year</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billDueMonth" class="form-control" required>
+                                            <option value="">Month</option>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="billDueDay" class="form-control" required>
+                                            <option value="">Day</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="billAmount" data-translate="billing.amount">Amount *</label>
+                                    <input type="number" id="billAmount" step="0.01" min="0" required placeholder="0.00">
+                                </div>
+                                <div class="form-group">
+                                    <label data-translate="carenote.category">Category</label>
+                                    <select id="billCategory">
+                                        <option value="Monthly Fee">Monthly Fee</option>
+                                        <option value="Medical Services">Medical Services</option>
+                                        <option value="Medications">Medications</option>
+                                        <option value="Special Care">Special Care</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="billing.description">Description</label>
+                                <input type="text" id="billDescription" placeholder="e.g., Monthly care fee for December">
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="appointment.notes">Notes</label>
+                                <textarea id="billNotes" rows="2"></textarea>
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-success" data-translate="billing.save">Save Bill</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideBillForm()" data-translate="common.cancel">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Record Payment Form -->
+                <div class="form-card">
+                    <h3 data-translate="payment.add">Record Payment</h3>
+                    <button class="btn btn-primary" onclick="showPaymentForm()" data-translate="payment.add">+ Record Payment</button>
+
+                    <div id="paymentForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
+                        <form id="newPaymentForm" onsubmit="savePayment(event)">
+                            <div class="form-group">
+                                <label>Payment Date *</label>
+                                <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="paymentYear" class="form-control" required>
+                                            <option value="">Year</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="paymentMonth" class="form-control" required>
+                                            <option value="">Month</option>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <select id="paymentDay" class="form-control" required>
+                                            <option value="">Day</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="paymentAmount" data-translate="billing.amount">Amount *</label>
+                                    <input type="number" id="paymentAmount" step="0.01" min="0" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="paymentMethod">Payment Method</label>
+                                    <select id="paymentMethod">
+                                        <option value="Cash">Cash</option>
+                                        <option value="Check">Check</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                        <option value="Debit Card">Debit Card</option>
+                                        <option value="Bank Transfer">Bank Transfer</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="paymentReference">Reference Number</label>
+                                    <input type="text" id="paymentReference" placeholder="Check #, Transaction ID, etc.">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="paymentBillId">Apply to Bill (Optional)</label>
+                                <select id="paymentBillId">
+                                    <option value="" data-translate="common.selectBill">Select bill</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="appointment.notes">Notes</label>
+                                <textarea id="paymentNotes" rows="2"></textarea>
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-success" data-translate="payment.add">Record Payment</button>
+                                <button type="button" class="btn btn-secondary" onclick="hidePaymentForm()" data-translate="common.cancel">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Bills List -->
+                <div style="margin-top: 2rem;">
+                    <h3>Bills</h3>
+                    <div id="billsList" class="item-list"></div>
+                </div>
+
+                <!-- Payments List -->
+                <div style="margin-top: 2rem;">
+                    <h3>Payment History</h3>
+                    <div id="paymentsList" class="item-list"></div>
+                </div>
+            </div>
+
+            <!-- Incident Reports Page -->
+            <div id="incidents" class="page" style="display: none;">
+                <h2 id="incidentsH2" style="display: block !important; visibility: visible !important; opacity: 1 !important; color: var(--text-color) !important; margin-bottom: 1.5rem !important; font-size: 1.8rem !important; font-weight: bold !important; position: relative !important; z-index: 1 !important; width: 100% !important; height: auto !important;" data-translate="incident.title">Incident Reports</h2>
+                <button id="incidentsButton" class="btn btn-primary" onclick="showIncidentForm()" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1.5rem !important; padding: 0.75rem 1.5rem !important; font-size: 1rem !important; cursor: pointer !important; position: relative !important; z-index: 1 !important; width: auto !important; height: auto !important; background: var(--primary-color) !important; color: white !important; border: none !important;" data-translate="incident.add">+ Report Incident</button>
+
+                <!-- Incident Form -->
+                <div id="incidentForm" class="form-card" style="display: none; margin-top: 2rem;">
+                    <h3 id="incidentFormTitle" data-translate="incident.add">Report Incident</h3>
+                    <form id="newIncidentForm" onsubmit="saveIncident(event)" enctype="multipart/form-data">
+                        <!-- Timestamp Section -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="incidentDate">Incident Date &amp; Time *</label>
+                                <input type="datetime-local" id="incidentDate" required>
+                                <small class="form-hint">Timestamp when the incident occurred</small>
+                            </div>
+                        </div>
+
+                        <!-- Staff and Residents Section -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="incidentStaffId">Reporting Staff *</label>
+                                <select id="incidentStaffId" required>
+                                    <option value="">-- Select Staff --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="incidentResidents">Residents Involved *</label>
+                                <select id="incidentResidents" multiple required style="min-height: 120px;">
+                                    <option value="">-- Select Residents --</option>
+                                </select>
+                                <small class="form-hint">Hold Ctrl/Cmd to select multiple</small>
+                            </div>
+                        </div>
+
+                        <!-- Incident Type and Severity -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="incidentType">Incident Type *</label>
+                                <select id="incidentType" required>
+                                    <option value="">-- Select --</option>
+                                    <option value="Fall">Fall</option>
+                                    <option value="Injury">Injury</option>
+                                    <option value="Medication Error">Medication Error</option>
+                                    <option value="Behavioral">Behavioral</option>
+                                    <option value="Medical Emergency">Medical Emergency</option>
+                                    <option value="Equipment Failure">Equipment Failure</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="incidentSeverity">Severity *</label>
+                                <select id="incidentSeverity" required>
+                                    <option value="minor">Minor</option>
+                                    <option value="moderate">Moderate</option>
+                                    <option value="major">Major</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="appointment.location">Location</label>
+                                <input type="text" id="incidentLocation" placeholder="e.g., Room 101, Dining Hall">
+                            </div>
+                        </div>
+
+                        <!-- Description Section -->
+                        <div class="form-group">
+                            <label for="incidentDescription">Description *</label>
+                            <textarea id="incidentDescription" rows="6" required placeholder="Provide a detailed description of what happened, who was involved, and any immediate observations..."></textarea>
+                        </div>
+
+                        <!-- Photo Upload Section -->
+                        <div class="form-group">
+                            <label>Incident Photos</label>
+                            <div class="photo-upload-area" id="incidentPhotoArea">
+                                <input type="file" id="incidentPhotos" multiple accept="image/*" capture="environment" style="display: none;" onchange="handleIncidentPhotos(event)">
+                                <div class="photo-upload-placeholder" onclick="document.getElementById('incidentPhotos').click()">
+                                    <div class="photo-upload-icon">📷</div>
+                                    <p><strong>Tap to Upload Photos</strong></p>
+                                    <p>Camera will open automatically</p>
+                                    <p class="photo-upload-hint">You can select multiple photos</p>
+                                </div>
+                                <div id="incidentPhotoPreview" class="photo-preview-grid"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="incidentWitnesses">Witnesses</label>
+                                <input type="text" id="incidentWitnesses" placeholder="Names of witnesses">
+                            </div>
+                            <div class="form-group">
+                                <label for="incidentActions">Actions Taken</label>
+                                <textarea id="incidentActions" rows="3" placeholder="What was done in response..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                                    <input type="checkbox" id="incidentFamilyNotified">
+                                    <span>Family Notified</span>
+                                </label>
+                            </div>
+                            <div class="form-group" id="familyNotificationDateGroup" style="display: none;">
+                                <label for="familyNotificationDate">Notification Date</label>
+                                <input type="datetime-local" id="familyNotificationDate">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                                <input type="checkbox" id="incidentFollowUp">
+                                <span>Follow-up Required</span>
+                            </label>
+                        </div>
+                        <div class="form-group" id="followUpNotesGroup" style="display: none;">
+                            <label for="followUpNotes">Follow-up Notes</label>
+                            <textarea id="followUpNotes" rows="2"></textarea>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success">Save Report</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideIncidentForm()" data-translate="common.cancel">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="incidentsList" class="item-list" style="margin-top: 2rem !important; display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 200px !important; width: 100% !important; padding: 1rem !important; background: var(--white) !important; border-radius: 8px !important;"></div>
+            </div>
+
+            <!-- Daily Care Notes Page -->
+            <div id="carenotes" class="page">
+                <div class="page-header">
+                    <h2 data-translate="carenote.title">Care Notes</h2>
+                    <button class="btn btn-primary" onclick="showCareNoteForm()" data-translate="carenote.add">+ Add Care Note</button>
+                </div>
+
+                <!-- Care Note Form -->
+                <div id="careNoteForm" class="form-card" style="display: none; margin-top: 2rem;">
+                    <h3 id="careNoteFormTitle" data-translate="carenote.add">Add Care Note</h3>
+                    <form id="newCareNoteForm" onsubmit="saveCareNote(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="appointment.date">Date *</label>
+                                <input type="date" id="careNoteDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="careNoteTime" data-translate="carenote.time">Time</label>
+                                <input type="time" id="careNoteTime">
+                            </div>
+                            <div class="form-group">
+                                <label for="careNoteShift">Shift</label>
+                                <select id="careNoteShift">
+                                    <option value="">-- Select --</option>
+                                    <option value="Morning">Morning</option>
+                                    <option value="Afternoon">Afternoon</option>
+                                    <option value="Evening">Evening</option>
+                                    <option value="Night">Night</option>
+                                </select>
+                            </div>
+                        </div>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Nutrition &amp; Hydration</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="appetiteRating">Appetite</label>
+                                <select id="appetiteRating">
+                                    <option value="">-- Select --</option>
+                                    <option value="Poor">Poor</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Excellent">Excellent</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="fluidIntake">Fluid Intake</label>
+                                <input type="text" id="fluidIntake" placeholder="e.g., 6 glasses water, 2 cups juice">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="mealBreakfast">Breakfast</label>
+                                <textarea id="mealBreakfast" rows="2" placeholder="What was eaten, how much..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="mealLunch">Lunch</label>
+                                <textarea id="mealLunch" rows="2" placeholder="What was eaten, how much..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="mealDinner">Dinner</label>
+                                <textarea id="mealDinner" rows="2" placeholder="What was eaten, how much..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="mealSnacks">Snacks</label>
+                                <textarea id="mealSnacks" rows="2" placeholder="Snacks consumed..."></textarea>
+                            </div>
+                        </div>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Personal Care</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bathing">Bathing</label>
+                                <textarea id="bathing" rows="2" placeholder="Bathing details..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="hygiene">Hygiene</label>
+                                <textarea id="hygiene" rows="2" placeholder="Hygiene details..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="toileting">Toileting</label>
+                                <textarea id="toileting" rows="2" placeholder="Frequency, type, any issues..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="skinCondition">Skin Condition</label>
+                                <textarea id="skinCondition" rows="2" placeholder="Any redness, sores, wounds, pressure points..."></textarea>
+                            </div>
+                        </div>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Mobility &amp; Pain</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="mobility">Mobility</label>
+                                <textarea id="mobility" rows="2" placeholder="How resident moved, assistance needed, distance..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="painLevel">Pain Level</label>
+                                <select id="painLevel">
+                                    <option value="">-- Select --</option>
+                                    <option value="None">None</option>
+                                    <option value="Mild (1-3)">Mild (1-3)</option>
+                                    <option value="Moderate (4-6)">Moderate (4-6)</option>
+                                    <option value="Severe (7-10)">Severe (7-10)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="painLocation">Pain Location</label>
+                            <input type="text" id="painLocation" placeholder="Where the pain is located...">
+                        </div>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Sleep</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sleepHours">Hours Slept</label>
+                                <input type="number" id="sleepHours" step="0.5" min="0" max="24" placeholder="e.g., 7.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="sleepQuality">Sleep Quality</label>
+                                <select id="sleepQuality">
+                                    <option value="">-- Select --</option>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                    <option value="Restless">Restless</option>
+                                </select>
+                            </div>
+                        </div>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Mood &amp; Behavior</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="mood">Mood</label>
+                                <select id="mood">
+                                    <option value="">-- Select --</option>
+                                    <option value="Happy">Happy</option>
+                                    <option value="Content">Content</option>
+                                    <option value="Neutral">Neutral</option>
+                                    <option value="Sad">Sad</option>
+                                    <option value="Agitated">Agitated</option>
+                                    <option value="Confused">Confused</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="behaviorNotes">Behavior Notes</label>
+                                <textarea id="behaviorNotes" rows="3" placeholder="Behavior observations..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="activities">Activities</label>
+                            <textarea id="activities" rows="2" placeholder="Activities participated in..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="generalNotes">General Notes</label>
+                            <textarea id="generalNotes" rows="4" placeholder="Any other observations or notes..."></textarea>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success">Save Note</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideCareNoteForm()" data-translate="common.cancel">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="careNotesList" class="item-list" style="margin-top: 2rem;"></div>
+            </div>
+
+            <!-- Notifications Page -->
+            <div id="notifications" class="page">
+                <h2 data-translate="nav.notifications">Notifications</h2>
+                <div class="button-group" style="margin-bottom: 1rem;">
+                    <button class="btn btn-secondary" onclick="markAllNotificationsRead()" data-translate="common.markAllRead">Mark All Read</button>
+                    <button class="btn btn-primary" onclick="loadNotificationsPage()">Refresh</button>
+                </div>
+                <div id="notificationsPageList" class="item-list"></div>
+            </div>
+
+            <!-- History / Journal Page -->
+            <div id="history" class="page">
+                <h2>History / Journal</h2>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="historyAllResidents" checked>
+                                All Residents
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="historyResidentFilter">Resident</label>
+                            <select id="historyResidentFilter" class="form-control" disabled>
+                                <option value="">Select Resident</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="historyStaffFilter">Staff</label>
+                            <select id="historyStaffFilter" class="form-control">
+                                <option value="">All Staff</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="historySince">From (date/time)</label>
+                            <input type="datetime-local" id="historySince" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="historyUntil">To (date/time)</label>
+                            <input type="datetime-local" id="historyUntil" class="form-control">
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-bottom: 0;">
+                        <button class="btn btn-secondary" type="button" onclick="setHistoryYesterday()">Yesterday</button>
+                        <button class="btn btn-primary" type="button" onclick="loadJournalPage()">Apply / Refresh</button>
+                    </div>
+                </div>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 2;">
+                            <label for="historyEmailTo">Email PDF To</label>
+                            <input type="email" id="historyEmailTo" class="form-control" placeholder="name@example.com">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-secondary" onclick="downloadHistoryJournalPdf()">Download PDF</button>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-secondary" onclick="printHistoryJournalPdf()">Print</button>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-secondary" onclick="emailHistoryJournalPdf()">Email PDF</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-group" style="margin-bottom: 1rem;">
+                    <button class="btn btn-primary" onclick="loadJournalPage()">Refresh</button>
+                </div>
+                <div id="journalPageList" class="item-list"></div>
+            </div>
+
+            <!-- Financial Management Page (Admin Only) -->
+            <div id="financial" class="page">
+                <div class="page-header">
+                    <h2 data-translate="nav.financial">Financial Management</h2>
+                    <p style="color: var(--dark-gray); margin-bottom: 2rem;" data-translate="financial.subtitle">Manage bank accounts, transactions, and reconciliation</p>
+
+                    <!-- Tabs Navigation -->
+                    <div class="button-group" style="margin-bottom: 2rem; border-bottom: 2px solid var(--light-gray); padding-bottom: 1rem;">
+                        <button class="btn btn-primary" onclick="showFinancialTab('accounts')" id="tabAccounts" data-translate="financial.tab.accounts">Bank Accounts</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('transactions')" id="tabTransactions" data-translate="financial.tab.transactions">Transactions</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('reconciliation')" id="tabReconciliation" data-translate="financial.tab.reconciliation">Reconciliation</button>
+                        <button class="btn btn-secondary" onclick="showFinancialTab('receipts')" id="tabReceipts" data-translate="financial.tab.receipts">Payment Receipts</button>
+                    </div>
+                </div>
+
+                <!-- Bank Accounts Tab -->
+                <div id="financialAccounts" class="financial-tab">
+                    <div class="form-card">
+                        <h3 data-translate="financial.accounts.title">Bank Accounts</h3>
+                        <button class="btn btn-primary" onclick="showBankAccountForm()" data-translate="financial.accounts.add">+ Add Bank Account</button>
+
+                        <div id="bankAccountForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
+                            <form id="newBankAccountForm" onsubmit="saveBankAccount(event)">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Account Name *</label>
+                                        <input type="text" id="accountName" required placeholder="e.g., Main Checking">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Bank Name *</label>
+                                        <input type="text" id="bankName" required placeholder="e.g., Banco Popular">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Account Number</label>
+                                        <input type="text" id="accountNumber" placeholder="****1234">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Routing Number</label>
+                                        <input type="text" id="routingNumber" placeholder="000000000">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Account Type</label>
+                                        <select id="accountType">
+                                            <option value="checking">Checking</option>
+                                            <option value="savings">Savings</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Opening Balance ($)</label>
+                                        <input type="number" id="openingBalance" step="0.01" value="0.00">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Notes</label>
+                                    <textarea id="accountNotes" rows="2"></textarea>
+                                </div>
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-success">Save Account</button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideBankAccountForm()" data-translate="common.cancel">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="bankAccountsList" class="item-list" style="margin-top: 2rem;"></div>
+                </div>
+
+                <!-- Transactions Tab -->
+                <div id="financialTransactions" class="financial-tab" style="display: none;">
+                    <div class="form-card">
+                        <h3 data-translate="financial.transactions.title">Transactions</h3>
+                        <button class="btn btn-primary" onclick="showTransactionForm()" data-translate="financial.transactions.add">+ Add Transaction</button>
+
+                        <div id="transactionForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
+                            <form id="newTransactionForm" onsubmit="saveTransaction(event)">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Bank Account *</label>
+                                        <select id="transactionBankAccount" required></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Transaction Type *</label>
+                                        <select id="transactionType" required>
+                                            <option value="deposit">Deposit</option>
+                                            <option value="withdrawal">Withdrawal</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Date *</label>
+                                        <input type="date" id="transactionDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Amount ($) *</label>
+                                        <input type="number" id="transactionAmount" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Description *</label>
+                                    <input type="text" id="transactionDescription" required placeholder="e.g., Payment from Resident">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Check Number</label>
+                                        <input type="text" id="transactionCheckNumber" placeholder="Optional">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Payee</label>
+                                        <input type="text" id="transactionPayee" placeholder="Optional">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                        <label>Category</label>
+                                        <input type="text" id="transactionCategory" placeholder="e.g., Payment, Expense">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Reconciled</label>
+                                        <select id="transactionReconciled">
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Notes</label>
+                                    <textarea id="transactionNotes" rows="2"></textarea>
+                                </div>
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-success">Save Transaction</button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideTransactionForm()" data-translate="common.cancel">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="form-card" style="margin-top: 2rem;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-translate="financial.transactions.filterByAccount">Filter by Account</label>
+                                <select id="filterTransactionAccount" onchange="loadTransactions()">
+                                    <option value="" data-translate="financial.transactions.allAccounts">All Accounts</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label data-translate="financial.transactions.showReconciled">Show Reconciled</label>
+                                <select id="filterReconciled" onchange="loadTransactions()">
+                                    <option value="" data-translate="financial.transactions.reconciledFilter.all">All</option>
+                                    <option value="true" data-translate="financial.transactions.reconciledFilter.reconciledOnly">Reconciled Only</option>
+                                    <option value="false" data-translate="financial.transactions.reconciledFilter.unreconciledOnly">Unreconciled Only</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="transactionsList" class="item-list" style="margin-top: 2rem;"></div>
+                </div>
+
+                <!-- Reconciliation Tab -->
+                <div id="financialReconciliation" class="financial-tab" style="display: none;">
+                    <div class="form-card">
+                        <h3 data-translate="financial.reconciliation.title">Reconcile Account</h3>
+                        <form id="reconciliationForm" onsubmit="reconcileAccount(event)">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Bank Account *</label>
+                                    <select id="reconcileBankAccount" required onchange="loadUnreconciledTransactions()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Statement Date *</label>
+                                    <input type="date" id="statementDate" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Statement Balance ($) *</label>
+                                    <input type="number" id="statementBalance" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Current Balance</label>
+                                    <input type="text" id="currentAccountBalance" readonly style="background: var(--light-gray);">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Transactions to Reconcile</label>
+                                <div id="unreconciledTransactions" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--medium-gray); padding: 1rem; border-radius: 8px; background: var(--white);"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Notes</label>
+                                <textarea id="reconciliationNotes" rows="2"></textarea>
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-success">Reconcile</button>
+                                <button type="button" class="btn btn-secondary" onclick="loadReconciliationHistory()">View History</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="reconciliationHistory" class="item-list" style="margin-top: 2rem; display: none;"></div>
+                </div>
+
+                <!-- Payment Receipts Tab -->
+                <div id="financialReceipts" class="financial-tab" style="display: none;">
+                    <div class="form-card">
+                        <h3 data-translate="financial.receipts.title">Payment Receipts</h3>
+                        <div class="form-group">
+                            <label data-translate="financial.receipts.searchLabel">Search by Receipt Number or Payment ID</label>
+                            <div class="form-row">
+                                <input type="text" id="receiptSearch" class="form-control" placeholder="Receipt Number or Payment ID">
+                                <button class="btn btn-primary" onclick="searchReceipt()" data-translate="common.search">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="receiptDisplay" class="form-card" style="margin-top: 2rem; display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="reports" class="page">
+                <h2 data-translate="nav.reports">Reports</h2>
+
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <h3>Total Incidents</h3>
+                        <p class="stat-number" id="totalIncidents">0</p>
+                        <p class="stat-label">This Month</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Care Notes</h3>
+                        <p class="stat-number" id="totalCareNotes">0</p>
+                        <p class="stat-label">This Month</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Medications Due</h3>
+                        <p class="stat-number" id="medicationsDue">0</p>
+                        <p class="stat-label">Today</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Appointments</h3>
+                        <p class="stat-number" id="upcomingAppointments">0</p>
+                        <p class="stat-label">This Week</p>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3 data-translate="reports.generate">Generate Report</h3>
+                    <form id="reportForm" onsubmit="generateReport(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reportType" data-translate="reports.type">Report Type *</label>
+                                <select id="reportType" required>
+                                    <option value="">-- Select --</option>
+                                    <option value="journal">Journal Report (Resident/Date/Time/Staff)</option>
+                                    <option value="incidents" data-translate="reports.type.incidents">Incident Report</option>
+                                    <option value="care_notes" data-translate="reports.type.care_notes">Care Notes Summary</option>
+                                    <option value="medications" data-translate="reports.type.medications">Medication Report</option>
+                                    <option value="appointments" data-translate="reports.type.appointments">Appointments Report</option>
+                                    <option value="vital_signs" data-translate="reports.type.vital_signs">Vital Signs Report</option>
+                                    <option value="comprehensive" data-translate="reports.type.comprehensive">Comprehensive Report</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="reportDateFrom" data-translate="reports.from">From Date</label>
+                                <input type="date" id="reportDateFrom">
+                            </div>
+                            <div class="form-group">
+                                <label for="reportDateTo" data-translate="reports.to">To Date</label>
+                                <input type="date" id="reportDateTo">
+                            </div>
+                        </div>
+
+                        <div id="journalReportExtras" style="display:none; margin-top: 0.5rem;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>From Date &amp; Time</label>
+                                    <input type="datetime-local" id="journalSince">
+                                </div>
+                                <div class="form-group">
+                                    <label>To Date &amp; Time</label>
+                                    <input type="datetime-local" id="journalUntil">
+                                </div>
+                                <div class="form-group">
+                                    <label>Staff</label>
+                                    <select id="journalStaff">
+                                        <option value="">All Staff</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 2;">
+                                    <label>Email PDF To</label>
+                                    <input type="email" id="journalEmailTo" placeholder="name@example.com">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn btn-secondary" onclick="downloadJournalPdf()">Download PDF</button>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn btn-secondary" onclick="emailJournalPdf()">Email PDF</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary" data-translate="reports.generatePreview">Generate Preview</button>
+                            <button type="button" class="btn btn-secondary" onclick="printCurrentReport()">Print (Save as PDF)</button>
+                            <button type="button" class="btn btn-secondary" onclick="exportReportToCSV()" data-translate="reports.exportCsv">Export CSV</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="form-card" id="reportPreviewCard" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
+                        <h3 id="reportPreviewTitle">Report Preview</h3>
+                        <div id="reportPreviewMeta" style="color: #666; font-size: 0.9rem;"></div>
+                    </div>
+                    <div id="reportPreview" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="shortcutsModal" class="modal" style="display: none;">
+        <div class="form-card" style="max-width: 600px;">
+            <h2 data-translate="common.keyboardShortcuts">Keyboard Shortcuts</h2>
+            <div class="shortcuts-list">
+                <div class="shortcut-item">
+                    <kbd>/</kbd> <span>Focus search</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Esc</kbd> <span>Close modals</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl/Cmd + P</kbd> <span>Print current page</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl/Cmd + D</kbd> <span>Toggle dark mode</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>1</kbd> <span>Go to Dashboard</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>2</kbd> <span>Go to Residents</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>3</kbd> <span>Go to Medications</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>4</kbd> <span>Go to Appointments</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>?</kbd> <span>Show this help</span>
+                </div>
+            </div>
+            <div class="button-group" style="margin-top: 1.5rem;">
+                <button class="btn btn-primary" onclick="hideKeyboardShortcuts()" data-translate="common.close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // CRITICAL: These logs MUST appear - if they don't, JavaScript is disabled or blocked
+        try {
+            console.log('%c🔴🔴🔴 HTML SCRIPT BLOCK EXECUTING 🔴🔴🔴', 'background: red; color: white; font-size: 24px; font-weight: bold; padding: 20px;');
+            console.log('📄 index.html script block loaded at:', new Date().toISOString());
+            console.log('🌐 Current URL:', window.location.href);
+            console.log('📍 Hostname:', window.location.hostname);
+            console.log('🔍 User Agent:', navigator.userAgent);
+            console.log('✅ Console is working!');
+
+            // Check if script.js loads - only log actual script/resource errors
+            window.addEventListener('error', function(e) {
+                // Only log errors related to scripts or if error has meaningful properties
+                if (e.filename && e.filename.includes('.js')) {
+                    console.error('%c❌❌❌ SCRIPT LOAD ERROR ❌❌❌', 'background: red; color: white; font-size: 16px; padding: 10px;');
+                    if (e.filename) console.error('File:', e.filename);
+                    if (e.message) console.error('Message:', e.message);
+                    if (e.lineno) console.error('Line:', e.lineno);
+                    if (e.colno) console.error('Column:', e.colno);
+                    if (e.error) console.error('Error object:', e.error);
+                }
+            }, true);
+
+            // Verify script loaded after a delay
+            setTimeout(function() {
+                console.log('⏰ 2 second check - verifying script.js loaded...');
+                if (typeof showPage === 'undefined') {
+                    console.error('%c❌❌❌ script.js DID NOT LOAD ❌❌❌', 'background: red; color: white; font-size: 20px; padding: 15px;');
+                    console.error('showPage function is undefined!');
+                    console.error('Check Network tab for script.js request');
+                    alert('ERROR: script.js failed to load!\n\nCheck:\n1. Network tab for script.js\n2. Console for errors\n3. Server logs');
+                } else {
+                    console.log('%c✅✅✅ script.js LOADED SUCCESSFULLY ✅✅✅', 'background: green; color: white; font-size: 16px; padding: 10px;');
+                    console.log('showPage function exists:', typeof showPage);
+                }
+            }, 2000);
+        } catch(e) {
+            console.error('FATAL ERROR in HTML script block:', e);
+            alert('FATAL: JavaScript error in HTML: ' + e.message);
+        }
+    </script>
+    <script>
+        (function() {
+            try {
+                var s = document.createElement('script');
+                s.src = 'script.js?v=' + Date.now();
+                s.onerror = function() {
+                    console.error('%c❌❌❌ FAILED TO LOAD script.js! ❌❌❌', 'background: red; color: white; font-size: 20px; padding: 15px;');
+                    alert('ERROR: Cannot load script.js!\n\nCheck Network tab.');
+                };
+                document.body.appendChild(s);
+            } catch (e) {
+                console.error('FATAL: Could not inject script.js', e);
+                alert('FATAL: Could not inject script.js: ' + e.message);
+            }
+        })();
+    </script>
+    <script>
+        // Force show incidents page content immediately if page is active
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOMContentLoaded fired');
+            const incidentsPage = document.getElementById('incidents');
+            if (incidentsPage) {
+                console.log('✅ Incidents page element found in DOM');
+                // Check if it has active class or if incidents nav is selected
+                const incidentsNav = document.querySelector('.nav-link[data-page="incidents"]');
+                if (incidentsNav && incidentsNav.classList.contains('active')) {
+                    console.log('✅ Incidents nav is active - forcing page visibility');
+                    incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important;';
+                    incidentsPage.classList.add('active');
+                }
+            } else {
+                console.error('❌ Incidents page element NOT FOUND in DOM!');
+            }
+        });
+    </script>
+
+    <!-- Ensure financial page button is visible with normal styling -->
+    <script>
+        // Run when DOM is ready to ensure button visibility
+        (function() {
+            function ensureFinancialButtonVisible() {
+                // Remove any fixed position flashing buttons
+                const fixedButton = document.getElementById('financialFixedButton');
+                if (fixedButton) {
+                    fixedButton.remove();
+                }
+
+                // Find and ensure the regular button is visible
+                setTimeout(() => {
+                    const accountsTab = document.getElementById('financialAccounts');
+                    const formCard = document.querySelector('#financialAccounts .form-card');
+                    const regularButton = document.querySelector('#financialAccounts .form-card button');
+
+                    if (regularButton) {
+                        // Normal blue styling - ensure visibility
+                        regularButton.style.setProperty('display', 'inline-block', 'important');
+                        regularButton.style.setProperty('visibility', 'visible', 'important');
+                        regularButton.style.setProperty('opacity', '1', 'important');
+                        console.log('✅ Button visible with normal styling');
+                    }
+
+                    // Ensure form-card is visible
+                    if (formCard) {
+                        formCard.style.setProperty('display', 'block', 'important');
+                        formCard.style.setProperty('visibility', 'visible', 'important');
+                        formCard.style.setProperty('opacity', '1', 'important');
+                    }
+                }, 100);
+            }
+
+            // Run on load
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', ensureFinancialButtonVisible);
+            } else {
+                ensureFinancialButtonVisible();
+            }
+
+            // Run when navigating to financial page
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.nav-link[data-page="financial"]')) {
+                    setTimeout(ensureFinancialButtonVisible, 200);
+                }
+            });
+        })();
+    </script>
+
+    <!-- Bootstrap JS Bundle (optional, for interactive components) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "script"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-undef": "error",
+    "no-console": "off",
+    "no-unreachable": "error",
+    "no-duplicate-case": "error",
+    "no-empty": "warn",
+    "no-extra-semi": "error",
+    "no-func-assign": "error",
+    "no-invalid-regexp": "error",
+    "no-irregular-whitespace": "error",
+    "no-obj-calls": "error",
+    "no-sparse-arrays": "error",
+    "no-unexpected-multiline": "error",
+    "valid-typeof": "error",
+    "eqeqeq": ["warn", "always"],
+    "curly": ["warn", "all"]
+  },
+  "globals": {
+    "authToken": "readonly",
+    "currentLanguage": "readonly",
+    "editingResidentId": "writable",
+    "residentPhotoData": "writable",
+    "residentPhotoDataPage": "writable"
+  }
+}
+

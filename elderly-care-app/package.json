@@ -1,0 +1,25 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint script.js sync-to-google-calendar.js",
+    "lint:fix": "eslint script.js sync-to-google-calendar.js --fix",
+    "format": "prettier --write \"*.js\" \"*.html\" \"*.css\"",
+    "format:check": "prettier --check \"*.js\" \"*.html\" \"*.css\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "googleapis": "^167.0.0",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  }
+}

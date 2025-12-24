@@ -1,0 +1,3 @@
+# Additional requirements for monitoring service
+twilio>=8.0.0
+
