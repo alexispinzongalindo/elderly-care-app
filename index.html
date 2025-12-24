@@ -2290,7 +2290,22 @@
             alert('FATAL: JavaScript error in HTML: ' + e.message);
         }
     </script>
-    <script src="script.js?v=1766209161" onerror="console.error('%c❌❌❌ FAILED TO LOAD script.js! ❌❌❌', 'background: red; color: white; font-size: 20px; padding: 15px;'); alert('ERROR: Cannot load script.js!\n\nStatus: ' + (this.status || 'unknown') + '\n\nCheck Network tab.');"></script>
+    <script>
+        (function() {
+            try {
+                var s = document.createElement('script');
+                s.src = 'script.js?v=' + Date.now();
+                s.onerror = function() {
+                    console.error('%c❌❌❌ FAILED TO LOAD script.js! ❌❌❌', 'background: red; color: white; font-size: 20px; padding: 15px;');
+                    alert('ERROR: Cannot load script.js!\n\nCheck Network tab.');
+                };
+                document.body.appendChild(s);
+            } catch (e) {
+                console.error('FATAL: Could not inject script.js', e);
+                alert('FATAL: Could not inject script.js: ' + e.message);
+            }
+        })();
+    </script>
     <script>
         // Force show incidents page content immediately if page is active
         document.addEventListener('DOMContentLoaded', function() {
