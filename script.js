@@ -3678,6 +3678,16 @@ function toggleMobileMenu() {
     if (navMenu) {
         navMenu.classList.toggle('active');
         console.log('🍔 Mobile menu toggled, active:', navMenu.classList.contains('active'));
+
+        // Navbar height can change when menu expands; keep the content offset in sync.
+        try {
+            if (typeof window.updateStickyHeaderOffset === 'function') {
+                window.updateStickyHeaderOffset();
+                requestAnimationFrame(() => window.updateStickyHeaderOffset());
+            }
+        } catch (e) {
+            // ignore
+        }
     } else {
         console.error('❌ navMenu element not found!');
     }
@@ -10448,6 +10458,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.updateStickyHeaderOffset();
     window.addEventListener('resize', window.updateStickyHeaderOffset);
+
+    // Keep offset in sync when the navbar height changes (mobile menu open, wrapping rows, etc.).
+    try {
+        const navbar = document.querySelector('.navbar');
+        if (navbar && typeof ResizeObserver !== 'undefined') {
+            const ro = new ResizeObserver(() => {
+                if (typeof window.updateStickyHeaderOffset === 'function') {
+                    window.updateStickyHeaderOffset();
+                }
+            });
+            ro.observe(navbar);
+        }
+    } catch (e) {
+        // ignore
+    }
 
     // Load language from localStorage if available (but wait for login to use staff preferred_language)
     // Only set language from localStorage if user is not logged in yet
