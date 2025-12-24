@@ -6,6 +6,8 @@ A comprehensive web application for managing elderly care homes in Puerto Rico w
 
 - 🔐 **Staff Authentication** - Secure login system with role-based access
 - 👥 **Multi-Resident Management** - Manage multiple residents with detailed profiles
+- 🎓 **Training (Practice Mode)** - Built-in staff training with demo data hidden from normal views (caregivers + admins)
+- 🧾 **Practice Reports (Training Only)** - Generate/print practice Journal PDFs using training data (ALL training residents + date range)
 - 🗂️ **Documents** - Upload and store resident documents (scanner PDFs or photos), download, and soft delete (admin-only)
 - 💊 **Medication Tracking** - Track medications per resident with scheduling
 - 📅 **Appointment Management** - Schedule and track medical appointments
@@ -49,6 +51,7 @@ A comprehensive web application for managing elderly care homes in Puerto Rico w
 2. **Select Resident** - Choose a resident from the list or add a new one
 3. **Manage Data** - Add medications, appointments, and record vital signs
 4. **View Dashboard** - See daily overview and statistics
+5. **Training (Practice Mode)** - Go to **Training** to create demo residents and generate practice PDFs (training data is hidden from normal Residents/History/Reports)
 
 ## Project Structure
 
