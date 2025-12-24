@@ -2061,7 +2061,34 @@ def vital_signs():
         return jsonify(signs)
 
     elif request.method == 'POST':
-        data = request.json
+        data = request.get_json(silent=True) or {}
+
+        def _to_int(val):
+            if val is None:
+                return None
+            if isinstance(val, bool):
+                return None
+            s = str(val).strip()
+            if not s:
+                return None
+            try:
+                return int(float(s))
+            except Exception:
+                return None
+
+        def _to_float(val):
+            if val is None:
+                return None
+            if isinstance(val, bool):
+                return None
+            s = str(val).strip()
+            if not s:
+                return None
+            try:
+                return float(s)
+            except Exception:
+                return None
+
         resident_id = data.get('resident_id')
         if not resident_id:
             conn.close()
@@ -2075,11 +2102,13 @@ def vital_signs():
         if not cursor.fetchone():
             conn.close()
             return jsonify({'error': 'Resident not found'}), 400
-        systolic = data.get('systolic')
-        diastolic = data.get('diastolic')
-        glucose = data.get('glucose')
-        temperature = data.get('temperature')
-        heart_rate = data.get('heart_rate')
+
+        systolic = _to_int(data.get('systolic'))
+        diastolic = _to_int(data.get('diastolic'))
+        glucose = _to_float(data.get('glucose'))
+        temperature = _to_float(data.get('temperature'))
+        heart_rate = _to_int(data.get('heart_rate'))
+        weight = _to_float(data.get('weight'))
         staff_id = request.current_staff['id']
 
         cursor.execute('''
@@ -2091,7 +2120,7 @@ def vital_signs():
             systolic,
             diastolic,
             glucose,
-            data.get('weight'),
+            weight,
             temperature,
             heart_rate,
             data.get('notes', ''),
