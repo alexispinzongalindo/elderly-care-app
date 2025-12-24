@@ -1,3 +1,13 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Local databases / data
+*.db
+*.sqlite
+*.sqlite3
+elder_care.db
+
 # Python
 __pycache__/
 *.py[cod]
@@ -5,28 +15,12 @@ __pycache__/
 *.so
 .Python
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
-elder_care.db
-
-# Environment
+# Environments
 .env
-.venv
-env/
+.venv/
 venv/
+env/
 ENV/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
 
 # Logs
 *.log
@@ -35,4 +29,16 @@ Thumbs.db
 *.tmp
 *.temp
 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
+.git_backup_parent_repo/
+
+elderly-care-app/.git.bak-*/
+
+elderly-care-app/PatientCareTracker-2.zip
+elderly-care-app/attached_assets/Screenshot_*.png
+elderly-care-app/attached_assets/Patient_Care_Tracker_-_Requirements_Document_*.pdf
