@@ -354,18 +354,17 @@ body {
     }
 
     .nav-link > span:not(.nav-icon) {
-        display: -webkit-box;
-        line-clamp: 2;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
         max-width: 100%;
         line-height: 1.15;
-        min-height: 2.3em;
+        height: 2.3em;
+        overflow: hidden;
         word-break: break-word;
-        width: 100%;
-        text-align: center;
+        padding: 0 2px;
     }
 }
 
