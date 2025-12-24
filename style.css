@@ -341,11 +341,12 @@ body {
     .nav-link {
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         text-align: center;
         gap: 0.35rem;
         padding: 0.6rem 0.5rem;
+        width: 100%;
     }
 
     .nav-link .nav-icon {
@@ -363,6 +364,8 @@ body {
         line-height: 1.15;
         min-height: 2.3em;
         word-break: break-word;
+        width: 100%;
+        text-align: center;
     }
 }
 
