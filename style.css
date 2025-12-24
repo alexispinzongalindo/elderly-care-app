@@ -1428,13 +1428,13 @@ h3 {
 /* Item Lists */
 .item-list {
     display: grid;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 #journalPageList {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .history-subtitle {
@@ -1462,9 +1462,8 @@ h3 {
     background: var(--white);
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    border-left: 3px solid var(--primary-color);
     border: 1px solid rgba(0,0,0,0.06);
-    padding: 0.9rem 1rem;
+    padding: 0.65rem 0.85rem;
     display: grid;
     grid-template-columns: 90px 1fr;
     gap: 0.75rem;
@@ -1512,31 +1511,21 @@ h3 {
 
 .item-card {
     background: var(--white);
-    padding: 0.9rem 1rem;
+    padding: 0.65rem 0.85rem;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     border: 1px solid rgba(0,0,0,0.06);
-    border-left: 3px solid var(--primary-color);
 }
 
 .item-card.completed {
-    border-left-color: var(--success-color);
     opacity: 0.8;
-}
-
-.item-card.missed {
-    border-left-color: var(--danger-color);
-}
-
-.item-card.pending {
-    border-left-color: var(--warning-color);
 }
 
 .item-header {
     display: flex;
     justify-content: space-between;
     align-items: start;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
 }
 
 .item-title {
