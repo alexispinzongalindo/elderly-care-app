@@ -10451,8 +10451,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             navbarHeight = navbar.offsetHeight || 0;
         }
         // Safety clamp: prevent accidental huge offsets (which look like a big blank gap).
-        // Navbar can legitimately be taller than 240px on desktop (two-row nav), so allow a higher ceiling.
-        const clamped = Math.max(0, Math.min(420, Math.ceil(navbarHeight)));
+        // Navbar can legitimately be quite tall on mobile when expanded (menu + user controls),
+        // so allow a higher ceiling.
+        const clamped = Math.max(0, Math.min(900, Math.ceil(navbarHeight)));
         document.documentElement.style.setProperty('--sticky-offset', `${clamped}px`);
     };
 
@@ -10466,6 +10467,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const ro = new ResizeObserver(() => {
                 if (typeof window.updateStickyHeaderOffset === 'function') {
                     window.updateStickyHeaderOffset();
+                    // Some mobile browsers report intermediate heights during layout; re-check once settled.
+                    setTimeout(() => {
+                        try {
+                            window.updateStickyHeaderOffset();
+                        } catch (e) {
+                            // ignore
+                        }
+                    }, 80);
                 }
             });
             ro.observe(navbar);
