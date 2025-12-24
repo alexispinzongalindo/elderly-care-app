@@ -3251,6 +3251,19 @@ function initApp() {
     const mainAppEl = document.getElementById('mainApp');
     if (mainAppEl) mainAppEl.style.display = 'block';
 
+    // Navbar is position:fixed; if we calculated --sticky-offset while #mainApp was hidden,
+    // it may be 0 and pages will render under the header (especially on mobile).
+    // Recalculate after showing the app shell.
+    try {
+        if (typeof window.updateStickyHeaderOffset === 'function') {
+            window.updateStickyHeaderOffset();
+            requestAnimationFrame(() => window.updateStickyHeaderOffset());
+            setTimeout(() => window.updateStickyHeaderOffset(), 150);
+        }
+    } catch (e) {
+        // ignore
+    }
+
     // If already initialized, avoid re-registering handlers/intervals.
     if (appInitialized) {
         // Ensure the user sees an active page instead of a blank container
