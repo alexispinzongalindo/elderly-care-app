@@ -5,10 +5,48 @@ console.log('%c📡 TIP: Open Network tab (not Console) to see HTTP requests!', 
 
 const API_URL = '/api';
 
+function safeStorageGet(key) {
+    try {
+        return localStorage.getItem(key);
+    } catch (e) {
+        try {
+            return sessionStorage.getItem(key);
+        } catch (_) {
+            return null;
+        }
+    }
+}
+
+function safeStorageSet(key, value) {
+    try {
+        localStorage.setItem(key, value);
+        return;
+    } catch (e) {
+        try {
+            sessionStorage.setItem(key, value);
+        } catch (_) {
+            // ignore
+        }
+    }
+}
+
+function safeStorageRemove(key) {
+    try {
+        localStorage.removeItem(key);
+    } catch (e) {
+        // ignore
+    }
+    try {
+        sessionStorage.removeItem(key);
+    } catch (_) {
+        // ignore
+    }
+}
+
 // Authentication state
-let authToken = localStorage.getItem('authToken');
-let currentStaff = JSON.parse(localStorage.getItem('currentStaff') || 'null');
-let currentResidentId = localStorage.getItem('currentResidentId');
+let authToken = safeStorageGet('authToken');
+let currentStaff = JSON.parse(safeStorageGet('currentStaff') || 'null');
+let currentResidentId = safeStorageGet('currentResidentId');
 
 function normalizeAuthState() {
     // iOS/Safari can sometimes persist unexpected string values; treat them as logged-out.
@@ -1716,23 +1754,25 @@ async function validateAuthOnLoad() {
             if (me) {
                 currentStaff = me;
                 currentUser = me;
-                localStorage.setItem('currentStaff', JSON.stringify(currentStaff));
+                safeStorageSet('currentStaff', JSON.stringify(currentStaff));
             }
             return;
         }
 
         // Any non-OK response means we cannot trust the local session.
         // This avoids skipping the login UI when the token is expired, invalid, or the server rejects it.
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentStaff');
+        safeStorageRemove('authToken');
+        safeStorageRemove('currentStaff');
+        safeStorageRemove('currentResidentId');
         authToken = null;
         currentStaff = null;
         currentUser = null;
     } catch (error) {
         console.error('Auth validation error:', error);
         // If validation cannot be completed (network/server error), do NOT auto-enter the app.
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentStaff');
+        safeStorageRemove('authToken');
+        safeStorageRemove('currentStaff');
+        safeStorageRemove('currentResidentId');
         authToken = null;
         currentStaff = null;
         currentUser = null;
@@ -1794,11 +1834,11 @@ async function handleLogin(event) {
             authToken = data.token;
             currentStaff = data.staff;
             currentUser = data.staff; // Set for language system
-            localStorage.setItem('authToken', authToken);
-            localStorage.setItem('currentStaff', JSON.stringify(currentStaff));
+            safeStorageSet('authToken', authToken);
+            safeStorageSet('currentStaff', JSON.stringify(currentStaff));
 
             // Load user's preferred language
-            const userLanguage = currentStaff.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
+            const userLanguage = currentStaff.preferred_language || safeStorageGet('preferredLanguage') || 'en';
             setLanguage(userLanguage);
 
             document.getElementById('userName').textContent = currentStaff.full_name;
