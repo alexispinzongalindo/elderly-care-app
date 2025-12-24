@@ -6,10 +6,13 @@ A comprehensive web application for managing elderly care homes in Puerto Rico w
 
 - 🔐 **Staff Authentication** - Secure login system with role-based access
 - 👥 **Multi-Resident Management** - Manage multiple residents with detailed profiles
+- 🗂️ **Documents** - Upload and store resident documents (scanner PDFs or photos), download, and soft delete (admin-only)
 - 💊 **Medication Tracking** - Track medications per resident with scheduling
 - 📅 **Appointment Management** - Schedule and track medical appointments
 - 🩺 **Vital Signs Monitoring** - Record and track vital signs (BP, glucose, temperature, heart rate, weight)
+- 🗄️ **Archived Residents** - Soft-delete residents (archive) and restore (admin-only)
 - 📊 **Dashboard** - Overview of daily activities and statistics
+- 📘 **History / Journal** - Activity timeline with filtering and PDF export
 - 🌐 **Bilingual Support** - Spanish/English interface
 - 📱 **Responsive Design** - Works on desktop, tablet, and mobile devices
 
@@ -33,7 +36,7 @@ A comprehensive web application for managing elderly care homes in Puerto Rico w
    ```
 
 3. **Open your browser:**
-   Navigate to `http://localhost:5001`
+   Navigate to `http://localhost:5002`
 
 ## Default Login
 
@@ -120,6 +123,14 @@ For production deployment:
 3. Set up HTTPS/SSL
 4. Configure proper database backups
 5. Set environment variables for sensitive data
+
+### Render persistence (production)
+
+If you deploy on Render with SQLite, you must use a **Persistent Disk** and set:
+
+- `DB_PATH=/var/data/elder_care.db`
+
+This prevents losing residents/documents on restarts or redeploys.
 
 ## Support
 
