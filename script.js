@@ -7488,12 +7488,76 @@ async function openCareNotePreviewModal(noteId) {
         const resident = note.resident_name || '';
         const general = (note.general_notes || '').trim();
 
+        const renderRow = (label, value) => {
+            const v = (value === null || value === undefined) ? '' : String(value).trim();
+            if (!v) return '';
+            return `<div class="history-entry-details"><strong>${escapeHtml(label)}:</strong> ${escapeHtml(v)}</div>`;
+        };
+
+        const sections = [];
+
+        const meals = [
+            renderRow('Breakfast', note.meal_breakfast),
+            renderRow('Lunch', note.meal_lunch),
+            renderRow('Dinner', note.meal_dinner),
+            renderRow('Snacks', note.meal_snacks),
+            renderRow('Appetite', note.appetite_rating),
+            renderRow('Fluids', note.fluid_intake)
+        ].filter(Boolean).join('');
+        if (meals) {
+            sections.push(`<div class="form-section"><h4>Meals</h4>${meals}</div>`);
+        }
+
+        const care = [
+            renderRow('Bathing', note.bathing),
+            renderRow('Hygiene', note.hygiene),
+            renderRow('Toileting', note.toileting),
+            renderRow('Mobility', note.mobility),
+            renderRow('Skin', note.skin_condition)
+        ].filter(Boolean).join('');
+        if (care) {
+            sections.push(`<div class="form-section"><h4>Care</h4>${care}</div>`);
+        }
+
+        const pain = [
+            renderRow('Pain level', note.pain_level),
+            renderRow('Pain location', note.pain_location)
+        ].filter(Boolean).join('');
+        if (pain) {
+            sections.push(`<div class="form-section"><h4>Pain</h4>${pain}</div>`);
+        }
+
+        const sleep = [
+            renderRow('Sleep hours', note.sleep_hours),
+            renderRow('Sleep quality', note.sleep_quality)
+        ].filter(Boolean).join('');
+        if (sleep) {
+            sections.push(`<div class="form-section"><h4>Sleep</h4>${sleep}</div>`);
+        }
+
+        const mood = [
+            renderRow('Mood', note.mood),
+            renderRow('Behavior notes', note.behavior_notes),
+            renderRow('Activities', note.activities)
+        ].filter(Boolean).join('');
+        if (mood) {
+            sections.push(`<div class="form-section"><h4>Mood & Activities</h4>${mood}</div>`);
+        }
+
+        if (general) {
+            sections.push(`<div class="form-section"><h4>General Notes</h4><div style="white-space: pre-wrap;">${escapeHtml(general)}</div></div>`);
+        }
+
+        const detailsHtml = sections.length
+            ? sections.join('')
+            : '<div class="empty-state">(No notes)</div>';
+
         bodyEl.innerHTML = `
             ${resident ? `<div class="history-entry-details"><strong>Resident:</strong> ${escapeHtml(resident)}</div>` : ''}
             ${when ? `<div class="history-entry-details"><strong>Date/Time:</strong> ${escapeHtml(when)}</div>` : ''}
             ${shift ? `<div class="history-entry-details"><strong>Shift:</strong> ${escapeHtml(shift)}</div>` : ''}
             ${staff ? `<div class="history-entry-details"><strong>Staff:</strong> ${escapeHtml(staff)}</div>` : ''}
-            <div style="margin-top: 0.75rem; white-space: pre-wrap;">${escapeHtml(general || '(No notes)')}</div>
+            <div style="margin-top: 0.75rem;">${detailsHtml}</div>
         `;
     } catch (e) {
         console.error('openCareNotePreviewModal error:', e);
@@ -7511,6 +7575,19 @@ function bindHistoryCareNotePreview(container) {
         e.preventDefault();
         e.stopPropagation();
         const idRaw = btn.getAttribute('data-care-note-id');
+        if (!idRaw) return;
+        const id = parseInt(idRaw, 10);
+        if (!id) return;
+        openCareNotePreviewModal(id);
+    });
+
+    container.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const target = e.target?.closest?.('[data-care-note-id]');
+        if (!target) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const idRaw = target.getAttribute('data-care-note-id');
         if (!idRaw) return;
         const id = parseInt(idRaw, 10);
         if (!id) return;
@@ -7756,7 +7833,6 @@ async function loadJournalPage() {
                     <div class="history-entry-card">
                         <div class="history-entry-time">
                             <div>${escapeHtml(timeText)}</div>
-                            ${isCareNote && careNoteId ? `<button type="button" class="btn btn-secondary history-care-note-thumb" data-care-note-id="${escapeHtml(careNoteId)}">View</button>` : ''}
                         </div>
                         <div class="history-entry-body">
                             <div class="history-entry-main">
@@ -7764,6 +7840,12 @@ async function loadJournalPage() {
                                 ${(showAllResidents && residentName) ? `<div class="history-entry-details">Resident: ${escapeHtml(residentName)}</div>` : ''}
                                 ${details ? `<div class="history-entry-details">${escapeHtml(details)}</div>` : ''}
                             </div>
+                            ${isCareNote && careNoteId ? `
+                                <div class="history-care-note-thumb" role="button" tabindex="0" data-care-note-id="${escapeHtml(careNoteId)}">
+                                    <div class="history-care-note-thumb-title">Care Note</div>
+                                    <div class="history-care-note-thumb-body">${escapeHtml(details || 'Tap to view note')}</div>
+                                </div>
+                            ` : ''}
                             <div class="history-entry-meta">
                                 <span class="history-entry-type">${escapeHtml(typeLabel)}</span>
                                 <span class="history-entry-performer">Performed by: ${escapeHtml(staffName)}</span>
