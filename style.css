@@ -273,7 +273,7 @@ body {
     font-size: 0.85rem;
     display: flex;
     align-items: center;
-    white-space: nowrap;
+    white-space: normal;
     flex-shrink: 1;
     min-width: 0;
     max-width: 100%;
@@ -281,10 +281,14 @@ body {
 }
 
 #currentResidentName {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
     min-width: 0;
+    word-break: break-word;
 }
 
 .live-clock {
