@@ -1921,6 +1921,10 @@ h3 {
         position: relative;
         z-index: 2100;
     }
+
+    .quick-actions-nav {
+        display: none !important;
+    }
     
     .nav-menu {
         display: none;
@@ -2037,6 +2041,14 @@ h3 {
     .user-info {
         padding: 0.2rem 0.4rem;
         gap: 0.25rem;
+    }
+
+    .user-info .menu-toggle {
+        padding: 0.25rem 0.45rem;
+        border: 1px solid var(--medium-gray);
+        background: var(--white);
+        border-radius: 6px;
+        line-height: 1;
     }
     
     .user-info span {
