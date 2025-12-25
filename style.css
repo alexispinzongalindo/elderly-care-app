@@ -274,7 +274,17 @@ body {
     display: flex;
     align-items: center;
     white-space: nowrap;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#currentResidentName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
 }
 
 .live-clock {
@@ -1920,6 +1930,11 @@ h3 {
         display: block;
         position: relative;
         z-index: 2100;
+    }
+
+    .resident-badge {
+        white-space: normal;
+        line-height: 1.15;
     }
 
     .quick-actions-nav {
