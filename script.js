@@ -1542,6 +1542,11 @@ function _applyAuthSuccess(data) {
         payrollNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
     }
 
+    const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
+    if (settingsHeaderBtn) {
+        settingsHeaderBtn.style.display = currentStaff.role === 'admin' ? 'inline-flex' : 'none';
+    }
+
     hideLoginModal();
     checkAuth();
 }
