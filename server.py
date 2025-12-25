@@ -104,6 +104,7 @@ app = Flask(__name__, static_folder='.')
 CORS(app)
 
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+_FRONTEND_DIR = os.path.join(_BASE_DIR, 'elderly-care-app')
 _DB_PATH_ENV = os.getenv('DB_PATH', '').strip()
 if _DB_PATH_ENV:
     # If DB_PATH is relative, anchor it to the repo folder so working directory differences
@@ -5270,7 +5271,7 @@ def test_post():
 @app.route('/')
 def index():
     try:
-        response = send_from_directory('.', 'index.html')
+        response = send_from_directory(_FRONTEND_DIR, 'index.html')
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
@@ -5540,6 +5541,9 @@ def static_files(path):
         if path == 'index.min.html':
             path = 'index.html'
 
+        # Serve files from the frontend folder
+        requested = os.path.join(_FRONTEND_DIR, path)
+
         # In production, prefer minified versions if they exist
         # Check for .min.js, .min.css files first for faster loading
         use_minified_env = os.getenv('USE_MINIFIED')
@@ -5559,14 +5563,24 @@ def static_files(path):
             # Check if minified version exists and use it instead
             if path.endswith('.js') and not path.endswith('.min.js'):
                 min_path = path.replace('.js', '.min.js')
-                if os.path.exists(min_path):
+                if os.path.exists(os.path.join(_FRONTEND_DIR, min_path)):
                     path = min_path
             elif path.endswith('.css') and not path.endswith('.min.css'):
                 min_path = path.replace('.css', '.min.css')
-                if os.path.exists(min_path):
+                if os.path.exists(os.path.join(_FRONTEND_DIR, min_path)):
                     path = min_path
 
-        response = send_from_directory('.', path)
+        requested = os.path.join(_FRONTEND_DIR, path)
+
+        # SPA fallback: if it doesn't look like a file request and file doesn't exist, serve index.html
+        if not os.path.exists(requested) and '.' not in os.path.basename(path):
+            response = send_from_directory(_FRONTEND_DIR, 'index.html')
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response
+
+        response = send_from_directory(_FRONTEND_DIR, path)
         # Add aggressive cache control for JS and CSS files to prevent caching
         if original_path.endswith('.js') or original_path.endswith('.css') or original_path.endswith('.html'):
             response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
