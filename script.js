@@ -1099,6 +1099,17 @@ const translations = {
         'payroll.staffAll': 'All Staff',
         'payroll.run': 'Run Report',
         'payroll.exportCsv': 'Export CSV',
+
+        // History
+        'history.title': 'History / Journal',
+        'history.allResidents': 'All Residents',
+        'history.selectResident': 'Select Resident',
+        'history.resident': 'Resident',
+        'history.staff': 'Staff',
+        'history.since': 'From (date/time)',
+        'history.until': 'To (date/time)',
+        'history.yesterday': 'Yesterday',
+        'history.emailTo': 'Email PDF To',
     },
     es: {
         // Navigation

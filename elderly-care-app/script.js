@@ -965,7 +965,12 @@ const translations = {
         'history.title': 'History / Journal',
         'history.allResidents': 'All Residents',
         'history.selectResident': 'Select Resident',
+        'history.resident': 'Resident',
+        'history.staff': 'Staff',
+        'history.since': 'From (date/time)',
+        'history.until': 'To (date/time)',
         'history.yesterday': 'Yesterday',
+
 
         // Archived Residents
         'archivedResidents.title': 'Residentes Archivados',
