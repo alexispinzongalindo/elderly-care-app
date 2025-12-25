@@ -9,7 +9,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Elder Care Management - Puerto Rico</title>
+    <title data-translate="app.browserTitle">Elder Care Management - Puerto Rico</title>
 
     <!-- Favicon / App Icons -->
     <link rel="icon" type="image/png" href="attached_assets/generated_images/medical_cross_heart_logo.png">
@@ -239,7 +239,7 @@
                     <div class="nav-left">
                         <h1 class="nav-title">
                             <img src="attached_assets/generated_images/medical_cross_heart_logo.png" alt="Logo" class="nav-logo">
-                            <span class="nav-title-text">Elder Care Tracker</span>
+                            <span class="nav-title-text" data-translate="app.navTitle">Elder Care Tracker</span>
                         </h1>
                         <div class="quick-actions-nav" style="display: none;">
                             <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeToggle" data-translate-title="common.darkMode" title="Dark Mode"><i class="fas fa-moon"></i></button>
@@ -255,11 +255,11 @@
                             <button class="btn-icon-small" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">✕</button>
                         </div>
                         <div id="currentResidentInfo" class="resident-badge" style="display: none;">
-                            <strong id="currentResidentName">No resident selected</strong>
+                            <strong id="currentResidentName" data-translate="resident.noneSelected">No resident selected</strong>
                         </div>
                         <div id="trainingModeIndicator" class="training-mode-indicator" style="display: none;" role="status" aria-live="polite">
                             <span class="training-mode-light" aria-hidden="true"></span>
-                            <span class="training-mode-text">TRAINING MODE</span>
+                            <span class="training-mode-text" data-translate="training.modeIndicator">TRAINING MODE</span>
                         </div>
                     </div>
 
@@ -289,8 +289,8 @@
                         <div id="userInfo" class="user-info" style="display: none;">
                             <span id="userName"></span>
                             <span class="user-role" id="userRole" style="display: none;"></span>
-                            <button class="btn btn-sm btn-secondary" type="button" onclick="forceResidentPicker()">Change Resident</button>
-                            <button class="btn btn-sm btn-secondary" id="settingsHeaderBtn" type="button" onclick="showPage('settings')" style="display: none;"><i class="fas fa-cog"></i> Settings</button>
+                            <button class="btn btn-sm btn-secondary" type="button" onclick="forceResidentPicker()" data-translate="resident.change">Change Resident</button>
+                            <button class="btn btn-sm btn-secondary" id="settingsHeaderBtn" type="button" onclick="showPage('settings')" style="display: none;"><i class="fas fa-cog"></i> <span data-translate="nav.settings">Settings</span></button>
                             <button class="btn btn-sm btn-secondary" onclick="handleLogout()" data-translate="nav.logout" data-translate-title="nav.logout">Logout</button>
                         </div>
                         <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
@@ -324,13 +324,13 @@
                     <li class="nav-group-header"><span data-translate="nav.group.system">System</span></li>
                     <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon"><i class="fas fa-bell"></i></span><span data-translate="nav.notifications">Notifications</span></a></li>
                     <li><a href="#" class="nav-link" data-page="timeclock"><span class="nav-icon"><i class="fas fa-clock"></i></span><span data-translate="nav.timeclock">Time Clock</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="history"><span class="nav-icon"><i class="fas fa-book"></i></span><span>History</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="training" id="trainingNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-graduation-cap"></i></span><span>Training</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="documents" id="documentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-alt"></i></span><span>Documents</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="archivedResidents" id="archivedResidentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-archive"></i></span><span>Archived Residents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="history"><span class="nav-icon"><i class="fas fa-book"></i></span><span data-translate="nav.history">History</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="training" id="trainingNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-graduation-cap"></i></span><span data-translate="nav.training">Training</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="documents" id="documentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-alt"></i></span><span data-translate="nav.documents">Documents</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="archivedResidents" id="archivedResidentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-archive"></i></span><span data-translate="nav.archivedResidents">Archived Residents</span></a></li>
                     <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-user-shield"></i></span><span data-translate="nav.staff">Staff</span></a></li>
                     <li><a href="#" class="nav-link" data-page="payroll" id="payrollNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-invoice"></i></span><span data-translate="nav.payroll">Payroll</span></a></li>
-                    <li><a href="#" class="nav-link" data-page="settings" id="settingsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-cog"></i></span><span>Settings</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="settings" id="settingsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-cog"></i></span><span data-translate="nav.settings">Settings</span></a></li>
                     <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span data-translate="nav.logout">Logout</span></a></li>
                 </ul>
             </div>
@@ -681,105 +681,105 @@
 
             <!-- Archived Residents Page (Admin Only) -->
             <div id="archivedResidents" class="page">
-                <h2>Archived Residents</h2>
-                <p style="color: var(--dark-gray);">Restore previously deleted (archived) residents.</p>
+                <h2 data-translate="archivedResidents.title">Archived Residents</h2>
+                <p style="color: var(--dark-gray);" data-translate="archivedResidents.subtitle">Restore previously deleted (archived) residents.</p>
                 <div id="archivedResidentsList" class="item-list"></div>
             </div>
 
             <!-- Documents Page (Admin Only) -->
             <div id="documents" class="page">
-                <h2>Documents</h2>
+                <h2 data-translate="documents.title">Documents</h2>
                 <div class="form-card" style="margin-bottom: 1rem;">
                     <form id="documentsUploadForm" onsubmit="uploadDocument(event)">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="documentsResidentSelect">Resident</label>
+                                <label for="documentsResidentSelect" data-translate="documents.resident">Resident</label>
                                 <select id="documentsResidentSelect" class="form-control" required></select>
                             </div>
                             <div class="form-group">
-                                <label for="documentCategory">Category</label>
+                                <label for="documentCategory" data-translate="documents.category">Category</label>
                                 <select id="documentCategory" class="form-control">
-                                    <option value="">-- Select --</option>
-                                    <option value="Insurance">Insurance</option>
-                                    <option value="ID">ID</option>
-                                    <option value="POA">POA</option>
-                                    <option value="Medical">Medical</option>
-                                    <option value="Billing">Billing</option>
-                                    <option value="Other">Other</option>
+                                    <option value="" data-translate="common.select">-- Select --</option>
+                                    <option value="Insurance" data-translate="documents.category.insurance">Insurance</option>
+                                    <option value="ID" data-translate="documents.category.id">ID</option>
+                                    <option value="POA" data-translate="documents.category.poa">POA</option>
+                                    <option value="Medical" data-translate="documents.category.medical">Medical</option>
+                                    <option value="Billing" data-translate="documents.category.billing">Billing</option>
+                                    <option value="Other" data-translate="documents.category.other">Other</option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group" style="flex: 2;">
-                                <label for="documentTitle">Title</label>
-                                <input type="text" id="documentTitle" placeholder="e.g., Insurance Card, POA">
+                                <label for="documentTitle" data-translate="documents.docTitle">Title</label>
+                                <input type="text" id="documentTitle" data-translate-placeholder="documents.docTitle.placeholder" placeholder="e.g., Insurance Card, POA">
                             </div>
                             <div class="form-group" style="flex: 2;">
-                                <label for="documentFile">File (PDF or Photo)</label>
+                                <label for="documentFile" data-translate="documents.file">File (PDF or Photo)</label>
                                 <input type="file" id="documentFile" accept="application/pdf,image/*" capture="environment" required>
                             </div>
                         </div>
                         <div class="button-group" style="margin-bottom: 0;">
-                            <button type="submit" class="btn btn-success">Upload</button>
+                            <button type="submit" class="btn btn-success" data-translate="documents.upload">Upload</button>
                         </div>
                     </form>
                 </div>
                 <div class="button-group" style="margin-bottom: 1rem;">
-                    <button class="btn btn-primary" type="button" onclick="loadDocumentsList()">Refresh</button>
+                    <button class="btn btn-primary" type="button" onclick="loadDocumentsList()" data-translate="common.refresh">Refresh</button>
                 </div>
                 <div id="documentsList" class="item-list"></div>
             </div>
 
             <!-- Training Page (Practice Mode) -->
             <div id="training" class="page">
-                <h2>Training (Practice Mode)</h2>
+                <h2 data-translate="training.title">Training (Practice Mode)</h2>
 
                 <div class="form-card" style="margin-bottom: 1rem;">
-                    <h3>Create Demo Training Residents</h3>
+                    <h3 data-translate="training.demo.title">Create Demo Training Residents</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="trainingDemoCount">How many demo residents?</label>
+                            <label for="trainingDemoCount" data-translate="training.demo.count">How many demo residents?</label>
                             <input type="number" id="trainingDemoCount" value="3" min="1" max="10">
                         </div>
                         <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button class="btn btn-success" type="button" onclick="createTrainingDemoData()">Create Demo Data</button>
+                            <button class="btn btn-success" type="button" onclick="createTrainingDemoData()" data-translate="training.demo.create">Create Demo Data</button>
                         </div>
                     </div>
                     <div class="button-group" style="margin-bottom: 0;">
-                        <button class="btn btn-danger" type="button" onclick="clearTrainingDemoData()">Delete All Training Data</button>
+                        <button class="btn btn-danger" type="button" onclick="clearTrainingDemoData()" data-translate="training.demo.clear">Delete All Training Data</button>
                     </div>
-                    <p style="color: var(--dark-gray); margin: 0;">Training data is hidden from normal Residents/History/Reports.</p>
+                    <p style="color: var(--dark-gray); margin: 0;" data-translate="training.demo.hint">Training data is hidden from normal Residents/History/Reports.</p>
                 </div>
 
                 <div class="form-card" style="margin-bottom: 1rem;">
-                    <h3>Training Resident Selector</h3>
+                    <h3 data-translate="training.selector.title">Training Resident Selector</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="trainingResidentSelect">Training Resident</label>
+                            <label for="trainingResidentSelect" data-translate="training.selector.resident">Training Resident</label>
                             <select id="trainingResidentSelect" class="form-control"></select>
                         </div>
                         <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button class="btn btn-secondary" type="button" onclick="loadTrainingResidents()">Refresh</button>
+                            <button class="btn btn-secondary" type="button" onclick="loadTrainingResidents()" data-translate="common.refresh">Refresh</button>
                         </div>
                     </div>
-                    <p style="color: var(--dark-gray); margin: 0;">Staff should practice selecting a resident using the normal resident selector too.</p>
+                    <p style="color: var(--dark-gray); margin: 0;" data-translate="training.selector.hint">Staff should practice selecting a resident using the normal resident selector too.</p>
                 </div>
 
                 <div class="form-card" style="margin-bottom: 1rem;">
-                    <h3>Practice Reports (All Training Residents)</h3>
+                    <h3 data-translate="training.reports.title">Practice Reports (All Training Residents)</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="trainingReportSince">From (date/time)</label>
+                            <label for="trainingReportSince" data-translate="training.reports.from">From (date/time)</label>
                             <input type="datetime-local" id="trainingReportSince" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label for="trainingReportUntil">To (date/time)</label>
+                            <label for="trainingReportUntil" data-translate="training.reports.to">To (date/time)</label>
                             <input type="datetime-local" id="trainingReportUntil" class="form-control">
                         </div>
                     </div>
                     <div class="button-group" style="margin-bottom: 0;">
-                        <button class="btn btn-secondary" type="button" onclick="downloadTrainingJournalPdf()">Download Practice PDF</button>
-                        <button class="btn btn-secondary" type="button" onclick="printTrainingJournalPdf()">Print Practice PDF</button>
+                        <button class="btn btn-secondary" type="button" onclick="downloadTrainingJournalPdf()" data-translate="training.reports.downloadPdf">Download Practice PDF</button>
+                        <button class="btn btn-secondary" type="button" onclick="printTrainingJournalPdf()" data-translate="training.reports.printPdf">Print Practice PDF</button>
                     </div>
                 </div>
             </div>
@@ -790,7 +790,7 @@
                 <button class="btn btn-primary" onclick="showAddStaffForm()" data-translate="staff.addNew">+ Add New Staff</button>
 
                 <!-- Add/Edit Staff Form -->
-                <div id="addStaffForm" class="form-card" style="display: none; margin-top: 2rem;">
+                <div id="addStaffForm" class="form-card" style="display: none;">
                     <h3 id="staffFormTitle" data-translate="staff.add">Add New Staff Member</h3>
                     <form id="newStaffForm" onsubmit="saveStaff(event)">
                         <div class="form-row">
@@ -1187,11 +1187,11 @@
                             <h4>🩸 <span data-translate="vitals.section.bloodPressure">Blood Pressure</span></h4>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="vsSystolic">Systolic (mmHg)</label>
+                                    <label for="vsSystolic" data-translate="vitals.systolic">Systolic (mmHg)</label>
                                     <input type="number" id="vsSystolic" min="0" max="300" placeholder="120">
                                 </div>
                                 <div class="form-group">
-                                    <label for="vsDiastolic">Diastolic (mmHg)</label>
+                                    <label for="vsDiastolic" data-translate="vitals.diastolic">Diastolic (mmHg)</label>
                                     <input type="number" id="vsDiastolic" min="0" max="200" placeholder="80">
                                 </div>
                             </div>
@@ -1200,7 +1200,7 @@
                         <div class="form-section">
                             <h4>🩹 <span data-translate="vitals.section.bloodGlucose">Blood Glucose</span></h4>
                             <div class="form-group">
-                                <label for="vsGlucose">Glucose Level (mg/dL)</label>
+                                <label for="vsGlucose" data-translate="vitals.glucose">Glucose Level (mg/dL)</label>
                                 <input type="number" id="vsGlucose" min="0" max="600" step="0.1" placeholder="100">
                             </div>
                         </div>
@@ -1208,7 +1208,7 @@
                         <div class="form-section">
                             <h4>🌡️ <span data-translate="vitals.section.temperature">Temperature</span></h4>
                             <div class="form-group">
-                                <label for="vsTemperature">Temperature (°F)</label>
+                                <label for="vsTemperature" data-translate="vitals.temperature">Temperature (°F)</label>
                                 <input type="number" id="vsTemperature" min="90" max="110" step="0.1" placeholder="98.6">
                             </div>
                         </div>
@@ -1216,7 +1216,7 @@
                         <div class="form-section">
                             <h4>❤️ <span data-translate="vitals.section.heartRate">Heart Rate</span></h4>
                             <div class="form-group">
-                                <label for="vsHeartRate">Heart Rate (bpm)</label>
+                                <label for="vsHeartRate" data-translate="vitals.heartRate">Heart Rate (bpm)</label>
                                 <input type="number" id="vsHeartRate" min="30" max="200" placeholder="72">
                             </div>
                         </div>
@@ -1224,14 +1224,14 @@
                         <div class="form-section">
                             <h4>⚖️ <span data-translate="vitals.section.weight">Weight</span></h4>
                             <div class="form-group">
-                                <label for="vsWeight">Weight (lbs)</label>
+                                <label for="vsWeight" data-translate="vitals.weight">Weight (lbs)</label>
                                 <input type="number" id="vsWeight" min="0" max="1000" step="0.1" placeholder="150">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label data-translate="appointment.notes">Notes</label>
-                            <textarea id="vsNotes" rows="2" placeholder="Any observations..."></textarea>
+                            <textarea id="vsNotes" rows="2" data-translate-placeholder="vitals.notesPlaceholder" placeholder="Any observations..."></textarea>
                         </div>
 
                         <div class="button-group">
@@ -1527,7 +1527,7 @@
                         <!-- Timestamp Section -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentDate">Incident Date &amp; Time *</label>
+                                <label for="incidentDate" data-translate="incident.date">Incident Date &amp; Time *</label>
                                 <input type="datetime-local" id="incidentDate" required>
                                 <small class="form-hint">Timestamp when the incident occurred</small>
                             </div>
@@ -1536,42 +1536,42 @@
                         <!-- Staff and Residents Section -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentStaffId">Reporting Staff *</label>
+                                <label for="incidentStaffId" data-translate="incident.staff">Reporting Staff *</label>
                                 <select id="incidentStaffId" required>
-                                    <option value="">-- Select Staff --</option>
+                                    <option value="" data-translate="incident.selectStaff">-- Select Staff --</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="incidentResidents">Residents Involved *</label>
+                                <label for="incidentResidents" data-translate="incident.residents">Residents Involved *</label>
                                 <select id="incidentResidents" multiple required style="min-height: 120px;">
-                                    <option value="">-- Select Residents --</option>
+                                    <option value="" data-translate="incident.selectResidents">-- Select Residents --</option>
                                 </select>
-                                <small class="form-hint">Hold Ctrl/Cmd to select multiple</small>
+                                <small class="form-hint" data-translate="incident.multiSelectHint">Hold Ctrl/Cmd to select multiple</small>
                             </div>
                         </div>
 
                         <!-- Incident Type and Severity -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentType">Incident Type *</label>
+                                <label for="incidentType" data-translate="incident.type">Incident Type *</label>
                                 <select id="incidentType" required>
                                     <option value="">-- Select --</option>
-                                    <option value="Fall">Fall</option>
-                                    <option value="Injury">Injury</option>
-                                    <option value="Medication Error">Medication Error</option>
-                                    <option value="Behavioral">Behavioral</option>
-                                    <option value="Medical Emergency">Medical Emergency</option>
-                                    <option value="Equipment Failure">Equipment Failure</option>
-                                    <option value="Other">Other</option>
+                                    <option value="Fall" data-translate="incident.type.fall">Fall</option>
+                                    <option value="Injury" data-translate="incident.type.injury">Injury</option>
+                                    <option value="Medication Error" data-translate="incident.type.medicationError">Medication Error</option>
+                                    <option value="Behavioral" data-translate="incident.type.behavioral">Behavioral</option>
+                                    <option value="Medical Emergency" data-translate="incident.type.medicalEmergency">Medical Emergency</option>
+                                    <option value="Equipment Failure" data-translate="incident.type.equipmentFailure">Equipment Failure</option>
+                                    <option value="Other" data-translate="incident.type.other">Other</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="incidentSeverity">Severity *</label>
+                                <label for="incidentSeverity" data-translate="incident.severity">Severity *</label>
                                 <select id="incidentSeverity" required>
-                                    <option value="minor">Minor</option>
-                                    <option value="moderate">Moderate</option>
-                                    <option value="major">Major</option>
-                                    <option value="critical">Critical</option>
+                                    <option value="minor" data-translate="incident.severity.minor">Minor</option>
+                                    <option value="moderate" data-translate="incident.severity.moderate">Moderate</option>
+                                    <option value="major" data-translate="incident.severity.major">Major</option>
+                                    <option value="critical" data-translate="incident.severity.critical">Critical</option>
                                 </select>
                             </div>
                         </div>
@@ -1586,58 +1586,58 @@
 
                         <!-- Description Section -->
                         <div class="form-group">
-                            <label for="incidentDescription">Description *</label>
+                            <label for="incidentDescription" data-translate="incident.description">Description *</label>
                             <textarea id="incidentDescription" rows="6" required placeholder="Provide a detailed description of what happened, who was involved, and any immediate observations..."></textarea>
                         </div>
 
                         <!-- Photo Upload Section -->
                         <div class="form-group">
-                            <label>Incident Photos</label>
+                            <label data-translate="incident.photos">Incident Photos</label>
                             <div class="photo-upload-area" id="incidentPhotoArea">
                                 <input type="file" id="incidentPhotos" multiple accept="image/*" capture="environment" style="display: none;" onchange="handleIncidentPhotos(event)">
                                 <div class="photo-upload-placeholder" onclick="document.getElementById('incidentPhotos').click()">
                                     <div class="photo-upload-icon">📷</div>
-                                    <p><strong>Tap to Upload Photos</strong></p>
-                                    <p>Camera will open automatically</p>
-                                    <p class="photo-upload-hint">You can select multiple photos</p>
+                                    <p><strong data-translate="incident.photos.tapToUpload">Tap to Upload Photos</strong></p>
+                                    <p data-translate="common.cameraAutoOpen">Camera will open automatically</p>
+                                    <p class="photo-upload-hint" data-translate="incident.photos.multiHint">You can select multiple photos</p>
                                 </div>
                                 <div id="incidentPhotoPreview" class="photo-preview-grid"></div>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="incidentWitnesses">Witnesses</label>
-                                <input type="text" id="incidentWitnesses" placeholder="Names of witnesses">
+                                <label for="incidentWitnesses" data-translate="incident.witnesses">Witnesses</label>
+                                <input type="text" id="incidentWitnesses" data-translate-placeholder="incident.witnesses.placeholder" placeholder="Names of witnesses">
                             </div>
                             <div class="form-group">
-                                <label for="incidentActions">Actions Taken</label>
-                                <textarea id="incidentActions" rows="3" placeholder="What was done in response..."></textarea>
+                                <label for="incidentActions" data-translate="incident.actions">Actions Taken</label>
+                                <textarea id="incidentActions" rows="3" data-translate-placeholder="incident.actions.placeholder" placeholder="What was done in response..."></textarea>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
                                     <input type="checkbox" id="incidentFamilyNotified">
-                                    <span>Family Notified</span>
+                                    <span data-translate="incident.familyNotified">Family Notified</span>
                                 </label>
                             </div>
                             <div class="form-group" id="familyNotificationDateGroup" style="display: none;">
-                                <label for="familyNotificationDate">Notification Date</label>
+                                <label for="familyNotificationDate" data-translate="incident.familyNotificationDate">Notification Date</label>
                                 <input type="datetime-local" id="familyNotificationDate">
                             </div>
                         </div>
                         <div class="form-group">
                             <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
                                 <input type="checkbox" id="incidentFollowUp">
-                                <span>Follow-up Required</span>
+                                <span data-translate="incident.followUp">Follow-up Required</span>
                             </label>
                         </div>
                         <div class="form-group" id="followUpNotesGroup" style="display: none;">
-                            <label for="followUpNotes">Follow-up Notes</label>
+                            <label for="followUpNotes" data-translate="incident.followUpNotes">Follow-up Notes</label>
                             <textarea id="followUpNotes" rows="2"></textarea>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-success">Save Report</button>
+                            <button type="submit" class="btn btn-success" data-translate="incident.save">Save Report</button>
                             <button type="button" class="btn btn-secondary" onclick="hideIncidentForm()" data-translate="common.cancel">Cancel</button>
                         </div>
                     </form>
@@ -1667,142 +1667,142 @@
                                 <input type="time" id="careNoteTime">
                             </div>
                             <div class="form-group">
-                                <label for="careNoteShift">Shift</label>
+                                <label for="careNoteShift" data-translate="carenote.shift">Shift</label>
                                 <select id="careNoteShift">
-                                    <option value="">-- Select --</option>
-                                    <option value="Morning">Morning</option>
-                                    <option value="Afternoon">Afternoon</option>
-                                    <option value="Evening">Evening</option>
-                                    <option value="Night">Night</option>
+                                    <option value="" data-translate="common.select">-- Select --</option>
+                                    <option value="Morning" data-translate="carenote.shift.morning">Morning</option>
+                                    <option value="Afternoon" data-translate="carenote.shift.afternoon">Afternoon</option>
+                                    <option value="Evening" data-translate="carenote.shift.evening">Evening</option>
+                                    <option value="Night" data-translate="carenote.shift.night">Night</option>
                                 </select>
                             </div>
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Nutrition &amp; Hydration</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;" data-translate="carenote.section.nutrition">Nutrition &amp; Hydration</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="appetiteRating">Appetite</label>
+                                <label for="appetiteRating" data-translate="carenote.appetite">Appetite</label>
                                 <select id="appetiteRating">
-                                    <option value="">-- Select --</option>
-                                    <option value="Poor">Poor</option>
-                                    <option value="Fair">Fair</option>
-                                    <option value="Good">Good</option>
-                                    <option value="Excellent">Excellent</option>
+                                    <option value="" data-translate="common.select">-- Select --</option>
+                                    <option value="Poor" data-translate="carenote.appetite.poor">Poor</option>
+                                    <option value="Fair" data-translate="carenote.appetite.fair">Fair</option>
+                                    <option value="Good" data-translate="carenote.appetite.good">Good</option>
+                                    <option value="Excellent" data-translate="carenote.appetite.excellent">Excellent</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="fluidIntake">Fluid Intake</label>
-                                <input type="text" id="fluidIntake" placeholder="e.g., 6 glasses water, 2 cups juice">
+                                <label for="fluidIntake" data-translate="carenote.fluidIntake">Fluid Intake</label>
+                                <input type="text" id="fluidIntake" data-translate-placeholder="carenote.fluidIntake.placeholder" placeholder="e.g., 6 glasses water, 2 cups juice">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mealBreakfast">Breakfast</label>
-                                <textarea id="mealBreakfast" rows="2" placeholder="What was eaten, how much..."></textarea>
+                                <label for="mealBreakfast" data-translate="carenote.mealBreakfast">Breakfast</label>
+                                <textarea id="mealBreakfast" rows="2" data-translate-placeholder="carenote.meal.placeholder" placeholder="What was eaten, how much..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="mealLunch">Lunch</label>
-                                <textarea id="mealLunch" rows="2" placeholder="What was eaten, how much..."></textarea>
+                                <label for="mealLunch" data-translate="carenote.mealLunch">Lunch</label>
+                                <textarea id="mealLunch" rows="2" data-translate-placeholder="carenote.meal.placeholder" placeholder="What was eaten, how much..."></textarea>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mealDinner">Dinner</label>
-                                <textarea id="mealDinner" rows="2" placeholder="What was eaten, how much..."></textarea>
+                                <label for="mealDinner" data-translate="carenote.mealDinner">Dinner</label>
+                                <textarea id="mealDinner" rows="2" data-translate-placeholder="carenote.meal.placeholder" placeholder="What was eaten, how much..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="mealSnacks">Snacks</label>
+                                <label for="mealSnacks" data-translate="carenote.mealSnacks">Snacks</label>
                                 <textarea id="mealSnacks" rows="2" placeholder="Snacks consumed..."></textarea>
                             </div>
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Personal Care</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;" data-translate="carenote.section.personalCare">Personal Care</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="bathing">Bathing</label>
-                                <textarea id="bathing" rows="2" placeholder="Bathing details..."></textarea>
+                                <label for="bathing" data-translate="carenote.bathing">Bathing</label>
+                                <textarea id="bathing" rows="2" data-translate-placeholder="carenote.bathing.placeholder" placeholder="Bathing details..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="hygiene">Hygiene</label>
-                                <textarea id="hygiene" rows="2" placeholder="Hygiene details..."></textarea>
+                                <label for="hygiene" data-translate="carenote.hygiene">Hygiene</label>
+                                <textarea id="hygiene" rows="2" data-translate-placeholder="carenote.hygiene.placeholder" placeholder="Hygiene details..."></textarea>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="toileting">Toileting</label>
-                                <textarea id="toileting" rows="2" placeholder="Frequency, type, any issues..."></textarea>
+                                <label for="toileting" data-translate="carenote.toileting">Toileting</label>
+                                <textarea id="toileting" rows="2" data-translate-placeholder="carenote.toileting.placeholder" placeholder="Frequency, type, any issues..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="skinCondition">Skin Condition</label>
-                                <textarea id="skinCondition" rows="2" placeholder="Any redness, sores, wounds, pressure points..."></textarea>
+                                <label for="skinCondition" data-translate="carenote.skinCondition">Skin Condition</label>
+                                <textarea id="skinCondition" rows="2" data-translate-placeholder="carenote.skinCondition.placeholder" placeholder="Any redness, sores, wounds, pressure points..."></textarea>
                             </div>
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Mobility &amp; Pain</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;" data-translate="carenote.section.mobilityPain">Mobility &amp; Pain</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mobility">Mobility</label>
-                                <textarea id="mobility" rows="2" placeholder="How resident moved, assistance needed, distance..."></textarea>
+                                <label for="mobility" data-translate="carenote.mobility">Mobility</label>
+                                <textarea id="mobility" rows="2" data-translate-placeholder="carenote.mobility.placeholder" placeholder="How resident moved, assistance needed, distance..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="painLevel">Pain Level</label>
+                                <label for="painLevel" data-translate="carenote.painLevel">Pain Level</label>
                                 <select id="painLevel">
-                                    <option value="">-- Select --</option>
-                                    <option value="None">None</option>
-                                    <option value="Mild (1-3)">Mild (1-3)</option>
-                                    <option value="Moderate (4-6)">Moderate (4-6)</option>
-                                    <option value="Severe (7-10)">Severe (7-10)</option>
+                                    <option value="" data-translate="common.select">-- Select --</option>
+                                    <option value="None" data-translate="carenote.pain.none">None</option>
+                                    <option value="Mild (1-3)" data-translate="carenote.pain.mild">Mild (1-3)</option>
+                                    <option value="Moderate (4-6)" data-translate="carenote.pain.moderate">Moderate (4-6)</option>
+                                    <option value="Severe (7-10)" data-translate="carenote.pain.severe">Severe (7-10)</option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="painLocation">Pain Location</label>
-                            <input type="text" id="painLocation" placeholder="Where the pain is located...">
+                            <label for="painLocation" data-translate="carenote.painLocation">Pain Location</label>
+                            <input type="text" id="painLocation" data-translate-placeholder="carenote.painLocation.placeholder" placeholder="Where the pain is located...">
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Sleep</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;" data-translate="carenote.section.sleep">Sleep</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="sleepHours">Hours Slept</label>
-                                <input type="number" id="sleepHours" step="0.5" min="0" max="24" placeholder="e.g., 7.5">
+                                <label for="sleepHours" data-translate="carenote.sleepHours">Hours Slept</label>
+                                <input type="number" id="sleepHours" step="0.5" min="0" max="24" data-translate-placeholder="carenote.sleepHours.placeholder" placeholder="e.g., 7.5">
                             </div>
                             <div class="form-group">
-                                <label for="sleepQuality">Sleep Quality</label>
+                                <label for="sleepQuality" data-translate="carenote.sleepQuality">Sleep Quality</label>
                                 <select id="sleepQuality">
-                                    <option value="">-- Select --</option>
-                                    <option value="Excellent">Excellent</option>
-                                    <option value="Good">Good</option>
-                                    <option value="Fair">Fair</option>
-                                    <option value="Poor">Poor</option>
-                                    <option value="Restless">Restless</option>
+                                    <option value="" data-translate="common.select">-- Select --</option>
+                                    <option value="Excellent" data-translate="carenote.sleepQuality.excellent">Excellent</option>
+                                    <option value="Good" data-translate="carenote.sleepQuality.good">Good</option>
+                                    <option value="Fair" data-translate="carenote.sleepQuality.fair">Fair</option>
+                                    <option value="Poor" data-translate="carenote.sleepQuality.poor">Poor</option>
+                                    <option value="Restless" data-translate="carenote.sleepQuality.restless">Restless</option>
                                 </select>
                             </div>
                         </div>
-                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Mood &amp; Behavior</h4>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;" data-translate="carenote.section.moodBehavior">Mood &amp; Behavior</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mood">Mood</label>
+                                <label for="mood" data-translate="carenote.mood">Mood</label>
                                 <select id="mood">
-                                    <option value="">-- Select --</option>
-                                    <option value="Happy">Happy</option>
-                                    <option value="Content">Content</option>
-                                    <option value="Neutral">Neutral</option>
-                                    <option value="Sad">Sad</option>
-                                    <option value="Agitated">Agitated</option>
-                                    <option value="Confused">Confused</option>
+                                    <option value="" data-translate="common.select">-- Select --</option>
+                                    <option value="Happy" data-translate="carenote.mood.happy">Happy</option>
+                                    <option value="Content" data-translate="carenote.mood.content">Content</option>
+                                    <option value="Neutral" data-translate="carenote.mood.neutral">Neutral</option>
+                                    <option value="Sad" data-translate="carenote.mood.sad">Sad</option>
+                                    <option value="Agitated" data-translate="carenote.mood.agitated">Agitated</option>
+                                    <option value="Confused" data-translate="carenote.mood.confused">Confused</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="behaviorNotes">Behavior Notes</label>
-                                <textarea id="behaviorNotes" rows="3" placeholder="Behavior observations..."></textarea>
+                                <label for="behaviorNotes" data-translate="carenote.behaviorNotes">Behavior Notes</label>
+                                <textarea id="behaviorNotes" rows="3" data-translate-placeholder="carenote.behaviorNotes.placeholder" placeholder="Behavior observations..."></textarea>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="activities">Activities</label>
-                            <textarea id="activities" rows="2" placeholder="Activities participated in..."></textarea>
+                            <label for="activities" data-translate="carenote.activities">Activities</label>
+                            <textarea id="activities" rows="2" data-translate-placeholder="carenote.activities.placeholder" placeholder="Activities participated in..."></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="generalNotes">General Notes</label>
-                            <textarea id="generalNotes" rows="4" placeholder="Any other observations or notes..."></textarea>
+                            <label for="generalNotes" data-translate="carenote.generalNotes">General Notes</label>
+                            <textarea id="generalNotes" rows="4" data-translate-placeholder="carenote.generalNotes.placeholder" placeholder="Any other observations or notes..."></textarea>
                         </div>
                         <div class="button-group">
-                            <button type="submit" class="btn btn-success">Save Note</button>
+                            <button type="submit" class="btn btn-success" data-translate="carenote.save">Save Note</button>
                             <button type="button" class="btn btn-secondary" onclick="hideCareNoteForm()" data-translate="common.cancel">Cancel</button>
                         </div>
                     </form>
@@ -1816,150 +1816,150 @@
                 <h2 data-translate="nav.notifications">Notifications</h2>
                 <div class="button-group" style="margin-bottom: 1rem;">
                     <button class="btn btn-secondary" onclick="markAllNotificationsRead()" data-translate="common.markAllRead">Mark All Read</button>
-                    <button class="btn btn-primary" onclick="loadNotificationsPage()">Refresh</button>
+                    <button class="btn btn-primary" onclick="loadNotificationsPage()" data-translate="common.refresh">Refresh</button>
                 </div>
                 <div id="notificationsPageList" class="item-list"></div>
             </div>
 
             <!-- Settings Page -->
             <div id="settings" class="page">
-                <h2>Settings</h2>
+                <h2 data-translate="settings.title">Settings</h2>
                 <div class="form-card" style="margin-bottom: 1rem;">
-                    <h3>Enabled Areas</h3>
+                    <h3 data-translate="settings.enabledAreas">Enabled Areas</h3>
                     <div class="form-row">
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleTogglePayroll" checked> Payroll</label>
+                            <label><input type="checkbox" id="moduleTogglePayroll" checked> <span data-translate="nav.payroll">Payroll</span></label>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleFinancial" checked> Financial Management</label>
+                            <label><input type="checkbox" id="moduleToggleFinancial" checked> <span data-translate="nav.financial">Financial Management</span></label>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleStaff" checked> Staff</label>
+                            <label><input type="checkbox" id="moduleToggleStaff" checked> <span data-translate="nav.staff">Staff</span></label>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleArchivedResidents" checked> Archived Residents</label>
+                            <label><input type="checkbox" id="moduleToggleArchivedResidents" checked> <span data-translate="nav.archivedResidents">Archived Residents</span></label>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleDocuments" checked> Documents</label>
+                            <label><input type="checkbox" id="moduleToggleDocuments" checked> <span data-translate="nav.documents">Documents</span></label>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleTraining" checked> Training</label>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleResidents" checked> Residents</label>
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleMedications" checked> Medications</label>
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleAppointments" checked> Appointments</label>
+                            <label><input type="checkbox" id="moduleToggleTraining" checked> <span data-translate="nav.training">Training</span></label>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleVitalSigns" checked> Vital Signs</label>
+                            <label><input type="checkbox" id="moduleToggleResidents" checked> <span data-translate="nav.residents">Residents</span></label>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleCareNotes" checked> Care Notes</label>
+                            <label><input type="checkbox" id="moduleToggleMedications" checked> <span data-translate="nav.medications">Medications</span></label>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleIncidents" checked> Incidents</label>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleCalendar" checked> Calendar</label>
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleReports" checked> Reports</label>
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleBilling" checked> Billing</label>
+                            <label><input type="checkbox" id="moduleToggleAppointments" checked> <span data-translate="nav.appointments">Appointments</span></label>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleNotifications" checked> Notifications</label>
+                            <label><input type="checkbox" id="moduleToggleVitalSigns" checked> <span data-translate="nav.vitalSigns">Vital Signs</span></label>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleTimeClock" checked> Time Clock</label>
+                            <label><input type="checkbox" id="moduleToggleCareNotes" checked> <span data-translate="nav.careNotes">Care Notes</span></label>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label><input type="checkbox" id="moduleToggleHistory" checked> History</label>
+                            <label><input type="checkbox" id="moduleToggleIncidents" checked> <span data-translate="nav.incidents">Incidents</span></label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleCalendar" checked> <span data-translate="nav.calendar">Calendar</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleReports" checked> <span data-translate="nav.reports">Reports</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleBilling" checked> <span data-translate="nav.billing">Billing</span></label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleNotifications" checked> <span data-translate="nav.notifications">Notifications</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleTimeClock" checked> <span data-translate="nav.timeclock">Time Clock</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleHistory" checked> <span data-translate="nav.history">History</span></label>
                         </div>
                     </div>
                     <div class="button-group" style="margin-bottom: 0;">
-                        <button type="button" class="btn btn-primary" onclick="saveModuleSettings()">Save</button>
-                        <button type="button" class="btn btn-secondary" onclick="resetModuleSettings()">Reset</button>
+                        <button type="button" class="btn btn-primary" onclick="saveModuleSettings()" data-translate="common.save">Save</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetModuleSettings()" data-translate="common.reset">Reset</button>
                     </div>
                 </div>
             </div>
 
             <!-- History / Journal Page -->
             <div id="history" class="page">
-                <h2>History / Journal</h2>
+                <h2 data-translate="history.title">History / Journal</h2>
                 <div class="form-card" style="margin-bottom: 1rem;">
                     <div class="form-row">
                         <div class="form-group">
                             <label>
                                 <input type="checkbox" id="historyAllResidents" checked>
-                                All Residents
+                                <span data-translate="history.allResidents">All Residents</span>
                             </label>
                         </div>
                         <div class="form-group">
-                            <label for="historyResidentFilter">Resident</label>
+                            <label for="historyResidentFilter" data-translate="history.resident">Resident</label>
                             <select id="historyResidentFilter" class="form-control" disabled>
-                                <option value="">Select Resident</option>
+                                <option value="" data-translate="history.selectResident">Select Resident</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="historyStaffFilter">Staff</label>
+                            <label for="historyStaffFilter" data-translate="history.staff">Staff</label>
                             <select id="historyStaffFilter" class="form-control">
-                                <option value="">All Staff</option>
+                                <option value="" data-translate="payroll.staffAll">All Staff</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="historySince">From (date/time)</label>
+                            <label for="historySince" data-translate="history.since">From (date/time)</label>
                             <input type="datetime-local" id="historySince" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label for="historyUntil">To (date/time)</label>
+                            <label for="historyUntil" data-translate="history.until">To (date/time)</label>
                             <input type="datetime-local" id="historyUntil" class="form-control">
                         </div>
                     </div>
                     <div class="button-group" style="margin-bottom: 0;">
-                        <button class="btn btn-secondary" type="button" onclick="setHistoryYesterday()">Yesterday</button>
-                        <button class="btn btn-primary" type="button" onclick="loadJournalPage()">Apply / Refresh</button>
+                        <button class="btn btn-secondary" type="button" onclick="setHistoryYesterday()" data-translate="history.yesterday">Yesterday</button>
+                        <button class="btn btn-primary" type="button" onclick="loadJournalPage()" data-translate="common.applyRefresh">Apply / Refresh</button>
                     </div>
                 </div>
                 <div class="form-card" style="margin-bottom: 1rem;">
                     <div class="form-row">
                         <div class="form-group" style="flex: 2;">
-                            <label for="historyEmailTo">Email PDF To</label>
-                            <input type="email" id="historyEmailTo" class="form-control" placeholder="name@example.com">
+                            <label for="historyEmailTo" data-translate="history.emailTo">Email PDF To</label>
+                            <input type="email" id="historyEmailTo" class="form-control" data-translate-placeholder="reports.journal.emailPlaceholder" placeholder="name@example.com">
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>&nbsp;</label>
-                            <button type="button" class="btn btn-secondary" onclick="downloadHistoryJournalPdf()">Download PDF</button>
+                            <button type="button" class="btn btn-secondary" onclick="downloadHistoryJournalPdf()" data-translate="reports.journal.downloadPdf">Download PDF</button>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>&nbsp;</label>
-                            <button type="button" class="btn btn-secondary" onclick="printHistoryJournalPdf()">Print</button>
+                            <button type="button" class="btn btn-secondary" onclick="printHistoryJournalPdf()" data-translate="common.print">Print</button>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>&nbsp;</label>
-                            <button type="button" class="btn btn-secondary" onclick="emailHistoryJournalPdf()">Email PDF</button>
+                            <button type="button" class="btn btn-secondary" onclick="emailHistoryJournalPdf()" data-translate="reports.journal.emailPdf">Email PDF</button>
                         </div>
                     </div>
                 </div>
                 <div class="button-group" style="margin-bottom: 1rem;">
-                    <button class="btn btn-primary" onclick="loadJournalPage()">Refresh</button>
+                    <button class="btn btn-primary" onclick="loadJournalPage()" data-translate="common.refresh">Refresh</button>
                 </div>
                 <div id="journalPageList" class="item-list"></div>
             </div>
@@ -1968,7 +1968,7 @@
             <div id="financial" class="page">
                 <div class="page-header">
                     <h2 data-translate="nav.financial">Financial Management</h2>
-                    <p style="color: var(--dark-gray); margin-bottom: 2rem;" data-translate="financial.subtitle">Manage bank accounts, transactions, and reconciliation</p>
+                    <p style="color: var(--dark-gray);" data-translate="financial.subtitle">Manage bank accounts, transactions, and reconciliation</p>
 
                     <!-- Tabs Navigation -->
                     <div class="button-group" style="margin-bottom: 2rem; border-bottom: 2px solid var(--light-gray); padding-bottom: 1rem;">
@@ -1989,44 +1989,44 @@
                             <form id="newBankAccountForm" onsubmit="saveBankAccount(event)">
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Account Name *</label>
+                                        <label data-translate="financial.accounts.accountName">Account Name *</label>
                                         <input type="text" id="accountName" required placeholder="e.g., Main Checking">
                                     </div>
                                     <div class="form-group">
-                                        <label>Bank Name *</label>
+                                        <label data-translate="financial.accounts.bankName">Bank Name *</label>
                                         <input type="text" id="bankName" required placeholder="e.g., Banco Popular">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Account Number</label>
+                                        <label data-translate="financial.accounts.accountNumber">Account Number</label>
                                         <input type="text" id="accountNumber" placeholder="****1234">
                                     </div>
                                     <div class="form-group">
-                                        <label>Routing Number</label>
+                                        <label data-translate="financial.accounts.routingNumber">Routing Number</label>
                                         <input type="text" id="routingNumber" placeholder="000000000">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Account Type</label>
+                                        <label data-translate="financial.accounts.accountType">Account Type</label>
                                         <select id="accountType">
-                                            <option value="checking">Checking</option>
-                                            <option value="savings">Savings</option>
-                                            <option value="other">Other</option>
+                                            <option value="checking" data-translate="financial.accountType.checking">Checking</option>
+                                            <option value="savings" data-translate="financial.accountType.savings">Savings</option>
+                                            <option value="other" data-translate="financial.accountType.other">Other</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Opening Balance ($)</label>
+                                        <label data-translate="financial.accounts.openingBalance">Opening Balance ($)</label>
                                         <input type="number" id="openingBalance" step="0.01" value="0.00">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Notes</label>
+                                    <label data-translate="common.notes">Notes</label>
                                     <textarea id="accountNotes" rows="2"></textarea>
                                 </div>
                                 <div class="button-group">
-                                    <button type="submit" class="btn btn-success">Save Account</button>
+                                    <button type="submit" class="btn btn-success" data-translate="common.save">Save Account</button>
                                     <button type="button" class="btn btn-secondary" onclick="hideBankAccountForm()" data-translate="common.cancel">Cancel</button>
                                 </div>
                             </form>
@@ -2045,47 +2045,48 @@
                             <form id="newTransactionForm" onsubmit="saveTransaction(event)">
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Bank Account *</label>
+                                        <label data-translate="financial.bankAccount">Bank Account *</label>
                                         <select id="transactionBankAccount" required></select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Transaction Type *</label>
+                                        <label data-translate="financial.transactions.transactionType">Transaction Type *</label>
                                         <select id="transactionType" required>
-                                            <option value="deposit">Deposit</option>
-                                            <option value="withdrawal">Withdrawal</option>
+                                            <option value="deposit" data-translate="financial.transactionType.deposit">Deposit</option>
+                                            <option value="withdrawal" data-translate="financial.transactionType.withdrawal">Withdrawal</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Date *</label>
+                                        <label data-translate="financial.transactions.date">Date *</label>
                                         <input type="date" id="transactionDate" required>
                                     </div>
                                     <div class="form-group">
-                                        <label>Amount ($) *</label>
+                                        <label data-translate="financial.transactions.amount">Amount ($) *</label>
                                         <input type="number" id="transactionAmount" step="0.01" min="0" required>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Description *</label>
+                                    <label data-translate="financial.transactions.description">Description *</label>
                                     <input type="text" id="transactionDescription" required placeholder="e.g., Payment from Resident">
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Check Number</label>
+                                        <label data-translate="financial.transactions.checkNumber">Check Number</label>
                                         <input type="text" id="transactionCheckNumber" placeholder="Optional">
                                     </div>
                                     <div class="form-group">
-                                        <label>Payee</label>
+                                        <label data-translate="financial.transactions.payee">Payee</label>
                                         <input type="text" id="transactionPayee" placeholder="Optional">
                                     </div>
                                 </div>
                                 <div class="form-row">
-                                        <label>Category</label>
+                                    <div class="form-group">
+                                        <label data-translate="financial.transactions.category">Category</label>
                                         <input type="text" id="transactionCategory" placeholder="e.g., Payment, Expense">
                                     </div>
                                     <div class="form-group">
-                                        <label>Reconciled</label>
+                                        <label data-translate="financial.transactions.reconciled">Reconciled</label>
                                         <select id="transactionReconciled">
                                             <option value="0">No</option>
                                             <option value="1">Yes</option>
@@ -2093,11 +2094,11 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Notes</label>
+                                    <label data-translate="common.notes">Notes</label>
                                     <textarea id="transactionNotes" rows="2"></textarea>
                                 </div>
                                 <div class="button-group">
-                                    <button type="submit" class="btn btn-success">Save Transaction</button>
+                                    <button type="submit" class="btn btn-success" data-translate="common.save">Save Transaction</button>
                                     <button type="button" class="btn btn-secondary" onclick="hideTransactionForm()" data-translate="common.cancel">Cancel</button>
                                 </div>
                             </form>
@@ -2131,35 +2132,35 @@
                         <form id="reconciliationForm" onsubmit="reconcileAccount(event)">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Bank Account *</label>
+                                    <label data-translate="financial.bankAccount">Bank Account *</label>
                                     <select id="reconcileBankAccount" required onchange="loadUnreconciledTransactions()"></select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Statement Date *</label>
+                                    <label data-translate="financial.reconciliation.statementDate">Statement Date *</label>
                                     <input type="date" id="statementDate" required>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Statement Balance ($) *</label>
+                                    <label data-translate="financial.reconciliation.statementBalance">Statement Balance ($) *</label>
                                     <input type="number" id="statementBalance" step="0.01" required>
                                 </div>
                                 <div class="form-group">
-                                    <label>Current Balance</label>
+                                    <label data-translate="financial.reconciliation.currentBalance">Current Balance</label>
                                     <input type="text" id="currentAccountBalance" readonly style="background: var(--light-gray);">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Select Transactions to Reconcile</label>
+                                <label data-translate="financial.reconciliation.selectTransactions">Select Transactions to Reconcile</label>
                                 <div id="unreconciledTransactions" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--medium-gray); padding: 1rem; border-radius: 8px; background: var(--white);"></div>
                             </div>
                             <div class="form-group">
-                                <label>Notes</label>
+                                <label data-translate="common.notes">Notes</label>
                                 <textarea id="reconciliationNotes" rows="2"></textarea>
                             </div>
                             <div class="button-group">
-                                <button type="submit" class="btn btn-success">Reconcile</button>
-                                <button type="button" class="btn btn-secondary" onclick="loadReconciliationHistory()">View History</button>
+                                <button type="submit" class="btn btn-success" data-translate="financial.reconciliation.reconcile">Reconcile</button>
+                                <button type="button" class="btn btn-secondary" onclick="loadReconciliationHistory()" data-translate="common.viewHistory">View History</button>
                             </div>
                         </form>
                     </div>
@@ -2173,7 +2174,7 @@
                         <div class="form-group">
                             <label data-translate="financial.receipts.searchLabel">Search by Receipt Number or Payment ID</label>
                             <div class="form-row">
-                                <input type="text" id="receiptSearch" class="form-control" placeholder="Receipt Number or Payment ID">
+                                <input type="text" id="receiptSearch" class="form-control" data-translate-placeholder="financial.receipts.searchPlaceholder" placeholder="Receipt Number or Payment ID">
                                 <button class="btn btn-primary" onclick="searchReceipt()" data-translate="common.search">Search</button>
                             </div>
                         </div>
@@ -2188,24 +2189,24 @@
 
                 <div class="stats-grid" style="margin-bottom: 2rem;">
                     <div class="stat-card">
-                        <h3>Total Incidents</h3>
+                        <h3 data-translate="reports.stats.totalIncidents">Total Incidents</h3>
                         <p class="stat-number" id="totalIncidents">0</p>
-                        <p class="stat-label">This Month</p>
+                        <p class="stat-label" data-translate="reports.stats.thisMonth">This Month</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Care Notes</h3>
+                        <h3 data-translate="reports.stats.careNotes">Care Notes</h3>
                         <p class="stat-number" id="totalCareNotes">0</p>
-                        <p class="stat-label">This Month</p>
+                        <p class="stat-label" data-translate="reports.stats.thisMonth">This Month</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Medications Due</h3>
+                        <h3 data-translate="reports.stats.medicationsDue">Medications Due</h3>
                         <p class="stat-number" id="medicationsDue">0</p>
-                        <p class="stat-label">Today</p>
+                        <p class="stat-label" data-translate="reports.stats.today">Today</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Appointments</h3>
+                        <h3 data-translate="reports.stats.appointments">Appointments</h3>
                         <p class="stat-number" id="upcomingAppointments">0</p>
-                        <p class="stat-label">This Week</p>
+                        <p class="stat-label" data-translate="reports.stats.thisWeek">This Week</p>
                     </div>
                 </div>
 
@@ -2239,38 +2240,38 @@
                         <div id="journalReportExtras" style="display:none; margin-top: 0.5rem;">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>From Date &amp; Time</label>
+                                    <label data-translate="reports.journal.fromDateTime">From Date &amp; Time</label>
                                     <input type="datetime-local" id="journalSince">
                                 </div>
                                 <div class="form-group">
-                                    <label>To Date &amp; Time</label>
+                                    <label data-translate="reports.journal.toDateTime">To Date &amp; Time</label>
                                     <input type="datetime-local" id="journalUntil">
                                 </div>
                                 <div class="form-group">
-                                    <label>Staff</label>
+                                    <label data-translate="reports.journal.staff">Staff</label>
                                     <select id="journalStaff">
-                                        <option value="">All Staff</option>
+                                        <option value="" data-translate="payroll.staffAll">All Staff</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group" style="flex: 2;">
-                                    <label>Email PDF To</label>
-                                    <input type="email" id="journalEmailTo" placeholder="name@example.com">
+                                    <label data-translate="reports.journal.emailTo">Email PDF To</label>
+                                    <input type="email" id="journalEmailTo" data-translate-placeholder="reports.journal.emailPlaceholder" placeholder="name@example.com">
                                 </div>
                                 <div class="form-group" style="flex: 1;">
                                     <label>&nbsp;</label>
-                                    <button type="button" class="btn btn-secondary" onclick="downloadJournalPdf()">Download PDF</button>
+                                    <button type="button" class="btn btn-secondary" onclick="downloadJournalPdf()" data-translate="reports.journal.downloadPdf">Download PDF</button>
                                 </div>
                                 <div class="form-group" style="flex: 1;">
                                     <label>&nbsp;</label>
-                                    <button type="button" class="btn btn-secondary" onclick="emailJournalPdf()">Email PDF</button>
+                                    <button type="button" class="btn btn-secondary" onclick="emailJournalPdf()" data-translate="reports.journal.emailPdf">Email PDF</button>
                                 </div>
                             </div>
                         </div>
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary" data-translate="reports.generatePreview">Generate Preview</button>
-                            <button type="button" class="btn btn-secondary" onclick="printCurrentReport()">Print (Save as PDF)</button>
+                            <button type="button" class="btn btn-secondary" onclick="printCurrentReport()" data-translate="reports.printSaveAsPdf">Print (Save as PDF)</button>
                             <button type="button" class="btn btn-secondary" onclick="exportReportToCSV()" data-translate="reports.exportCsv">Export CSV</button>
                         </div>
                     </form>
@@ -2278,7 +2279,7 @@
 
                 <div class="form-card" id="reportPreviewCard" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
-                        <h3 id="reportPreviewTitle">Report Preview</h3>
+                        <h3 id="reportPreviewTitle" data-translate="reports.preview.title">Report Preview</h3>
                         <div id="reportPreviewMeta" style="color: #666; font-size: 0.9rem;"></div>
                     </div>
                     <div id="reportPreview" style="margin-top: 1rem;"></div>
@@ -2295,31 +2296,31 @@
             <h2 data-translate="common.keyboardShortcuts">Keyboard Shortcuts</h2>
             <div class="shortcuts-list">
                 <div class="shortcut-item">
-                    <kbd>/</kbd> <span>Focus search</span>
+                    <kbd>/</kbd> <span data-translate="shortcuts.focusSearch">Focus search</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>Esc</kbd> <span>Close modals</span>
+                    <kbd>Esc</kbd> <span data-translate="shortcuts.closeModals">Close modals</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>Ctrl/Cmd + P</kbd> <span>Print current page</span>
+                    <kbd>Ctrl/Cmd + P</kbd> <span data-translate="shortcuts.print">Print current page</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>Ctrl/Cmd + D</kbd> <span>Toggle dark mode</span>
+                    <kbd>Ctrl/Cmd + D</kbd> <span data-translate="shortcuts.toggleDarkMode">Toggle dark mode</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>1</kbd> <span>Go to Dashboard</span>
+                    <kbd>1</kbd> <span data-translate="shortcuts.goDashboard">Go to Dashboard</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>2</kbd> <span>Go to Residents</span>
+                    <kbd>2</kbd> <span data-translate="shortcuts.goResidents">Go to Residents</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>3</kbd> <span>Go to Medications</span>
+                    <kbd>3</kbd> <span data-translate="shortcuts.goMedications">Go to Medications</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>4</kbd> <span>Go to Appointments</span>
+                    <kbd>4</kbd> <span data-translate="shortcuts.goAppointments">Go to Appointments</span>
                 </div>
                 <div class="shortcut-item">
-                    <kbd>?</kbd> <span>Show this help</span>
+                    <kbd>?</kbd> <span data-translate="shortcuts.showHelp">Show this help</span>
                 </div>
             </div>
             <div class="button-group" style="margin-top: 1.5rem;">

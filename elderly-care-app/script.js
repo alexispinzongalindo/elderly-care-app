@@ -727,6 +727,10 @@ function formatPhoneNumber(phone) {
 // Translation dictionary
 const translations = {
     en: {
+        // App
+        'app.browserTitle': 'Elder Care Management - Puerto Rico',
+        'app.navTitle': 'Elder Care Tracker',
+
         // Navigation
         'nav.dashboard': 'Dashboard',
         'nav.residents': 'Residents',
@@ -742,6 +746,11 @@ const translations = {
         'nav.reports': 'Reports',
         'nav.staff': 'Staff',
         'nav.logout': 'Logout',
+        'nav.history': 'History',
+        'nav.training': 'Training',
+        'nav.documents': 'Documents',
+        'nav.archivedResidents': 'Archived Residents',
+        'nav.settings': 'Settings',
         'nav.group.care': 'Care Management',
         'nav.group.records': 'Records & Reports',
         'nav.group.financial': 'Financial',
@@ -805,6 +814,11 @@ const translations = {
         'common.success': 'Success',
         'common.markAllRead': 'Mark All Read',
         'common.viewAll': 'View All',
+        'common.refresh': 'Refresh',
+        'common.applyRefresh': 'Apply / Refresh',
+        'common.viewHistory': 'View History',
+        'common.notes': 'Notes',
+        'common.reset': 'Reset',
         'common.select': 'Select',
         'common.required': 'Required',
         'common.continue': 'Continue',
@@ -844,6 +858,12 @@ const translations = {
         'financial.tab.receipts': 'Payment Receipts',
         'financial.accounts.title': 'Bank Accounts',
         'financial.accounts.add': '+ Add Bank Account',
+        'financial.bankAccount': 'Bank Account *',
+        'financial.accountType.checking': 'Checking',
+        'financial.accountType.savings': 'Savings',
+        'financial.accountType.other': 'Other',
+        'financial.transactionType.deposit': 'Deposit',
+        'financial.transactionType.withdrawal': 'Withdrawal',
         'financial.transactions.title': 'Transactions',
         'financial.transactions.add': '+ Add Transaction',
         'financial.transactions.filterByAccount': 'Filter by Account',
@@ -853,8 +873,14 @@ const translations = {
         'financial.transactions.reconciledFilter.reconciledOnly': 'Reconciled Only',
         'financial.transactions.reconciledFilter.unreconciledOnly': 'Unreconciled Only',
         'financial.reconciliation.title': 'Reconcile Account',
+        'financial.reconciliation.statementDate': 'Statement Date *',
+        'financial.reconciliation.statementBalance': 'Statement Balance ($) *',
+        'financial.reconciliation.currentBalance': 'Current Balance',
+        'financial.reconciliation.selectTransactions': 'Select Transactions to Reconcile',
+        'financial.reconciliation.reconcile': 'Reconcile',
         'financial.receipts.title': 'Payment Receipts',
         'financial.receipts.searchLabel': 'Search by Receipt Number or Payment ID',
+        'financial.receipts.searchPlaceholder': 'Receipt Number or Payment ID',
 
         // Reports
         'reports.generate': 'Generate Report',
@@ -869,6 +895,120 @@ const translations = {
         'reports.to': 'To Date',
         'reports.generatePreview': 'Generate Preview',
         'reports.exportCsv': 'Export CSV',
+        'reports.printSaveAsPdf': 'Print (Save as PDF)',
+        'reports.preview.title': 'Report Preview',
+        'reports.stats.totalIncidents': 'Total Incidents',
+        'reports.stats.careNotes': 'Care Notes',
+        'reports.stats.medicationsDue': 'Medications Due',
+        'reports.stats.appointments': 'Appointments',
+        'reports.stats.thisMonth': 'This Month',
+        'reports.stats.today': 'Today',
+        'reports.stats.thisWeek': 'This Week',
+        'reports.journal.fromDateTime': 'From Date & Time',
+        'reports.journal.toDateTime': 'To Date & Time',
+        'reports.journal.staff': 'Staff',
+        'reports.journal.emailTo': 'Email PDF To',
+        'reports.journal.emailPlaceholder': 'name@example.com',
+        'reports.journal.downloadPdf': 'Download PDF',
+        'reports.journal.emailPdf': 'Email PDF',
+
+        // Incidents
+        'incident.selectStaff': '-- Select Staff --',
+        'incident.selectResidents': '-- Select Residents --',
+        'incident.multiSelectHint': 'Hold Ctrl/Cmd to select multiple',
+        'incident.photos.tapToUpload': 'Tap to Upload Photos',
+        'incident.photos.multiHint': 'You can select multiple photos',
+        'incident.witnesses.placeholder': 'Names of witnesses',
+        'incident.actions.placeholder': 'What was done in response...',
+
+        // Care Notes
+        'carenote.shift.morning': 'Morning',
+        'carenote.shift.afternoon': 'Afternoon',
+        'carenote.shift.evening': 'Evening',
+        'carenote.shift.night': 'Night',
+        'carenote.appetite.poor': 'Poor',
+        'carenote.appetite.fair': 'Fair',
+        'carenote.appetite.good': 'Good',
+        'carenote.appetite.excellent': 'Excellent',
+        'carenote.pain.none': 'None',
+        'carenote.pain.mild': 'Mild (1-3)',
+        'carenote.pain.moderate': 'Moderate (4-6)',
+        'carenote.pain.severe': 'Severe (7-10)',
+
+        'carenote.section.nutrition': 'Nutrition & Hydration',
+        'carenote.section.personalCare': 'Personal Care',
+        'carenote.section.mobilityPain': 'Mobility & Pain',
+        'carenote.section.sleep': 'Sleep',
+        'carenote.section.moodBehavior': 'Mood & Behavior',
+        'carenote.fluidIntake.placeholder': 'e.g., 6 glasses of water, 2 cups of juice',
+        'carenote.meal.placeholder': 'What was eaten, how much...',
+        'carenote.bathing.placeholder': 'Bathing details...',
+        'carenote.hygiene.placeholder': 'Hygiene details...',
+        'carenote.toileting.placeholder': 'Frequency, type, any issues...',
+        'carenote.skinCondition.placeholder': 'Any redness, sores, wounds, pressure points...',
+        'carenote.mobility.placeholder': 'How the resident moved, assistance needed, distance...',
+        'carenote.painLocation.placeholder': 'Where the pain is located...',
+        'carenote.sleepHours.placeholder': 'e.g., 7.5',
+        'carenote.behaviorNotes.placeholder': 'Behavior observations...',
+        'carenote.activities.placeholder': 'Activities participated in...',
+        'carenote.generalNotes.placeholder': 'Any other observations or notes...',
+
+        // History
+        'history.title': 'History / Journal',
+        'history.allResidents': 'All Residents',
+        'history.selectResident': 'Select Resident',
+        'history.yesterday': 'Yesterday',
+
+        // Archived Residents
+        'archivedResidents.title': 'Residentes Archivados',
+        'archivedResidents.subtitle': 'Restaure residentes previamente eliminados (archivados).',
+
+        // Settings
+        'settings.title': 'Configuración',
+        'settings.enabledAreas': 'Áreas habilitadas',
+
+        // Documents
+        'documents.title': 'Documents',
+        'documents.resident': 'Resident',
+        'documents.category': 'Category',
+        'documents.category.insurance': 'Insurance',
+        'documents.category.id': 'ID',
+        'documents.category.poa': 'POA',
+        'documents.category.medical': 'Medical',
+        'documents.category.billing': 'Billing',
+        'documents.category.other': 'Other',
+        'documents.docTitle': 'Title',
+        'documents.docTitle.placeholder': 'e.g., Insurance Card, POA',
+        'documents.file': 'File (PDF or Photo)',
+        'documents.upload': 'Upload',
+
+        // Training
+        'training.title': 'Training (Practice Mode)',
+        'training.modeIndicator': 'TRAINING MODE',
+        'training.demo.title': 'Create Demo Training Residents',
+        'training.demo.count': 'How many demo residents?',
+        'training.demo.create': 'Create Demo Data',
+        'training.demo.clear': 'Delete All Training Data',
+        'training.demo.hint': 'Training data is hidden from normal Residents/History/Reports.',
+        'training.selector.title': 'Training Resident Selector',
+        'training.selector.resident': 'Training Resident',
+        'training.selector.hint': 'Staff should practice selecting a resident using the normal resident selector too.',
+        'training.reports.title': 'Practice Reports (All Training Residents)',
+        'training.reports.from': 'From (date/time)',
+        'training.reports.to': 'To (date/time)',
+        'training.reports.downloadPdf': 'Download Practice PDF',
+        'training.reports.printPdf': 'Print Practice PDF',
+
+        // Keyboard Shortcuts
+        'shortcuts.focusSearch': 'Focus search',
+        'shortcuts.closeModals': 'Close modals',
+        'shortcuts.print': 'Print current page',
+        'shortcuts.toggleDarkMode': 'Toggle dark mode',
+        'shortcuts.goDashboard': 'Go to Dashboard',
+        'shortcuts.goResidents': 'Go to Residents',
+        'shortcuts.goMedications': 'Go to Medications',
+        'shortcuts.goAppointments': 'Go to Appointments',
+        'shortcuts.showHelp': 'Show this help',
 
         // Login
         'login.title': 'Elder Care Management',
@@ -885,6 +1025,8 @@ const translations = {
         'resident.choose': 'Choose Resident',
         'resident.selectOption': 'Select a resident',
         'resident.addNew': 'Add New Resident',
+        'resident.noneSelected': 'No resident selected',
+        'resident.change': 'Change Resident',
 
         // Resident Form
         'resident.title': 'Residents Management',
@@ -1017,6 +1159,11 @@ const translations = {
         'vitals.notes': 'Notes',
         'vitals.save': 'Save Vital Signs',
 
+        'vitals.systolic': 'Systolic (mmHg)',
+        'vitals.diastolic': 'Diastolic (mmHg)',
+        'vitals.glucose': 'Glucose Level (mg/dL)',
+        'vitals.notesPlaceholder': 'Any observations...',
+
         'vitals.section.bloodPressure': 'Blood Pressure',
         'vitals.section.bloodGlucose': 'Blood Glucose',
         'vitals.section.temperature': 'Temperature',
@@ -1093,6 +1240,10 @@ const translations = {
         'payroll.exportCsv': 'Export CSV',
     },
     es: {
+        // App
+        'app.browserTitle': 'Gestión de Cuidado de Adultos Mayores - Puerto Rico',
+        'app.navTitle': 'Registro de Cuidado',
+
         // Navigation
         'nav.dashboard': 'Panel de Control',
         'nav.residents': 'Residentes',
@@ -1108,6 +1259,11 @@ const translations = {
         'nav.reports': 'Reportes',
         'nav.staff': 'Personal',
         'nav.logout': 'Cerrar Sesión',
+        'nav.history': 'Historial',
+        'nav.training': 'Entrenamiento',
+        'nav.documents': 'Documentos',
+        'nav.archivedResidents': 'Residentes Archivados',
+        'nav.settings': 'Configuración',
         'nav.group.care': 'Gestión de Cuidado',
         'nav.group.records': 'Registros y Reportes',
         'nav.group.financial': 'Financiero',
@@ -1172,6 +1328,11 @@ const translations = {
         'common.success': 'Éxito',
         'common.markAllRead': 'Marcar Todas',
         'common.viewAll': 'Ver Todas',
+        'common.refresh': 'Actualizar',
+        'common.applyRefresh': 'Aplicar / Actualizar',
+        'common.viewHistory': 'Ver Historial',
+        'common.notes': 'Notas',
+        'common.reset': 'Restablecer',
         'common.select': 'Seleccionar',
         'common.required': 'Requerido',
         'common.continue': 'Continuar',
@@ -1216,6 +1377,11 @@ const translations = {
         'financial.tab.receipts': 'Recibos de Pago',
         'financial.accounts.title': 'Cuentas Bancarias',
         'financial.accounts.add': '+ Agregar Cuenta Bancaria',
+        'financial.accountType.checking': 'Cheque',
+        'financial.accountType.savings': 'Ahorros',
+        'financial.accountType.other': 'Otra',
+        'financial.transactionType.deposit': 'Depósito',
+        'financial.transactionType.withdrawal': 'Retiro',
         'financial.transactions.title': 'Transacciones',
         'financial.transactions.add': '+ Agregar Transacción',
         'financial.transactions.filterByAccount': 'Filtrar por Cuenta',
@@ -1241,6 +1407,47 @@ const translations = {
         'reports.to': 'Hasta',
         'reports.generatePreview': 'Generar Vista Previa',
         'reports.exportCsv': 'Exportar CSV',
+
+        // Incidents
+        'incident.selectStaff': '-- Seleccionar Personal --',
+        'incident.selectResidents': '-- Seleccionar Residentes --',
+        'incident.multiSelectHint': 'Mantenga Ctrl/Cmd para seleccionar varios',
+        'incident.photos.tapToUpload': 'Toque para subir fotos',
+        'incident.photos.multiHint': 'Puede seleccionar varias fotos',
+        'incident.witnesses.placeholder': 'Nombres de los testigos',
+        'incident.actions.placeholder': 'Describa lo que se hizo en respuesta...',
+
+        // Care Notes
+        'carenote.shift.morning': 'Mañana',
+        'carenote.shift.afternoon': 'Tarde',
+        'carenote.shift.evening': 'Noche',
+        'carenote.shift.night': 'Madrugada',
+        'carenote.appetite.poor': 'Pobre',
+        'carenote.appetite.fair': 'Regular',
+        'carenote.appetite.good': 'Buena',
+        'carenote.appetite.excellent': 'Excelente',
+        'carenote.pain.none': 'Ninguno',
+        'carenote.pain.mild': 'Leve (1-3)',
+        'carenote.pain.moderate': 'Moderado (4-6)',
+        'carenote.pain.severe': 'Severo (7-10)',
+
+        'carenote.section.nutrition': 'Nutrición e hidratación',
+        'carenote.section.personalCare': 'Cuidado personal',
+        'carenote.section.mobilityPain': 'Movilidad y dolor',
+        'carenote.section.sleep': 'Sueño',
+        'carenote.section.moodBehavior': 'Estado de ánimo y conducta',
+        'carenote.fluidIntake.placeholder': 'ej., 6 vasos de agua, 2 tazas de jugo',
+        'carenote.meal.placeholder': 'Qué comió y cuánto...',
+        'carenote.bathing.placeholder': 'Detalles del baño...',
+        'carenote.hygiene.placeholder': 'Detalles de higiene...',
+        'carenote.toileting.placeholder': 'Frecuencia, tipo, cualquier problema...',
+        'carenote.skinCondition.placeholder': 'Enrojecimiento, llagas, heridas, puntos de presión...',
+        'carenote.mobility.placeholder': 'Cómo se movió el residente, asistencia necesaria, distancia...',
+        'carenote.painLocation.placeholder': 'Dónde está localizado el dolor...',
+        'carenote.sleepHours.placeholder': 'ej., 7.5',
+        'carenote.behaviorNotes.placeholder': 'Observaciones sobre la conducta...',
+        'carenote.activities.placeholder': 'Actividades en las que participó...',
+        'carenote.generalNotes.placeholder': 'Cualquier otra observación o nota...',
 
         'activity.vitalRecorded': 'Signos vitales registrados',
         'activity.careNoteAdded': 'Nota de cuidado agregada',
@@ -1394,6 +1601,11 @@ const translations = {
         'vitals.weight': 'Peso',
         'vitals.notes': 'Notas',
         'vitals.save': 'Guardar Signos Vitales',
+
+        'vitals.systolic': 'Sistólica (mmHg)',
+        'vitals.diastolic': 'Diastólica (mmHg)',
+        'vitals.glucose': 'Nivel de Glucosa (mg/dL)',
+        'vitals.notesPlaceholder': 'Observaciones...',
 
         'vitals.section.bloodPressure': 'Presión Arterial',
         'vitals.section.bloodGlucose': 'Glucosa en Sangre',
@@ -1663,6 +1875,16 @@ function applyModuleSettings() {
         history: '.nav-link[data-page="history"]'
     };
 
+    const setNavVisibility = (el, visible) => {
+        if (!el) return;
+        const li = el.closest ? el.closest('li') : null;
+        if (li) {
+            li.style.display = visible ? '' : 'none';
+            return;
+        }
+        el.style.display = visible ? '' : 'none';
+    };
+
     Object.keys(navMap).forEach((key) => {
         if (navMap[key]) {
             const el = document.getElementById(navMap[key]);
@@ -1670,7 +1892,7 @@ function applyModuleSettings() {
 
             const roleAllows = !currentStaff || currentStaff.role === 'admin';
             const enabled = !!settings[key];
-            el.style.display = roleAllows && enabled ? 'block' : 'none';
+            setNavVisibility(el, roleAllows && enabled);
             return;
         }
 
@@ -1679,12 +1901,12 @@ function applyModuleSettings() {
         const el = document.querySelector(selector);
         if (!el) return;
         const enabled = !!settings[key];
-        el.style.display = enabled ? 'block' : 'none';
+        setNavVisibility(el, enabled);
     });
 
     const settingsNavLink = document.getElementById('settingsNavLink');
     if (settingsNavLink) {
-        settingsNavLink.style.display = currentStaff && currentStaff.role === 'admin' ? 'block' : 'none';
+        setNavVisibility(settingsNavLink, !!(currentStaff && currentStaff.role === 'admin'));
     }
 
     const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
@@ -1708,6 +1930,16 @@ function applyModuleSettings() {
 
             btn.style.display = isPageEnabled(mod) ? '' : 'none';
         });
+    } catch (e) {
+        // ignore
+    }
+
+    // Navbar height can change when items are hidden/shown
+    try {
+        if (typeof window.updateStickyHeaderOffset === 'function') {
+            window.updateStickyHeaderOffset();
+            window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
+        }
     } catch (e) {
         // ignore
     }
