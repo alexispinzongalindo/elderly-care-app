@@ -400,7 +400,7 @@ body {
 
 @media (min-width: 769px) {
     .nav-menu li {
-        width: 108px;
+        width: 120px;
     }
 
     .nav-link {
@@ -425,10 +425,13 @@ body {
         text-align: center;
         width: 100%;
         max-width: 100%;
+        font-size: 0.8rem;
         line-height: 1.15;
         height: 2.3em;
         overflow: hidden;
-        word-break: break-word;
+        overflow-wrap: break-word;
+        word-break: normal;
+        hyphens: auto;
         padding: 0 2px;
     }
 }
