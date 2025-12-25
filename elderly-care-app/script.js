@@ -615,6 +615,14 @@ let currentResidentId = safeStorageGet('currentResidentId');
 let isTrainingMode = false;
 let currentResidentIsTraining = false;
 
+function isAdminStaff(staff) {
+    if (!staff) return false;
+    const raw = staff.role;
+    if (!raw) return false;
+    const role = String(raw).trim().toLowerCase();
+    return role === 'admin' || role === 'administrator';
+}
+
 function normalizeAuthState() {
     // iOS/Safari can sometimes persist unexpected string values; treat them as logged-out.
     const badStrings = new Set(['undefined', 'null', 'NaN', '[object Object]']);
@@ -1732,13 +1740,13 @@ function _applyAuthSuccess(data) {
     document.getElementById('userName').textContent = currentStaff.full_name;
     const userRoleEl = document.getElementById('userRole');
     if (userRoleEl) {
-        userRoleEl.textContent = currentStaff.role === 'admin' ? 'Administrator' : 'Caregiver';
+        userRoleEl.textContent = isAdminStaff(currentStaff) ? 'Administrator' : 'Caregiver';
         userRoleEl.style.display = 'inline-block';
     }
     document.getElementById('userInfo').style.display = 'flex';
 
     const staffNavLink = document.getElementById('staffNavLink');
-    if (staffNavLink && currentStaff.role === 'admin') {
+    if (staffNavLink && isAdminStaff(currentStaff)) {
         staffNavLink.style.display = 'block';
     } else if (staffNavLink) {
         staffNavLink.style.display = 'none';
@@ -1746,22 +1754,22 @@ function _applyAuthSuccess(data) {
 
     const financialNavLink = document.getElementById('financialNavLink');
     if (financialNavLink) {
-        financialNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
+        financialNavLink.style.display = isAdminStaff(currentStaff) ? 'block' : 'none';
     }
 
     const payrollNavLink = document.getElementById('payrollNavLink');
     if (payrollNavLink) {
-        payrollNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
+        payrollNavLink.style.display = isAdminStaff(currentStaff) ? 'block' : 'none';
     }
 
     const settingsNavLink = document.getElementById('settingsNavLink');
     if (settingsNavLink) {
-        settingsNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
+        settingsNavLink.style.display = isAdminStaff(currentStaff) ? 'block' : 'none';
     }
 
     const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
     if (settingsHeaderBtn) {
-        settingsHeaderBtn.style.display = currentStaff.role === 'admin' ? 'inline-flex' : 'none';
+        settingsHeaderBtn.style.display = isAdminStaff(currentStaff) ? 'inline-flex' : 'none';
     }
 
     hideLoginModal();
@@ -1890,7 +1898,7 @@ function applyModuleSettings() {
             const el = document.getElementById(navMap[key]);
             if (!el) return;
 
-            const roleAllows = !currentStaff || currentStaff.role === 'admin';
+            const roleAllows = !currentStaff || isAdminStaff(currentStaff);
             const enabled = !!settings[key];
             setNavVisibility(el, roleAllows && enabled);
             return;
@@ -1906,12 +1914,12 @@ function applyModuleSettings() {
 
     const settingsNavLink = document.getElementById('settingsNavLink');
     if (settingsNavLink) {
-        setNavVisibility(settingsNavLink, !!(currentStaff && currentStaff.role === 'admin'));
+        setNavVisibility(settingsNavLink, !!(currentStaff && isAdminStaff(currentStaff)));
     }
 
     const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
     if (settingsHeaderBtn) {
-        settingsHeaderBtn.style.display = currentStaff && currentStaff.role === 'admin' ? 'inline-flex' : 'none';
+        settingsHeaderBtn.style.display = currentStaff && isAdminStaff(currentStaff) ? 'inline-flex' : 'none';
     }
 
     // Dashboard quick actions (grid will reflow automatically when items are display:none)
@@ -1923,7 +1931,7 @@ function applyModuleSettings() {
 
             // Respect admin-only items
             if (mod === 'staff') {
-                const adminAllowed = currentStaff && currentStaff.role === 'admin';
+                const adminAllowed = currentStaff && isAdminStaff(currentStaff);
                 btn.style.display = adminAllowed && !!settings.staff ? '' : 'none';
                 return;
             }

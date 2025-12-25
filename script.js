@@ -615,6 +615,14 @@ let currentResidentId = safeStorageGet('currentResidentId');
 let isTrainingMode = false;
 let currentResidentIsTraining = false;
 
+function isAdminStaff(staff) {
+    if (!staff) return false;
+    const raw = staff.role;
+    if (!raw) return false;
+    const role = String(raw).trim().toLowerCase();
+    return role === 'admin' || role === 'administrator';
+}
+
 function normalizeAuthState() {
     // iOS/Safari can sometimes persist unexpected string values; treat them as logged-out.
     const badStrings = new Set(['undefined', 'null', 'NaN', '[object Object]']);
@@ -1520,13 +1528,13 @@ function _applyAuthSuccess(data) {
     document.getElementById('userName').textContent = currentStaff.full_name;
     const userRoleEl = document.getElementById('userRole');
     if (userRoleEl) {
-        userRoleEl.textContent = currentStaff.role === 'admin' ? 'Administrator' : 'Caregiver';
+        userRoleEl.textContent = isAdminStaff(currentStaff) ? 'Administrator' : 'Caregiver';
         userRoleEl.style.display = 'inline-block';
     }
     document.getElementById('userInfo').style.display = 'flex';
 
     const staffNavLink = document.getElementById('staffNavLink');
-    if (staffNavLink && currentStaff.role === 'admin') {
+    if (staffNavLink && isAdminStaff(currentStaff)) {
         staffNavLink.style.display = 'block';
     } else if (staffNavLink) {
         staffNavLink.style.display = 'none';
@@ -1534,17 +1542,17 @@ function _applyAuthSuccess(data) {
 
     const financialNavLink = document.getElementById('financialNavLink');
     if (financialNavLink) {
-        financialNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
+        financialNavLink.style.display = isAdminStaff(currentStaff) ? 'block' : 'none';
     }
 
     const payrollNavLink = document.getElementById('payrollNavLink');
     if (payrollNavLink) {
-        payrollNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
+        payrollNavLink.style.display = isAdminStaff(currentStaff) ? 'block' : 'none';
     }
 
     const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
     if (settingsHeaderBtn) {
-        settingsHeaderBtn.style.display = currentStaff.role === 'admin' ? 'inline-flex' : 'none';
+        settingsHeaderBtn.style.display = isAdminStaff(currentStaff) ? 'inline-flex' : 'none';
     }
 
     hideLoginModal();
@@ -2270,7 +2278,7 @@ function checkAuth() {
         }
         const documentsNavLink = document.getElementById('documentsNavLink');
         if (documentsNavLink) {
-            if (currentStaff.role === 'admin') {
+            if (isAdminStaff(currentStaff)) {
                 documentsNavLink.style.display = 'block';
             } else {
                 documentsNavLink.style.display = 'none';
@@ -2278,7 +2286,7 @@ function checkAuth() {
         }
         const archivedResidentsNavLink = document.getElementById('archivedResidentsNavLink');
         if (archivedResidentsNavLink) {
-            if (currentStaff.role === 'admin') {
+            if (isAdminStaff(currentStaff)) {
                 archivedResidentsNavLink.style.display = 'block';
             } else {
                 archivedResidentsNavLink.style.display = 'none';
@@ -2286,7 +2294,7 @@ function checkAuth() {
         }
         // Show Staff nav link if user is admin
         const staffNavLink = document.getElementById('staffNavLink');
-        if (staffNavLink && currentStaff.role === 'admin') {
+        if (staffNavLink && isAdminStaff(currentStaff)) {
             staffNavLink.style.display = 'block';
         } else if (staffNavLink) {
             staffNavLink.style.display = 'none';
@@ -2295,7 +2303,7 @@ function checkAuth() {
         // Show Financial Management nav link if user is admin
         const financialNavLink = document.getElementById('financialNavLink');
         if (financialNavLink) {
-            if (currentStaff.role === 'admin') {
+            if (isAdminStaff(currentStaff)) {
                 financialNavLink.style.display = 'block';
                 console.log('✅ Financial Management link shown for admin user (checkAuth)');
             } else {
@@ -2458,14 +2466,14 @@ async function handleLogin(event) {
             document.getElementById('userName').textContent = currentStaff.full_name;
             const userRoleEl = document.getElementById('userRole');
             if (userRoleEl) {
-                userRoleEl.textContent = currentStaff.role === 'admin' ? 'Administrator' : 'Caregiver';
+                userRoleEl.textContent = isAdminStaff(currentStaff) ? 'Administrator' : 'Caregiver';
                 userRoleEl.style.display = 'inline-block';
             }
             document.getElementById('userInfo').style.display = 'flex';
 
             // Show Staff nav link if user is admin
             const staffNavLink = document.getElementById('staffNavLink');
-            if (staffNavLink && currentStaff.role === 'admin') {
+            if (staffNavLink && isAdminStaff(currentStaff)) {
                 staffNavLink.style.display = 'block';
             } else if (staffNavLink) {
                 staffNavLink.style.display = 'none';
@@ -2474,7 +2482,7 @@ async function handleLogin(event) {
             // Show Financial Management nav link if user is admin
             const financialNavLink = document.getElementById('financialNavLink');
             if (financialNavLink) {
-                if (currentStaff.role === 'admin') {
+                if (isAdminStaff(currentStaff)) {
                     financialNavLink.style.display = 'block';
                     console.log('✅ Financial Management link shown for admin user');
                 } else {
