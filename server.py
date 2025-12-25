@@ -5544,6 +5544,13 @@ def static_files(path):
             use_minified = use_minified_env.lower() == 'true'
         original_path = path
         if use_minified:
+            # IMPORTANT: Do not silently swap the main app entry assets.
+            # Our minified bundles may lag behind feature changes (e.g., Settings),
+            # and swapping them can make features "disappear" in production.
+            # If the client wants minified assets, it should request *.min.* explicitly.
+            if original_path in ('script.js', 'style.css'):
+                use_minified = False
+
             # Check if minified version exists and use it instead
             if path.endswith('.js') and not path.endswith('.min.js'):
                 min_path = path.replace('.js', '.min.js')
