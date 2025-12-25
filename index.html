@@ -1960,7 +1960,7 @@
                 <div id="financialTransactions" class="financial-tab" style="display: none;">
                     <div class="form-card">
                         <h3 data-translate="financial.transactions.title">Transactions</h3>
-                        <button class="btn btn-primary" onclick="showTransactionForm()" data-translate="financial.transactions.add">+ Add Transaction</button>
+                        <button id="addTransactionBtn" class="btn btn-primary" onclick="showTransactionForm()" data-translate="financial.transactions.add">+ Add Transaction</button>
 
                         <div id="transactionForm" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-gray);">
                             <form id="newTransactionForm" onsubmit="saveTransaction(event)">

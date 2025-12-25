@@ -638,6 +638,22 @@ function normalizeAuthState() {
     }
 }
 
+function hasSelectedResident() {
+    if (!currentResidentId) return false;
+    const s = String(currentResidentId).trim();
+    if (!s) return false;
+    const bad = new Set(['undefined', 'null', 'nan', '[object object]', '0']);
+    return !bad.has(s.toLowerCase());
+}
+
+function updateFinancialTransactionControls() {
+    const btn = document.getElementById('addTransactionBtn');
+    if (!btn) return;
+    const enabled = hasSelectedResident();
+    btn.disabled = !enabled;
+    btn.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+}
+
 function setTrainingModeIndicator(on) {
     isTrainingMode = !!on;
     const el = document.getElementById('trainingModeIndicator');
@@ -2821,6 +2837,7 @@ function forceResidentPicker() {
     // Allow the user to re-pick a resident at any time (mobile-friendly).
     currentResidentId = null;
     localStorage.removeItem('currentResidentId');
+    updateFinancialTransactionControls();
     showResidentSelector();
 }
 
@@ -3069,6 +3086,7 @@ function selectResident() {
         console.warn('selectResident called while unauthenticated; redirecting to login');
         localStorage.removeItem('currentResidentId');
         currentResidentId = null;
+        updateFinancialTransactionControls();
         showLoginModal();
         showMessage('Please log in to continue / Por favor inicie sesión para continuar', 'error');
         return;
@@ -3084,6 +3102,7 @@ function selectResident() {
 
     currentResidentId = residentId;
     localStorage.setItem('currentResidentId', residentId);
+    updateFinancialTransactionControls();
 
     loadCurrentResidentInfo(residentId);
 
@@ -3129,6 +3148,8 @@ async function loadCurrentResidentInfo(residentId) {
         } else if (photoElement) {
             photoElement.style.display = 'none';
         }
+
+        updateFinancialTransactionControls();
     } catch (error) {
         console.error('Error loading resident info:', error);
     }
@@ -3746,6 +3767,8 @@ function initApp() {
     // Always re-show the app shell after login. Login flow hides #mainApp.
     const mainAppEl = document.getElementById('mainApp');
     if (mainAppEl) mainAppEl.style.display = 'block';
+
+    updateFinancialTransactionControls();
 
     // Navbar is position:fixed; if we calculated --sticky-offset while #mainApp was hidden,
     // it may be 0 and pages will render under the header (especially on mobile).
@@ -11652,7 +11675,7 @@ async function loadBankAccountsForSelect(selectId) {
 }
 
 function showTransactionForm() {
-    if (!currentResidentId) {
+    if (!hasSelectedResident()) {
         showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
         return;
     }
@@ -11733,7 +11756,7 @@ async function saveTransaction(event) {
     try {
         if (!checkFinancialAuth()) return;
 
-        if (!currentResidentId) {
+        if (!hasSelectedResident()) {
             showMessage('Please select a resident first / Por favor seleccione un residente primero', 'error');
             return;
         }
