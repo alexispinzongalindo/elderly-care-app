@@ -5535,6 +5535,11 @@ def static_files(path):
         if path.startswith('api/'):
             return jsonify({'error': 'Not found'}), 404
 
+        # IMPORTANT: Always serve the canonical app shell.
+        # index.min.html may lag behind features and can make UI items disappear (e.g., Settings).
+        if path == 'index.min.html':
+            path = 'index.html'
+
         # In production, prefer minified versions if they exist
         # Check for .min.js, .min.css files first for faster loading
         use_minified_env = os.getenv('USE_MINIFIED')
