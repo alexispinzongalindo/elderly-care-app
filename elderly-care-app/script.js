@@ -1558,6 +1558,18 @@ function _applyAuthSuccess(data) {
 
 function getDefaultModuleSettings() {
     return {
+        residents: true,
+        medications: true,
+        appointments: true,
+        vitalsigns: true,
+        carenotes: true,
+        incidents: true,
+        calendar: true,
+        reports: true,
+        billing: true,
+        notifications: true,
+        timeclock: true,
+        history: true,
         payroll: true,
         financial: true,
         staff: true,
@@ -1589,6 +1601,18 @@ function setModuleSettings(settings) {
 function isPageEnabled(pageName) {
     const settings = getModuleSettings();
     const pageToKey = {
+        residents: 'residents',
+        medications: 'medications',
+        appointments: 'appointments',
+        vitalsigns: 'vitalsigns',
+        carenotes: 'carenotes',
+        incidents: 'incidents',
+        calendar: 'calendar',
+        reports: 'reports',
+        billing: 'billing',
+        notifications: 'notifications',
+        timeclock: 'timeclock',
+        history: 'history',
         payroll: 'payroll',
         financial: 'financial',
         staff: 'staff',
@@ -1604,6 +1628,18 @@ function isPageEnabled(pageName) {
 function applyModuleSettings() {
     const settings = getModuleSettings();
     const navMap = {
+        residents: null,
+        medications: null,
+        appointments: null,
+        vitalsigns: null,
+        carenotes: null,
+        incidents: null,
+        calendar: null,
+        reports: null,
+        billing: null,
+        notifications: null,
+        timeclock: null,
+        history: null,
         payroll: 'payrollNavLink',
         financial: 'financialNavLink',
         staff: 'staffNavLink',
@@ -1612,13 +1648,38 @@ function applyModuleSettings() {
         training: 'trainingNavLink'
     };
 
-    Object.keys(navMap).forEach((key) => {
-        const el = document.getElementById(navMap[key]);
-        if (!el) return;
+    const navSelectorMap = {
+        residents: '.nav-link[data-page="residents"]',
+        medications: '.nav-link[data-page="medications"]',
+        appointments: '.nav-link[data-page="appointments"]',
+        vitalsigns: '.nav-link[data-page="vitalsigns"]',
+        carenotes: '.nav-link[data-page="carenotes"]',
+        incidents: '.nav-link[data-page="incidents"]',
+        calendar: '.nav-link[data-page="calendar"]',
+        reports: '.nav-link[data-page="reports"]',
+        billing: '.nav-link[data-page="billing"]',
+        notifications: '.nav-link[data-page="notifications"]',
+        timeclock: '.nav-link[data-page="timeclock"]',
+        history: '.nav-link[data-page="history"]'
+    };
 
-        const roleAllows = !currentStaff || currentStaff.role === 'admin';
+    Object.keys(navMap).forEach((key) => {
+        if (navMap[key]) {
+            const el = document.getElementById(navMap[key]);
+            if (!el) return;
+
+            const roleAllows = !currentStaff || currentStaff.role === 'admin';
+            const enabled = !!settings[key];
+            el.style.display = roleAllows && enabled ? 'block' : 'none';
+            return;
+        }
+
+        const selector = navSelectorMap[key];
+        if (!selector) return;
+        const el = document.querySelector(selector);
+        if (!el) return;
         const enabled = !!settings[key];
-        el.style.display = roleAllows && enabled ? 'block' : 'none';
+        el.style.display = enabled ? 'block' : 'none';
     });
 
     const settingsNavLink = document.getElementById('settingsNavLink');
@@ -1630,6 +1691,26 @@ function applyModuleSettings() {
     if (settingsHeaderBtn) {
         settingsHeaderBtn.style.display = currentStaff && currentStaff.role === 'admin' ? 'inline-flex' : 'none';
     }
+
+    // Dashboard quick actions (grid will reflow automatically when items are display:none)
+    try {
+        const quickActionButtons = document.querySelectorAll('.quick-action-btn[data-module]');
+        quickActionButtons.forEach((btn) => {
+            const mod = (btn.getAttribute('data-module') || '').trim();
+            if (!mod) return;
+
+            // Respect admin-only items
+            if (mod === 'staff') {
+                const adminAllowed = currentStaff && currentStaff.role === 'admin';
+                btn.style.display = adminAllowed && !!settings.staff ? '' : 'none';
+                return;
+            }
+
+            btn.style.display = isPageEnabled(mod) ? '' : 'none';
+        });
+    } catch (e) {
+        // ignore
+    }
 }
 
 function loadModuleSettingsIntoForm() {
@@ -1638,6 +1719,18 @@ function loadModuleSettingsIntoForm() {
         const el = document.getElementById(id);
         if (el) el.checked = !!value;
     };
+    setChecked('moduleToggleResidents', settings.residents);
+    setChecked('moduleToggleMedications', settings.medications);
+    setChecked('moduleToggleAppointments', settings.appointments);
+    setChecked('moduleToggleVitalSigns', settings.vitalsigns);
+    setChecked('moduleToggleCareNotes', settings.carenotes);
+    setChecked('moduleToggleIncidents', settings.incidents);
+    setChecked('moduleToggleCalendar', settings.calendar);
+    setChecked('moduleToggleReports', settings.reports);
+    setChecked('moduleToggleBilling', settings.billing);
+    setChecked('moduleToggleNotifications', settings.notifications);
+    setChecked('moduleToggleTimeClock', settings.timeclock);
+    setChecked('moduleToggleHistory', settings.history);
     setChecked('moduleTogglePayroll', settings.payroll);
     setChecked('moduleToggleFinancial', settings.financial);
     setChecked('moduleToggleStaff', settings.staff);
@@ -1652,6 +1745,18 @@ function saveModuleSettings() {
         return el ? !!el.checked : true;
     };
     const next = {
+        residents: getChecked('moduleToggleResidents'),
+        medications: getChecked('moduleToggleMedications'),
+        appointments: getChecked('moduleToggleAppointments'),
+        vitalsigns: getChecked('moduleToggleVitalSigns'),
+        carenotes: getChecked('moduleToggleCareNotes'),
+        incidents: getChecked('moduleToggleIncidents'),
+        calendar: getChecked('moduleToggleCalendar'),
+        reports: getChecked('moduleToggleReports'),
+        billing: getChecked('moduleToggleBilling'),
+        notifications: getChecked('moduleToggleNotifications'),
+        timeclock: getChecked('moduleToggleTimeClock'),
+        history: getChecked('moduleToggleHistory'),
         payroll: getChecked('moduleTogglePayroll'),
         financial: getChecked('moduleToggleFinancial'),
         staff: getChecked('moduleToggleStaff'),
@@ -1659,6 +1764,11 @@ function saveModuleSettings() {
         documents: getChecked('moduleToggleDocuments'),
         training: getChecked('moduleToggleTraining')
     };
+
+    // Dashboard and Settings are always enabled
+    next.dashboard = true;
+    next.settings = true;
+
     setModuleSettings(next);
     applyModuleSettings();
     showMessage('Settings saved / Configuración guardada', 'success');
