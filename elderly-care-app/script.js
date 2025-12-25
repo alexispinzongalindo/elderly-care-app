@@ -1542,8 +1542,128 @@ function _applyAuthSuccess(data) {
         payrollNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
     }
 
+    const settingsNavLink = document.getElementById('settingsNavLink');
+    if (settingsNavLink) {
+        settingsNavLink.style.display = currentStaff.role === 'admin' ? 'block' : 'none';
+    }
+
     hideLoginModal();
     checkAuth();
+}
+
+function getDefaultModuleSettings() {
+    return {
+        payroll: true,
+        financial: true,
+        staff: true,
+        archivedResidents: true,
+        documents: true,
+        training: true
+    };
+}
+
+function getModuleSettings() {
+    try {
+        const raw = localStorage.getItem('moduleSettings');
+        if (!raw) return getDefaultModuleSettings();
+        const parsed = JSON.parse(raw);
+        return { ...getDefaultModuleSettings(), ...(parsed || {}) };
+    } catch (e) {
+        return getDefaultModuleSettings();
+    }
+}
+
+function setModuleSettings(settings) {
+    try {
+        localStorage.setItem('moduleSettings', JSON.stringify(settings));
+    } catch (e) {
+        // ignore
+    }
+}
+
+function isPageEnabled(pageName) {
+    const settings = getModuleSettings();
+    const pageToKey = {
+        payroll: 'payroll',
+        financial: 'financial',
+        staff: 'staff',
+        archivedResidents: 'archivedResidents',
+        documents: 'documents',
+        training: 'training'
+    };
+    const key = pageToKey[pageName];
+    if (!key) return true;
+    return !!settings[key];
+}
+
+function applyModuleSettings() {
+    const settings = getModuleSettings();
+    const navMap = {
+        payroll: 'payrollNavLink',
+        financial: 'financialNavLink',
+        staff: 'staffNavLink',
+        archivedResidents: 'archivedResidentsNavLink',
+        documents: 'documentsNavLink',
+        training: 'trainingNavLink'
+    };
+
+    Object.keys(navMap).forEach((key) => {
+        const el = document.getElementById(navMap[key]);
+        if (!el) return;
+
+        const roleAllows = !currentStaff || currentStaff.role === 'admin';
+        const enabled = !!settings[key];
+        el.style.display = roleAllows && enabled ? 'block' : 'none';
+    });
+
+    const settingsNavLink = document.getElementById('settingsNavLink');
+    if (settingsNavLink) {
+        settingsNavLink.style.display = currentStaff && currentStaff.role === 'admin' ? 'block' : 'none';
+    }
+}
+
+function loadModuleSettingsIntoForm() {
+    const settings = getModuleSettings();
+    const setChecked = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!value;
+    };
+    setChecked('moduleTogglePayroll', settings.payroll);
+    setChecked('moduleToggleFinancial', settings.financial);
+    setChecked('moduleToggleStaff', settings.staff);
+    setChecked('moduleToggleArchivedResidents', settings.archivedResidents);
+    setChecked('moduleToggleDocuments', settings.documents);
+    setChecked('moduleToggleTraining', settings.training);
+}
+
+function saveModuleSettings() {
+    const getChecked = (id) => {
+        const el = document.getElementById(id);
+        return el ? !!el.checked : true;
+    };
+    const next = {
+        payroll: getChecked('moduleTogglePayroll'),
+        financial: getChecked('moduleToggleFinancial'),
+        staff: getChecked('moduleToggleStaff'),
+        archivedResidents: getChecked('moduleToggleArchivedResidents'),
+        documents: getChecked('moduleToggleDocuments'),
+        training: getChecked('moduleToggleTraining')
+    };
+    setModuleSettings(next);
+    applyModuleSettings();
+    showMessage('Settings saved / Configuración guardada', 'success');
+
+    const activePageId = document.querySelector('.page.active')?.id;
+    if (activePageId && !isPageEnabled(activePageId)) {
+        showPage('dashboard');
+    }
+}
+
+function resetModuleSettings() {
+    setModuleSettings(getDefaultModuleSettings());
+    loadModuleSettingsIntoForm();
+    applyModuleSettings();
+    showMessage('Settings reset / Configuración restablecida', 'success');
 }
 
 async function handlePinClockIn() {
@@ -3299,6 +3419,7 @@ function initApp() {
         window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
     }
     initNavigation();
+    applyModuleSettings();
     loadDashboard();
     updateClock();
     setInterval(updateClock, 1000);
@@ -3710,6 +3831,11 @@ function initNavigation() {
                 console.warn('Nav link clicked without data-page; skipping showPage', link);
                 return;
             }
+
+            if (!isPageEnabled(page)) {
+                showMessage('This area is disabled in Settings / Esta área está deshabilitada en Configuración', 'error');
+                return;
+            }
             showPage(page);
 
             navLinks.forEach(l => l.classList.remove('active'));
@@ -3756,6 +3882,10 @@ function showPage(pageName) {
 	setTrainingModeIndicator(pageName === 'training' || currentResidentIsTraining);
 
 	try {
+		if (!isPageEnabled(pageName)) {
+			showMessage('This area is disabled in Settings / Esta área está deshabilitada en Configuración', 'error');
+			return;
+		}
 		if (pageName === 'history') {
 			console.log('🧵 showPage(history) call stack:');
 			try {
@@ -4857,6 +4987,9 @@ function showPage(pageName) {
         }
         else if (pageName === 'payroll') {
             // Data loading handled by page-specific loaders below
+        }
+        else if (pageName === 'settings') {
+            loadModuleSettingsIntoForm();
         }
         else if (pageName === 'financial') {
             // Financial page should behave like any other page. The layout issues were caused by
@@ -6436,6 +6569,12 @@ async function loadIncidents() {
             return;
         }
 
+        const activePageId = document.querySelector('.page.active')?.id;
+        if (activePageId !== 'incidents') {
+            console.log('ℹ️ loadIncidents() called while not on incidents page; skipping visibility changes. Active page:', activePageId);
+            return;
+        }
+
         // ALWAYS ensure the page is visible and active - don't check, just force it
         incidentsPage.classList.add('active');
         incidentsPage.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-height: 400px !important; width: 100% !important; background: var(--light-gray) !important; overflow: visible !important;';
@@ -7076,6 +7215,12 @@ async function loadCareNotes() {
         return;
     }
     console.log('✅ Container found');
+
+    const activePageId = document.querySelector('.page.active')?.id;
+    if (activePageId !== 'carenotes') {
+        console.log('ℹ️ loadCareNotes() called while not on carenotes page; skipping visibility changes. Active page:', activePageId);
+        return;
+    }
 
     // CRITICAL: Ensure parent page is visible first
     const carenotesPage = document.getElementById('carenotes');

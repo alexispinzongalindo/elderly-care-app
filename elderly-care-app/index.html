@@ -24,7 +24,7 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="style.css?v=20251224-1">
+    <link rel="stylesheet" href="style.css?v=20251225-1">
     <!-- jsPDF for PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -329,6 +329,7 @@
                     <li><a href="#" class="nav-link" data-page="archivedResidents" id="archivedResidentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-archive"></i></span><span>Archived Residents</span></a></li>
                     <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-user-shield"></i></span><span data-translate="nav.staff">Staff</span></a></li>
                     <li><a href="#" class="nav-link" data-page="payroll" id="payrollNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-invoice"></i></span><span data-translate="nav.payroll">Payroll</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="settings" id="settingsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-cog"></i></span><span>Settings</span></a></li>
                     <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span data-translate="nav.logout">Logout</span></a></li>
                 </ul>
             </div>
@@ -1817,6 +1818,40 @@
                     <button class="btn btn-primary" onclick="loadNotificationsPage()">Refresh</button>
                 </div>
                 <div id="notificationsPageList" class="item-list"></div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings" class="page">
+                <h2>Settings</h2>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <h3>Enabled Areas</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleTogglePayroll" checked> Payroll</label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleFinancial" checked> Financial Management</label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleStaff" checked> Staff</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleArchivedResidents" checked> Archived Residents</label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleDocuments" checked> Documents</label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleTraining" checked> Training</label>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-bottom: 0;">
+                        <button type="button" class="btn btn-primary" onclick="saveModuleSettings()">Save</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetModuleSettings()">Reset</button>
+                    </div>
+                </div>
             </div>
 
             <!-- History / Journal Page -->
