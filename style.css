@@ -1905,8 +1905,8 @@ h3 {
     }
     
     .user-info span {
-        font-size: 0.75rem;
-        max-width: 100px;
+        font-size: 0.72rem;
+        max-width: 90px;
     }
     
     .nav-right {
@@ -1994,7 +1994,7 @@ h3 {
     
     .nav-top {
         grid-template-columns: 1fr;
-        gap: 0.75rem;
+        gap: 0.45rem;
     }
     
     .nav-left {
@@ -2023,20 +2023,20 @@ h3 {
     }
     
     .live-clock {
-        font-size: 0.85rem;
-        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.45rem;
     }
     
     .language-selector {
         min-width: 100px;
         max-width: 130px;
-        font-size: 0.8rem;
-        padding: 0.35rem 0.4rem;
+        font-size: 0.78rem;
+        padding: 0.25rem 0.4rem;
     }
     
     .user-info {
-        padding: 0.3rem 0.5rem;
-        gap: 0.3rem;
+        padding: 0.2rem 0.4rem;
+        gap: 0.25rem;
     }
     
     .user-info span {
@@ -2045,8 +2045,15 @@ h3 {
     }
     
     .user-info .btn {
-        padding: 0.3rem 0.5rem;
-        font-size: 0.75rem;
+        padding: 0.25rem 0.45rem;
+        font-size: 0.72rem;
+    }
+
+    /* Keep header controls compact: avoid mobile global .btn { width:100% } */
+    .navbar .btn {
+        width: auto;
+        padding: 0.3rem 0.55rem;
+        font-size: 0.78rem;
     }
 
     .nav-right {
