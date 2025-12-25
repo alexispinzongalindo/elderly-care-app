@@ -1689,6 +1689,17 @@ const translations = {
         'payroll.staffAll': 'Todo el Personal',
         'payroll.run': 'Generar',
         'payroll.exportCsv': 'Exportar CSV',
+
+        // History
+        'history.title': 'Historial / Diario',
+        'history.allResidents': 'Todos los Residentes',
+        'history.selectResident': 'Seleccionar Residente',
+        'history.resident': 'Residente',
+        'history.staff': 'Personal',
+        'history.since': 'Desde (fecha/hora)',
+        'history.until': 'Hasta (fecha/hora)',
+        'history.yesterday': 'Ayer',
+        'history.emailTo': 'Enviar PDF por correo a',
     }
 };
 
