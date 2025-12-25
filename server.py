@@ -16,6 +16,74 @@ import re
 import io
 from werkzeug.utils import secure_filename
 
+try:
+    from pypdf import PdfReader
+    PYPDF_AVAILABLE = True
+except Exception:
+    PdfReader = None
+    PYPDF_AVAILABLE = False
+
+def _sqlite_has_regulations_fts(conn) -> bool:
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='regulations_documents_fts'")
+        return cur.fetchone() is not None
+    except Exception:
+        return False
+
+def _extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
+    if not PYPDF_AVAILABLE:
+        return ''
+    try:
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        parts = []
+        for p in reader.pages:
+            try:
+                t = p.extract_text() or ''
+            except Exception:
+                t = ''
+            t = (t or '').strip()
+            if t:
+                parts.append(t)
+        return '\n\n'.join(parts).strip()
+    except Exception:
+        return ''
+
+def _fetch_url_bytes(url: str, timeout_seconds: int = 25) -> bytes:
+    import urllib.request
+    with urllib.request.urlopen(url, timeout=timeout_seconds) as resp:
+        return resp.read()
+
+def index_regulations_documents_text(conn, *, only_missing: bool = True) -> dict:
+    out = {"indexed": 0, "skipped": 0, "errors": 0, "pypdf_available": bool(PYPDF_AVAILABLE)}
+    if not PYPDF_AVAILABLE:
+        return out
+
+    cur = conn.cursor()
+    if only_missing:
+        cur.execute('SELECT id, source_url FROM regulations_documents WHERE (text_content IS NULL OR LENGTH(text_content) = 0)')
+    else:
+        cur.execute('SELECT id, source_url FROM regulations_documents')
+    rows = cur.fetchall() or []
+    for r in rows:
+        doc_id = int(r['id'])
+        url = str(r['source_url'] or '').strip()
+        if not url:
+            out['skipped'] += 1
+            continue
+        try:
+            pdf_bytes = _fetch_url_bytes(url)
+            text = _extract_text_from_pdf_bytes(pdf_bytes)
+            if not text:
+                out['skipped'] += 1
+                continue
+            cur.execute('UPDATE regulations_documents SET text_content = ? WHERE id = ?', (text, doc_id))
+            conn.commit()
+            out['indexed'] += 1
+        except Exception:
+            out['errors'] += 1
+    return out
+
 # Import email service
 try:
     from email_service import (
@@ -507,6 +575,75 @@ def init_db():
             FOREIGN KEY (staff_id) REFERENCES staff (id)
         )
     ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS regulations_documents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            agency TEXT,
+            regulation_number TEXT,
+            source_url TEXT NOT NULL,
+            language TEXT NOT NULL DEFAULT 'es',
+            text_content TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    try:
+        cursor.execute('''
+            CREATE VIRTUAL TABLE IF NOT EXISTS regulations_documents_fts
+            USING fts5(title, agency, regulation_number, text_content, content='regulations_documents', content_rowid='id')
+        ''')
+        cursor.execute('''
+            CREATE TRIGGER IF NOT EXISTS regulations_documents_ai AFTER INSERT ON regulations_documents BEGIN
+                INSERT INTO regulations_documents_fts(rowid, title, agency, regulation_number, text_content)
+                VALUES (new.id, new.title, new.agency, new.regulation_number, new.text_content);
+            END;
+        ''')
+        cursor.execute('''
+            CREATE TRIGGER IF NOT EXISTS regulations_documents_ad AFTER DELETE ON regulations_documents BEGIN
+                INSERT INTO regulations_documents_fts(regulations_documents_fts, rowid, title, agency, regulation_number, text_content)
+                VALUES('delete', old.id, old.title, old.agency, old.regulation_number, old.text_content);
+            END;
+        ''')
+        cursor.execute('''
+            CREATE TRIGGER IF NOT EXISTS regulations_documents_au AFTER UPDATE ON regulations_documents BEGIN
+                INSERT INTO regulations_documents_fts(regulations_documents_fts, rowid, title, agency, regulation_number, text_content)
+                VALUES('delete', old.id, old.title, old.agency, old.regulation_number, old.text_content);
+                INSERT INTO regulations_documents_fts(rowid, title, agency, regulation_number, text_content)
+                VALUES (new.id, new.title, new.agency, new.regulation_number, new.text_content);
+            END;
+        ''')
+    except Exception as e:
+        print(f"⚠️ Warning: regulations FTS not available: {e}")
+
+    cursor.execute('SELECT COUNT(*) AS count FROM regulations_documents')
+    regs_count_row = cursor.fetchone()
+    regs_count = int(regs_count_row['count']) if regs_count_row else 0
+    if regs_count == 0:
+        seed_docs = [
+            {
+                'title': 'Reglamento 7349 - Licenciamiento y Supervisión de Establecimientos para Cuidado de Personas de Edad Avanzada',
+                'agency': 'Departamento de la Familia / ADFAN',
+                'regulation_number': '7349',
+                'source_url': 'http://app.estado.gobierno.pr/ReglamentosOnLine/Reglamentos/7349.pdf',
+                'language': 'es'
+            },
+            {
+                'title': 'Ley Núm. 94-1977 - Ley de Establecimientos Para Personas de Edad Avanzada',
+                'agency': 'Estado Libre Asociado de Puerto Rico',
+                'regulation_number': '94-1977',
+                'source_url': 'https://bvirtualogp.pr.gov/ogp/Bvirtual/leyesreferencia/PDF/Personas%20de%20Edad%20Avanzada/94-1977/94-1977.pdf',
+                'language': 'es'
+            }
+        ]
+        for d in seed_docs:
+            cursor.execute('''
+                INSERT INTO regulations_documents (title, agency, regulation_number, source_url, language)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (d['title'], d['agency'], d['regulation_number'], d['source_url'], d['language']))
+
+    conn.commit()
 
     # Billing table (linked to residents)
     cursor.execute('''
@@ -1013,6 +1150,91 @@ def require_role(*allowed_roles):
             return f(*args, **kwargs)
         return decorated_function
     return decorator
+
+@app.route('/api/regulations', methods=['GET'])
+@require_auth
+def list_regulations_documents():
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT id, title, agency, regulation_number, source_url,
+                   CASE WHEN text_content IS NOT NULL AND LENGTH(text_content) > 0 THEN 1 ELSE 0 END AS has_text
+            FROM regulations_documents
+            ORDER BY COALESCE(regulation_number, ''), title
+        ''')
+        rows = cur.fetchall() or []
+        conn.close()
+        return jsonify([dict(r) for r in rows])
+    except Exception as e:
+        return jsonify({'error': f'Failed to load regulations: {str(e)}'}), 500
+
+
+@app.route('/api/regulations/search', methods=['GET'])
+@require_auth
+def search_regulations_documents():
+    q = (request.args.get('q') or '').strip()
+    limit = request.args.get('limit')
+    try:
+        limit = int(limit) if limit is not None else 25
+    except Exception:
+        limit = 25
+    limit = max(1, min(limit, 50))
+
+    if not q:
+        return jsonify([])
+
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        use_fts = _sqlite_has_regulations_fts(conn)
+        results = []
+
+        if use_fts:
+            try:
+                cur.execute('''
+                    SELECT d.id, d.title, d.agency, d.regulation_number, d.source_url,
+                           CASE WHEN d.text_content IS NOT NULL AND LENGTH(d.text_content) > 0 THEN 1 ELSE 0 END AS has_text,
+                           snippet(regulations_documents_fts, 3, '[', ']', '…', 12) AS snippet
+                    FROM regulations_documents_fts
+                    JOIN regulations_documents d ON d.id = regulations_documents_fts.rowid
+                    WHERE regulations_documents_fts MATCH ?
+                    ORDER BY rank
+                    LIMIT ?
+                ''', (q, limit))
+                results = [dict(r) for r in (cur.fetchall() or [])]
+            except Exception:
+                results = []
+
+        if not results:
+            like = f"%{q}%"
+            cur.execute('''
+                SELECT id, title, agency, regulation_number, source_url,
+                       CASE WHEN text_content IS NOT NULL AND LENGTH(text_content) > 0 THEN 1 ELSE 0 END AS has_text,
+                       '' AS snippet
+                FROM regulations_documents
+                WHERE title LIKE ? OR agency LIKE ? OR regulation_number LIKE ? OR text_content LIKE ?
+                ORDER BY title
+                LIMIT ?
+            ''', (like, like, like, like, limit))
+            results = [dict(r) for r in (cur.fetchall() or [])]
+
+        conn.close()
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': f'Search failed: {str(e)}'}), 500
+
+
+@app.route('/api/regulations/reindex', methods=['POST'])
+@require_role('admin')
+def reindex_regulations_documents():
+    try:
+        conn = get_db()
+        out = index_regulations_documents_text(conn, only_missing=True)
+        conn.close()
+        return jsonify(out)
+    except Exception as e:
+        return jsonify({'error': f'Reindex failed: {str(e)}'}), 500
 
 # Authentication endpoints
 @app.route('/api/auth/login', methods=['POST'])

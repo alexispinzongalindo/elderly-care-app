@@ -17,6 +17,198 @@ function safeStorageGet(key) {
     }
 }
 
+let _regulationsPageBound = false;
+
+function _renderRegulationsDocActions(doc) {
+    const url = (doc && doc.source_url) ? String(doc.source_url) : '';
+    const safeUrl = escapeHtml(url);
+    return `
+        <div class="button-group" style="margin-top: 0.75rem;">
+            <button class="btn btn-secondary" type="button" onclick="openRegulationPdf('${safeUrl}')">Abrir PDF</button>
+            <button class="btn btn-secondary" type="button" onclick="downloadRegulationPdf('${safeUrl}')">Descargar PDF</button>
+            <button class="btn btn-secondary" type="button" onclick="printRegulationPdf('${safeUrl}')">Imprimir</button>
+        </div>
+    `;
+}
+
+function _renderRegulationsDocItem(doc) {
+    const title = escapeHtml(doc.title || '');
+    const agency = escapeHtml(doc.agency || '');
+    const regNo = escapeHtml(doc.regulation_number || '');
+    const hasText = !!doc.has_text;
+    const badge = hasText ? '<span class="badge bg-success" style="margin-left: 0.5rem;">Indexado</span>' : '<span class="badge bg-secondary" style="margin-left: 0.5rem;">Sin índice</span>';
+    return `
+        <div class="form-card" style="margin-bottom: 1rem;">
+            <h4 style="margin-bottom: 0.25rem;">${title}${badge}</h4>
+            <div style="color: var(--dark-gray);">
+                ${regNo ? `<div><strong>Número:</strong> ${regNo}</div>` : ''}
+                ${agency ? `<div><strong>Agencia:</strong> ${agency}</div>` : ''}
+            </div>
+            ${_renderRegulationsDocActions(doc)}
+        </div>
+    `;
+}
+
+function _renderRegulationsSearchResultItem(row) {
+    const title = escapeHtml(row.title || '');
+    const agency = escapeHtml(row.agency || '');
+    const regNo = escapeHtml(row.regulation_number || '');
+    const snippet = escapeHtml(row.snippet || '');
+    const hasText = !!row.has_text;
+    const badge = hasText ? '<span class="badge bg-success" style="margin-left: 0.5rem;">Indexado</span>' : '<span class="badge bg-secondary" style="margin-left: 0.5rem;">Sin índice</span>';
+    return `
+        <div class="form-card" style="margin-bottom: 1rem;">
+            <h4 style="margin-bottom: 0.25rem;">${title}${badge}</h4>
+            <div style="color: var(--dark-gray);">
+                ${regNo ? `<div><strong>Número:</strong> ${regNo}</div>` : ''}
+                ${agency ? `<div><strong>Agencia:</strong> ${agency}</div>` : ''}
+            </div>
+            ${snippet ? `<div style="margin-top: 0.75rem;"><strong>Coincidencia:</strong> <div style="margin-top: 0.25rem;">${snippet}</div></div>` : ''}
+            ${_renderRegulationsDocActions(row)}
+        </div>
+    `;
+}
+
+async function loadRegulationsPage() {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+
+        const listEl = document.getElementById('regulationsList');
+        const resultsEl = document.getElementById('regulationsResults');
+        const inputEl = document.getElementById('regulationsSearchInput');
+        const reindexBtn = document.getElementById('regulationsReindexBtn');
+
+        if (reindexBtn) {
+            reindexBtn.style.display = currentStaff && isAdminStaff(currentStaff) ? '' : 'none';
+        }
+
+        if (!_regulationsPageBound && inputEl) {
+            _regulationsPageBound = true;
+            inputEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchRegulationsFromUI();
+                }
+            });
+        }
+
+        if (listEl) listEl.innerHTML = '<div class="empty-state">Cargando...</div>';
+        if (resultsEl) resultsEl.innerHTML = '';
+
+        const res = await fetch('/api/regulations', { headers: getAuthHeaders(), cache: 'no-store' });
+        if (!res.ok) throw new Error(`Failed to load regulations (${res.status})`);
+        const docs = await res.json();
+
+        if (listEl) {
+            if (!docs || docs.length === 0) {
+                listEl.innerHTML = '<div class="empty-state">No hay documentos.</div>';
+            } else {
+                listEl.innerHTML = docs.map(_renderRegulationsDocItem).join('');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading regulations:', error);
+        showMessage(`Error loading regulations: ${error.message}`, 'error');
+        const listEl = document.getElementById('regulationsList');
+        if (listEl) listEl.innerHTML = '<div class="empty-state">Error al cargar.</div>';
+    }
+}
+
+async function searchRegulationsFromUI() {
+    try {
+        const inputEl = document.getElementById('regulationsSearchInput');
+        const resultsEl = document.getElementById('regulationsResults');
+        if (!inputEl || !resultsEl) return;
+
+        const q = (inputEl.value || '').trim();
+        if (!q) {
+            resultsEl.innerHTML = '';
+            return;
+        }
+
+        resultsEl.innerHTML = '<div class="empty-state">Buscando...</div>';
+        const url = `/api/regulations/search?q=${encodeURIComponent(q)}&limit=25`;
+        const res = await fetch(url, { headers: getAuthHeaders(), cache: 'no-store' });
+        if (!res.ok) throw new Error(`Search failed (${res.status})`);
+        const rows = await res.json();
+
+        if (!rows || rows.length === 0) {
+            resultsEl.innerHTML = '<div class="empty-state">Sin resultados.</div>';
+            return;
+        }
+        resultsEl.innerHTML = rows.map(_renderRegulationsSearchResultItem).join('');
+    } catch (error) {
+        console.error('Error searching regulations:', error);
+        showMessage(`Error searching regulations: ${error.message}`, 'error');
+        const resultsEl = document.getElementById('regulationsResults');
+        if (resultsEl) resultsEl.innerHTML = '<div class="empty-state">Error en la búsqueda.</div>';
+    }
+}
+
+function openRegulationPdf(url) {
+    const u = (url || '').trim();
+    if (!u) return;
+    window.open(u, '_blank', 'noopener');
+}
+
+function downloadRegulationPdf(url) {
+    const u = (url || '').trim();
+    if (!u) return;
+    const a = document.createElement('a');
+    a.href = u;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+function printRegulationPdf(url) {
+    const u = (url || '').trim();
+    if (!u) return;
+    const w = window.open(u, '_blank', 'noopener');
+    if (!w) return;
+    w.addEventListener('load', () => {
+        try {
+            w.focus();
+            w.print();
+        } catch (e) {
+        }
+    });
+}
+
+async function reindexRegulations() {
+    try {
+        if (!authToken || !currentStaff) {
+            checkAuth();
+            return;
+        }
+        if (!currentStaff || !isAdminStaff(currentStaff)) {
+            showMessage('Insufficient permissions / Permisos insuficientes', 'error');
+            return;
+        }
+        const btn = document.getElementById('regulationsReindexBtn');
+        if (btn) btn.disabled = true;
+        const res = await fetch('/api/regulations/reindex', { method: 'POST', headers: getAuthHeaders() });
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            throw new Error(payload.error || `Reindex failed (${res.status})`);
+        }
+        showMessage('Regulations indexed / Regulaciones indexadas', 'success');
+        await loadRegulationsPage();
+    } catch (error) {
+        console.error('Error reindexing regulations:', error);
+        showMessage(`Error reindexing regulations: ${error.message}`, 'error');
+    } finally {
+        const btn = document.getElementById('regulationsReindexBtn');
+        if (btn) btn.disabled = false;
+    }
+}
+
 function getTrainingJournalReportPayload() {
     const sinceEl = document.getElementById('trainingReportSince');
     const untilEl = document.getElementById('trainingReportUntil');
@@ -771,6 +963,7 @@ const translations = {
         'nav.staff': 'Staff',
         'nav.logout': 'Logout',
         'nav.history': 'History',
+        'nav.regulations': 'Regulations',
         'nav.training': 'Training',
         'nav.documents': 'Documents',
         'nav.archivedResidents': 'Archived Residents',
@@ -935,6 +1128,12 @@ const translations = {
         'reports.journal.emailPlaceholder': 'name@example.com',
         'reports.journal.downloadPdf': 'Download PDF',
         'reports.journal.emailPdf': 'Email PDF',
+
+        'regulations.title': 'Regulations',
+        'regulations.searchLabel': 'Search',
+        'regulations.documents': 'Documents',
+        'regulations.results': 'Results',
+        'regulations.index': 'Index',
 
         // Incidents
         'incident.selectStaff': '-- Select Staff --',
@@ -1287,8 +1486,9 @@ const translations = {
         'nav.notifications': 'Notificaciones',
         'nav.reports': 'Reportes',
         'nav.staff': 'Personal',
-        'nav.logout': 'Cerrar Sesión',
+        'nav.logout': 'Salir',
         'nav.history': 'Historial',
+        'nav.regulations': 'Regulaciones',
         'nav.training': 'Entrenamiento',
         'nav.documents': 'Documentos',
         'nav.archivedResidents': 'Residentes Archivados',
@@ -5389,6 +5589,9 @@ function showPage(pageName) {
         }
         else if (pageName === 'settings') {
             loadModuleSettingsIntoForm();
+        }
+        else if (pageName === 'regulations') {
+            loadRegulationsPage();
         }
         else if (pageName === 'financial') {
             // Financial page should behave like any other page. The layout issues were caused by

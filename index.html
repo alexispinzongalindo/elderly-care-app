@@ -325,6 +325,7 @@
                     <li><a href="#" class="nav-link" data-page="notifications"><span class="nav-icon"><i class="fas fa-bell"></i></span><span data-translate="nav.notifications">Notifications</span></a></li>
                     <li><a href="#" class="nav-link" data-page="timeclock"><span class="nav-icon"><i class="fas fa-clock"></i></span><span data-translate="nav.timeclock">Time Clock</span></a></li>
                     <li><a href="#" class="nav-link" data-page="history"><span class="nav-icon"><i class="fas fa-book"></i></span><span>History</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="regulations"><span class="nav-icon"><i class="fas fa-gavel"></i></span><span data-translate="nav.regulations">Regulations</span></a></li>
                     <li><a href="#" class="nav-link" data-page="training" id="trainingNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-graduation-cap"></i></span><span>Training</span></a></li>
                     <li><a href="#" class="nav-link" data-page="documents" id="documentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-alt"></i></span><span>Documents</span></a></li>
                     <li><a href="#" class="nav-link" data-page="archivedResidents" id="archivedResidentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-archive"></i></span><span>Archived Residents</span></a></li>
@@ -1883,6 +1884,31 @@
                     <button class="btn btn-primary" onclick="loadJournalPage()">Refresh</button>
                 </div>
                 <div id="journalPageList" class="item-list"></div>
+            </div>
+
+            <div id="regulations" class="page">
+                <h2 data-translate="regulations.title">Regulaciones</h2>
+
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <div class="form-row" style="grid-template-columns: 1fr auto auto; align-items: end;">
+                        <div class="form-group" style="margin: 0;">
+                            <label for="regulationsSearchInput" data-translate="regulations.searchLabel">Buscar</label>
+                            <input type="text" id="regulationsSearchInput" placeholder="Buscar en el texto...">
+                        </div>
+                        <button class="btn btn-primary" type="button" onclick="searchRegulationsFromUI()" data-translate="common.search">Search</button>
+                        <button class="btn btn-secondary" type="button" id="regulationsReindexBtn" onclick="reindexRegulations()" style="display: none;" data-translate="regulations.index">Indexar</button>
+                    </div>
+                </div>
+
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <h3 data-translate="regulations.documents">Documentos</h3>
+                    <div id="regulationsList"></div>
+                </div>
+
+                <div class="form-card">
+                    <h3 data-translate="regulations.results">Resultados</h3>
+                    <div id="regulationsResults"></div>
+                </div>
             </div>
 
             <!-- Financial Management Page (Admin Only) -->
