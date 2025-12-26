@@ -5648,13 +5648,18 @@ def test_post():
 @app.route('/')
 def index():
     try:
-        response = send_from_directory(_FRONTEND_DIR, 'index.html')
+        serve_landing = get_app_setting_bool('show_landing_first', True)
+        filename = 'landing_main.html' if serve_landing else 'index.html'
+        if filename == 'landing_main.html' and not os.path.exists(os.path.join(_FRONTEND_DIR, 'landing_main.html')):
+            filename = 'index.html'
+
+        response = send_from_directory(_FRONTEND_DIR, filename)
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
         return response
     except Exception as e:
-        return jsonify({'error': f'Error serving index.html: {str(e)}'}), 500
+        return jsonify({'error': f'Error serving root page: {str(e)}'}), 500
 
 
 @app.route('/api/settings/landing', methods=['GET', 'POST'])
