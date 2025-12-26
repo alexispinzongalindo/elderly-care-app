@@ -854,6 +854,24 @@ function hasSelectedResident() {
     return !bad.has(s.toLowerCase());
 }
 
+function refreshResidentBadge() {
+    const infoEl = document.getElementById('currentResidentInfo');
+    const nameEl = document.getElementById('currentResidentName');
+    if (!infoEl || !nameEl) return;
+
+    if (hasSelectedResident()) {
+        try {
+            loadCurrentResidentInfo(currentResidentId);
+        } catch (e) {
+            // ignore
+        }
+        return;
+    }
+
+    nameEl.textContent = t('resident.noneSelected');
+    infoEl.style.display = 'none';
+}
+
 function updateFinancialTransactionControls() {
     const btn = document.getElementById('addTransactionBtn');
     if (!btn) return;
@@ -1856,6 +1874,7 @@ const translations = {
         'resident.choose': 'Elegir Residente',
         'resident.selectOption': 'Seleccione un residente',
         'resident.addNew': 'Agregar Nuevo Residente',
+        'resident.noneSelected': 'Ningún residente seleccionado',
 
         // Resident Form
         'resident.title': 'Gestión de Residentes',
@@ -2859,6 +2878,9 @@ function setLanguage(lang) {
 
     // Replace all dual-language text with single language
     replaceDualLanguageText();
+
+    // Re-apply dynamic resident badge text (name is dynamic and should not be overwritten)
+    refreshResidentBadge();
 
     // Update dashboard date to new language
     const dateEl = document.getElementById('dashboardDate');
