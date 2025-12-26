@@ -204,6 +204,20 @@ async function reindexRegulations() {
         const details = Array.isArray(payload.details) ? payload.details : [];
 
         let msg = `Regulations reindex complete. Indexed: ${indexed}, Skipped: ${skipped}, Errors: ${errors}`;
+        if (skipped > 0) {
+            const skipLines = details
+                .filter(d => d && d.status === 'skipped')
+                .slice(0, 2)
+                .map(d => {
+                    const u = (d.url || '').trim();
+                    const reason = (d.reason || '').trim();
+                    return [u, reason].filter(Boolean).join(' - ');
+                })
+                .filter(Boolean);
+            if (skipLines.length) {
+                msg += `\nSkipped: ${skipLines.join(' | ')}`;
+            }
+        }
         if (errors > 0) {
             const errLines = details
                 .filter(d => d && d.status === 'error')

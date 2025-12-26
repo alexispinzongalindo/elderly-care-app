@@ -64,6 +64,35 @@ def _extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
 
     return (text or '').strip()
 
+def _pdf_scan_diagnostics(pdf_bytes: bytes) -> dict:
+    diag = {"pages": None, "pages_with_text": 0, "images": None}
+    if not PYPDF_AVAILABLE:
+        return diag
+    try:
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        pages = list(reader.pages or [])
+        diag["pages"] = len(pages)
+        pages_with_text = 0
+        images_count = 0
+        for p in pages:
+            try:
+                t = (p.extract_text() or '').strip()
+            except Exception:
+                t = ''
+            if t:
+                pages_with_text += 1
+            try:
+                imgs = getattr(p, 'images', None)
+                if imgs is not None:
+                    images_count += len(imgs)
+            except Exception:
+                pass
+        diag["pages_with_text"] = pages_with_text
+        diag["images"] = images_count
+        return diag
+    except Exception:
+        return diag
+
 def _fetch_url_bytes(url: str, timeout_seconds: int = 25) -> bytes:
     import urllib.request
     with urllib.request.urlopen(url, timeout=timeout_seconds) as resp:
@@ -91,8 +120,15 @@ def index_regulations_documents_text(conn, *, only_missing: bool = True) -> dict
             pdf_bytes = _fetch_url_bytes(url)
             text = _extract_text_from_pdf_bytes(pdf_bytes)
             if not text:
+                diag = _pdf_scan_diagnostics(pdf_bytes)
+                if diag.get('pages') and diag.get('pages_with_text', 0) == 0 and (diag.get('images') or 0) > 0:
+                    reason = 'scanned_pdf_requires_ocr'
+                    hint = 'PDF appears image-only; OCR is required to index text.'
+                else:
+                    reason = 'no_text_extracted'
+                    hint = 'No selectable text found in PDF.'
                 out['skipped'] += 1
-                out['details'].append({"id": doc_id, "url": url, "status": "skipped", "reason": "no_text_extracted"})
+                out['details'].append({"id": doc_id, "url": url, "status": "skipped", "reason": reason, "hint": hint, "diagnostics": diag})
                 continue
             cur.execute('UPDATE regulations_documents SET text_content = ? WHERE id = ?', (text, doc_id))
             conn.commit()
