@@ -1186,10 +1186,13 @@ const translations = {
         'incident.actions.placeholder': 'What was done in response...',
 
         // Care Notes
+        'carenote.shift': 'Shift',
         'carenote.shift.morning': 'Morning',
         'carenote.shift.afternoon': 'Afternoon',
         'carenote.shift.evening': 'Evening',
         'carenote.shift.night': 'Night',
+
+        'carenote.appetite': 'Appetite',
         'carenote.appetite.poor': 'Poor',
         'carenote.appetite.fair': 'Fair',
         'carenote.appetite.good': 'Good',
@@ -1198,6 +1201,42 @@ const translations = {
         'carenote.pain.mild': 'Mild (1-3)',
         'carenote.pain.moderate': 'Moderate (4-6)',
         'carenote.pain.severe': 'Severe (7-10)',
+
+        'carenote.fluidIntake': 'Fluid Intake',
+        'carenote.mealBreakfast': 'Breakfast',
+        'carenote.mealLunch': 'Lunch',
+        'carenote.mealDinner': 'Dinner',
+        'carenote.mealSnacks': 'Snacks',
+        'carenote.mealSnacks.placeholder': 'Snacks consumed...',
+
+        'carenote.bathing': 'Bathing',
+        'carenote.hygiene': 'Hygiene',
+        'carenote.toileting': 'Toileting',
+        'carenote.skinCondition': 'Skin Condition',
+        'carenote.mobility': 'Mobility',
+        'carenote.painLevel': 'Pain Level',
+        'carenote.painLocation': 'Pain Location',
+        'carenote.sleepHours': 'Hours Slept',
+        'carenote.sleepQuality': 'Sleep Quality',
+        'carenote.sleepQuality.excellent': 'Excellent',
+        'carenote.sleepQuality.good': 'Good',
+        'carenote.sleepQuality.fair': 'Fair',
+        'carenote.sleepQuality.poor': 'Poor',
+        'carenote.sleepQuality.restless': 'Restless',
+        'carenote.mood': 'Mood',
+        'carenote.mood.happy': 'Happy',
+        'carenote.mood.content': 'Content',
+        'carenote.mood.neutral': 'Neutral',
+        'carenote.mood.sad': 'Sad',
+        'carenote.mood.agitated': 'Agitated',
+        'carenote.mood.confused': 'Confused',
+        'carenote.behaviorNotes': 'Behavior Notes',
+        'carenote.activities': 'Activities',
+        'carenote.generalNotes': 'General Notes',
+        'carenote.recordedBy': 'Recorded by',
+        'carenote.hours': 'hours',
+        'carenote.loading': 'Loading care notes...',
+        'carenote.emptyHint': 'Click the “Add Care Note” button above to create your first care note.',
 
         'carenote.section.nutrition': 'Nutrition & Hydration',
         'carenote.section.personalCare': 'Personal Care',
@@ -1722,10 +1761,20 @@ const translations = {
         'incident.actions.placeholder': 'Describa lo que se hizo en respuesta...',
 
         // Care Notes
+        'carenote.title': 'Notas de Cuidado',
+        'carenote.add': 'Agregar nota de cuidado',
+        'carenote.edit': 'Editar nota de cuidado',
+        'carenote.date': 'Fecha',
+        'carenote.time': 'Hora',
+        'carenote.save': 'Guardar nota de cuidado',
+
+        'carenote.shift': 'Turno',
         'carenote.shift.morning': 'Mañana',
         'carenote.shift.afternoon': 'Tarde',
         'carenote.shift.evening': 'Noche',
         'carenote.shift.night': 'Madrugada',
+
+        'carenote.appetite': 'Apetito',
         'carenote.appetite.poor': 'Pobre',
         'carenote.appetite.fair': 'Regular',
         'carenote.appetite.good': 'Buena',
@@ -1734,6 +1783,42 @@ const translations = {
         'carenote.pain.mild': 'Leve (1-3)',
         'carenote.pain.moderate': 'Moderado (4-6)',
         'carenote.pain.severe': 'Severo (7-10)',
+
+        'carenote.fluidIntake': 'Ingesta de líquidos',
+        'carenote.mealBreakfast': 'Desayuno',
+        'carenote.mealLunch': 'Almuerzo',
+        'carenote.mealDinner': 'Cena',
+        'carenote.mealSnacks': 'Meriendas',
+        'carenote.mealSnacks.placeholder': 'Meriendas consumidas...',
+
+        'carenote.bathing': 'Baño',
+        'carenote.hygiene': 'Higiene',
+        'carenote.toileting': 'Uso de baño',
+        'carenote.skinCondition': 'Condición de la piel',
+        'carenote.mobility': 'Movilidad',
+        'carenote.painLevel': 'Nivel de dolor',
+        'carenote.painLocation': 'Ubicación del dolor',
+        'carenote.sleepHours': 'Horas de sueño',
+        'carenote.sleepQuality': 'Calidad del sueño',
+        'carenote.sleepQuality.excellent': 'Excelente',
+        'carenote.sleepQuality.good': 'Buena',
+        'carenote.sleepQuality.fair': 'Regular',
+        'carenote.sleepQuality.poor': 'Pobre',
+        'carenote.sleepQuality.restless': 'Inquieto',
+        'carenote.mood': 'Estado de ánimo',
+        'carenote.mood.happy': 'Feliz',
+        'carenote.mood.content': 'Conforme',
+        'carenote.mood.neutral': 'Neutral',
+        'carenote.mood.sad': 'Triste',
+        'carenote.mood.agitated': 'Agitado',
+        'carenote.mood.confused': 'Confundido',
+        'carenote.behaviorNotes': 'Notas de conducta',
+        'carenote.activities': 'Actividades',
+        'carenote.generalNotes': 'Notas generales',
+        'carenote.recordedBy': 'Registrado por',
+        'carenote.hours': 'horas',
+        'carenote.loading': 'Cargando notas de cuidado...',
+        'carenote.emptyHint': 'Presione el botón “Agregar nota de cuidado” arriba para crear su primera nota.',
 
         'carenote.section.nutrition': 'Nutrición e hidratación',
         'carenote.section.personalCare': 'Cuidado personal',
@@ -8034,7 +8119,7 @@ async function loadCareNotes() {
     console.log('✅ Container visibility forced');
 
     // Show loading state
-    container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">Loading care notes...</div>';
+    container.innerHTML = `<div style="padding: 2rem; text-align: center; color: #666;">${t('carenote.loading')}</div>`;
 
     try {
         if (!authToken) {
@@ -8081,7 +8166,7 @@ async function loadCareNotes() {
             container.innerHTML = `
                 <div class="empty-state" style="padding: 2rem; text-align: center; color: #666; display: block !important; visibility: visible !important; opacity: 1 !important; min-height: 150px !important; width: 100% !important;">
                     <p style="font-size: 1.1em; margin-bottom: 0.5rem; font-weight: 500;">${t('common.noCareNotes')}</p>
-                    <p style="margin-top: 1rem; color: #888;">Click the "Add Care Note" button above to create your first care note.</p>
+                    <p style="margin-top: 1rem; color: #888;">${t('carenote.emptyHint')}</p>
                 </div>
             `;
             console.log('✅ Empty state displayed, container innerHTML length:', container.innerHTML.length);
@@ -8093,35 +8178,62 @@ async function loadCareNotes() {
         container.style.setProperty('display', 'block', 'important');
         container.style.setProperty('visibility', 'visible', 'important');
         container.style.setProperty('opacity', '1', 'important');
+
+        const translateEnumValue = (value, prefix, fallback = value) => {
+            const normalized = (value || '').toString().trim();
+            if (!normalized) return '';
+            const key = `${prefix}.${normalized.toLowerCase().replace(/\s+/g, '')}`;
+            const translated = t(key);
+            return translated && translated !== key ? translated : (fallback || normalized);
+        };
+
+        const translatePainValue = (value) => {
+            const v = (value || '').toString().trim();
+            if (!v) return '';
+            const lower = v.toLowerCase();
+            if (lower.startsWith('none')) return t('carenote.pain.none');
+            if (lower.startsWith('mild')) return t('carenote.pain.mild');
+            if (lower.startsWith('moderate')) return t('carenote.pain.moderate');
+            if (lower.startsWith('severe')) return t('carenote.pain.severe');
+            return v;
+        };
+
         container.innerHTML = notes.map(note => {
             const date = new Date(note.note_date);
             const timeDisplay = note.note_time ? ` - ${note.note_time}` : '';
+            const shiftLabel = translateEnumValue(note.shift, 'carenote.shift', note.shift);
+            const appetiteLabel = translateEnumValue(note.appetite_rating, 'carenote.appetite', note.appetite_rating);
+            const painLabel = translatePainValue(note.pain_level);
+            const sleepQualityLabel = translateEnumValue(note.sleep_quality, 'carenote.sleepQuality', note.sleep_quality);
+            const moodLabel = translateEnumValue(note.mood, 'carenote.mood', note.mood);
+
             return `
                 <div class="item-card">
                     <div class="item-header">
                         <h3>${date.toLocaleDateString()}${timeDisplay} - ${note.resident_name || 'N/A'}</h3>
-                        ${note.shift ? `<span class="badge badge-success">${note.shift}</span>` : ''}
+                        ${note.shift ? `<span class="badge badge-success">${shiftLabel}</span>` : ''}
                     </div>
                     <div class="item-details">
-                        ${note.appetite_rating ? `<p><strong>Appetite / Apetito:</strong> ${note.appetite_rating}</p>` : ''}
-                        ${note.fluid_intake ? `<p><strong>Fluid Intake / Ingesta de Líquidos:</strong> ${note.fluid_intake}</p>` : ''}
-                        ${note.meal_breakfast ? `<p><strong>Breakfast / Desayuno:</strong> ${note.meal_breakfast}</p>` : ''}
-                        ${note.meal_lunch ? `<p><strong>Lunch / Almuerzo:</strong> ${note.meal_lunch}</p>` : ''}
-                        ${note.meal_dinner ? `<p><strong>Dinner / Cena:</strong> ${note.meal_dinner}</p>` : ''}
-                        ${note.toileting ? `<p><strong>Toileting / Uso de Baño:</strong> ${note.toileting}</p>` : ''}
-                        ${note.mobility ? `<p><strong>Mobility / Movilidad:</strong> ${note.mobility}</p>` : ''}
-                        ${note.pain_level ? `<p><strong>Pain Level / Nivel de Dolor:</strong> ${note.pain_level}${note.pain_location ? ` - ${note.pain_location}` : ''}</p>` : ''}
-                        ${note.skin_condition ? `<p><strong>Skin Condition / Condición de la Piel:</strong> ${note.skin_condition}</p>` : ''}
-                        ${note.sleep_hours ? `<p><strong>Sleep / Sueño:</strong> ${note.sleep_hours} hours / horas</p>` : ''}
-                        ${note.sleep_quality ? `<p><strong>Sleep Quality / Calidad:</strong> ${note.sleep_quality}</p>` : ''}
-                        ${note.mood ? `<p><strong>Mood / Estado de Ánimo:</strong> ${note.mood}</p>` : ''}
-                        ${note.activities ? `<p><strong>Activities / Actividades:</strong> ${note.activities}</p>` : ''}
-                        ${note.general_notes ? `<p><strong>Notes / Notas:</strong> ${note.general_notes}</p>` : ''}
-                        <p><strong>Recorded by / Registrado por:</strong> ${note.staff_name || 'N/A'}</p>
+                        ${note.appetite_rating ? `<p><strong>${t('carenote.appetite')}:</strong> ${appetiteLabel}</p>` : ''}
+                        ${note.fluid_intake ? `<p><strong>${t('carenote.fluidIntake')}:</strong> ${note.fluid_intake}</p>` : ''}
+                        ${note.meal_breakfast ? `<p><strong>${t('carenote.mealBreakfast')}:</strong> ${note.meal_breakfast}</p>` : ''}
+                        ${note.meal_lunch ? `<p><strong>${t('carenote.mealLunch')}:</strong> ${note.meal_lunch}</p>` : ''}
+                        ${note.meal_dinner ? `<p><strong>${t('carenote.mealDinner')}:</strong> ${note.meal_dinner}</p>` : ''}
+                        ${note.meal_snacks ? `<p><strong>${t('carenote.mealSnacks')}:</strong> ${note.meal_snacks}</p>` : ''}
+                        ${note.toileting ? `<p><strong>${t('carenote.toileting')}:</strong> ${note.toileting}</p>` : ''}
+                        ${note.mobility ? `<p><strong>${t('carenote.mobility')}:</strong> ${note.mobility}</p>` : ''}
+                        ${note.pain_level ? `<p><strong>${t('carenote.painLevel')}:</strong> ${painLabel}${note.pain_location ? ` - ${note.pain_location}` : ''}</p>` : ''}
+                        ${note.skin_condition ? `<p><strong>${t('carenote.skinCondition')}:</strong> ${note.skin_condition}</p>` : ''}
+                        ${note.sleep_hours ? `<p><strong>${t('carenote.section.sleep')}:</strong> ${note.sleep_hours} ${t('carenote.hours')}</p>` : ''}
+                        ${note.sleep_quality ? `<p><strong>${t('carenote.sleepQuality')}:</strong> ${sleepQualityLabel}</p>` : ''}
+                        ${note.mood ? `<p><strong>${t('carenote.mood')}:</strong> ${moodLabel}</p>` : ''}
+                        ${note.activities ? `<p><strong>${t('carenote.activities')}:</strong> ${note.activities}</p>` : ''}
+                        ${note.general_notes ? `<p><strong>${t('carenote.generalNotes')}:</strong> ${note.general_notes}</p>` : ''}
+                        <p><strong>${t('carenote.recordedBy')}:</strong> ${note.staff_name || 'N/A'}</p>
                     </div>
                     <div class="item-actions">
-                        <button class="btn btn-sm btn-primary" onclick="editCareNote(${note.id})">Edit / Editar</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCareNote(${note.id})">Delete / Eliminar</button>
+                        <button class="btn btn-sm btn-primary" onclick="editCareNote(${note.id})">${t('common.edit')}</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteCareNote(${note.id})">${t('common.delete')}</button>
                     </div>
                 </div>
             `;
