@@ -3052,7 +3052,7 @@ function checkAuth() {
 function forceResidentPicker() {
     // Allow the user to re-pick a resident at any time (mobile-friendly).
     currentResidentId = null;
-    localStorage.removeItem('currentResidentId');
+    safeStorageRemove('currentResidentId');
     updateFinancialTransactionControls();
     showResidentSelector();
 }
@@ -3239,9 +3239,9 @@ async function handleLogout() {
     authToken = null;
     currentStaff = null;
     currentResidentId = null;
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentStaff');
-    localStorage.removeItem('currentResidentId');
+    safeStorageRemove('authToken');
+    safeStorageRemove('currentStaff');
+    safeStorageRemove('currentResidentId');
 
     document.getElementById('userInfo').style.display = 'none';
     document.getElementById('currentResidentInfo').style.display = 'none';
@@ -3300,7 +3300,7 @@ function selectResident() {
     // If user is not authenticated, force login instead of initializing the app.
     if (!authToken || !currentStaff) {
         console.warn('selectResident called while unauthenticated; redirecting to login');
-        localStorage.removeItem('currentResidentId');
+        safeStorageRemove('currentResidentId');
         currentResidentId = null;
         updateFinancialTransactionControls();
         showLoginModal();
@@ -3317,7 +3317,7 @@ function selectResident() {
     }
 
     currentResidentId = residentId;
-    localStorage.setItem('currentResidentId', residentId);
+    safeStorageSet('currentResidentId', String(residentId));
     updateFinancialTransactionControls();
 
     loadCurrentResidentInfo(residentId);
@@ -3338,6 +3338,10 @@ async function loadCurrentResidentInfo(residentId) {
             throw new Error(`Failed to load resident info (${response.status})`);
         }
         const resident = await response.json();
+
+        // Normalize + persist selection (mobile browsers can be flaky with raw localStorage).
+        currentResidentId = String(residentId);
+        safeStorageSet('currentResidentId', String(residentId));
 
         currentResidentIsTraining = !!(resident && (resident.is_training === 1 || resident.is_training === true || resident.is_training === '1'));
         const activePageId = document.querySelector('.page.active')?.id || '';
@@ -4142,7 +4146,8 @@ async function performSearch(query) {
                             title: `${r.first_name} ${r.last_name}`,
                             details: `Room: ${r.room_number || 'N/A'} | DOB: ${r.date_of_birth || 'N/A'}`,
                             action: () => {
-                                localStorage.setItem('currentResidentId', r.id);
+                                currentResidentId = String(r.id);
+                                safeStorageSet('currentResidentId', String(r.id));
                                 loadCurrentResidentInfo(r.id);
                                 showPage('residents');
                                 clearSearch();
@@ -6381,7 +6386,7 @@ function selectResidentById(residentId) {
     // If user is not authenticated, force login instead of navigating into the app.
     if (!authToken || !currentStaff) {
         console.warn('selectResidentById called while unauthenticated; redirecting to login');
-        localStorage.removeItem('currentResidentId');
+        safeStorageRemove('currentResidentId');
         currentResidentId = null;
         showLoginModal();
         showMessage('Please log in to continue / Por favor inicie sesión para continuar', 'error');
@@ -6389,7 +6394,7 @@ function selectResidentById(residentId) {
     }
 
     currentResidentId = residentId;
-    localStorage.setItem('currentResidentId', residentId);
+    safeStorageSet('currentResidentId', String(residentId));
     loadCurrentResidentInfo(residentId);
     showPage('dashboard');
     showMessage('Resident selected / Residente seleccionado', 'success');
@@ -8549,8 +8554,9 @@ function setupHistoryResidentFilterControls() {
     residentSelect.addEventListener('change', () => {
         const v = (residentSelect.value || '').trim();
         if (v) {
-            localStorage.setItem('currentResidentId', v);
             currentResidentId = v;
+            safeStorageSet('currentResidentId', v);
+            loadCurrentResidentInfo(v);
         }
     });
 
