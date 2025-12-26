@@ -2373,12 +2373,19 @@ async function saveLandingFirstSetting() {
         });
         const data = await res.json().catch(() => null);
         if (!res.ok) {
-            showMessage((data && (data.error || data.message)) || 'Failed to save / Error al guardar', 'error');
+            if (data && (data.error || data.message)) {
+                showMessage(String(data.error || data.message), 'error');
+                return;
+            }
+            const text = await res.text().catch(() => '');
+            const snippet = (text || '').trim().slice(0, 200);
+            const details = snippet ? ` (${snippet})` : '';
+            showMessage(`Failed to save (${res.status}) / Error al guardar (${res.status})${details}`, 'error');
             return;
         }
         showMessage('Settings saved / Configuración guardada', 'success');
     } catch (e) {
-        showMessage('Failed to save / Error al guardar', 'error');
+        showMessage(`Failed to save: ${e.message} / Error al guardar: ${e.message}`, 'error');
     }
 }
 
