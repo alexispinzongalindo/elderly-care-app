@@ -55,7 +55,7 @@ def _fetch_url_bytes(url: str, timeout_seconds: int = 25) -> bytes:
         return resp.read()
 
 def index_regulations_documents_text(conn, *, only_missing: bool = True) -> dict:
-    out = {"indexed": 0, "skipped": 0, "errors": 0, "pypdf_available": bool(PYPDF_AVAILABLE)}
+    out = {"indexed": 0, "skipped": 0, "errors": 0, "pypdf_available": bool(PYPDF_AVAILABLE), "details": []}
     if not PYPDF_AVAILABLE:
         return out
 
@@ -70,18 +70,22 @@ def index_regulations_documents_text(conn, *, only_missing: bool = True) -> dict
         url = str(r['source_url'] or '').strip()
         if not url:
             out['skipped'] += 1
+            out['details'].append({"id": doc_id, "url": "", "status": "skipped", "reason": "missing_url"})
             continue
         try:
             pdf_bytes = _fetch_url_bytes(url)
             text = _extract_text_from_pdf_bytes(pdf_bytes)
             if not text:
                 out['skipped'] += 1
+                out['details'].append({"id": doc_id, "url": url, "status": "skipped", "reason": "no_text_extracted"})
                 continue
             cur.execute('UPDATE regulations_documents SET text_content = ? WHERE id = ?', (text, doc_id))
             conn.commit()
             out['indexed'] += 1
-        except Exception:
+            out['details'].append({"id": doc_id, "url": url, "status": "indexed"})
+        except Exception as e:
             out['errors'] += 1
+            out['details'].append({"id": doc_id, "url": url, "status": "error", "error": str(e)})
     return out
 
 # Import email service

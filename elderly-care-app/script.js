@@ -198,7 +198,23 @@ async function reindexRegulations() {
         if (!res.ok) {
             throw new Error(payload.error || `Reindex failed (${res.status})`);
         }
-        showMessage('Regulations indexed / Regulaciones indexadas', 'success');
+        const indexed = Number(payload.indexed || 0);
+        const skipped = Number(payload.skipped || 0);
+        const errors = Number(payload.errors || 0);
+        const details = Array.isArray(payload.details) ? payload.details : [];
+
+        let msg = `Regulations reindex complete. Indexed: ${indexed}, Skipped: ${skipped}, Errors: ${errors}`;
+        if (errors > 0) {
+            const errLines = details
+                .filter(d => d && d.status === 'error')
+                .slice(0, 3)
+                .map(d => `${d.url || ''}${d.error ? ` (${d.error})` : ''}`)
+                .filter(Boolean);
+            if (errLines.length) {
+                msg += `\nErrors: ${errLines.join(' | ')}`;
+            }
+        }
+        showMessage(msg, errors > 0 ? 'error' : 'success');
         await loadRegulationsPage();
     } catch (error) {
         console.error('Error reindexing regulations:', error);
