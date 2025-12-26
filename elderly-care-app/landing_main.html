@@ -133,14 +133,43 @@
         .logo-container {
             margin-bottom: 2rem;
         }
-        
-        .logo-container img {
-            width: 120px;
-            height: 120px;
-            background: white;
-            border-radius: 50%;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+        .brand-header {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .brand-header .brand-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 34px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        .brand-header .brand-text {
+            text-align: left;
+            line-height: 1.05;
+        }
+
+        .brand-header .brand-text .brand-title {
+            font-size: 2.3rem;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .brand-header .brand-text .brand-subtitle {
+            font-size: 1.05rem;
+            margin: 6px 0 0 0;
+            opacity: 0.95;
         }
         
         /* CTA Buttons */
@@ -443,10 +472,14 @@
         <div class="container">
             <div class="hero-content">
                 <div class="logo-container">
-                    <img src="attached_assets/generated_images/medical_cross_heart_logo.png" alt="Elder Care Management Logo" onerror="this.style.display='none'">
+                    <div class="brand-header">
+                        <div class="brand-icon" aria-hidden="true"><i class="fas fa-hospital"></i></div>
+                        <div class="brand-text">
+                            <div class="brand-title" data-translate="hero.title">Elder Care Management</div>
+                            <div class="brand-subtitle" data-translate="hero.subtitle">Comprehensive Healthcare Management System for Elderly Care Facilities</div>
+                        </div>
+                    </div>
                 </div>
-                <h1 data-translate="hero.title">Elder Care Management</h1>
-                <p data-translate="hero.subtitle">Comprehensive Healthcare Management System for Elderly Care Facilities</p>
                 <p data-translate="hero.location" style="font-size: 1rem; opacity: 0.9;">Serving Puerto Rico with Professional Care Solutions</p>
                 <div class="cta-buttons">
                     <a href="/app" class="btn-hero btn-hero-primary" data-translate="hero.accessApp">
