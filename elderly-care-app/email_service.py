@@ -18,18 +18,19 @@ import urllib.error
 
 # Email configuration - Use environment variables or set directly
 # Resend API (RECOMMENDED - works on Render free tier via HTTP)
-RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
-RESEND_FROM_EMAIL = os.getenv('RESEND_FROM_EMAIL', '')  # Your verified domain email (e.g., notifications@yourdomain.com)
-
 # Gmail SMTP (fallback for local development)
-SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
-SMTP_PORT = int(os.getenv('SMTP_PORT', 0))  # 0 means auto-detect: try 465 first, then 587
-USE_SSL = os.getenv('USE_SSL', '').lower() == 'true'  # Force SSL mode
-SENDER_EMAIL = os.getenv('SENDER_EMAIL', '')  # Your Gmail address
-SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', '')  # Gmail App Password
 
-# Use Resend if API key is set, otherwise use SMTP
-USE_RESEND = bool(RESEND_API_KEY)
+def _get_email_runtime_config():
+    return {
+        'resend_api_key': os.getenv('RESEND_API_KEY', ''),
+        'resend_from_email': os.getenv('RESEND_FROM_EMAIL', ''),
+        'smtp_server': os.getenv('SMTP_SERVER', 'smtp.gmail.com'),
+        'smtp_port': int(os.getenv('SMTP_PORT', 0)),
+        'use_ssl': os.getenv('USE_SSL', '').lower() == 'true',
+        'sender_email': os.getenv('SENDER_EMAIL', ''),
+        'sender_password': os.getenv('SENDER_PASSWORD', ''),
+        'allow_smtp_fallback': os.getenv('ALLOW_SMTP_FALLBACK', '').lower() == 'true',
+    }
 
 def send_email_via_resend(to_email, subject, html_body, text_body=None, attachments=None):
     """
@@ -44,11 +45,13 @@ def send_email_via_resend(to_email, subject, html_body, text_body=None, attachme
     Returns:
         bool: True if email sent successfully, False otherwise
     """
-    if not RESEND_API_KEY:
+    cfg = _get_email_runtime_config()
+
+    if not cfg['resend_api_key']:
         print("❌ Resend API key not configured")
         return False
     
-    if not RESEND_FROM_EMAIL:
+    if not cfg['resend_from_email']:
         print("❌ RESEND_FROM_EMAIL not configured. Set it in environment variables.")
         return False
     
@@ -59,7 +62,7 @@ def send_email_via_resend(to_email, subject, html_body, text_body=None, attachme
     try:
         url = "https://api.resend.com/emails"
         data = {
-            "from": RESEND_FROM_EMAIL,
+            "from": cfg['resend_from_email'],
             "to": [to_email],
             "subject": subject,
             "html": html_body
@@ -88,7 +91,7 @@ def send_email_via_resend(to_email, subject, html_body, text_body=None, attachme
         json_data = json.dumps(data).encode('utf-8')
         
         req = urllib.request.Request(url, data=json_data, method='POST')
-        req.add_header('Authorization', f'Bearer {RESEND_API_KEY}')
+        req.add_header('Authorization', f"Bearer {cfg['resend_api_key']}")
         req.add_header('Content-Type', 'application/json')
         
         print(f"📧 Sending email via Resend API to {to_email}...")
@@ -132,11 +135,13 @@ def send_email_via_smtp(to_email, subject, html_body, text_body=None, attachment
     Returns:
         bool: True if email sent successfully, False otherwise
     """
-    if not SENDER_EMAIL or not SENDER_PASSWORD:
+    cfg = _get_email_runtime_config()
+
+    if not cfg['sender_email'] or not cfg['sender_password']:
         error_msg = "⚠️ SMTP not configured. Set SENDER_EMAIL and SENDER_PASSWORD environment variables."
         print(error_msg)
-        print(f"   SENDER_EMAIL: {'SET' if SENDER_EMAIL else 'NOT SET'}")
-        print(f"   SENDER_PASSWORD: {'SET' if SENDER_PASSWORD else 'NOT SET'}")
+        print(f"   SENDER_EMAIL: {'SET' if cfg['sender_email'] else 'NOT SET'}")
+        print(f"   SENDER_PASSWORD: {'SET' if cfg['sender_password'] else 'NOT SET'}")
         return False
     
     if not to_email:
@@ -146,7 +151,7 @@ def send_email_via_smtp(to_email, subject, html_body, text_body=None, attachment
     try:
         # Create message
         msg = MIMEMultipart('mixed')
-        msg['From'] = SENDER_EMAIL
+        msg['From'] = cfg['sender_email']
         msg['To'] = to_email
         msg['Subject'] = subject
 
@@ -175,21 +180,21 @@ def send_email_via_smtp(to_email, subject, html_body, text_body=None, attachment
         
         # Try to send email - use SSL (port 465) first, then STARTTLS (port 587)
         # Render often blocks port 587, so we try 465 first
-        port_to_try = SMTP_PORT if SMTP_PORT > 0 else 465
-        use_ssl_for_this_attempt = USE_SSL if SMTP_PORT > 0 else True
+        port_to_try = cfg['smtp_port'] if cfg['smtp_port'] > 0 else 465
+        use_ssl_for_this_attempt = cfg['use_ssl'] if cfg['smtp_port'] > 0 else True
         
         try:
             if use_ssl_for_this_attempt:
                 # Use SSL (port 465) - sometimes works better on Render
-                print(f"📧 Attempting to send email via {SMTP_SERVER}:{port_to_try} using SSL...")
-                server = smtplib.SMTP_SSL(SMTP_SERVER, port_to_try, timeout=10)
+                print(f"📧 Attempting to send email via {cfg['smtp_server']}:{port_to_try} using SSL...")
+                server = smtplib.SMTP_SSL(cfg['smtp_server'], port_to_try, timeout=10)
             else:
                 # Use STARTTLS (port 587)
-                print(f"📧 Attempting to send email via {SMTP_SERVER}:{port_to_try} using STARTTLS...")
-                server = smtplib.SMTP(SMTP_SERVER, port_to_try, timeout=10)
+                print(f"📧 Attempting to send email via {cfg['smtp_server']}:{port_to_try} using STARTTLS...")
+                server = smtplib.SMTP(cfg['smtp_server'], port_to_try, timeout=10)
                 server.starttls()
             
-            server.login(SENDER_EMAIL, SENDER_PASSWORD)
+            server.login(cfg['sender_email'], cfg['sender_password'])
             server.send_message(msg)
             server.quit()
             
@@ -197,12 +202,12 @@ def send_email_via_smtp(to_email, subject, html_body, text_body=None, attachment
             return True
         except (OSError, ConnectionError) as conn_error:
             # If SSL/port 465 failed and we haven't tried port 587 yet, try that
-            if port_to_try == 465 and SMTP_PORT == 0 and '101' in str(conn_error):
+            if port_to_try == 465 and cfg['smtp_port'] == 0 and '101' in str(conn_error):
                 print(f"⚠️ Port 465 (SSL) failed with network error, trying port 587 (STARTTLS)...")
                 try:
-                    server = smtplib.SMTP(SMTP_SERVER, 587, timeout=10)
+                    server = smtplib.SMTP(cfg['smtp_server'], 587, timeout=10)
                     server.starttls()
-                    server.login(SENDER_EMAIL, SENDER_PASSWORD)
+                    server.login(cfg['sender_email'], cfg['sender_password'])
                     server.send_message(msg)
                     server.quit()
                     print(f"✅ Email sent successfully to {to_email} via port 587")
@@ -218,7 +223,7 @@ def send_email_via_smtp(to_email, subject, html_body, text_body=None, attachment
         print(f"❌ {error_msg}")
         return False
     except smtplib.SMTPConnectError as e:
-        error_msg = f"SMTP Connection Error: {str(e)}. Cannot connect to {SMTP_SERVER}."
+        error_msg = f"SMTP Connection Error: {str(e)}. Cannot connect to {cfg['smtp_server']}."
         print(f"❌ {error_msg}")
         return False
     except (OSError, ConnectionError) as e:
@@ -253,13 +258,19 @@ def send_email(to_email, subject, html_body, text_body=None, attachments=None):
     Returns:
         bool: True if email sent successfully, False otherwise
     """
+    cfg = _get_email_runtime_config()
+
     # Prefer Resend API (works on Render), fallback to SMTP for local dev
-    if USE_RESEND:
+    if bool(cfg['resend_api_key']):
         print('📧 Email provider: Resend')
         result = send_email_via_resend(to_email, subject, html_body, text_body, attachments)
         if result:
             return True
-        # If Resend fails, fall back to SMTP (but log the attempt)
+        # If Resend fails, do not silently fall back to SMTP (Render blocks SMTP).
+        if not cfg['allow_smtp_fallback']:
+            print("⚠️ Resend failed and SMTP fallback is disabled. Set ALLOW_SMTP_FALLBACK=true to enable fallback.")
+            return False
+        # If explicitly allowed, fall back to SMTP (but log the attempt)
         print("⚠️ Resend failed, attempting SMTP fallback...")
 
     print('📧 Email provider: SMTP')
