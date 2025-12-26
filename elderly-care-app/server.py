@@ -5437,7 +5437,7 @@ def landing_setting():
         value = get_app_setting_bool('show_landing_first', True)
         return jsonify({'show_landing_first': bool(value)})
 
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     raw = data.get('show_landing_first')
     value = 1 if bool(raw) else 0
     if set_app_setting('show_landing_first', str(value)):

@@ -2367,7 +2367,7 @@ async function saveLandingFirstSetting() {
 
         const res = await fetch('/api/settings/landing', {
             method: 'POST',
-            headers: { ...getAuthHeaders(), 'Accept': 'application/json' },
+            headers: { ...getAuthHeaders(), 'Accept': 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({ show_landing_first: !!el.checked }),
             cache: 'no-store'
         });
