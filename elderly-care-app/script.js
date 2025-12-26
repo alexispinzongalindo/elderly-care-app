@@ -3044,6 +3044,12 @@ function checkAuth() {
             showResidentSelector();
         } else {
             hideResidentSelector();
+            // On refresh, ensure the resident badge is restored before entering the app.
+            try {
+                loadCurrentResidentInfo(currentResidentId);
+            } catch (e) {
+                // ignore
+            }
             initApp();
         }
     }
@@ -3987,6 +3993,16 @@ function initApp() {
     // Always re-show the app shell after login. Login flow hides #mainApp.
     const mainAppEl = document.getElementById('mainApp');
     if (mainAppEl) mainAppEl.style.display = 'block';
+
+    // If a resident was previously selected, restore the header badge on startup.
+    // This is especially important on mobile where users may refresh often.
+    try {
+        if (hasSelectedResident()) {
+            loadCurrentResidentInfo(currentResidentId);
+        }
+    } catch (e) {
+        // ignore
+    }
 
     updateFinancialTransactionControls();
 
