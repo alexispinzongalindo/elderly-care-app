@@ -1062,40 +1062,72 @@ h3 {
 }
 
 .kpi-icon i {
-    color: #fff;
+    color: #0f172a;
     font-size: 1.05rem;
 }
 
 .kpi-icon-med {
-    background: linear-gradient(135deg, #2563eb, #22c55e);
+    background: #dbeafe;
 }
 
 .kpi-icon-warning {
-    background: linear-gradient(135deg, #f59e0b, #f97316);
+    background: #ffedd5;
 }
 
 .kpi-icon-teal {
-    background: linear-gradient(135deg, #06b6d4, #22c55e);
+    background: #ccfbf1;
 }
 
 .kpi-icon-vitals {
-    background: linear-gradient(135deg, #ef4444, #fb7185);
+    background: #ffe4e6;
 }
 
 .kpi-icon-staff {
-    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    background: #e0e7ff;
 }
 
 .kpi-icon-danger {
-    background: linear-gradient(135deg, #dc2626, #f97316);
+    background: #fee2e2;
 }
 
 .kpi-icon-blue {
-    background: linear-gradient(135deg, #2563eb, #60a5fa);
+    background: #e0f2fe;
 }
 
 .kpi-icon-muted {
-    background: linear-gradient(135deg, #64748b, #94a3b8);
+    background: #e2e8f0;
+}
+
+.kpi-icon-med i {
+    color: #2563eb;
+}
+
+.kpi-icon-warning i {
+    color: #d97706;
+}
+
+.kpi-icon-teal i {
+    color: #0ea5a4;
+}
+
+.kpi-icon-vitals i {
+    color: #e11d48;
+}
+
+.kpi-icon-staff i {
+    color: #4f46e5;
+}
+
+.kpi-icon-danger i {
+    color: #dc2626;
+}
+
+.kpi-icon-blue i {
+    color: #0284c7;
+}
+
+.kpi-icon-muted i {
+    color: #64748b;
 }
 
 .kpi-body {
@@ -2709,6 +2741,42 @@ body.dark-mode .nav-link.active {
 
 body.dark-mode .nav-link.active .nav-icon {
     background: var(--nav-accent, #93c5fd);
+}
+
+body.dark-mode .kpi-icon {
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .kpi-icon-med {
+    background: rgba(37, 99, 235, 0.22);
+}
+
+body.dark-mode .kpi-icon-warning {
+    background: rgba(217, 119, 6, 0.22);
+}
+
+body.dark-mode .kpi-icon-teal {
+    background: rgba(14, 165, 164, 0.22);
+}
+
+body.dark-mode .kpi-icon-vitals {
+    background: rgba(225, 29, 72, 0.22);
+}
+
+body.dark-mode .kpi-icon-staff {
+    background: rgba(79, 70, 229, 0.22);
+}
+
+body.dark-mode .kpi-icon-danger {
+    background: rgba(220, 38, 38, 0.22);
+}
+
+body.dark-mode .kpi-icon-blue {
+    background: rgba(2, 132, 199, 0.22);
+}
+
+body.dark-mode .kpi-icon-muted {
+    background: rgba(148, 163, 184, 0.20);
 }
 
 body.dark-mode .attention-item {
