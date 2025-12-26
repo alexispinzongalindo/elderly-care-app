@@ -17,41 +17,6 @@ function safeStorageGet(key) {
     }
 }
 
-async function setRegulation7349SourceUrl() {
-    try {
-        if (!authToken || !currentStaff) {
-            checkAuth();
-            return;
-        }
-        if (!currentStaff || !isAdminStaff(currentStaff)) {
-            showMessage('Insufficient permissions / Permisos insuficientes', 'error');
-            return;
-        }
-        const url = (prompt('Paste the OCR PDF URL for regulation 7349:') || '').trim();
-        if (!url) return;
-
-        const btn = document.getElementById('regulationsSet7349UrlBtn');
-        if (btn) btn.disabled = true;
-        const res = await fetch('/api/regulations/source-url', {
-            method: 'POST',
-            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-            body: JSON.stringify({ regulation_number: '7349', source_url: url })
-        });
-        const payload = await res.json().catch(() => ({}));
-        if (!res.ok) {
-            throw new Error(payload.error || `Update failed (${res.status})`);
-        }
-        showMessage('7349 PDF URL updated. Reindexing…', 'success');
-        await reindexRegulations();
-    } catch (error) {
-        console.error('Error updating 7349 source url:', error);
-        showMessage(`Error updating 7349 source URL: ${error.message}`, 'error');
-    } finally {
-        const btn = document.getElementById('regulationsSet7349UrlBtn');
-        if (btn) btn.disabled = false;
-    }
-}
-
 let _regulationsPageBound = false;
 
 function _renderRegulationsDocActions(doc) {
@@ -115,14 +80,9 @@ async function loadRegulationsPage() {
         const resultsEl = document.getElementById('regulationsResults');
         const inputEl = document.getElementById('regulationsSearchInput');
         const reindexBtn = document.getElementById('regulationsReindexBtn');
-        const set7349Btn = document.getElementById('regulationsSet7349UrlBtn');
 
         if (reindexBtn) {
             reindexBtn.style.display = currentStaff && isAdminStaff(currentStaff) ? '' : 'none';
-        }
-
-        if (set7349Btn) {
-            set7349Btn.style.display = currentStaff && isAdminStaff(currentStaff) ? '' : 'none';
         }
 
         if (!_regulationsPageBound && inputEl) {
