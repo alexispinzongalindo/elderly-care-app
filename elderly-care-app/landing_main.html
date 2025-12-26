@@ -480,12 +480,93 @@
 
     <!-- Features Section -->
     <section class="features" id="features">
-        <!-- ... -->
+        <div class="container">
+            <div class="section-title">
+                <h2 data-translate="features.title">Key Features</h2>
+                <p data-translate="features.subtitle">Tools designed to support daily operations, safety, and documentation.</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card" data-accent="primary">
+                    <div class="feature-icon"><i class="fas fa-user-nurse"></i></div>
+                    <h3 data-translate="features.staff">Staff & Roles</h3>
+                    <p data-translate="features.staffDesc">Role-based access for administrators, managers, and care staff.</p>
+                </div>
+
+                <div class="feature-card" data-accent="secondary">
+                    <div class="feature-icon"><i class="fas fa-notes-medical"></i></div>
+                    <h3 data-translate="features.residents">Residents & Records</h3>
+                    <p data-translate="features.residentsDesc">Centralized resident profiles with quick access to key information.</p>
+                </div>
+
+                <div class="feature-card" data-accent="success">
+                    <div class="feature-icon"><i class="fas fa-pills"></i></div>
+                    <h3 data-translate="features.medication">Medication Tracking</h3>
+                    <p data-translate="features.medicationDesc">Log scheduled and administered medications with accountability.</p>
+                </div>
+
+                <div class="feature-card" data-accent="warning">
+                    <div class="feature-icon"><i class="fas fa-heartbeat"></i></div>
+                    <h3 data-translate="features.vitals">Vital Signs</h3>
+                    <p data-translate="features.vitalsDesc">Record vitals over time to support clinical awareness and reporting.</p>
+                </div>
+
+                <div class="feature-card" data-accent="danger">
+                    <div class="feature-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                    <h3 data-translate="features.incidents">Incident Reporting</h3>
+                    <p data-translate="features.incidentsDesc">Standardized documentation of incidents with severity classification.</p>
+                </div>
+
+                <div class="feature-card" data-accent="accent">
+                    <div class="feature-icon"><i class="fas fa-file-pdf"></i></div>
+                    <h3 data-translate="features.history">History & Exports</h3>
+                    <p data-translate="features.historyDesc">Generate summaries and export/print PDFs for continuity of care.</p>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Benefits Section -->
     <section class="benefits">
-        <!-- ... -->
+        <div class="container">
+            <div class="section-title" style="margin-bottom: 40px;">
+                <h2 style="color: white;" data-translate="benefits.title">Benefits</h2>
+                <p style="color: rgba(255,255,255,0.9);" data-translate="benefits.subtitle">Built to improve consistency, visibility, and compliance in daily care workflows.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-shield-heart"></i></div>
+                        <h4 data-translate="benefits.safety">Patient Safety</h4>
+                        <p data-translate="benefits.safetyDesc">Clear documentation and alerts help reduce missed steps and improve response time.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <h4 data-translate="benefits.audit">Audit-Ready</h4>
+                        <p data-translate="benefits.auditDesc">Structured records support oversight and make reviews simpler.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-bolt"></i></div>
+                        <h4 data-translate="benefits.efficiency">Operational Efficiency</h4>
+                        <p data-translate="benefits.efficiencyDesc">Reduce paperwork and consolidate workflows into a single system.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-buttons" style="margin-top: 10px;">
+                <a href="/app" class="btn-hero btn-hero-primary" data-translate="benefits.openApp">
+                    <i class="fas fa-right-to-bracket"></i> Open the Application
+                </a>
+                <a href="#features" class="btn-hero btn-hero-secondary" data-translate="benefits.backToTop">
+                    <i class="fas fa-arrow-up"></i> Back to Features
+                </a>
+            </div>
+        </div>
     </section>
 
     <!-- Footer -->
@@ -522,10 +603,36 @@
                 'qr.instruction1': 'Point your camera at the QR code',
                 'qr.instruction2': 'Or click the link below',
 
+                'features.title': 'Key Features',
+                'features.subtitle': 'Tools designed to support daily operations, safety, and documentation.',
+                'features.staff': 'Staff & Roles',
+                'features.staffDesc': 'Role-based access for administrators, managers, and care staff.',
+                'features.residents': 'Residents & Records',
+                'features.residentsDesc': 'Centralized resident profiles with quick access to key information.',
+                'features.medication': 'Medication Tracking',
+                'features.medicationDesc': 'Log scheduled and administered medications with accountability.',
+                'features.vitals': 'Vital Signs',
+                'features.vitalsDesc': 'Record vitals over time to support clinical awareness and reporting.',
+                'features.incidents': 'Incident Reporting',
+                'features.incidentsDesc': 'Standardized documentation of incidents with severity classification.',
+                'features.history': 'History & Exports',
+                'features.historyDesc': 'Generate summaries and export/print PDFs for continuity of care.',
+
+                'benefits.title': 'Benefits',
+                'benefits.subtitle': 'Built to improve consistency, visibility, and compliance in daily care workflows.',
+                'benefits.safety': 'Patient Safety',
+                'benefits.safetyDesc': 'Clear documentation and alerts help reduce missed steps and improve response time.',
+                'benefits.audit': 'Audit-Ready',
+                'benefits.auditDesc': 'Structured records support oversight and make reviews simpler.',
+                'benefits.efficiency': 'Operational Efficiency',
+                'benefits.efficiencyDesc': 'Reduce paperwork and consolidate workflows into a single system.',
+                'benefits.openApp': 'Open the Application',
+                'benefits.backToTop': 'Back to Features',
+
                 'footer.title': 'Elder Care Management System',
                 'footer.subtitle': 'Professional Healthcare Solutions for Puerto Rico',
                 'footer.access': 'Access Application',
-                'footer.copyright': '© 2025 Elder Care Management. All rights reserved.'
+                'footer.copyright': ' 2025 Elder Care Management. All rights reserved.'
             },
             es: {
                 'hero.title': 'Gestión de Cuidado de Adultos Mayores',
@@ -539,10 +646,36 @@
                 'qr.instruction1': 'Apunte la cámara hacia el código QR',
                 'qr.instruction2': 'O presione el enlace a continuación',
 
+                'features.title': 'Funcionalidades principales',
+                'features.subtitle': 'Herramientas diseñadas para apoyar las operaciones diarias, la seguridad y la documentación.',
+                'features.staff': 'Personal y roles',
+                'features.staffDesc': 'Acceso por roles para administradores, gerentes y personal de cuidado.',
+                'features.residents': 'Residentes y expedientes',
+                'features.residentsDesc': 'Perfiles centralizados de residentes con acceso rápido a información clave.',
+                'features.medication': 'Control de medicamentos',
+                'features.medicationDesc': 'Registro de medicamentos programados y administrados con trazabilidad.',
+                'features.vitals': 'Signos vitales',
+                'features.vitalsDesc': 'Registro de signos vitales en el tiempo para apoyar la supervisión clínica y reportes.',
+                'features.incidents': 'Reporte de incidentes',
+                'features.incidentsDesc': 'Documentación estandarizada de incidentes con clasificación de severidad.',
+                'features.history': 'Historial y exportaciones',
+                'features.historyDesc': 'Generación de resúmenes y exportación/impresión de PDFs para continuidad del cuidado.',
+
+                'benefits.title': 'Beneficios',
+                'benefits.subtitle': 'Diseñado para mejorar la consistencia, la visibilidad y el cumplimiento en los flujos de trabajo de cuidado.',
+                'benefits.safety': 'Seguridad del residente',
+                'benefits.safetyDesc': 'Documentación clara y alertas ayudan a reducir omisiones y a mejorar el tiempo de respuesta.',
+                'benefits.audit': 'Listo para auditorías',
+                'benefits.auditDesc': 'Registros estructurados facilitan la supervisión y simplifican las revisiones.',
+                'benefits.efficiency': 'Eficiencia operacional',
+                'benefits.efficiencyDesc': 'Menos papeleo y flujos consolidados en un solo sistema.',
+                'benefits.openApp': 'Abrir la aplicación',
+                'benefits.backToTop': 'Volver a funcionalidades',
+
                 'footer.title': 'Sistema de Gestión de Cuidado de Adultos Mayores',
                 'footer.subtitle': 'Soluciones profesionales de salud para Puerto Rico',
                 'footer.access': 'Acceder a la aplicación',
-                'footer.copyright': '© 2025 Elder Care Management. Todos los derechos reservados.'
+                'footer.copyright': ' 2025 Elder Care Management. Todos los derechos reservados.'
             }
         };
 
