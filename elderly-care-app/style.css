@@ -352,7 +352,7 @@ body {
 .nav-icon {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--nav-accent-bg, rgba(44, 90, 160, 0.12));
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -363,7 +363,7 @@ body {
 }
 
 .nav-icon i {
-    color: white;
+    color: var(--nav-accent, var(--primary-color));
     font-size: 1.1rem;
     transition: transform 0.3s ease;
 }
@@ -427,8 +427,8 @@ body {
 }
 
 .nav-link:hover {
-    background-color: rgba(78, 205, 196, 0.1);
-    color: var(--primary-color);
+    background-color: var(--nav-accent-bg, rgba(44, 90, 160, 0.12));
+    color: var(--nav-accent, var(--primary-color));
 }
 
 .nav-link:hover .nav-icon {
@@ -441,17 +441,92 @@ body {
 }
 
 .nav-link.active {
-    background-color: var(--primary-color);
+    background-color: var(--nav-accent, var(--primary-color));
     color: var(--white);
 }
 
 .nav-link.active .nav-icon {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.22);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .nav-link.active .nav-icon i {
     color: var(--white);
+}
+
+.nav-link[data-page="dashboard"] {
+    --nav-accent: #2563eb;
+    --nav-accent-bg: rgba(37, 99, 235, 0.14);
+}
+
+.nav-link[data-page="residents"] {
+    --nav-accent: #7c3aed;
+    --nav-accent-bg: rgba(124, 58, 237, 0.14);
+}
+
+.nav-link[data-page="medications"] {
+    --nav-accent: #16a34a;
+    --nav-accent-bg: rgba(22, 163, 74, 0.14);
+}
+
+.nav-link[data-page="appointments"] {
+    --nav-accent: #0ea5a4;
+    --nav-accent-bg: rgba(14, 165, 164, 0.14);
+}
+
+.nav-link[data-page="vitalsigns"] {
+    --nav-accent: #ef4444;
+    --nav-accent-bg: rgba(239, 68, 68, 0.14);
+}
+
+.nav-link[data-page="carenotes"] {
+    --nav-accent: #f59e0b;
+    --nav-accent-bg: rgba(245, 158, 11, 0.16);
+}
+
+.nav-link[data-page="incidents"] {
+    --nav-accent: #f97316;
+    --nav-accent-bg: rgba(249, 115, 22, 0.16);
+}
+
+.nav-link[data-page="calendar"] {
+    --nav-accent: #06b6d4;
+    --nav-accent-bg: rgba(6, 182, 212, 0.14);
+}
+
+.nav-link[data-page="reports"] {
+    --nav-accent: #3b82f6;
+    --nav-accent-bg: rgba(59, 130, 246, 0.14);
+}
+
+.nav-link[data-page="billing"] {
+    --nav-accent: #d97706;
+    --nav-accent-bg: rgba(217, 119, 6, 0.16);
+}
+
+.nav-link[data-page="history"] {
+    --nav-accent: #64748b;
+    --nav-accent-bg: rgba(100, 116, 139, 0.14);
+}
+
+.nav-link[data-page="regulations"] {
+    --nav-accent: #0f172a;
+    --nav-accent-bg: rgba(15, 23, 42, 0.10);
+}
+
+.nav-link[data-page="notifications"] {
+    --nav-accent: #8b5cf6;
+    --nav-accent-bg: rgba(139, 92, 246, 0.14);
+}
+
+.nav-link[data-page="timeclock"] {
+    --nav-accent: #22c55e;
+    --nav-accent-bg: rgba(34, 197, 94, 0.14);
+}
+
+.nav-link[data-page="settings"] {
+    --nav-accent: #334155;
+    --nav-accent-bg: rgba(51, 65, 85, 0.12);
 }
 
 .logout-link {
@@ -2589,6 +2664,22 @@ body.dark-mode .dashboard-context-pill,
 body.dark-mode .widget-title-icon {
     background: rgba(96, 165, 250, 0.10);
     border-color: rgba(96, 165, 250, 0.18);
+}
+
+body.dark-mode .nav-link {
+    color: rgba(224, 224, 224, 0.86);
+}
+
+body.dark-mode .nav-link:hover {
+    color: var(--nav-accent, #93c5fd);
+}
+
+body.dark-mode .nav-icon {
+    background: var(--nav-accent-bg, rgba(96, 165, 250, 0.14));
+}
+
+body.dark-mode .nav-icon i {
+    color: var(--nav-accent, #93c5fd);
 }
 
 body.dark-mode .attention-item {
