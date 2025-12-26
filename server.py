@@ -23,6 +23,13 @@ except Exception:
     PdfReader = None
     PYPDF_AVAILABLE = False
 
+try:
+    from pdfminer.high_level import extract_text as pdfminer_extract_text
+    PDFMINER_AVAILABLE = True
+except Exception:
+    pdfminer_extract_text = None
+    PDFMINER_AVAILABLE = False
+
 def _sqlite_has_regulations_fts(conn) -> bool:
     try:
         cur = conn.cursor()
@@ -32,22 +39,30 @@ def _sqlite_has_regulations_fts(conn) -> bool:
         return False
 
 def _extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
-    if not PYPDF_AVAILABLE:
-        return ''
-    try:
-        reader = PdfReader(io.BytesIO(pdf_bytes))
-        parts = []
-        for p in reader.pages:
-            try:
-                t = p.extract_text() or ''
-            except Exception:
-                t = ''
-            t = (t or '').strip()
-            if t:
-                parts.append(t)
-        return '\n\n'.join(parts).strip()
-    except Exception:
-        return ''
+    text = ''
+    if PYPDF_AVAILABLE:
+        try:
+            reader = PdfReader(io.BytesIO(pdf_bytes))
+            parts = []
+            for p in reader.pages:
+                try:
+                    t = p.extract_text() or ''
+                except Exception:
+                    t = ''
+                t = (t or '').strip()
+                if t:
+                    parts.append(t)
+            text = '\n\n'.join(parts).strip()
+        except Exception:
+            text = ''
+
+    if not text and PDFMINER_AVAILABLE:
+        try:
+            text = (pdfminer_extract_text(io.BytesIO(pdf_bytes)) or '').strip()
+        except Exception:
+            text = ''
+
+    return (text or '').strip()
 
 def _fetch_url_bytes(url: str, timeout_seconds: int = 25) -> bytes:
     import urllib.request
@@ -55,8 +70,8 @@ def _fetch_url_bytes(url: str, timeout_seconds: int = 25) -> bytes:
         return resp.read()
 
 def index_regulations_documents_text(conn, *, only_missing: bool = True) -> dict:
-    out = {"indexed": 0, "skipped": 0, "errors": 0, "pypdf_available": bool(PYPDF_AVAILABLE), "details": []}
-    if not PYPDF_AVAILABLE:
+    out = {"indexed": 0, "skipped": 0, "errors": 0, "pypdf_available": bool(PYPDF_AVAILABLE), "pdfminer_available": bool(PDFMINER_AVAILABLE), "details": []}
+    if not PYPDF_AVAILABLE and not PDFMINER_AVAILABLE:
         return out
 
     cur = conn.cursor()
