@@ -3035,6 +3035,15 @@ function checkAuth() {
         // On mobile, always force the resident picker ONCE per session so staff can choose/change resident.
         // This prevents auto-jumping to dashboard due to a stale saved currentResidentId.
         if (isMobile && !hasShownPickerThisSession) {
+            // Still restore the badge if a resident was previously selected.
+            // Otherwise the top bar can incorrectly show "No resident selected" after refresh.
+            if (currentResidentId) {
+                try {
+                    loadCurrentResidentInfo(currentResidentId);
+                } catch (e) {
+                    // ignore
+                }
+            }
             safeStorageSet('residentPickerShownThisSession', '1');
             showResidentSelector();
             return;
