@@ -245,6 +245,49 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+
+def get_app_setting(key: str, default=None):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT value FROM app_settings WHERE key = ?', (key,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return default
+    return row['value']
+
+
+def set_app_setting(key: str, value: str) -> bool:
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            'INSERT INTO app_settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP) '
+            'ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP',
+            (key, value),
+        )
+        conn.commit()
+        conn.close()
+        return True
+    except Exception:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return False
+
+
+def get_app_setting_bool(key: str, default: bool = False) -> bool:
+    raw = get_app_setting(key, None)
+    if raw is None:
+        return bool(default)
+    s = str(raw).strip().lower()
+    if s in ('1', 'true', 'yes', 'y', 'on'):
+        return True
+    if s in ('0', 'false', 'no', 'n', 'off'):
+        return False
+    return bool(default)
+
 def get_staff_display_name(conn, staff_id):
     if not staff_id:
         return None
@@ -439,6 +482,19 @@ def create_journal_entry(conn, *, resident_id, entry_type, title, details, occur
 def init_db():
     conn = get_db()
     cursor = conn.cursor()
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS app_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute(
+        'INSERT OR IGNORE INTO app_settings (key, value) VALUES (?, ?)',
+        ('show_landing_first', '1'),
+    )
 
     # Staff/Users table
     cursor.execute('''
@@ -5599,6 +5655,21 @@ def index():
         return response
     except Exception as e:
         return jsonify({'error': f'Error serving index.html: {str(e)}'}), 500
+
+
+@app.route('/api/settings/landing', methods=['GET', 'POST'])
+@require_role('admin', 'manager')
+def landing_setting():
+    if request.method == 'GET':
+        value = get_app_setting_bool('show_landing_first', True)
+        return jsonify({'show_landing_first': bool(value)})
+
+    data = request.get_json(silent=True) or {}
+    raw = data.get('show_landing_first')
+    value = 1 if bool(raw) else 0
+    if set_app_setting('show_landing_first', str(value)):
+        return jsonify({'message': 'Landing setting updated', 'show_landing_first': bool(value)})
+    return jsonify({'error': 'Failed to update landing setting'}), 500
 
 # Alert Management API Endpoints
 @app.route('/api/alerts/thresholds', methods=['GET', 'POST'])
