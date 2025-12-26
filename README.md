@@ -18,6 +18,102 @@ A comprehensive web application for managing elderly care homes in Puerto Rico w
 - 🌐 **Bilingual Support** - Spanish/English interface
 - 📱 **Responsive Design** - Works on desktop, tablet, and mobile devices
 
+## App Sections & Features (EN + ES)
+
+### Core Navigation / Navegación principal
+
+- **Dashboard**
+  - **EN:** Quick overview of daily operations with KPI cards (med adherence, meds due soon, vitals recorded, incidents, care notes, appointments, active residents/staff) plus "Needs Attention" and recent activity.
+  - **ES:** Vista general rápida de la operación diaria con indicadores (adherencia a medicamentos, medicamentos por vencer, signos vitales registrados, incidentes, notas de cuidado, citas, residentes/personal activos), además de "Requiere atención" y actividad reciente.
+
+### Care Management / Gestión de cuidado
+
+- **Residents / Residentes**
+  - **EN:** Create and manage resident profiles (demographics, room/bed, photo, emergency contacts, medical conditions, allergies, dietary restrictions). Select a resident to unlock resident-specific pages.
+  - **ES:** Cree y administre perfiles de residentes (datos, cuarto/cama, foto, contactos de emergencia, condiciones médicas, alergias, restricciones dietarias). Seleccione un residente para habilitar las páginas por residente.
+
+- **Medications / Medicamentos**
+  - **EN:** Maintain each resident's medication list and schedule (dosage, frequency, start/end/ongoing, instructions, scheduled times) and mark doses as taken to track adherence.
+  - **ES:** Mantenga la lista y el horario de medicamentos (dosis, frecuencia, inicio/fin/continuo, instrucciones, horas programadas) y marque dosis como administradas para medir la adherencia.
+
+- **Appointments / Citas**
+  - **EN:** Track resident appointments (date/time, provider, facility, purpose, location, notes) and update schedules as care changes.
+  - **ES:** Registre citas (fecha/hora, proveedor, facilidad, propósito, ubicación, notas) y actualice el calendario según cambien las necesidades de cuidado.
+
+- **Vital Signs / Signos Vitales**
+  - **EN:** Record and review vitals over time (BP, glucose, temperature, heart rate, weight, SpO₂ and notes).
+  - **ES:** Registre y revise signos vitales a través del tiempo (presión, glucosa, temperatura, pulso, peso, SpO₂ y notas).
+
+- **Care Notes / Notas de Cuidado**
+  - **EN:** Daily care documentation covering nutrition/hydration, personal care, mobility/pain, sleep, mood/behavior, activities, and general observations.
+  - **ES:** Documentación diaria del cuidado que cubre nutrición/hidratación, cuidado personal, movilidad/dolor, sueño, estado de ánimo/conducta, actividades y observaciones generales.
+
+### Records & Reports / Registros y reportes
+
+- **Incidents / Incidentes**
+  - **EN:** Create incident reports with staff/resident selection, incident details, actions taken, witnesses, and photo uploads.
+  - **ES:** Cree reportes de incidentes con selección de personal/residentes, detalles, acciones tomadas, testigos y carga de fotos.
+
+- **Calendar / Calendario**
+  - **EN:** Central calendar to browse and search activities (appointments, medications, and logged care events).
+  - **ES:** Calendario central para ver y buscar actividades (citas, medicamentos y eventos de cuidado registrados).
+
+- **Reports / Reportes**
+  - **EN:** Generate report previews by type and date range; export CSV and support print/PDF workflows.
+  - **ES:** Genere vistas previas por tipo y rango de fechas; exporta a CSV y apoya flujo de impresión/PDF.
+
+### Financial / Financiero
+
+- **Billing / Facturación**
+  - **EN:** Create and manage bills, track status, record payments, and view balance summaries.
+  - **ES:** Cree y administre facturas, dé seguimiento a estatus, registre pagos y vea resúmenes de balance.
+
+- **Financial Management / Gestión Financiera** *(Admin/Enabled-area controlled)*
+  - **EN:** Manage bank accounts, transactions, reconciliation, and payment receipts.
+  - **ES:** Gestione cuentas bancarias, transacciones, conciliación y recibos de pago.
+
+### System / Sistema
+
+- **Notifications / Notificaciones**
+  - **EN:** View system notifications and alerts; review and mark items as read.
+  - **ES:** Vea notificaciones y alertas; revise y marque como leído.
+
+- **Time Clock / Reloj**
+  - **EN:** PIN-based clock actions (clock in/out, break start/end) plus a "My Hours" summary.
+  - **ES:** Acciones del reloj con PIN (entrada/salida, inicio/fin de break) y resumen de "Mis horas".
+
+- **History / Journal / Historial**
+  - **EN:** Audit-style timeline by resident/staff and date range; supports export/print/email reporting workflows.
+  - **ES:** Historial tipo bitácora por residente/personal y rango de fechas; apoya exportación/impresión/envío por correo.
+
+- **Regulations / Regulaciones**
+  - **EN:** Search and browse regulations/reference documents for compliance.
+  - **ES:** Busque y consulte regulaciones/documentos de referencia para cumplimiento.
+
+- **Training (Practice Mode) / Entrenamiento** *(Admin/Enabled-area controlled)*
+  - **EN:** Practice environment with demo residents/data and practice reports.
+  - **ES:** Ambiente de práctica con residentes/datos de demostración y reportes de práctica.
+
+- **Documents / Documentos** *(Admin/Enabled-area controlled)*
+  - **EN:** Upload and organize resident documents by category (PDF/photo).
+  - **ES:** Suba y organice documentos del residente por categoría (PDF/foto).
+
+- **Archived Residents / Residentes Archivados** *(Admin/Enabled-area controlled)*
+  - **EN:** Restore previously archived residents back into active care.
+  - **ES:** Restaure residentes archivados para que vuelvan a estar activos.
+
+- **Staff / Personal** *(Admin/Enabled-area controlled)*
+  - **EN:** Manage staff users/roles and generate PINs for time clock access.
+  - **ES:** Administre usuarios/roles y genere PINs para acceso al reloj.
+
+- **Payroll / Nómina** *(Admin/Enabled-area controlled)*
+  - **EN:** Generate payroll reports by date range and staff selection; export CSV.
+  - **ES:** Genere reportes de nómina por rango de fechas y personal; exporta a CSV.
+
+- **Settings / Configuración** *(Admin/Enabled-area controlled)*
+  - **EN:** Configure enabled areas/modules and landing-page behavior.
+  - **ES:** Configure áreas/módulos habilitados y el comportamiento del "landing".
+
 ## Installation
 
 ### Prerequisites
