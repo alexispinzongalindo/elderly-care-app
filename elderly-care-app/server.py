@@ -500,12 +500,30 @@ def init_db():
             weight REAL,
             temperature REAL,
             heart_rate INTEGER,
+            respiratory_rate INTEGER,
+            spo2 INTEGER,
+            o2_flow_rate REAL,
+            o2_method TEXT,
+            pain_score INTEGER,
             notes TEXT,
             staff_id INTEGER,
             FOREIGN KEY (resident_id) REFERENCES residents (id),
             FOREIGN KEY (staff_id) REFERENCES staff (id)
         )
     ''')
+
+    # Vital signs migrations
+    for col_def in [
+        ('respiratory_rate', 'INTEGER'),
+        ('spo2', 'INTEGER'),
+        ('o2_flow_rate', 'REAL'),
+        ('o2_method', 'TEXT'),
+        ('pain_score', 'INTEGER')
+    ]:
+        try:
+            cursor.execute(f"ALTER TABLE vital_signs ADD COLUMN {col_def[0]} {col_def[1]}")
+        except sqlite3.OperationalError:
+            pass
 
     # Billing table (linked to residents)
     cursor.execute('''
@@ -2112,11 +2130,21 @@ def vital_signs():
         temperature = _to_float(data.get('temperature'))
         heart_rate = _to_int(data.get('heart_rate'))
         weight = _to_float(data.get('weight'))
+        respiratory_rate = _to_int(data.get('respiratory_rate'))
+        spo2 = _to_int(data.get('spo2'))
+        o2_flow_rate = _to_float(data.get('o2_flow_rate'))
+        o2_method = (data.get('o2_method') or '').strip()
+        pain_score = _to_int(data.get('pain_score'))
         staff_id = request.current_staff['id']
 
         cursor.execute('''
-            INSERT INTO vital_signs (resident_id, recorded_at, systolic, diastolic, glucose, weight, temperature, heart_rate, notes, staff_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO vital_signs (
+                resident_id, recorded_at,
+                systolic, diastolic, glucose, weight, temperature, heart_rate,
+                respiratory_rate, spo2, o2_flow_rate, o2_method, pain_score,
+                notes, staff_id
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             resident_id,
             data.get('recorded_at'),
@@ -2126,6 +2154,11 @@ def vital_signs():
             weight,
             temperature,
             heart_rate,
+            respiratory_rate,
+            spo2,
+            o2_flow_rate,
+            o2_method,
+            pain_score,
             data.get('notes', ''),
             staff_id
         ))
@@ -2145,6 +2178,20 @@ def vital_signs():
                 parts.append(f"Temp {temperature}")
             if heart_rate is not None:
                 parts.append(f"HR {heart_rate}")
+            if respiratory_rate is not None:
+                parts.append(f"RR {respiratory_rate}")
+            if spo2 is not None:
+                parts.append(f"SpO2 {spo2}%")
+            if o2_flow_rate is not None or o2_method:
+                o2_parts = []
+                if o2_flow_rate is not None:
+                    o2_parts.append(f"{o2_flow_rate} L/min")
+                if o2_method:
+                    o2_parts.append(o2_method)
+                if o2_parts:
+                    parts.append("O2 " + ' '.join(o2_parts))
+            if pain_score is not None:
+                parts.append(f"Pain {pain_score}/10")
             if data.get('weight') is not None:
                 parts.append(f"Weight {data.get('weight')}")
             vitals_summary = ', '.join(parts) if parts else 'Vitals recorded'
@@ -2415,21 +2462,66 @@ def vital_sign_detail(sign_id):
         return jsonify(dict(sign))
 
     elif request.method == 'PUT':
-        data = request.json
+        data = request.get_json(silent=True) or {}
+
+        def _to_int(val):
+            if val is None:
+                return None
+            if isinstance(val, bool):
+                return None
+            s = str(val).strip()
+            if not s:
+                return None
+            try:
+                return int(float(s))
+            except Exception:
+                return None
+
+        def _to_float(val):
+            if val is None:
+                return None
+            if isinstance(val, bool):
+                return None
+            s = str(val).strip()
+            if not s:
+                return None
+            try:
+                return float(s)
+            except Exception:
+                return None
+
+        recorded_at = (data.get('recorded_at') or '').strip() or None
+        systolic = _to_int(data.get('systolic'))
+        diastolic = _to_int(data.get('diastolic'))
+        glucose = _to_float(data.get('glucose'))
+        weight = _to_float(data.get('weight'))
+        temperature = _to_float(data.get('temperature'))
+        heart_rate = _to_int(data.get('heart_rate'))
+        respiratory_rate = _to_int(data.get('respiratory_rate'))
+        spo2 = _to_int(data.get('spo2'))
+        o2_flow_rate = _to_float(data.get('o2_flow_rate'))
+        o2_method = (data.get('o2_method') or '').strip()
+        pain_score = _to_int(data.get('pain_score'))
+        notes = (data.get('notes') or '')
         cursor.execute('''
             UPDATE vital_signs
             SET recorded_at = ?, systolic = ?, diastolic = ?, glucose = ?, weight = ?,
-                temperature = ?, heart_rate = ?, notes = ?
+                temperature = ?, heart_rate = ?, respiratory_rate = ?, spo2 = ?, o2_flow_rate = ?, o2_method = ?, pain_score = ?, notes = ?
             WHERE id = ?
         ''', (
-            data.get('recorded_at'),
-            data.get('systolic'),
-            data.get('diastolic'),
-            data.get('glucose'),
-            data.get('weight'),
-            data.get('temperature'),
-            data.get('heart_rate'),
-            data.get('notes', ''),
+            recorded_at,
+            systolic,
+            diastolic,
+            glucose,
+            weight,
+            temperature,
+            heart_rate,
+            respiratory_rate,
+            spo2,
+            o2_flow_rate,
+            o2_method,
+            pain_score,
+            notes,
             sign_id
         ))
         conn.commit()

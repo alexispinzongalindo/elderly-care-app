@@ -10022,6 +10022,16 @@ function clearVitalSignsForm() {
     document.getElementById('vsWeight').value = '';
     document.getElementById('vsTemperature').value = '';
     document.getElementById('vsHeartRate').value = '';
+    const rrEl = document.getElementById('vsRespiratoryRate');
+    if (rrEl) rrEl.value = '';
+    const spo2El = document.getElementById('vsSpo2');
+    if (spo2El) spo2El.value = '';
+    const o2FlowEl = document.getElementById('vsO2FlowRate');
+    if (o2FlowEl) o2FlowEl.value = '';
+    const o2MethodEl = document.getElementById('vsO2Method');
+    if (o2MethodEl) o2MethodEl.value = '';
+    const painEl = document.getElementById('vsPainScore');
+    if (painEl) painEl.value = '';
     document.getElementById('vsNotes').value = '';
 }
 
@@ -10073,6 +10083,16 @@ async function editVitalSign(id) {
         document.getElementById('vsWeight').value = sign.weight || '';
         document.getElementById('vsTemperature').value = sign.temperature || '';
         document.getElementById('vsHeartRate').value = sign.heart_rate || '';
+        const rrEl = document.getElementById('vsRespiratoryRate');
+        if (rrEl) rrEl.value = sign.respiratory_rate || '';
+        const spo2El = document.getElementById('vsSpo2');
+        if (spo2El) spo2El.value = sign.spo2 || '';
+        const o2FlowEl = document.getElementById('vsO2FlowRate');
+        if (o2FlowEl) o2FlowEl.value = sign.o2_flow_rate || '';
+        const o2MethodEl = document.getElementById('vsO2Method');
+        if (o2MethodEl) o2MethodEl.value = sign.o2_method || '';
+        const painEl = document.getElementById('vsPainScore');
+        if (painEl) painEl.value = sign.pain_score || '';
         document.getElementById('vsNotes').value = sign.notes || '';
 
         // Update form title
@@ -10107,10 +10127,15 @@ async function saveVitalSign(event) {
         weight: document.getElementById('vsWeight').value || null,
         temperature: document.getElementById('vsTemperature').value || null,
         heart_rate: document.getElementById('vsHeartRate').value || null,
+        respiratory_rate: (document.getElementById('vsRespiratoryRate')?.value) || null,
+        spo2: (document.getElementById('vsSpo2')?.value) || null,
+        o2_flow_rate: (document.getElementById('vsO2FlowRate')?.value) || null,
+        o2_method: (document.getElementById('vsO2Method')?.value) || null,
+        pain_score: (document.getElementById('vsPainScore')?.value) || null,
         notes: document.getElementById('vsNotes').value
     };
 
-    if (!data.systolic && !data.diastolic && !data.glucose && !data.weight && !data.temperature && !data.heart_rate) {
+    if (!data.systolic && !data.diastolic && !data.glucose && !data.weight && !data.temperature && !data.heart_rate && !data.respiratory_rate && !data.spo2 && !data.o2_flow_rate && !data.o2_method && !data.pain_score) {
         showMessage('Please enter at least one vital sign measurement / Por favor ingrese al menos una medición de signo vital', 'error');
         return;
     }
@@ -10206,6 +10231,21 @@ function displayVitalSignsList(signs) {
         }
         if (sign.heart_rate) {
             measurements.push(`<span>❤️ HR: ${sign.heart_rate} bpm</span>`);
+        }
+        if (sign.respiratory_rate) {
+            measurements.push(`<span>🫁 RR: ${sign.respiratory_rate} breaths/min</span>`);
+        }
+        if (sign.spo2) {
+            measurements.push(`<span>🩸 SpO2: ${sign.spo2}%</span>`);
+        }
+        if (sign.o2_flow_rate || sign.o2_method) {
+            const o2Parts = [];
+            if (sign.o2_flow_rate) o2Parts.push(`${sign.o2_flow_rate} L/min`);
+            if (sign.o2_method) o2Parts.push(`${sign.o2_method}`);
+            measurements.push(`<span>🩸 O2: ${o2Parts.join(' ')}</span>`);
+        }
+        if (sign.pain_score !== null && sign.pain_score !== undefined && sign.pain_score !== '') {
+            measurements.push(`<span>🩹 Pain: ${sign.pain_score}/10</span>`);
         }
         if (sign.weight) {
             measurements.push(`<span>⚖️ Weight: ${sign.weight} lbs</span>`);
