@@ -1291,6 +1291,50 @@ def reindex_regulations_documents():
     except Exception as e:
         return jsonify({'error': f'Reindex failed: {str(e)}'}), 500
 
+
+@app.route('/api/regulations/source-url', methods=['POST'])
+@require_role('admin')
+def update_regulations_document_source_url():
+    try:
+        data = request.json or {}
+        source_url = (data.get('source_url') or '').strip()
+        regulation_number = (data.get('regulation_number') or '').strip()
+        doc_id = data.get('id')
+
+        if not source_url:
+            return jsonify({'error': 'source_url is required'}), 400
+        if not (source_url.startswith('http://') or source_url.startswith('https://')):
+            return jsonify({'error': 'source_url must start with http:// or https://'}), 400
+        if not regulation_number and not doc_id:
+            return jsonify({'error': 'regulation_number or id is required'}), 400
+
+        conn = get_db()
+        cur = conn.cursor()
+        if doc_id is not None and str(doc_id).strip() != '':
+            try:
+                doc_id_int = int(doc_id)
+            except Exception:
+                conn.close()
+                return jsonify({'error': 'id must be an integer'}), 400
+            cur.execute('UPDATE regulations_documents SET source_url = ? WHERE id = ?', (source_url, doc_id_int))
+        else:
+            cur.execute('UPDATE regulations_documents SET source_url = ? WHERE regulation_number = ?', (source_url, regulation_number))
+
+        if cur.rowcount == 0:
+            conn.close()
+            return jsonify({'error': 'Regulation document not found'}), 404
+
+        conn.commit()
+        if doc_id is not None and str(doc_id).strip() != '':
+            cur.execute('SELECT id, title, agency, regulation_number, source_url, CASE WHEN text_content IS NOT NULL AND LENGTH(text_content) > 0 THEN 1 ELSE 0 END AS has_text FROM regulations_documents WHERE id = ?', (doc_id_int,))
+        else:
+            cur.execute('SELECT id, title, agency, regulation_number, source_url, CASE WHEN text_content IS NOT NULL AND LENGTH(text_content) > 0 THEN 1 ELSE 0 END AS has_text FROM regulations_documents WHERE regulation_number = ? LIMIT 1', (regulation_number,))
+        row = cur.fetchone()
+        conn.close()
+        return jsonify({'updated': True, 'document': dict(row) if row else None})
+    except Exception as e:
+        return jsonify({'error': f'Update failed: {str(e)}'}), 500
+
 # Authentication endpoints
 @app.route('/api/auth/login', methods=['POST'])
 def login():
