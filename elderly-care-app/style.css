@@ -123,6 +123,14 @@ body {
     animation: fadeIn 0.3s ease;
 }
 
+.login-logo {
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 0.75rem auto;
+}
+
 .login-tabs .btn {
     border-radius: 10px;
 }
