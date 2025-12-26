@@ -73,6 +73,11 @@
                 </div>
             </form>
             <p class="login-hint" data-translate="login.hint">Default credentials: admin (password: admin123)</p>
+
+            <div class="button-group" style="margin-top: 0.75rem;">
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="showWhatsNew()" data-translate="landing.whatsNew">What's New</button>
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="showUserManual()" data-translate="landing.userManual">User Manual</button>
+            </div>
         </div>
     </div>
 
@@ -2384,6 +2389,73 @@
             </div>
             <div class="button-group" style="margin-top: 1.5rem;">
                 <button class="btn btn-primary" onclick="hideKeyboardShortcuts()" data-translate="common.close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="whatsNewModal" class="modal" style="display: none;">
+        <div class="form-card" style="max-width: 700px;">
+            <h2 data-translate="whatsNew.title">What's New (Dec 26, 2025)</h2>
+            <div style="display: grid; gap: 0.75rem; margin-top: 1rem;">
+                <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                    <div class="nav-icon" style="--nav-accent: #ef4444; --nav-accent-bg: rgba(239, 68, 68, 0.14);"><i class="fas fa-heart-pulse"></i></div>
+                    <div>
+                        <strong data-translate="whatsNew.vitals.title">Vital Signs expanded</strong>
+                        <div data-translate="whatsNew.vitals.body">Added respiratory rate, SpO₂, oxygen flow rate, oxygen method, and pain score.</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                    <div class="nav-icon" style="--nav-accent: #2563eb; --nav-accent-bg: rgba(37, 99, 235, 0.14);"><i class="fas fa-mobile-screen"></i></div>
+                    <div>
+                        <strong data-translate="whatsNew.mobile.title">Mobile header improvements</strong>
+                        <div data-translate="whatsNew.mobile.body">Settings is centered, hamburger menu stays on the right, and resident badge restores after refresh.</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                    <div class="nav-icon" style="--nav-accent: #0ea5a4; --nav-accent-bg: rgba(14, 165, 164, 0.14);"><i class="fas fa-layer-group"></i></div>
+                    <div>
+                        <strong data-translate="whatsNew.ui.title">Refreshed UI</strong>
+                        <div data-translate="whatsNew.ui.body">Modern pastel, color-coded icons and improved navigation for desktop and mobile.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="button-group" style="margin-top: 1.5rem;">
+                <button class="btn btn-primary" onclick="hideWhatsNew()" data-translate="common.close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="userManualModal" class="modal" style="display: none;">
+        <div class="form-card" style="max-width: 800px;">
+            <h2 data-translate="userManual.title">User Manual (Quick Guide)</h2>
+            <div style="display: grid; gap: 0.75rem; margin-top: 1rem;">
+                <div>
+                    <strong data-translate="userManual.step1.title">1) Login</strong>
+                    <div data-translate="userManual.step1.body">Use Staff PIN (Clock In & Login) or Admin username/password.</div>
+                </div>
+                <div>
+                    <strong data-translate="userManual.step2.title">2) Select a Resident</strong>
+                    <div data-translate="userManual.step2.body">Choose a resident to unlock resident-specific pages. On mobile, you may be prompted once per session to confirm.</div>
+                </div>
+                <div>
+                    <strong data-translate="userManual.step3.title">3) Record Care</strong>
+                    <div data-translate="userManual.step3.body">Use Medications, Appointments, Care Notes, Incidents, and Vital Signs to document daily care.</div>
+                </div>
+                <div>
+                    <strong data-translate="userManual.step4.title">4) Vital Signs</strong>
+                    <div data-translate="userManual.step4.body">Record BP, glucose, temperature, heart rate, weight, plus respiratory rate, SpO₂, oxygen details, and pain score.</div>
+                </div>
+                <div>
+                    <strong data-translate="userManual.step5.title">5) History / Journal</strong>
+                    <div data-translate="userManual.step5.body">Review activity and export/print/email reports as needed.</div>
+                </div>
+                <div>
+                    <strong data-translate="userManual.tip.title">Tip</strong>
+                    <div data-translate="userManual.tip.body">Press “?” to open Keyboard Shortcuts.</div>
+                </div>
+            </div>
+            <div class="button-group" style="margin-top: 1.5rem;">
+                <button class="btn btn-primary" onclick="hideUserManual()" data-translate="common.close">Close</button>
             </div>
         </div>
     </div>

@@ -58,6 +58,10 @@
 - ✅ Weight tracking
 - ✅ Temperature
 - ✅ Heart rate
+- ✅ Respiratory rate
+- ✅ SpO₂
+- ✅ Oxygen flow rate and method
+- ✅ Pain score
 - ✅ Interactive charts (Chart.js)
 - ✅ Color-coded health indicators
 - ✅ Trend visualization
@@ -166,8 +170,10 @@
 - ✅ Responsive design (mobile-friendly)
 - ✅ Mobile scrolling fixed
 - ✅ Header fields visible on mobile
+- ✅ Mobile header improvements (settings centered, hamburger right, resident badge persists)
 - ✅ Clean, healthcare-appropriate design
 - ✅ Color-coded status indicators
+- ✅ Modern pastel, color-coded navigation icon system
 - ✅ Form validation
 - ✅ Error handling and user feedback
 - ✅ Loading states
@@ -380,4 +386,11 @@
 ---
 
 **Last Updated**: December 19, 2025
+
+### Latest Updates (Dec 26, 2025)
+- Expanded Vital Signs: respiratory rate, SpO₂, oxygen flow rate/method, pain score.
+- Refreshed UI with modern pastel, color-coded icons and improved navigation.
+- Mobile improvements: settings centered, hamburger menu pinned right, resident badge restore after refresh.
+
+**Last Updated**: December 26, 2025
 

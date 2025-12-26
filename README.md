@@ -11,7 +11,7 @@ A comprehensive web application for managing elderly care homes in Puerto Rico w
 - 🗂️ **Documents** - Upload and store resident documents (scanner PDFs or photos), download, and soft delete (admin-only)
 - 💊 **Medication Tracking** - Track medications per resident with scheduling
 - 📅 **Appointment Management** - Schedule and track medical appointments
-- 🩺 **Vital Signs Monitoring** - Record and track vital signs (BP, glucose, temperature, heart rate, weight)
+- 🩺 **Vital Signs Monitoring** - Record and track vital signs (BP, glucose, temperature, heart rate, weight, respiratory rate, SpO₂, oxygen flow rate, oxygen method, pain score)
 - 🗄️ **Archived Residents** - Soft-delete residents (archive) and restore (admin-only)
 - 📊 **Dashboard** - Overview of daily activities and statistics
 - 📘 **History / Journal** - Activity timeline with filtering and PDF export
@@ -52,6 +52,13 @@ A comprehensive web application for managing elderly care homes in Puerto Rico w
 3. **Manage Data** - Add medications, appointments, and record vital signs
 4. **View Dashboard** - See daily overview and statistics
 5. **Training (Practice Mode)** - Go to **Training** to create demo residents and generate practice PDFs (training data is hidden from normal Residents/History/Reports)
+
+## Landing Page (Login) Quick Links
+
+On the login screen, you can open:
+
+- **What's New** - Summary of the latest updates
+- **User Manual** - Quick guide for daily workflow
 
 ## Project Structure
 

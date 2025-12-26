@@ -963,6 +963,31 @@ const translations = {
         'app.browserTitle': 'Elder Care Management - Puerto Rico',
         'app.navTitle': 'Elder Care Tracker',
 
+        'landing.whatsNew': "What's New",
+        'landing.userManual': 'User Manual',
+
+        'whatsNew.title': "What's New (Dec 26, 2025)",
+        'whatsNew.vitals.title': 'Vital Signs expanded',
+        'whatsNew.vitals.body': 'Added respiratory rate, SpO₂, oxygen flow rate, oxygen method, and pain score.',
+        'whatsNew.mobile.title': 'Mobile header improvements',
+        'whatsNew.mobile.body': 'Settings is centered, hamburger menu stays on the right, and resident badge restores after refresh.',
+        'whatsNew.ui.title': 'Refreshed UI',
+        'whatsNew.ui.body': 'Modern pastel, color-coded icons and improved navigation for desktop and mobile.',
+
+        'userManual.title': 'User Manual (Quick Guide)',
+        'userManual.step1.title': '1) Login',
+        'userManual.step1.body': 'Use Staff PIN (Clock In & Login) or Admin username/password.',
+        'userManual.step2.title': '2) Select a Resident',
+        'userManual.step2.body': 'Choose a resident to unlock resident-specific pages. On mobile, you may be prompted once per session to confirm.',
+        'userManual.step3.title': '3) Record Care',
+        'userManual.step3.body': 'Use Medications, Appointments, Care Notes, Incidents, and Vital Signs to document daily care.',
+        'userManual.step4.title': '4) Vital Signs',
+        'userManual.step4.body': 'Record BP, glucose, temperature, heart rate, weight, plus respiratory rate, SpO₂, oxygen details, and pain score.',
+        'userManual.step5.title': '5) History / Journal',
+        'userManual.step5.body': 'Review activity and export/print/email reports as needed.',
+        'userManual.tip.title': 'Tip',
+        'userManual.tip.body': 'Press “?” to open Keyboard Shortcuts.',
+
         // Navigation
         'nav.dashboard': 'Dashboard',
         'nav.residents': 'Residents',
@@ -1487,6 +1512,31 @@ const translations = {
         // App
         'app.browserTitle': 'Gestión de Cuidado de Adultos Mayores - Puerto Rico',
         'app.navTitle': 'Registro de Cuidado',
+
+        'landing.whatsNew': 'Novedades',
+        'landing.userManual': 'Manual de Usuario',
+
+        'whatsNew.title': 'Novedades (26 de diciembre de 2025)',
+        'whatsNew.vitals.title': 'Signos vitales ampliados',
+        'whatsNew.vitals.body': 'Se añadió frecuencia respiratoria, SpO₂, flujo de oxígeno, método de oxígeno y escala de dolor.',
+        'whatsNew.mobile.title': 'Mejoras en móvil',
+        'whatsNew.mobile.body': 'Configuración centrada, menú hamburguesa a la derecha y el residente se restaura luego de actualizar.',
+        'whatsNew.ui.title': 'Interfaz actualizada',
+        'whatsNew.ui.body': 'Iconos modernos con colores pastel y mejor navegación en escritorio y móvil.',
+
+        'userManual.title': 'Manual de Usuario (Guía rápida)',
+        'userManual.step1.title': '1) Inicie sesión',
+        'userManual.step1.body': 'Use el PIN del personal (Marcar entrada e iniciar sesión) o el usuario/contraseña de administrador.',
+        'userManual.step2.title': '2) Seleccione un residente',
+        'userManual.step2.body': 'Seleccione un residente para habilitar las páginas por residente. En móvil, puede solicitar confirmación una vez por sesión.',
+        'userManual.step3.title': '3) Registre el cuidado',
+        'userManual.step3.body': 'Use Medicamentos, Citas, Notas de Cuidado, Incidentes y Signos Vitales para documentar el cuidado diario.',
+        'userManual.step4.title': '4) Signos Vitales',
+        'userManual.step4.body': 'Registre presión, glucosa, temperatura, pulso y peso, además de respiración, SpO₂, detalles de oxígeno y escala de dolor.',
+        'userManual.step5.title': '5) Historial / Diario',
+        'userManual.step5.body': 'Revise la actividad y exporte/imprima/envíe por correo los reportes según sea necesario.',
+        'userManual.tip.title': 'Consejo',
+        'userManual.tip.body': 'Presione “?” para abrir los atajos de teclado.',
 
         // Navigation
         'nav.dashboard': 'Panel de Control',
@@ -4422,6 +4472,26 @@ function showKeyboardShortcuts() {
 
 function hideKeyboardShortcuts() {
     const modal = document.getElementById('shortcutsModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function showWhatsNew() {
+    const modal = document.getElementById('whatsNewModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function hideWhatsNew() {
+    const modal = document.getElementById('whatsNewModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function showUserManual() {
+    const modal = document.getElementById('userManualModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function hideUserManual() {
+    const modal = document.getElementById('userManualModal');
     if (modal) modal.style.display = 'none';
 }
 
