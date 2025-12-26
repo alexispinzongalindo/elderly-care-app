@@ -1936,6 +1936,22 @@
                         <button type="button" class="btn btn-secondary" onclick="resetModuleSettings()" data-translate="common.reset">Reset</button>
                     </div>
                 </div>
+
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <h3 data-translate="settings.landingFirst.title">Landing Page</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label>
+                                <input type="checkbox" id="settingShowLandingFirst" checked>
+                                <span data-translate="settings.landingFirst.label">Show landing page first (elderlycare.tech)</span>
+                            </label>
+                            <small data-translate="settings.landingFirst.help">When enabled, the public site shows the landing page at / before entering the app.</small>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-bottom: 0;">
+                        <button type="button" class="btn btn-primary" onclick="saveLandingFirstSetting()" data-translate="common.save">Save</button>
+                    </div>
+                </div>
             </div>
 
             <!-- History / Journal Page -->

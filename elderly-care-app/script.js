@@ -1233,8 +1233,11 @@ const translations = {
         'archivedResidents.subtitle': 'Restaure residentes previamente eliminados (archivados).',
 
         // Settings
-        'settings.title': 'Configuración',
-        'settings.enabledAreas': 'Áreas habilitadas',
+        'settings.title': 'Settings',
+        'settings.enabledAreas': 'Enabled Areas',
+        'settings.landingFirst.title': 'Landing Page',
+        'settings.landingFirst.label': 'Show landing page first (elderlycare.tech)',
+        'settings.landingFirst.help': 'When enabled, the public site shows the landing page at / before entering the app.',
 
         // Documents
         'documents.title': 'Documents',
@@ -1608,6 +1611,12 @@ const translations = {
         'dashboard.attention.nextHourWindow': 'Ventana de medicamentos de la próxima hora',
         'dashboard.attention.incidentsIn7d': 'incidente(s) en los últimos 7 días',
         'dashboard.attention.reviewFollowups': 'Revisar seguimientos y documentación',
+
+        'settings.title': 'Configuración',
+        'settings.enabledAreas': 'Áreas habilitadas',
+        'settings.landingFirst.title': 'Página de inicio (Landing)',
+        'settings.landingFirst.label': 'Mostrar primero la página de inicio (elderlycare.tech)',
+        'settings.landingFirst.help': 'Si está activado, el sitio público muestra la página de inicio en / antes de entrar a la aplicación.',
 
         // Common
         'common.search': 'Buscar',
@@ -2322,6 +2331,55 @@ function resetModuleSettings() {
     loadModuleSettingsIntoForm();
     applyModuleSettings();
     showMessage('Settings reset / Configuración restablecida', 'success');
+}
+
+async function loadLandingFirstSetting() {
+    try {
+        if (!currentStaff || !currentStaff.role || !['admin', 'manager'].includes(String(currentStaff.role).toLowerCase())) {
+            return;
+        }
+        const el = document.getElementById('settingShowLandingFirst');
+        if (!el) return;
+
+        const res = await fetch('/api/settings/landing', {
+            method: 'GET',
+            headers: { ...getAuthHeaders(), 'Accept': 'application/json' },
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            return;
+        }
+        el.checked = !!(data && data.show_landing_first);
+    } catch (e) {
+        // ignore
+    }
+}
+
+async function saveLandingFirstSetting() {
+    try {
+        if (!currentStaff || !currentStaff.role || !['admin', 'manager'].includes(String(currentStaff.role).toLowerCase())) {
+            showMessage('Insufficient permissions / Permisos insuficientes', 'error');
+            return;
+        }
+        const el = document.getElementById('settingShowLandingFirst');
+        if (!el) return;
+
+        const res = await fetch('/api/settings/landing', {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Accept': 'application/json' },
+            body: JSON.stringify({ show_landing_first: !!el.checked }),
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            showMessage((data && (data.error || data.message)) || 'Failed to save / Error al guardar', 'error');
+            return;
+        }
+        showMessage('Settings saved / Configuración guardada', 'success');
+    } catch (e) {
+        showMessage('Failed to save / Error al guardar', 'error');
+    }
 }
 
 async function handlePinClockIn() {
@@ -5705,6 +5763,7 @@ function showPage(pageName) {
         }
         else if (pageName === 'settings') {
             loadModuleSettingsIntoForm();
+            loadLandingFirstSetting();
         }
         else if (pageName === 'regulations') {
             loadRegulationsPage();

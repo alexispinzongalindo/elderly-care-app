@@ -316,6 +316,18 @@ def init_db():
     conn = get_db()
     cursor = conn.cursor()
 
+    # App settings (simple key/value store)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS app_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Default settings
+    cursor.execute('INSERT OR IGNORE INTO app_settings (key, value) VALUES (?, ?)', ('show_landing_first', '1'))
+
     # Staff/Users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS staff (
@@ -1030,6 +1042,49 @@ def require_role(*allowed_roles):
             return f(*args, **kwargs)
         return decorated_function
     return decorator
+
+def get_app_setting(key: str, default: str = None) -> str:
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT value FROM app_settings WHERE key = ? LIMIT 1', (key,))
+        row = cursor.fetchone()
+        conn.close()
+        if row and row['value'] is not None:
+            return str(row['value'])
+    except Exception:
+        try:
+            conn.close()
+        except Exception:
+            pass
+    return default
+
+def get_app_setting_bool(key: str, default: bool = False) -> bool:
+    raw = get_app_setting(key, None)
+    if raw is None:
+        return bool(default)
+    s = str(raw).strip().lower()
+    return s in ('1', 'true', 'yes', 'y', 'on')
+
+def set_app_setting(key: str, value: str) -> bool:
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO app_settings (key, value, updated_at)
+            VALUES (?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
+        ''', (key, str(value)))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        print(f"❌ Failed to set app setting {key}: {e}")
+        return False
 
 # Authentication endpoints
 @app.route('/api/auth/login', methods=['POST'])
@@ -5362,13 +5417,32 @@ def test_post():
 @app.route('/')
 def index():
     try:
-        response = send_from_directory('.', 'index.html')
+        serve_landing = get_app_setting_bool('show_landing_first', True)
+        filename = 'landing_main.html' if serve_landing else 'index.html'
+        if filename == 'landing_main.html' and not os.path.exists(os.path.join(_BASE_DIR, 'landing_main.html')):
+            filename = 'index.html'
+
+        response = send_from_directory('.', filename)
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
         return response
     except Exception as e:
-        return jsonify({'error': f'Error serving index.html: {str(e)}'}), 500
+        return jsonify({'error': f'Error serving root page: {str(e)}'}), 500
+
+@app.route('/api/settings/landing', methods=['GET', 'POST'])
+@require_role('admin', 'manager')
+def landing_setting():
+    if request.method == 'GET':
+        value = get_app_setting_bool('show_landing_first', True)
+        return jsonify({'show_landing_first': bool(value)})
+
+    data = request.json or {}
+    raw = data.get('show_landing_first')
+    value = 1 if bool(raw) else 0
+    if set_app_setting('show_landing_first', str(value)):
+        return jsonify({'message': 'Landing setting updated', 'show_landing_first': bool(value)})
+    return jsonify({'error': 'Failed to update landing setting'}), 500
 
 # Alert Management API Endpoints
 @app.route('/api/alerts/thresholds', methods=['GET', 'POST'])
