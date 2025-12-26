@@ -2053,13 +2053,20 @@ h3 {
     }
     
     .nav-icon {
-        display: flex; /* Show icons on mobile */
-        width: 36px;
-        height: 36px;
+        display: flex;
+        width: 40px;
+        height: 40px;
         margin-right: 0.75rem;
-        width: 24px;
-        text-align: center;
+        border-radius: 10px;
+        align-items: center;
+        justify-content: center;
+        background: var(--nav-accent-bg, rgba(44, 90, 160, 0.12));
         flex-shrink: 0;
+    }
+
+    .nav-icon i {
+        font-size: 1.1rem;
+        color: var(--nav-accent, var(--primary-color));
     }
     
     .nav-link.logout-link {
