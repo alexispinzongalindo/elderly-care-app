@@ -263,18 +263,50 @@
             transition: all 0.3s ease;
             border: 1px solid rgba(15, 23, 42, 0.06);
             box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+            --feature-accent: var(--primary-color);
+            --feature-accent-border: rgba(44, 90, 160, 0.25);
         }
         
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
-            border-color: rgba(44, 90, 160, 0.25);
+            border-color: var(--feature-accent-border);
+        }
+
+        .feature-card[data-accent="primary"] {
+            --feature-accent: var(--primary-color);
+            --feature-accent-border: rgba(44, 90, 160, 0.25);
+        }
+
+        .feature-card[data-accent="secondary"] {
+            --feature-accent: var(--secondary-color);
+            --feature-accent-border: rgba(78, 205, 196, 0.35);
+        }
+
+        .feature-card[data-accent="success"] {
+            --feature-accent: var(--success-color);
+            --feature-accent-border: rgba(92, 184, 92, 0.35);
+        }
+
+        .feature-card[data-accent="warning"] {
+            --feature-accent: var(--warning-color);
+            --feature-accent-border: rgba(240, 173, 78, 0.38);
+        }
+
+        .feature-card[data-accent="danger"] {
+            --feature-accent: var(--danger-color);
+            --feature-accent-border: rgba(217, 83, 79, 0.35);
+        }
+
+        .feature-card[data-accent="accent"] {
+            --feature-accent: var(--accent-color);
+            --feature-accent-border: rgba(255, 107, 107, 0.35);
         }
         
         .feature-icon {
             width: 70px;
             height: 70px;
-            background: var(--primary-color);
+            background: var(--feature-accent);
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -455,7 +487,7 @@
             </div>
             
             <div class="feature-grid">
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="primary">
                     <div class="feature-icon">
                         <i class="fas fa-tachometer-alt"></i>
                     </div>
@@ -463,7 +495,7 @@
                     <p data-translate="feature.dashboard.description">Real-time overview of all critical information including medications, appointments, and vital signs. Get instant insights into resident health status.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="secondary">
                     <div class="feature-icon">
                         <i class="fas fa-users"></i>
                     </div>
@@ -471,7 +503,7 @@
                     <p data-translate="feature.residents.description">Complete resident profiles with personal information, medical history, emergency contacts, and photo management. Track all residents in one place.</p>
                 </div>
 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="primary">
                     <div class="feature-icon">
                         <i class="fas fa-file-alt"></i>
                     </div>
@@ -479,7 +511,7 @@
                     <p data-translate="feature.documents.description">Upload and store resident documents (scanner PDFs or photos). Download documents anytime for insurance, audits, or medical visits.</p>
                 </div>
 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="warning">
                     <div class="feature-icon">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
@@ -487,7 +519,7 @@
                     <p data-translate="feature.training.description">Train caregivers and admins inside the app using demo data hidden from normal views. Generate Practice Reports (PDF) using all training residents with a date range.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="success">
                     <div class="feature-icon">
                         <i class="fas fa-pills"></i>
                     </div>
@@ -495,7 +527,7 @@
                     <p data-translate="feature.medications.description">Schedule and track medication administration with automated alerts. Monitor adherence and generate medication reports for healthcare providers.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="secondary">
                     <div class="feature-icon">
                         <i class="fas fa-calendar-check"></i>
                     </div>
@@ -503,7 +535,7 @@
                     <p data-translate="feature.appointments.description">Manage medical appointments, therapy sessions, and family visits. Set reminders and track appointment history for each resident.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="danger">
                     <div class="feature-icon">
                         <i class="fas fa-heartbeat"></i>
                     </div>
@@ -511,7 +543,7 @@
                     <p data-translate="feature.vitals.description">Track blood pressure, glucose levels, and weight with interactive charts. Includes color-coded health indicators and trends over time.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="primary">
                     <div class="feature-icon">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
@@ -519,7 +551,7 @@
                     <p data-translate="feature.calendar.description">Unified calendar view of all appointments, medication schedules, and important events. Export to Google Calendar for easy access.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="accent">
                     <div class="feature-icon">
                         <i class="fas fa-file-invoice-dollar"></i>
                     </div>
@@ -527,7 +559,7 @@
                     <p data-translate="feature.billing.description">Comprehensive billing system with invoice generation, payment tracking, and financial reporting. Manage accounts receivable efficiently.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="danger">
                     <div class="feature-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
@@ -535,7 +567,7 @@
                     <p data-translate="feature.incidents.description">Document and track incidents with detailed reporting. Generate incident reports and maintain compliance records for regulatory requirements.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="secondary">
                     <div class="feature-icon">
                         <i class="fas fa-sticky-note"></i>
                     </div>
@@ -543,7 +575,7 @@
                     <p data-translate="feature.carenotes.description">Record daily care activities including meals, mobility, pain levels, sleep quality, and mood. Comprehensive documentation for continuity of care.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="warning">
                     <div class="feature-icon">
                         <i class="fas fa-bell"></i>
                     </div>
@@ -551,7 +583,7 @@
                     <p data-translate="feature.notifications.description">Automated alerts for medications, appointments, and critical events. Supports email notifications and optional SMS via carrier gateways.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="primary">
                     <div class="feature-icon">
                         <i class="fas fa-chart-bar"></i>
                     </div>
@@ -559,7 +591,7 @@
                     <p data-translate="feature.reports.description">Generate comprehensive reports on medications, appointments, vital signs, and financial data. Export to PDF for record keeping.</p>
                 </div>
                 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="secondary">
                     <div class="feature-icon">
                         <i class="fas fa-user-shield"></i>
                     </div>
@@ -567,7 +599,7 @@
                     <p data-translate="feature.staff.description">Manage staff accounts, roles, and permissions. Track staff assignments and maintain secure access controls.</p>
                 </div>
 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="primary">
                     <div class="feature-icon">
                         <i class="fas fa-history"></i>
                     </div>
@@ -575,7 +607,7 @@
                     <p data-translate="feature.history.description">View activity history by resident, date range, and staff. Export or print reports for audits and compliance.</p>
                 </div>
 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="success">
                     <div class="feature-icon">
                         <i class="fas fa-clock"></i>
                     </div>
@@ -583,7 +615,7 @@
                     <p data-translate="feature.timeclock.description">Clock in, start/end breaks, and clock out using a staff PIN. Supports fast login workflows for caregivers.</p>
                 </div>
 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="accent">
                     <div class="feature-icon">
                         <i class="fas fa-archive"></i>
                     </div>
@@ -591,7 +623,7 @@
                     <p data-translate="feature.archivedResidents.description">Archive inactive residents safely (soft delete) and restore them later. Protects historical records and avoids accidental data loss.</p>
                 </div>
 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="primary">
                     <div class="feature-icon">
                         <i class="fas fa-file-pdf"></i>
                     </div>
@@ -599,7 +631,7 @@
                     <p data-translate="feature.exports.description">Generate printable reports and export data to PDF or CSV. Email reports when needed for physicians, families, or internal records.</p>
                 </div>
 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="warning">
                     <div class="feature-icon">
                         <i class="fas fa-gavel"></i>
                     </div>
@@ -607,7 +639,7 @@
                     <p data-translate="feature.regulations.description">Quick access to facility regulations and reference materials to support compliance and staff training.</p>
                 </div>
 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="secondary">
                     <div class="feature-icon">
                         <i class="fas fa-cog"></i>
                     </div>
@@ -615,7 +647,7 @@
                     <p data-translate="feature.settings.description">Configure facility preferences, roles, and system options. Designed for administrators and managers.</p>
                 </div>
 
-                <div class="feature-card fade-in-up">
+                <div class="feature-card fade-in-up" data-accent="accent">
                     <div class="feature-icon">
                         <i class="fas fa-sack-dollar"></i>
                     </div>
