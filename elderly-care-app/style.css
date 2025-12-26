@@ -1336,6 +1336,36 @@ h3 {
     max-width: 100%;
 }
 
+.quick-action-btn[data-module="medications"] {
+    --qa-accent: #16a34a;
+    --qa-accent-bg: rgba(22, 163, 74, 0.14);
+}
+
+.quick-action-btn[data-module="vitalsigns"] {
+    --qa-accent: #ef4444;
+    --qa-accent-bg: rgba(239, 68, 68, 0.14);
+}
+
+.quick-action-btn[data-module="staff"] {
+    --qa-accent: #3b82f6;
+    --qa-accent-bg: rgba(59, 130, 246, 0.14);
+}
+
+.quick-action-btn[data-module="incidents"] {
+    --qa-accent: #f97316;
+    --qa-accent-bg: rgba(249, 115, 22, 0.16);
+}
+
+.quick-action-btn[data-module="carenotes"] {
+    --qa-accent: #f59e0b;
+    --qa-accent-bg: rgba(245, 158, 11, 0.16);
+}
+
+.quick-action-btn[data-module="appointments"] {
+    --qa-accent: #0ea5a4;
+    --qa-accent-bg: rgba(14, 165, 164, 0.14);
+}
+
 .quick-action-btn {
     display: flex;
     flex-direction: column;
@@ -1351,7 +1381,7 @@ h3 {
 }
 
 .quick-action-btn:hover {
-    background: rgba(44, 90, 160, 0.06);
+    background: var(--qa-accent-bg, rgba(44, 90, 160, 0.06));
     border-color: rgba(44, 90, 160, 0.35);
     transform: translateY(-2px);
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
@@ -1362,10 +1392,23 @@ h3 {
 }
 
 .quick-action-icon {
-    font-size: 1.5rem;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--qa-accent-bg, rgba(44, 90, 160, 0.12));
+    color: var(--qa-accent, var(--primary-color));
+    font-size: 1.35rem;
     line-height: 1;
     flex-shrink: 0;
     transition: transform 0.2s;
+}
+
+.quick-action-btn:hover .quick-action-icon {
+    background: var(--qa-accent, var(--primary-color));
+    color: var(--white);
 }
 
 .quick-action-btn span:last-child {
