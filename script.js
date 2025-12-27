@@ -11068,7 +11068,15 @@ function displayCalendar(searchTerm = '') {
                 e.preventDefault();
                 const raw = activityEl.getAttribute('data-calendar-activity');
                 try {
-                    const parsed = JSON.parse(raw);
+                    const decoded = (() => {
+                        if (raw === null || raw === undefined) return raw;
+                        const s = String(raw);
+                        if (!s.includes('&')) return s;
+                        const t = document.createElement('textarea');
+                        t.innerHTML = s;
+                        return t.value;
+                    })();
+                    const parsed = JSON.parse(decoded);
                     openCalendarActivity(parsed);
                 } catch (err) {
                     // ignore
