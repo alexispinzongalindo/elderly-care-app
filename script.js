@@ -855,6 +855,289 @@ function isAdminStaff(staff) {
     return role === 'admin' || role === 'administrator';
 }
 
+function getDefaultModuleSettings() {
+    return {
+        residents: true,
+        medications: true,
+        appointments: true,
+        vitalsigns: true,
+        carenotes: true,
+        incidents: true,
+        calendar: true,
+        reports: true,
+        billing: true,
+        notifications: true,
+        timeclock: true,
+        history: true,
+        payroll: true,
+        financial: true,
+        staff: true,
+        archivedResidents: true,
+        documents: true,
+        training: true
+    };
+}
+
+function getModuleSettings() {
+    try {
+        const raw = localStorage.getItem('moduleSettings');
+        if (!raw) return getDefaultModuleSettings();
+        const parsed = JSON.parse(raw);
+        return { ...getDefaultModuleSettings(), ...(parsed || {}) };
+    } catch (e) {
+        return getDefaultModuleSettings();
+    }
+}
+
+function setModuleSettings(settings) {
+    try {
+        localStorage.setItem('moduleSettings', JSON.stringify(settings));
+    } catch (e) {
+        // ignore
+    }
+}
+
+function isPageEnabled(pageName) {
+    const settings = getModuleSettings();
+    const pageToKey = {
+        residents: 'residents',
+        medications: 'medications',
+        appointments: 'appointments',
+        vitalsigns: 'vitalsigns',
+        carenotes: 'carenotes',
+        incidents: 'incidents',
+        calendar: 'calendar',
+        reports: 'reports',
+        billing: 'billing',
+        notifications: 'notifications',
+        timeclock: 'timeclock',
+        history: 'history',
+        payroll: 'payroll',
+        financial: 'financial',
+        staff: 'staff',
+        archivedResidents: 'archivedResidents',
+        documents: 'documents',
+        training: 'training'
+    };
+    const key = pageToKey[pageName];
+    if (!key) return true;
+    return !!settings[key];
+}
+
+function applyModuleSettings() {
+    const settings = getModuleSettings();
+    const navMap = {
+        residents: null,
+        medications: null,
+        appointments: null,
+        vitalsigns: null,
+        carenotes: null,
+        incidents: null,
+        calendar: null,
+        reports: null,
+        billing: null,
+        notifications: null,
+        timeclock: null,
+        history: null,
+        payroll: 'payrollNavLink',
+        financial: 'financialNavLink',
+        staff: 'staffNavLink',
+        archivedResidents: 'archivedResidentsNavLink',
+        documents: 'documentsNavLink',
+        training: 'trainingNavLink'
+    };
+
+    const navSelectorMap = {
+        residents: '.nav-link[data-page="residents"]',
+        medications: '.nav-link[data-page="medications"]',
+        appointments: '.nav-link[data-page="appointments"]',
+        vitalsigns: '.nav-link[data-page="vitalsigns"]',
+        carenotes: '.nav-link[data-page="carenotes"]',
+        incidents: '.nav-link[data-page="incidents"]',
+        calendar: '.nav-link[data-page="calendar"]',
+        reports: '.nav-link[data-page="reports"]',
+        billing: '.nav-link[data-page="billing"]',
+        notifications: '.nav-link[data-page="notifications"]',
+        timeclock: '.nav-link[data-page="timeclock"]',
+        history: '.nav-link[data-page="history"]'
+    };
+
+    const setNavVisibility = (el, visible) => {
+        if (!el) return;
+        const li = el.closest ? el.closest('li') : null;
+        if (li) {
+            li.style.display = visible ? '' : 'none';
+            return;
+        }
+        el.style.display = visible ? '' : 'none';
+    };
+
+    Object.keys(navMap).forEach((key) => {
+        if (navMap[key]) {
+            const el = document.getElementById(navMap[key]);
+            if (!el) return;
+            const roleAllows = !currentStaff || isAdminStaff(currentStaff);
+            const enabled = !!settings[key];
+            setNavVisibility(el, roleAllows && enabled);
+            return;
+        }
+
+        const selector = navSelectorMap[key];
+        if (!selector) return;
+        const el = document.querySelector(selector);
+        if (!el) return;
+        const enabled = !!settings[key];
+        setNavVisibility(el, enabled);
+    });
+
+    const settingsNavLink = document.getElementById('settingsNavLink');
+    if (settingsNavLink) {
+        setNavVisibility(settingsNavLink, !!(currentStaff && isAdminStaff(currentStaff)));
+    }
+
+    const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
+    if (settingsHeaderBtn) {
+        settingsHeaderBtn.style.display = currentStaff && isAdminStaff(currentStaff) ? 'inline-flex' : 'none';
+    }
+
+    try {
+        if (typeof window.updateStickyHeaderOffset === 'function') {
+            window.updateStickyHeaderOffset();
+            window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
+        }
+    } catch (e) {
+        // ignore
+    }
+}
+
+function loadModuleSettingsIntoForm() {
+    const settings = getModuleSettings();
+    const setChecked = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!value;
+    };
+    setChecked('moduleToggleResidents', settings.residents);
+    setChecked('moduleToggleMedications', settings.medications);
+    setChecked('moduleToggleAppointments', settings.appointments);
+    setChecked('moduleToggleVitalSigns', settings.vitalsigns);
+    setChecked('moduleToggleCareNotes', settings.carenotes);
+    setChecked('moduleToggleIncidents', settings.incidents);
+    setChecked('moduleToggleCalendar', settings.calendar);
+    setChecked('moduleToggleReports', settings.reports);
+    setChecked('moduleToggleBilling', settings.billing);
+    setChecked('moduleToggleNotifications', settings.notifications);
+    setChecked('moduleToggleTimeClock', settings.timeclock);
+    setChecked('moduleToggleHistory', settings.history);
+    setChecked('moduleTogglePayroll', settings.payroll);
+    setChecked('moduleToggleFinancial', settings.financial);
+    setChecked('moduleToggleStaff', settings.staff);
+    setChecked('moduleToggleArchivedResidents', settings.archivedResidents);
+    setChecked('moduleToggleDocuments', settings.documents);
+    setChecked('moduleToggleTraining', settings.training);
+}
+
+function saveModuleSettings() {
+    const getChecked = (id) => {
+        const el = document.getElementById(id);
+        return el ? !!el.checked : true;
+    };
+    const next = {
+        residents: getChecked('moduleToggleResidents'),
+        medications: getChecked('moduleToggleMedications'),
+        appointments: getChecked('moduleToggleAppointments'),
+        vitalsigns: getChecked('moduleToggleVitalSigns'),
+        carenotes: getChecked('moduleToggleCareNotes'),
+        incidents: getChecked('moduleToggleIncidents'),
+        calendar: getChecked('moduleToggleCalendar'),
+        reports: getChecked('moduleToggleReports'),
+        billing: getChecked('moduleToggleBilling'),
+        notifications: getChecked('moduleToggleNotifications'),
+        timeclock: getChecked('moduleToggleTimeClock'),
+        history: getChecked('moduleToggleHistory'),
+        payroll: getChecked('moduleTogglePayroll'),
+        financial: getChecked('moduleToggleFinancial'),
+        staff: getChecked('moduleToggleStaff'),
+        archivedResidents: getChecked('moduleToggleArchivedResidents'),
+        documents: getChecked('moduleToggleDocuments'),
+        training: getChecked('moduleToggleTraining')
+    };
+
+    next.dashboard = true;
+    next.settings = true;
+
+    setModuleSettings(next);
+    applyModuleSettings();
+    showMessage('Settings saved / Configuración guardada', 'success');
+
+    const activePageId = document.querySelector('.page.active')?.id;
+    if (activePageId && !isPageEnabled(activePageId)) {
+        showPage('dashboard');
+    }
+}
+
+function resetModuleSettings() {
+    setModuleSettings(getDefaultModuleSettings());
+    loadModuleSettingsIntoForm();
+    applyModuleSettings();
+    showMessage('Settings reset / Configuración restablecida', 'success');
+}
+
+async function loadLandingFirstSetting() {
+    try {
+        if (!currentStaff || !currentStaff.role || !['admin', 'manager'].includes(String(currentStaff.role).toLowerCase())) {
+            return;
+        }
+        const el = document.getElementById('settingShowLandingFirst');
+        if (!el) return;
+
+        const res = await fetch('/api/settings/landing', {
+            method: 'GET',
+            headers: { ...getAuthHeaders(), 'Accept': 'application/json' },
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            return;
+        }
+        el.checked = !!(data && data.show_landing_first);
+    } catch (e) {
+        // ignore
+    }
+}
+
+async function saveLandingFirstSetting() {
+    try {
+        if (!currentStaff || !currentStaff.role || !['admin', 'manager'].includes(String(currentStaff.role).toLowerCase())) {
+            showMessage('Insufficient permissions / Permisos insuficientes', 'error');
+            return;
+        }
+        const el = document.getElementById('settingShowLandingFirst');
+        if (!el) return;
+
+        const res = await fetch('/api/settings/landing', {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ show_landing_first: !!el.checked }),
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            if (data && (data.error || data.message)) {
+                showMessage(String(data.error || data.message), 'error');
+                return;
+            }
+            const text = await res.text().catch(() => '');
+            const snippet = (text || '').trim().slice(0, 200);
+            const details = snippet ? ` (${snippet})` : '';
+            showMessage(`Failed to save (${res.status}) / Error al guardar (${res.status})${details}`, 'error');
+            return;
+        }
+        showMessage('Settings saved / Configuración guardada', 'success');
+    } catch (e) {
+        showMessage(`Failed to save: ${e.message} / Error al guardar: ${e.message}`, 'error');
+    }
+}
+
 function normalizeAuthState() {
     // iOS/Safari can sometimes persist unexpected string values; treat them as logged-out.
     const badStrings = new Set(['undefined', 'null', 'NaN', '[object Object]']);
@@ -997,11 +1280,18 @@ const translations = {
         'nav.notifications': 'Notifications',
         'nav.reports': 'Reports',
         'nav.staff': 'Staff',
+        'nav.settings': 'Settings',
         'nav.logout': 'Logout',
         'nav.group.care': 'Care Management',
         'nav.group.records': 'Records & Reports',
         'nav.group.financial': 'Financial',
         'nav.group.system': 'System',
+
+        'settings.title': 'Settings',
+        'settings.enabledAreas': 'Enabled Areas',
+        'settings.landingFirst.title': 'Landing Page',
+        'settings.landingFirst.label': 'Show landing page first (elderlycare.tech)',
+        'settings.landingFirst.help': 'When enabled, the public site shows the landing page at / before entering the app.',
 
         // Dashboard
         'dashboard.title': 'Dashboard',
@@ -1383,11 +1673,18 @@ const translations = {
         'nav.notifications': 'Notificaciones',
         'nav.reports': 'Reportes',
         'nav.staff': 'Personal',
+        'nav.settings': 'Configuración',
         'nav.logout': 'Cerrar Sesión',
         'nav.group.care': 'Gestión de Cuidado',
         'nav.group.records': 'Registros y Reportes',
         'nav.group.financial': 'Financiero',
         'nav.group.system': 'Sistema',
+
+        'settings.title': 'Configuración',
+        'settings.enabledAreas': 'Áreas habilitadas',
+        'settings.landingFirst.title': 'Página principal',
+        'settings.landingFirst.label': 'Mostrar primero la página informativa (elderlycare.tech)',
+        'settings.landingFirst.help': 'Cuando está habilitado, el sitio público muestra la página informativa en / antes de entrar a la aplicación.',
 
         // Dashboard
         'dashboard.title': 'Panel de Control',
@@ -1834,6 +2131,11 @@ function _applyAuthSuccess(data) {
     const payrollNavLink = document.getElementById('payrollNavLink');
     if (payrollNavLink) {
         payrollNavLink.style.display = isAdminStaff(currentStaff) ? 'block' : 'none';
+    }
+
+    const settingsNavLink = document.getElementById('settingsNavLink');
+    if (settingsNavLink) {
+        settingsNavLink.style.display = isAdminStaff(currentStaff) ? 'block' : 'none';
     }
 
     const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
@@ -3603,6 +3905,11 @@ function initApp() {
         window.requestAnimationFrame(() => window.updateStickyHeaderOffset());
     }
     initNavigation();
+    try {
+        applyModuleSettings();
+    } catch (e) {
+        // ignore
+    }
     loadDashboard();
     updateClock();
     setInterval(updateClock, 1000);
@@ -5133,6 +5440,10 @@ function showPage(pageName) {
         }
         else if (pageName === 'notifications') {
             loadNotificationsPage();
+        }
+        else if (pageName === 'settings') {
+            loadModuleSettingsIntoForm();
+            loadLandingFirstSetting();
         }
         else if (pageName === 'reports') {
             loadReportsAnalytics();

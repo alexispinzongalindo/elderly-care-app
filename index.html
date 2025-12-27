@@ -331,6 +331,7 @@
                     <li><a href="#" class="nav-link" data-page="archivedResidents" id="archivedResidentsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-archive"></i></span><span>Archived Residents</span></a></li>
                     <li><a href="#" class="nav-link" data-page="staff" id="staffNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-user-shield"></i></span><span data-translate="nav.staff">Staff</span></a></li>
                     <li><a href="#" class="nav-link" data-page="payroll" id="payrollNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-file-invoice"></i></span><span data-translate="nav.payroll">Payroll</span></a></li>
+                    <li><a href="#" class="nav-link" data-page="settings" id="settingsNavLink" style="display: none;"><span class="nav-icon"><i class="fas fa-cog"></i></span><span data-translate="nav.settings">Settings</span></a></li>
                     <li><a href="#" class="nav-link logout-link" onclick="handleLogout(); return false;"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span data-translate="nav.logout">Logout</span></a></li>
                 </ul>
             </div>
@@ -1827,6 +1828,99 @@
                     <button class="btn btn-primary" onclick="loadNotificationsPage()">Refresh</button>
                 </div>
                 <div id="notificationsPageList" class="item-list"></div>
+            </div>
+
+            <div id="settings" class="page">
+                <h2 data-translate="settings.title">Settings</h2>
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <h3 data-translate="settings.enabledAreas">Enabled Areas</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleTogglePayroll" checked> <span data-translate="nav.payroll">Payroll</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleFinancial" checked> <span data-translate="nav.financial">Financial Management</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleStaff" checked> <span data-translate="nav.staff">Staff</span></label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleArchivedResidents" checked> <span data-translate="nav.archivedResidents">Archived Residents</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleDocuments" checked> <span data-translate="nav.documents">Documents</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleTraining" checked> <span data-translate="nav.training">Training</span></label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleResidents" checked> <span data-translate="nav.residents">Residents</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleMedications" checked> <span data-translate="nav.medications">Medications</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleAppointments" checked> <span data-translate="nav.appointments">Appointments</span></label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleVitalSigns" checked> <span data-translate="nav.vitalSigns">Vital Signs</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleCareNotes" checked> <span data-translate="nav.careNotes">Care Notes</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleIncidents" checked> <span data-translate="nav.incidents">Incidents</span></label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleCalendar" checked> <span data-translate="nav.calendar">Calendar</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleReports" checked> <span data-translate="nav.reports">Reports</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleBilling" checked> <span data-translate="nav.billing">Billing</span></label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleNotifications" checked> <span data-translate="nav.notifications">Notifications</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleTimeClock" checked> <span data-translate="nav.timeclock">Time Clock</span></label>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label><input type="checkbox" id="moduleToggleHistory" checked> <span data-translate="history.title">History</span></label>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-bottom: 0;">
+                        <button type="button" class="btn btn-primary" onclick="saveModuleSettings()" data-translate="common.save">Save</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetModuleSettings()" data-translate="common.reset">Reset</button>
+                    </div>
+                </div>
+
+                <div class="form-card" style="margin-bottom: 1rem;">
+                    <h3 data-translate="settings.landingFirst.title">Landing Page</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label>
+                                <input type="checkbox" id="settingShowLandingFirst" checked>
+                                <span data-translate="settings.landingFirst.label">Show landing page first (elderlycare.tech)</span>
+                            </label>
+                            <small data-translate="settings.landingFirst.help">When enabled, the public site shows the landing page at / before entering the app.</small>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-bottom: 0;">
+                        <button type="button" class="btn btn-primary" onclick="saveLandingFirstSetting()" data-translate="common.save">Save</button>
+                    </div>
+                </div>
             </div>
 
             <!-- History / Journal Page -->
