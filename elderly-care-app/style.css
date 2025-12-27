@@ -6,24 +6,24 @@
 
 :root {
     /* Primary colors from landing page */
-    --primary-color: #2c5aa0;
-    --primary-blue: #2c5aa0;
-    --secondary-color: #4ecdc4;
-    --accent-color: #FF6B6B;
+    --primary-color: #2f5d50;
+    --primary-blue: #2f5d50;
+    --secondary-color: #7aa892;
+    --accent-color: #c47f6a;
     
     /* Status colors */
-    --success-color: #5cb85c;
-    --success-green: #4CAF50;
-    --warning-color: #f0ad4e;
-    --danger-color: #d9534f;
-    --error-red: #d32f2f;
+    --success-color: #4f8a5b;
+    --success-green: #4f8a5b;
+    --warning-color: #c89f5b;
+    --danger-color: #b05a5a;
+    --error-red: #a94442;
     
     /* Neutral colors from landing page */
-    --light-gray: #f8f9fa;
-    --medium-gray: #e1e8ed;
-    --dark-gray: #7f8c8d;
-    --text-color: #2c3e50;
-    --text-light: #7f8c8d;
+    --light-gray: #f6f3ef;
+    --medium-gray: #e7e0d7;
+    --dark-gray: #7a726a;
+    --text-color: #2b2a28;
+    --text-light: #6f6a63;
     --white: #ffffff;
     --sticky-offset: 0px;
     --page-padding: 1.25rem;
@@ -274,7 +274,7 @@ body {
 }
 
 .resident-badge {
-    background: linear-gradient(135deg, rgba(164, 195, 255, 0.55) 0%, rgba(199, 168, 255, 0.55) 100%);
+    background: linear-gradient(135deg, rgba(231, 224, 215, 0.85) 0%, rgba(210, 228, 218, 0.85) 100%);
     color: var(--primary-color);
     padding: 0.35rem 0.65rem;
     border-radius: 999px;
@@ -286,7 +286,7 @@ body {
     flex-shrink: 1;
     min-width: 0;
     max-width: min(420px, 100%);
-    border: 1px solid rgba(44, 90, 160, 0.15);
+    border: 1px solid rgba(47, 93, 80, 0.18);
 }
 
 #currentResidentName {
@@ -875,23 +875,23 @@ h3 {
 }
 
 .stat-card-medications {
-    border-left-color: #22c55e;
+    border-left-color: var(--success-color);
 }
 
 .stat-card-appointments {
-    border-left-color: #6ea8fe;
+    border-left-color: rgba(122, 168, 146, 0.95);
 }
 
 .stat-card-residents {
-    border-left-color: #8b5cf6;
+    border-left-color: rgba(196, 127, 106, 0.95);
 }
 
 .stat-card-vitals {
-    border-left-color: #ef4444;
+    border-left-color: var(--danger-color);
 }
 
 .stat-card-billing {
-    border-left-color: #f59e0b;
+    border-left-color: var(--warning-color);
 }
 
 .stat-icon {
@@ -907,23 +907,23 @@ h3 {
 }
 
 .stat-card-medications .stat-icon {
-    background: linear-gradient(135deg, #16a34a, #4ade80);
+    background: linear-gradient(135deg, rgba(79, 138, 91, 0.92), rgba(122, 168, 146, 0.70));
 }
 
 .stat-card-appointments .stat-icon {
-    background: linear-gradient(135deg, rgba(110, 168, 254, 0.85), rgba(164, 195, 255, 0.85));
+    background: linear-gradient(135deg, rgba(122, 168, 146, 0.90), rgba(210, 228, 218, 0.90));
 }
 
 .stat-card-residents .stat-icon {
-    background: linear-gradient(135deg, #7c3aed, #c4b5fd);
+    background: linear-gradient(135deg, rgba(196, 127, 106, 0.92), rgba(231, 224, 215, 0.92));
 }
 
 .stat-card-vitals .stat-icon {
-    background: linear-gradient(135deg, #dc2626, #fb7185);
+    background: linear-gradient(135deg, rgba(176, 90, 90, 0.92), rgba(231, 224, 215, 0.92));
 }
 
 .stat-card-billing .stat-icon {
-    background: linear-gradient(135deg, #d97706, #fbbf24);
+    background: linear-gradient(135deg, rgba(200, 159, 91, 0.92), rgba(231, 224, 215, 0.92));
 }
 
 .stat-icon i {
@@ -1354,33 +1354,33 @@ h3 {
 }
 
 .quick-action-btn[data-module="medications"] {
-    --qa-accent: #16a34a;
-    --qa-accent-bg: rgba(22, 163, 74, 0.14);
+    --qa-accent: var(--success-color);
+    --qa-accent-bg: rgba(79, 138, 91, 0.14);
 }
 
 .quick-action-btn[data-module="vitalsigns"] {
-    --qa-accent: #ef4444;
-    --qa-accent-bg: rgba(239, 68, 68, 0.14);
+    --qa-accent: var(--danger-color);
+    --qa-accent-bg: rgba(176, 90, 90, 0.14);
 }
 
 .quick-action-btn[data-module="staff"] {
-    --qa-accent: #6ea8fe;
-    --qa-accent-bg: rgba(110, 168, 254, 0.18);
+    --qa-accent: rgba(122, 168, 146, 0.95);
+    --qa-accent-bg: rgba(122, 168, 146, 0.18);
 }
 
 .quick-action-btn[data-module="incidents"] {
-    --qa-accent: #f97316;
-    --qa-accent-bg: rgba(249, 115, 22, 0.16);
+    --qa-accent: var(--warning-color);
+    --qa-accent-bg: rgba(200, 159, 91, 0.16);
 }
 
 .quick-action-btn[data-module="carenotes"] {
-    --qa-accent: #f59e0b;
-    --qa-accent-bg: rgba(245, 158, 11, 0.16);
+    --qa-accent: rgba(196, 127, 106, 0.95);
+    --qa-accent-bg: rgba(196, 127, 106, 0.16);
 }
 
 .quick-action-btn[data-module="appointments"] {
-    --qa-accent: #0ea5a4;
-    --qa-accent-bg: rgba(14, 165, 164, 0.14);
+    --qa-accent: rgba(122, 168, 146, 0.95);
+    --qa-accent-bg: rgba(122, 168, 146, 0.14);
 }
 
 .quick-action-btn {
