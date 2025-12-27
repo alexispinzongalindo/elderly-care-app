@@ -496,6 +496,11 @@ def init_db():
         ('show_landing_first', '1'),
     )
 
+    cursor.execute(
+        'INSERT OR IGNORE INTO app_settings (key, value) VALUES (?, ?)',
+        ('module_settings', '{}'),
+    )
+
     # Staff/Users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS staff (
@@ -5678,6 +5683,37 @@ def landing_setting():
     if set_app_setting('show_landing_first', str(value)):
         return jsonify({'message': 'Landing setting updated', 'show_landing_first': bool(value)})
     return jsonify({'error': 'Failed to update landing setting'}), 500
+
+
+@app.route('/api/settings/modules', methods=['GET', 'POST'])
+@require_role('admin', 'manager')
+def module_settings():
+    if request.method == 'GET':
+        raw = get_app_setting('module_settings', '{}')
+        try:
+            parsed = json.loads(raw) if raw else {}
+            if not isinstance(parsed, dict):
+                parsed = {}
+        except Exception:
+            parsed = {}
+        return jsonify({'module_settings': parsed})
+
+    data = request.get_json(silent=True) or {}
+    incoming = data.get('module_settings')
+    if incoming is None:
+        incoming = data.get('settings')
+    if incoming is None and isinstance(data, dict):
+        incoming = data
+
+    if not isinstance(incoming, dict):
+        return jsonify({'error': 'module_settings must be an object'}), 400
+
+    if len(json.dumps(incoming)) > 20000:
+        return jsonify({'error': 'module_settings too large'}), 400
+
+    if set_app_setting('module_settings', json.dumps(incoming)):
+        return jsonify({'message': 'Module settings updated', 'module_settings': incoming})
+    return jsonify({'error': 'Failed to update module settings'}), 500
 
 # Alert Management API Endpoints
 @app.route('/api/alerts/thresholds', methods=['GET', 'POST'])

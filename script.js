@@ -889,6 +889,26 @@ function getModuleSettings() {
     }
 }
 
+async function loadModuleSettingsFromServer() {
+    try {
+        if (!authToken) return null;
+        const res = await fetch('/api/settings/modules', {
+            method: 'GET',
+            headers: { ...getAuthHeaders(), 'Accept': 'application/json' },
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) return null;
+        const incoming = data && data.module_settings;
+        if (!incoming || typeof incoming !== 'object') return null;
+        const merged = { ...getDefaultModuleSettings(), ...(incoming || {}) };
+        setModuleSettings(merged);
+        return merged;
+    } catch (e) {
+        return null;
+    }
+}
+
 function setModuleSettings(settings) {
     try {
         localStorage.setItem('moduleSettings', JSON.stringify(settings));
@@ -1067,7 +1087,27 @@ function saveModuleSettings() {
 
     setModuleSettings(next);
     applyModuleSettings();
-    showMessage('Settings saved / Configuración guardada', 'success');
+
+    const persist = async () => {
+        if (!authToken) return;
+        const res = await fetch('/api/settings/modules', {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Accept': 'application/json' },
+            body: JSON.stringify({ module_settings: next }),
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            const msg = (data && (data.error || data.message)) || 'Failed to save settings / Error al guardar configuración';
+            showMessage(String(msg), 'error');
+            return;
+        }
+        showMessage('Settings saved / Configuración guardada', 'success');
+    };
+
+    persist().catch(() => {
+        showMessage('Settings saved locally / Configuración guardada localmente', 'success');
+    });
 
     const activePageId = document.querySelector('.page.active')?.id;
     if (activePageId && !isPageEnabled(activePageId)) {
@@ -1076,10 +1116,31 @@ function saveModuleSettings() {
 }
 
 function resetModuleSettings() {
-    setModuleSettings(getDefaultModuleSettings());
+    const defaults = getDefaultModuleSettings();
+    setModuleSettings(defaults);
     loadModuleSettingsIntoForm();
     applyModuleSettings();
-    showMessage('Settings reset / Configuración restablecida', 'success');
+
+    const persist = async () => {
+        if (!authToken) return;
+        const res = await fetch('/api/settings/modules', {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Accept': 'application/json' },
+            body: JSON.stringify({ module_settings: defaults }),
+            cache: 'no-store'
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+            const msg = (data && (data.error || data.message)) || 'Failed to reset settings / Error al restablecer configuración';
+            showMessage(String(msg), 'error');
+            return;
+        }
+        showMessage('Settings reset / Configuración restablecida', 'success');
+    };
+
+    persist().catch(() => {
+        showMessage('Settings reset locally / Configuración restablecida localmente', 'success');
+    });
 }
 
 async function loadLandingFirstSetting() {
@@ -2141,6 +2202,16 @@ function _applyAuthSuccess(data) {
     const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
     if (settingsHeaderBtn) {
         settingsHeaderBtn.style.display = isAdminStaff(currentStaff) ? 'inline-flex' : 'none';
+    }
+
+    try {
+        loadModuleSettingsFromServer().then((serverSettings) => {
+            if (serverSettings) {
+                applyModuleSettings();
+            }
+        });
+    } catch (e) {
+        // ignore
     }
 
     hideLoginModal();
@@ -5442,7 +5513,11 @@ function showPage(pageName) {
             loadNotificationsPage();
         }
         else if (pageName === 'settings') {
-            loadModuleSettingsIntoForm();
+            loadModuleSettingsFromServer().then(() => {
+                loadModuleSettingsIntoForm();
+            }).catch(() => {
+                loadModuleSettingsIntoForm();
+            });
             loadLandingFirstSetting();
         }
         else if (pageName === 'reports') {
