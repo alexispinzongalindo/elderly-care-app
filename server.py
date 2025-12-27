@@ -3554,6 +3554,15 @@ def calendar():
     vs_query = 'SELECT *, resident_id FROM vital_signs WHERE 1=1'
     vs_params = []
 
+    tx_query = None
+    tx_params = []
+    try:
+        role = (request.current_staff.get('role') or '').strip().lower()
+    except Exception:
+        role = ''
+    if role in ('admin', 'administrator', 'manager'):
+        tx_query = 'SELECT id, resident_id, bank_account_id, transaction_date, transaction_type, description, amount FROM transactions WHERE 1=1'
+
     if resident_id:
         med_query += ' AND m.resident_id = ?'
         med_params.append(resident_id)
@@ -3561,6 +3570,9 @@ def calendar():
         appt_params.append(resident_id)
         vs_query += ' AND resident_id = ?'
         vs_params.append(resident_id)
+        if tx_query is not None:
+            tx_query += ' AND resident_id = ?'
+            tx_params.append(resident_id)
 
     if year and month:
         med_query += ' AND strftime("%Y", ml.taken_at) = ? AND strftime("%m", ml.taken_at) = ?'
@@ -3569,16 +3581,22 @@ def calendar():
         appt_params.extend([year, month.zfill(2)])
         vs_query += ' AND strftime("%Y", recorded_at) = ? AND strftime("%m", recorded_at) = ?'
         vs_params.extend([year, month.zfill(2)])
+        if tx_query is not None:
+            tx_query += ' AND strftime("%Y", transaction_date) = ? AND strftime("%m", transaction_date) = ?'
+            tx_params.extend([year, month.zfill(2)])
 
     med_query += ' ORDER BY ml.taken_at DESC'
     appt_query += ' ORDER BY date DESC, time DESC'
     vs_query += ' ORDER BY recorded_at DESC'
+    if tx_query is not None:
+        tx_query += ' ORDER BY transaction_date DESC, id DESC'
 
     cursor.execute(med_query, med_params)
     for row in cursor.fetchall():
         activities.append({
             'type': 'medication',
             'id': row['id'],
+            'medication_id': row['medication_id'],
             'datetime': row['taken_at'],
             'scheduled_time': row['scheduled_time'],
             'status': row['status'],
@@ -3617,6 +3635,22 @@ def calendar():
             'weight': row['weight'],
             'resident_id': row['resident_id']
         })
+
+    if tx_query is not None:
+        cursor.execute(tx_query, tx_params)
+        for row in cursor.fetchall():
+            tx_date = row['transaction_date']
+            activities.append({
+                'type': 'transaction',
+                'id': row['id'],
+                'datetime': f"{tx_date} 00:00" if tx_date else None,
+                'transaction_date': tx_date,
+                'transaction_type': row['transaction_type'],
+                'description': row['description'],
+                'amount': row['amount'],
+                'bank_account_id': row['bank_account_id'],
+                'resident_id': row['resident_id']
+            })
 
     activities.sort(key=lambda x: x['datetime'], reverse=True)
 

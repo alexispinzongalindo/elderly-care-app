@@ -10822,7 +10822,7 @@ async function loadCalendar() {
             url += `&resident_id=${currentResidentId}`;
         }
 
-        const response = await fetch(url);
+        const response = await fetch(url, { headers: getAuthHeaders(), cache: 'no-store' });
         allCalendarActivities = await response.json();
 
         displayCalendar();
@@ -10880,6 +10880,71 @@ function displayCalendar(searchTerm = '') {
     const monthNamesEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
+    const escapeHtml = (s) => {
+        return String(s ?? '').replace(/[&<>"']/g, (c) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[c] || c));
+    };
+
+    const safeInt = (v) => {
+        const n = Number(v);
+        return Number.isFinite(n) ? Math.trunc(n) : null;
+    };
+
+    const openCalendarActivity = async (activity) => {
+        if (!activity || !activity.type) return;
+        const type = String(activity.type);
+
+        try {
+            if (activity.resident_id && String(activity.resident_id) !== String(currentResidentId || '')) {
+                // Selecting resident is handled elsewhere; don't hard-switch automatically.
+            }
+
+            if (type === 'appointment') {
+                showPage('appointments');
+                setTimeout(() => {
+                    try { editAppointment(activity.id); } catch (e) {}
+                }, 0);
+                return;
+            }
+
+            if (type === 'vital_signs') {
+                showPage('vitalsigns');
+                setTimeout(() => {
+                    try { editVitalSign(activity.id); } catch (e) {}
+                }, 0);
+                return;
+            }
+
+            if (type === 'medication') {
+                const medId = activity.medication_id || activity.medicationId;
+                if (medId) {
+                    showPage('medications');
+                    setTimeout(() => {
+                        try { editMedication(medId); } catch (e) {}
+                    }, 0);
+                    return;
+                }
+                showPage('medications');
+                return;
+            }
+
+            if (type === 'transaction') {
+                showPage('financial');
+                setTimeout(() => {
+                    try { editTransaction(activity.id); } catch (e) {}
+                }, 0);
+                return;
+            }
+        } catch (e) {
+            showMessage(`Error: ${e.message}`, 'error');
+        }
+    };
+
     container.innerHTML = `
         <div class="form-card">
             <h3 style="text-align: center; margin-bottom: 1rem;">
@@ -10919,12 +10984,65 @@ function displayCalendar(searchTerm = '') {
                                             icon = '🩺';
                                             className = 'completed';
                                             title = 'Vital Signs';
+                                        } else if (activity.type === 'transaction') {
+                                            icon = '💳';
+                                            className = activity.transaction_type === 'deposit' ? 'completed' : 'pending';
+                                            const amt = (activity.amount === null || activity.amount === undefined) ? '' : `$${parseFloat(activity.amount || 0).toFixed(2)}`;
+                                            title = `${activity.description || 'Transaction'}${amt ? ' - ' + amt : ''}`;
                                         }
 
-                                        return `<div class="activity-item ${className}" title="${title}">${icon} ${title.length > 15 ? title.substring(0, 15) + '...' : title}</div>`;
+                                        const payload = escapeHtml(JSON.stringify({
+                                            type: activity.type,
+                                            id: safeInt(activity.id),
+                                            resident_id: safeInt(activity.resident_id),
+                                            medication_id: safeInt(activity.medication_id),
+                                            transaction_type: activity.transaction_type || null,
+                                            amount: activity.amount ?? null,
+                                            bank_account_id: safeInt(activity.bank_account_id)
+                                        }));
+
+                                        return `<div class="activity-item ${className}" role="button" tabindex="0" data-calendar-activity="${payload}" title="${escapeHtml(title)}">${icon} ${escapeHtml(title.length > 15 ? title.substring(0, 15) + '...' : title)}</div>`;
                                     }).join('')}
-                                    ${dayActivities.length > 3 ? `<div class="activity-item">+${dayActivities.length - 3} more</div>` : ''}
+                                    ${dayActivities.length > 3 ? `<div class="activity-item" role="button" tabindex="0" data-calendar-more="${escapeHtml(dateKey)}">+${dayActivities.length - 3} more</div>` : ''}
                                 </div>
+                                ${dayActivities.length > 3 ? `
+                                    <div class="day-activities day-activities-more" data-calendar-more-list="${escapeHtml(dateKey)}" style="display:none; margin-top: 0.35rem;">
+                                        ${dayActivities.slice(3).map(activity => {
+                                            let icon = '';
+                                            let className = '';
+                                            let title = '';
+                                            if (activity.type === 'medication') {
+                                                icon = '💊';
+                                                className = activity.status === 'taken' ? 'completed' : 'pending';
+                                                title = `${activity.name} - ${activity.scheduled_time}`;
+                                            } else if (activity.type === 'appointment') {
+                                                icon = '🏥';
+                                                className = activity.completed ? 'completed' : 'pending';
+                                                title = `Dr. ${activity.name} - ${activity.time}`;
+                                            } else if (activity.type === 'vital_signs') {
+                                                icon = '🩺';
+                                                className = 'completed';
+                                                title = 'Vital Signs';
+                                            } else if (activity.type === 'transaction') {
+                                                icon = '💳';
+                                                className = activity.transaction_type === 'deposit' ? 'completed' : 'pending';
+                                                const amt = (activity.amount === null || activity.amount === undefined) ? '' : `$${parseFloat(activity.amount || 0).toFixed(2)}`;
+                                                title = `${activity.description || 'Transaction'}${amt ? ' - ' + amt : ''}`;
+                                            }
+
+                                            const payload = escapeHtml(JSON.stringify({
+                                                type: activity.type,
+                                                id: safeInt(activity.id),
+                                                resident_id: safeInt(activity.resident_id),
+                                                medication_id: safeInt(activity.medication_id),
+                                                transaction_type: activity.transaction_type || null,
+                                                amount: activity.amount ?? null,
+                                                bank_account_id: safeInt(activity.bank_account_id)
+                                            }));
+                                            return `<div class="activity-item ${className}" role="button" tabindex="0" data-calendar-activity="${payload}" title="${escapeHtml(title)}">${icon} ${escapeHtml(title.length > 15 ? title.substring(0, 15) + '...' : title)}</div>`;
+                                        }).join('')}
+                                    </div>
+                                ` : ''}
                             ` : ''}
                         </div>
                     `;
@@ -10940,11 +11058,55 @@ function displayCalendar(searchTerm = '') {
 
     // Display activities list
     displayCalendarActivitiesList(activities);
+
+    // One delegated click handler for all calendar items (grid + list)
+    if (!container.__calendarClickWired) {
+        container.__calendarClickWired = true;
+        container.addEventListener('click', (e) => {
+            const activityEl = e.target && e.target.closest ? e.target.closest('[data-calendar-activity]') : null;
+            if (activityEl) {
+                e.preventDefault();
+                const raw = activityEl.getAttribute('data-calendar-activity');
+                try {
+                    const parsed = JSON.parse(raw);
+                    openCalendarActivity(parsed);
+                } catch (err) {
+                    // ignore
+                }
+                return;
+            }
+
+            const moreEl = e.target && e.target.closest ? e.target.closest('[data-calendar-more]') : null;
+            if (moreEl) {
+                e.preventDefault();
+                const dateKey = moreEl.getAttribute('data-calendar-more');
+                const list = container.querySelector(`[data-calendar-more-list="${CSS.escape(dateKey)}"]`);
+                if (list) {
+                    list.style.display = (list.style.display === 'none' || !list.style.display) ? 'block' : 'none';
+                }
+            }
+        });
+    }
 }
 
 function displayCalendarActivitiesList(activities) {
     const container = document.getElementById('calendarActivitiesList');
     if (!container) return;
+
+    const escapeHtml = (s) => {
+        return String(s ?? '').replace(/[&<>"']/g, (c) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[c] || c));
+    };
+
+    const safeInt = (v) => {
+        const n = Number(v);
+        return Number.isFinite(n) ? Math.trunc(n) : null;
+    };
 
     if (activities.length === 0) {
         container.innerHTML = '<p style="text-align: center; color: var(--dark-gray); padding: 2rem;">No activities found for this month. / No se encontraron actividades para este mes.</p>';
@@ -10963,10 +11125,26 @@ function displayCalendarActivitiesList(activities) {
             content = `🏥 Dr. ${activity.name} - ${activity.time} - ${activity.completed ? 'Completed' : 'Scheduled'}`;
         } else if (activity.type === 'vital_signs') {
             content = `🩺 Vital Signs recorded`;
+        } else if (activity.type === 'transaction') {
+            const sign = activity.transaction_type === 'deposit' ? '+' : '-';
+            content = `💳 ${activity.description || 'Transaction'} - ${sign}$${parseFloat(activity.amount || 0).toFixed(2)}`;
         }
 
+        const payload = (() => {
+            try {
+                return escapeHtml(JSON.stringify({
+                    type: activity.type,
+                    id: safeInt(activity.id),
+                    resident_id: safeInt(activity.resident_id),
+                    medication_id: safeInt(activity.medication_id)
+                }));
+            } catch (e) {
+                return '';
+            }
+        })();
+
         return `
-            <div class="item-card">
+            <div class="item-card" role="button" tabindex="0" data-calendar-activity="${payload}">
                 <div class="item-header">
                     <div>
                         <div class="item-title">${content}</div>
