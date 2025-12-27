@@ -1364,8 +1364,8 @@ h3 {
 }
 
 .quick-action-btn[data-module="staff"] {
-    --qa-accent: #3b82f6;
-    --qa-accent-bg: rgba(59, 130, 246, 0.14);
+    --qa-accent: #6ea8fe;
+    --qa-accent-bg: rgba(110, 168, 254, 0.18);
 }
 
 .quick-action-btn[data-module="incidents"] {
