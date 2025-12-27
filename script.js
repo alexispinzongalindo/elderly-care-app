@@ -10991,15 +10991,22 @@ function displayCalendar(searchTerm = '') {
                                             title = `${activity.description || 'Transaction'}${amt ? ' - ' + amt : ''}`;
                                         }
 
-                                        const payload = escapeHtml(JSON.stringify({
-                                            type: activity.type,
-                                            id: safeInt(activity.id),
-                                            resident_id: safeInt(activity.resident_id),
-                                            medication_id: safeInt(activity.medication_id),
-                                            transaction_type: activity.transaction_type || null,
-                                            amount: activity.amount ?? null,
-                                            bank_account_id: safeInt(activity.bank_account_id)
-                                        }));
+                                        const payload = (() => {
+                                            try {
+                                                const raw = JSON.stringify({
+                                                    type: activity.type,
+                                                    id: safeInt(activity.id),
+                                                    resident_id: safeInt(activity.resident_id),
+                                                    medication_id: safeInt(activity.medication_id),
+                                                    transaction_type: activity.transaction_type || null,
+                                                    amount: activity.amount ?? null,
+                                                    bank_account_id: safeInt(activity.bank_account_id)
+                                                });
+                                                return encodeURIComponent(raw);
+                                            } catch (e) {
+                                                return '';
+                                            }
+                                        })();
 
                                         return `<div class="activity-item ${className}" role="button" tabindex="0" data-calendar-activity="${payload}" title="${escapeHtml(title)}">${icon} ${escapeHtml(title.length > 15 ? title.substring(0, 15) + '...' : title)}</div>`;
                                     }).join('')}
@@ -11030,15 +11037,22 @@ function displayCalendar(searchTerm = '') {
                                                 title = `${activity.description || 'Transaction'}${amt ? ' - ' + amt : ''}`;
                                             }
 
-                                            const payload = escapeHtml(JSON.stringify({
-                                                type: activity.type,
-                                                id: safeInt(activity.id),
-                                                resident_id: safeInt(activity.resident_id),
-                                                medication_id: safeInt(activity.medication_id),
-                                                transaction_type: activity.transaction_type || null,
-                                                amount: activity.amount ?? null,
-                                                bank_account_id: safeInt(activity.bank_account_id)
-                                            }));
+                                            const payload = (() => {
+                                                try {
+                                                    const raw = JSON.stringify({
+                                                        type: activity.type,
+                                                        id: safeInt(activity.id),
+                                                        resident_id: safeInt(activity.resident_id),
+                                                        medication_id: safeInt(activity.medication_id),
+                                                        transaction_type: activity.transaction_type || null,
+                                                        amount: activity.amount ?? null,
+                                                        bank_account_id: safeInt(activity.bank_account_id)
+                                                    });
+                                                    return encodeURIComponent(raw);
+                                                } catch (e) {
+                                                    return '';
+                                                }
+                                            })();
                                             return `<div class="activity-item ${className}" role="button" tabindex="0" data-calendar-activity="${payload}" title="${escapeHtml(title)}">${icon} ${escapeHtml(title.length > 15 ? title.substring(0, 15) + '...' : title)}</div>`;
                                         }).join('')}
                                     </div>
@@ -11071,10 +11085,15 @@ function displayCalendar(searchTerm = '') {
                     const decoded = (() => {
                         if (raw === null || raw === undefined) return raw;
                         const s = String(raw);
-                        if (!s.includes('&')) return s;
-                        const t = document.createElement('textarea');
-                        t.innerHTML = s;
-                        return t.value;
+                        // New format: URI-encoded JSON
+                        try { return decodeURIComponent(s); } catch (e) {}
+                        // Back-compat: HTML-escaped JSON
+                        if (s.includes('&')) {
+                            const t = document.createElement('textarea');
+                            t.innerHTML = s;
+                            return t.value;
+                        }
+                        return s;
                     })();
                     const parsed = JSON.parse(decoded);
                     openCalendarActivity(parsed);
@@ -11140,12 +11159,13 @@ function displayCalendarActivitiesList(activities) {
 
         const payload = (() => {
             try {
-                return escapeHtml(JSON.stringify({
+                const raw = JSON.stringify({
                     type: activity.type,
                     id: safeInt(activity.id),
                     resident_id: safeInt(activity.resident_id),
                     medication_id: safeInt(activity.medication_id)
-                }));
+                });
+                return encodeURIComponent(raw);
             } catch (e) {
                 return '';
             }
