@@ -3701,7 +3701,7 @@ def staff():
             return jsonify({'error': 'Authentication required'}), 401
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at, pay_rate FROM staff ORDER BY full_name')
+        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, preferred_language, active, created_at, pay_rate FROM staff ORDER BY full_name')
         staff_list = []
         for row in cursor.fetchall():
             staff_dict = dict(row)
@@ -3724,8 +3724,8 @@ def staff():
         data = request.json
         password_hash = hash_password(data.get('password', 'password123'))
         cursor.execute('''
-            INSERT INTO staff (username, password_hash, full_name, role, email, phone, phone_carrier)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO staff (username, password_hash, full_name, role, email, phone, phone_carrier, preferred_language)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data.get('username'),
             password_hash,
@@ -3733,7 +3733,8 @@ def staff():
             data.get('role', 'caregiver'),
             data.get('email'),
             data.get('phone'),
-            data.get('phone_carrier')  # Carrier for SMS (e.g., 'verizon', 'att', 't-mobile')
+            data.get('phone_carrier'),  # Carrier for SMS (e.g., 'verizon', 'att', 't-mobile')
+            data.get('preferred_language', 'en')
         ))
         conn.commit()
         staff_id = cursor.lastrowid
@@ -3747,7 +3748,7 @@ def staff_detail(id):
     cursor = conn.cursor()
 
     if request.method == 'GET':
-        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at, pay_rate FROM staff WHERE id = ?', (id,))
+        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, preferred_language, active, created_at, pay_rate FROM staff WHERE id = ?', (id,))
         staff = cursor.fetchone()
         conn.close()
         if not staff:
@@ -3773,7 +3774,7 @@ def staff_detail(id):
             password_hash = hash_password(data.get('password'))
             cursor.execute('''
                 UPDATE staff
-                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, active = ?
+                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, preferred_language = ?, active = ?
                 WHERE id = ?
             ''', (
                 data.get('username'),
@@ -3781,6 +3782,7 @@ def staff_detail(id):
                 data.get('role', 'caregiver'),
                 data.get('email'),
                 data.get('phone'),
+                data.get('preferred_language', 'en'),
                 data.get('active', True),
                 id
             ))
@@ -3789,7 +3791,7 @@ def staff_detail(id):
         else:
             cursor.execute('''
                 UPDATE staff
-                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, phone_carrier = ?, active = ?, pay_rate = ?
+                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, phone_carrier = ?, preferred_language = ?, active = ?, pay_rate = ?
                 WHERE id = ?
             ''', (
                 data.get('username'),
@@ -3798,6 +3800,7 @@ def staff_detail(id):
                 data.get('email'),
                 data.get('phone'),
                 data.get('phone_carrier'),  # Carrier for SMS
+                data.get('preferred_language', 'en'),
                 data.get('active', True),
                 pay_rate,
                 id

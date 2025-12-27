@@ -3470,7 +3470,7 @@ def staff():
             return jsonify({'error': 'Authentication required'}), 401
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at, pay_rate FROM staff ORDER BY full_name')
+        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, preferred_language, active, created_at, pay_rate FROM staff ORDER BY full_name')
         staff_list = []
         for row in cursor.fetchall():
             staff_dict = dict(row)
@@ -3492,9 +3492,13 @@ def staff():
         cursor = conn.cursor()
         data = request.json
         password_hash = hash_password(data.get('password', 'password123'))
+        preferred_language = (data.get('preferred_language') or 'en')
+        if preferred_language not in ['en', 'es']:
+            conn.close()
+            return jsonify({'error': 'Invalid language. Must be "en" or "es"'}), 400
         cursor.execute('''
-            INSERT INTO staff (username, password_hash, full_name, role, email, phone, phone_carrier)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO staff (username, password_hash, full_name, role, email, phone, phone_carrier, preferred_language)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data.get('username'),
             password_hash,
@@ -3502,7 +3506,8 @@ def staff():
             data.get('role', 'caregiver'),
             data.get('email'),
             data.get('phone'),
-            data.get('phone_carrier')  # Carrier for SMS (e.g., 'verizon', 'att', 't-mobile')
+            data.get('phone_carrier'),  # Carrier for SMS (e.g., 'verizon', 'att', 't-mobile')
+            preferred_language
         ))
         conn.commit()
         staff_id = cursor.lastrowid
@@ -3516,7 +3521,7 @@ def staff_detail(id):
     cursor = conn.cursor()
 
     if request.method == 'GET':
-        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, active, created_at, pay_rate FROM staff WHERE id = ?', (id,))
+        cursor.execute('SELECT id, username, full_name, role, email, phone, phone_carrier, preferred_language, active, created_at, pay_rate FROM staff WHERE id = ?', (id,))
         staff = cursor.fetchone()
         conn.close()
         if not staff:
@@ -3537,12 +3542,17 @@ def staff_detail(id):
                 pay_rate = None
         except Exception:
             return jsonify({'error': 'Invalid pay rate / Tarifa inválida'}), 400
+
+        preferred_language = (data.get('preferred_language') or 'en')
+        if preferred_language not in ['en', 'es']:
+            conn.close()
+            return jsonify({'error': 'Invalid language. Must be "en" or "es"'}), 400
         # If password is provided, hash it; otherwise keep existing password
         if data.get('password'):
             password_hash = hash_password(data.get('password'))
             cursor.execute('''
                 UPDATE staff
-                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, active = ?
+                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, active = ?, preferred_language = ?
                 WHERE id = ?
             ''', (
                 data.get('username'),
@@ -3551,6 +3561,7 @@ def staff_detail(id):
                 data.get('email'),
                 data.get('phone'),
                 data.get('active', True),
+                preferred_language,
                 id
             ))
             # Update password separately if provided
@@ -3558,7 +3569,7 @@ def staff_detail(id):
         else:
             cursor.execute('''
                 UPDATE staff
-                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, phone_carrier = ?, active = ?, pay_rate = ?
+                SET username = ?, full_name = ?, role = ?, email = ?, phone = ?, phone_carrier = ?, preferred_language = ?, active = ?, pay_rate = ?
                 WHERE id = ?
             ''', (
                 data.get('username'),
@@ -3567,6 +3578,7 @@ def staff_detail(id):
                 data.get('email'),
                 data.get('phone'),
                 data.get('phone_carrier'),  # Carrier for SMS
+                preferred_language,
                 data.get('active', True),
                 pay_rate,
                 id

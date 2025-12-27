@@ -17,6 +17,16 @@ function safeStorageGet(key) {
     }
 }
 
+function normalizePreferredLanguage(lang) {
+    if (!lang) return 'en';
+    const v = String(lang).trim().toLowerCase();
+    if (v === 'en' || v === 'english' || v === 'en-us' || v === 'en_us') return 'en';
+    if (v === 'es' || v === 'spanish' || v === 'es-pr' || v === 'es_pr') return 'es';
+    if (v.startsWith('en')) return 'en';
+    if (v.startsWith('es')) return 'es';
+    return 'en';
+}
+
 let _regulationsPageBound = false;
 
 function _renderRegulationsDocActions(doc) {
@@ -1526,6 +1536,7 @@ const translations = {
         'staff.title': 'Staff Management',
         'staff.add': 'Add New Staff Member',
         'staff.edit': 'Edit Staff Member',
+        'staff.addNew': '+ Add New Staff',
         'staff.username': 'Username',
         'staff.fullName': 'Full Name',
         'staff.role': 'Role',
@@ -2048,6 +2059,7 @@ const translations = {
         'staff.title': 'Gestión de Personal',
         'staff.add': 'Agregar Nuevo Personal',
         'staff.edit': 'Editar Personal',
+        'staff.addNew': '+ Agregar Nuevo Personal',
         'staff.username': 'Usuario',
         'staff.fullName': 'Nombre Completo',
         'staff.role': 'Rol',
@@ -2871,6 +2883,12 @@ function setLanguage(lang) {
     const langSelector = document.getElementById('languageSelector');
     if (langSelector) {
         langSelector.value = lang;
+    }
+
+    // Update login language selector (shown before login)
+    const loginLangSelector = document.getElementById('loginLanguageSelector');
+    if (loginLangSelector) {
+        loginLangSelector.value = lang;
     }
 
     // Update all translatable elements
@@ -6858,6 +6876,8 @@ function showAddStaffForm() {
     if (staffPayRateEl) staffPayRateEl.value = '';
     const generatedPinEl = document.getElementById('generatedStaffPin');
     if (generatedPinEl) generatedPinEl.value = '';
+    const staffPreferredLanguageEl = document.getElementById('staffPreferredLanguage');
+    if (staffPreferredLanguageEl) staffPreferredLanguageEl.value = 'en';
     // Process dual-language text for form header
     replaceDualLanguageText();
     // Scroll to form
@@ -6928,6 +6948,20 @@ async function loadStaff() {
                 </div>
             `;
         }).join('');
+
+        // Staff page builds markup dynamically with bilingual strings.
+        // Re-apply translation + bilingual normalization after render so the chosen language
+        // actually shows up on the Staff page.
+        try {
+            updateTranslations();
+        } catch (e) {
+            // ignore
+        }
+        try {
+            replaceDualLanguageText();
+        } catch (e) {
+            // ignore
+        }
     } catch (error) {
         console.error('Error loading staff:', error);
         showMessage('Error loading staff / Error al cargar personal', 'error');
@@ -6986,6 +7020,8 @@ async function editStaff(id) {
         if (staffPhoneCarrierEl) staffPhoneCarrierEl.value = staff.phone_carrier || '';
         const staffPayRateEl = document.getElementById('staffPayRate');
         if (staffPayRateEl) staffPayRateEl.value = (staff.pay_rate === null || staff.pay_rate === undefined) ? '' : staff.pay_rate;
+        const staffPreferredLanguageEl = document.getElementById('staffPreferredLanguage');
+        if (staffPreferredLanguageEl) staffPreferredLanguageEl.value = normalizePreferredLanguage(staff.preferred_language);
         const generatedPinEl = document.getElementById('generatedStaffPin');
         if (generatedPinEl) generatedPinEl.value = '';
         elements.staffRole.value = staff.role || 'caregiver';
@@ -7010,6 +7046,8 @@ async function editStaff(id) {
 async function saveStaff(event) {
     event.preventDefault();
 
+    const preferredLanguage = normalizePreferredLanguage(document.getElementById('staffPreferredLanguage')?.value);
+
     const staffData = {
         full_name: document.getElementById('staffFullName').value,
         username: document.getElementById('staffUsername').value,
@@ -7017,6 +7055,7 @@ async function saveStaff(event) {
         phone: document.getElementById('staffPhone').value,
         phone_carrier: document.getElementById('staffPhoneCarrier')?.value || '',
         role: document.getElementById('staffRole').value,
+        preferred_language: preferredLanguage,
         active: document.getElementById('staffActive').checked ? 1 : 0,
         pay_rate: document.getElementById('staffPayRate')?.value || ''
     };
@@ -7069,8 +7108,17 @@ async function saveStaff(event) {
             hideAddStaffForm();
             loadStaff();
         } else {
-            const errorData = await response.json();
-            showMessage(errorData.error || 'Error saving staff / Error al guardar personal', 'error');
+            const responseText = await response.text();
+            let errorMsg = 'Error saving staff / Error al guardar personal';
+            try {
+                const errorData = JSON.parse(responseText);
+                errorMsg = errorData.error || errorData.message || errorMsg;
+            } catch (e) {
+                if (responseText) {
+                    errorMsg = responseText;
+                }
+            }
+            showMessage(errorMsg, 'error');
         }
     } catch (error) {
         console.error('Error saving staff:', error);
@@ -11609,8 +11657,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load language from localStorage if available (but wait for login to use staff preferred_language)
     // Only set language from localStorage if user is not logged in yet
     if (!authToken || !currentStaff) {
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+        const savedLanguage = localStorage.getItem('preferredLanguage');
+        if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
             setLanguage(savedLanguage); // Use setLanguage to ensure replaceDualLanguageText is called
         }
     }

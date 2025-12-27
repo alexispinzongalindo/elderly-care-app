@@ -17,6 +17,16 @@ function safeStorageGet(key) {
     }
 }
 
+function normalizePreferredLanguage(lang) {
+    if (!lang) return 'en';
+    const v = String(lang).trim().toLowerCase();
+    if (v === 'en' || v === 'english' || v === 'en-us' || v === 'en_us') return 'en';
+    if (v === 'es' || v === 'spanish' || v === 'es-pr' || v === 'es_pr') return 'es';
+    if (v.startsWith('en')) return 'en';
+    if (v.startsWith('es')) return 'es';
+    return 'en';
+}
+
 let _regulationsPageBound = false;
 
 function _renderRegulationsDocActions(doc) {
@@ -1298,9 +1308,12 @@ const translations = {
         'staff.edit': 'Edit Staff Member',
         'staff.username': 'Username',
         'staff.fullName': 'Full Name',
-        'staff.role': 'Role',
         'staff.email': 'Email',
         'staff.phone': 'Phone',
+        'staff.preferredLanguage': 'Preferred Language',
+        'staff.language.english': 'English',
+        'staff.language.spanish': 'Spanish',
+        'staff.role': 'Role',
         'staff.password': 'Password',
         'staff.password.placeholder': 'Enter new password',
         'staff.save': 'Save Staff',
@@ -1693,9 +1706,12 @@ const translations = {
         'staff.edit': 'Editar Personal',
         'staff.username': 'Usuario',
         'staff.fullName': 'Nombre Completo',
-        'staff.role': 'Rol',
-        'staff.email': 'Correo Electrónico',
+        'staff.email': 'Correo',
         'staff.phone': 'Teléfono',
+        'staff.preferredLanguage': 'Idioma preferido',
+        'staff.language.english': 'Inglés',
+        'staff.language.spanish': 'Español',
+        'staff.role': 'Rol',
         'staff.password': 'Contraseña',
         'staff.password.placeholder': 'Ingrese nueva contraseña',
         'staff.save': 'Guardar Personal',
@@ -6156,6 +6172,9 @@ async function loadStaff() {
                 '<span class="badge badge-success">Active / Activo</span>' :
                 '<span class="badge badge-danger">Inactive / Inactivo</span>';
 
+            const lang = (staff.preferred_language || 'en').toLowerCase();
+            const langLabel = lang === 'es' ? 'Spanish / Español' : 'English / Inglés';
+
             return `
                 <div class="item-card">
                     <div class="item-header">
@@ -6167,6 +6186,7 @@ async function loadStaff() {
                         <p><strong>Role / Rol:</strong> ${roleLabel}</p>
                         <p><strong>Email:</strong> ${staff.email || 'N/A'}</p>
                         <p><strong>Phone / Teléfono:</strong> ${staff.phone_formatted || formatPhoneNumber(staff.phone) || 'N/A'}</p>
+                        <p><strong>${t('staff.preferredLanguage')}:</strong> ${normalizeBilingualString(langLabel)}</p>
                         <p><strong>Created / Creado:</strong> ${createdDate}</p>
                     </div>
                     <div class="item-actions">
@@ -6232,6 +6252,8 @@ async function editStaff(id) {
         elements.staffPhone.value = staff.phone || '';
         const staffPhoneCarrierEl = document.getElementById('staffPhoneCarrier');
         if (staffPhoneCarrierEl) staffPhoneCarrierEl.value = staff.phone_carrier || '';
+        const staffPreferredLanguageEl = document.getElementById('staffPreferredLanguage');
+        if (staffPreferredLanguageEl) staffPreferredLanguageEl.value = normalizePreferredLanguage(staff.preferred_language);
         const staffPayRateEl = document.getElementById('staffPayRate');
         if (staffPayRateEl) staffPayRateEl.value = (staff.pay_rate === null || staff.pay_rate === undefined) ? '' : staff.pay_rate;
         const generatedPinEl = document.getElementById('generatedStaffPin');
@@ -6258,12 +6280,15 @@ async function editStaff(id) {
 async function saveStaff(event) {
     event.preventDefault();
 
+    const preferredLanguage = normalizePreferredLanguage(document.getElementById('staffPreferredLanguage')?.value);
+
     const staffData = {
         full_name: document.getElementById('staffFullName').value,
         username: document.getElementById('staffUsername').value,
         email: document.getElementById('staffEmail').value,
         phone: document.getElementById('staffPhone').value,
         phone_carrier: document.getElementById('staffPhoneCarrier')?.value || '',
+        preferred_language: preferredLanguage,
         role: document.getElementById('staffRole').value,
         active: document.getElementById('staffActive').checked ? 1 : 0,
         pay_rate: document.getElementById('staffPayRate')?.value || ''
@@ -6317,8 +6342,17 @@ async function saveStaff(event) {
             hideAddStaffForm();
             loadStaff();
         } else {
-            const errorData = await response.json();
-            showMessage(errorData.error || 'Error saving staff / Error al guardar personal', 'error');
+            const responseText = await response.text();
+            let errorMsg = 'Error saving staff / Error al guardar personal';
+            try {
+                const errorData = JSON.parse(responseText);
+                errorMsg = errorData.error || errorData.message || errorMsg;
+            } catch (e) {
+                if (responseText) {
+                    errorMsg = responseText;
+                }
+            }
+            showMessage(errorMsg, 'error');
         }
     } catch (error) {
         console.error('Error saving staff:', error);
