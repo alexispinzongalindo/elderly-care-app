@@ -10839,7 +10839,22 @@ function filterCalendarActivities() {
 }
 
 function displayCalendar(searchTerm = '') {
-    const container = document.getElementById('calendarDisplay');
+    let container = document.getElementById('calendarDisplay');
+    if (!container) {
+        container = document.querySelector('#calendarDisplay')
+            || document.querySelector('#calendar .calendar-container')
+            || document.querySelector('#calendar .form-card + .calendar-container');
+    }
+    if (!container) {
+        const calendarPage = document.getElementById('calendar');
+        if (calendarPage) {
+            const el = document.createElement('div');
+            el.id = 'calendarDisplay';
+            el.className = 'calendar-container';
+            calendarPage.appendChild(el);
+            container = el;
+        }
+    }
     if (!container) return;
 
     const year = currentCalendarYear;
